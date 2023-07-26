@@ -19,5 +19,10 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             ThisVM = new Viewport_ViewModel(mainVM, Viewport);
             DataContext = ThisVM;
         }
+
+        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ThisVM.nextFrame();
+        }
     }
 }

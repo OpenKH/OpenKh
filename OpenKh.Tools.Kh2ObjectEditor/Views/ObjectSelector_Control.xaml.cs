@@ -71,6 +71,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             if (item != null)
             {
                 ThisVM.MainVM.loadObject(new Object_Wrapper(item.FilePath.ToLower(), item.FilePath.ToLower().Replace(".mdlx", ".mset")));
+                ThisVM.MainVM.LoadedMotion = null;
                 //ThisVM.MainVM.LoadedObject = new Object_Wrapper(item.FilePath.ToLower(), item.FilePath.ToLower().Replace(".mdlx",".mset"));
                 Trace.WriteLine("Selected: " + item.FileName);
             }

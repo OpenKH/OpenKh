@@ -7,7 +7,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Classes
         public int Index { get; set; }
         public Bar.Entry Entry { get; set; }
         public string Name { get; set; }
-        public bool IsDummy { get { return Name == "DUMM"; } }
+        public bool IsDummy { get { return Name.Contains("DUMM"); } }
 
         public MotionSelector_Wrapper(int index, Bar.Entry entry)
         {
@@ -15,6 +15,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Classes
             Entry = entry;
             Name = "[" + Index + "] " + Entry.Name + " [" + (MotionSet.MotionName)(index / 4) + "]";
         }
+
 
     }
 }

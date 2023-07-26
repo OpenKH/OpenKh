@@ -1,3 +1,4 @@
+using OpenKh.Tools.Kh2ObjectEditor.Classes;
 using System;
 using System.Windows.Controls;
 
@@ -30,9 +31,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             Subscribe();
         }
 
-        public void applyFilters(string name, bool hasMset)
+        public void applyFilters(string name, bool hideDummies)
         {
-            ThisVM.applyFilters(name, hasMset);
+            ThisVM.applyFilters(name, hideDummies);
         }
 
         private void Button_ApplyFilters(object sender, System.Windows.RoutedEventArgs e)
@@ -42,18 +43,11 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
 
         private void list_doubleCLick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            /*Trace.WriteLine("Clicked - Current count: " + ThisVM.Objects.Count);
-            ObjectSelector_Wrapper iObject = new ObjectSelector_Wrapper();
-            iObject.FileName = "TEST" + ThisVM.Objects.Count;
-            //ThisVM.Objects.Add(iObject);
-
-            ObjectSelector_Wrapper item = (ObjectSelector_Wrapper)(sender as ListView).SelectedItem;
+            MotionSelector_Wrapper item = (MotionSelector_Wrapper)(sender as ListView).SelectedItem;
             if (item != null)
             {
-                ThisVM.MainVM.loadObject(new Object_Wrapper(item.FilePath.ToLower(), item.FilePath.ToLower().Replace(".mdlx", ".mset")));
-                //ThisVM.MainVM.LoadedObject = new Object_Wrapper(item.FilePath.ToLower(), item.FilePath.ToLower().Replace(".mdlx",".mset"));
-                Trace.WriteLine("Selected: " + item.FileName);
-            }*/
+                ThisVM.MainVM.loadMotion(item);
+            }
         }
         // Event load file
         public void Subscribe()

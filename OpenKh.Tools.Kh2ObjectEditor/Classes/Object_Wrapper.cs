@@ -8,9 +8,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Classes
 {
     public class Object_Wrapper
     {
-        string Name { get; set; }
-        string MdlxPath { get; set; }
-        string MsetPath { get; set; }
+        public string Name { get; set; }
+        public string MdlxPath { get; set; }
+        public string MsetPath { get; set; }
 
         public Bar MdlxBar { get; set; }
         public Bar MsetBar { get; set; }

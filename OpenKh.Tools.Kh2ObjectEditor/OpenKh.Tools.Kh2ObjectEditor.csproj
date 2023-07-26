@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+    <ProjectReference Include="..\OpenKh.Research.Kh2Anim\OpenKh.Research.Kh2Anim.csproj" />
     <ProjectReference Include="..\OpenKh.Tools.Common.Wpf\OpenKh.Tools.Common.Wpf.csproj" />
     <ProjectReference Include="..\Simple3DViewport\Simple3DViewport\Simple3DViewport.csproj" />
   </ItemGroup>

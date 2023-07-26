@@ -10,7 +10,7 @@
 
     <DockPanel Background="Red">
         <Grid DockPanel.Dock="Bottom">
-
+            <Button Click="Button_Click">Next frame</Button>
         </Grid>
 
         <S3V:Simple3DViewport_Control Grid.Column="0" x:Name="Viewport"/>
