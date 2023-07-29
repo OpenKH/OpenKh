@@ -8,19 +8,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers.HandyEditorSpec;
+using OpenKh.Kh2;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 {
     public class InitialPoseManagerWindowUsecase : IWindowRunnableProvider
     {
+        private readonly MakeHandyEditorUsecase _makeHandyEditorUsecase;
         private readonly LoadedModel _loadedModel;
         private readonly Settings _settings;
 
         public InitialPoseManagerWindowUsecase(
             Settings settings,
-            LoadedModel loadedModel
+            LoadedModel loadedModel,
+            MakeHandyEditorUsecase makeHandyEditorUsecase
         )
         {
+            _makeHandyEditorUsecase = makeHandyEditorUsecase;
             _loadedModel = loadedModel;
             _settings = settings;
         }
@@ -31,34 +36,65 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             var list = new List<string>();
             var selectedIndex = -1;
 
+            var editors = new List<HandyEditorController>();
+            Motion.InitialPose? pose = null;
+            editors.Add(_makeHandyEditorUsecase.InputInt("BoneId", () => pose!.BoneId, it => pose!.BoneId = (short)it));
+            editors.Add(_makeHandyEditorUsecase.InputInt("Channel", () => pose!.Channel, it => pose!.Channel = (short)it));
+            editors.Add(_makeHandyEditorUsecase.InputFloat("Value", () => pose!.Value, it => pose!.Value = it));
+
             return () =>
             {
                 if (_settings.ViewInitialPose)
                 {
                     ForWindow("InitialPose manager", () =>
                     {
-                        if (age.NeedToCatchUp())
+                        var refresh = false;
+
+                        ForMenuBar(() =>
+                        {
+                            ForMenuItem("Apply", () =>
+                            {
+                                pose = _loadedModel.MotionData!.InitialPoses[selectedIndex];
+                                editors.SaveAll();
+                                refresh = true;
+
+                                _loadedModel.SendBackMotionData.TurnOn();
+                            });
+                        });
+
+                        if (refresh || age.NeedToCatchUp())
                         {
                             list.Clear();
                             list.AddRange(
                                 _loadedModel.MotionData!.InitialPoses
                                     .Select(it => $"{it}")
                             );
-                            selectedIndex = -1;
+
+                            if (!refresh)
+                            {
+                                selectedIndex = -1;
+                            }
                         }
 
-                        if (ImGui.BeginCombo("item", ""))
+                        if (ImGui.BeginCombo("", (selectedIndex == -1) ? "..." : list[selectedIndex]))
                         {
                             foreach (var (one, index) in list.SelectWithIndex())
                             {
                                 if (ImGui.Selectable(one, selectedIndex == index))
                                 {
                                     selectedIndex = index;
+
+                                    pose = _loadedModel.MotionData!.InitialPoses[selectedIndex];
+                                    editors.LoadAll();
                                 }
                             }
                             ImGui.EndCombo();
                         }
-                    });
+
+                        editors.RenderAll();
+                    },
+                        menuBar: true
+                    );
                 }
             };
         }

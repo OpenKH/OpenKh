@@ -25,6 +25,20 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             );
         }
 
+        public HandyEditorController InputFloat(string label, Func<float> onLoad, Action<float> onSave)
+        {
+            float value = default;
+
+            return new HandyEditorController(
+                () => value = onLoad(),
+                () =>
+                {
+                    ImGui.InputFloat(label, ref value);
+                },
+                () => onSave(value)
+            );
+        }
+
         public HandyEditorController ForEdit3(string label, Func<Vector3> onLoad, Action<Vector3> onSave, float speed = 1f)
         {
             Vector3 value = default;
