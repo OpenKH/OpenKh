@@ -45,8 +45,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
         public List<JointDescription> IKJointDescriptions { get; set; } = new List<JointDescription>();
         public AgeManager JointDescriptionsAge { get; set; } = new AgeManager();
 
-        public IEnumerable<BoneElement>? ActiveFkBoneViews { get; set; }
-        public IEnumerable<BoneElement>? ActiveIkBoneViews { get; set; }
+        public Func<IEnumerable<BoneElement>>? GetActiveFkBoneViews { get; set; }
+        public Func<IEnumerable<BoneElement>>? GetActiveIkBoneViews { get; set; }
 
         public int SelectedJointIndex { get; set; } = -1;
         public AgeManager SelectedJointIndexAge { get; set; } = new AgeManager();
@@ -62,5 +62,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
         /// FK bones, read only, you cannot edit
         /// </summary>
         public List<Mdlx.Bone> InternalFkBones { get; set; } = new List<Mdlx.Bone>();
+
+        public AgeManager Kh2PresetsAge { get; set; } = new AgeManager();
     }
 }

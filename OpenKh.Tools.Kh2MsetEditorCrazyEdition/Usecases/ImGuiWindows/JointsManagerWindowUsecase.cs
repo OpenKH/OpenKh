@@ -35,24 +35,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
         {
             var jointAge = _loadedModel.JointDescriptionsAge.Branch().MarkDirty();
             var jointDefs = new List<JointDef>();
-
-            string FindFkJointName(int index)
-            {
-                return _loadedModel.ActiveFkBoneViews?
-                    .LastOrDefault(
-                        it => it.I == index
-                    )?
-                    .Name ?? "";
-            }
-
-            string FindIkJointName(int absIndex)
-            {
-                return _loadedModel.ActiveIkBoneViews?
-                    .LastOrDefault(
-                        it => it.I == absIndex
-                    )?
-                    .Name ?? "";
-            }
+            var configAge = _loadedModel.Kh2PresetsAge.Branch().MarkDirty();
 
             return () =>
             {
@@ -60,8 +43,29 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                 {
                     ForWindow("Joints manager", () =>
                     {
-                        if (jointAge.NeedToCatchUp())
+                        if (jointAge.NeedToCatchUpAnyOf(configAge))
                         {
+                            var fkView = _loadedModel.GetActiveFkBoneViews?.Invoke();
+                            var ikView = _loadedModel.GetActiveIkBoneViews?.Invoke();
+
+                            string FindFkJointName(int index)
+                            {
+                                return fkView?
+                                    .LastOrDefault(
+                                        it => it.I == index
+                                    )?
+                                    .Name ?? "";
+                            }
+
+                            string FindIkJointName(int absIndex)
+                            {
+                                return ikView?
+                                    .LastOrDefault(
+                                        it => it.I == absIndex
+                                    )?
+                                    .Name ?? "";
+                            }
+
                             jointDefs.Clear();
                             jointDefs.AddRange(
                                 _loadedModel.FKJointDescriptions

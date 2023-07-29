@@ -16,17 +16,14 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 {
     public class LoadMotionDataUsecase
     {
-        private readonly BoneDictElement _boneDictElement;
         private readonly FilterBoneViewUsecase _filterBoneViewUsecase;
         private readonly LoadedModel _loadedModel;
 
         public LoadMotionDataUsecase(
             LoadedModel loadedModel,
-            FilterBoneViewUsecase filterBoneViewUsecase,
-            BoneDictElement boneDictElement
+            FilterBoneViewUsecase filterBoneViewUsecase
         )
         {
-            _boneDictElement = boneDictElement;
             _filterBoneViewUsecase = filterBoneViewUsecase;
             _loadedModel = loadedModel;
         }
@@ -50,9 +47,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             );
             _loadedModel.JointDescriptionsAge.Bump();
 
-            _loadedModel.ActiveIkBoneViews = _filterBoneViewUsecase
+            _loadedModel.GetActiveIkBoneViews = () => _filterBoneViewUsecase
                 .Filter(
-                    _boneDictElement.BoneView,
                     _loadedModel.MotionList[index].BoneViewMatcher
                 );
 

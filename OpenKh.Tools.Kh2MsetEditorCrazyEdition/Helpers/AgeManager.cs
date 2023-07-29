@@ -36,6 +36,19 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
             return _age != _parent!._age;
         }
 
+        public bool NeedToCatchUpAnyOf(params AgeManager[] ageManagers)
+        {
+            var dirty = NeedToCatchUp();
+            foreach (var ageManager in ageManagers)
+            {
+                if (ageManager.NeedToCatchUp())
+                {
+                    dirty = true;
+                }
+            }
+            return dirty;
+        }
+
         public bool NeedToCatchUp()
         {
             if (IsDirty())

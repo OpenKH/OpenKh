@@ -35,6 +35,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
         {
             Directory.CreateDirectory(ConfigDir);
 
+            IEnumerable<MdlxMsetPreset> mdlxMsetPresets = new MdlxMsetPreset[0];
+            BoneDictElement boneDict = new BoneDictElement();
+
             self.AddSingleton<GetGamePathUsecase>(
                 sp => () => GamePath
             );
@@ -54,7 +57,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<GenerateXsdUsecase>();
             self.AddSingleton<LoadXmlUsecase>();
             self.AddSingleton<FilterBoneViewUsecase>();
-            
 
 
 
@@ -105,26 +107,37 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
                     }
             );
 
-            self.AddSingleton(
+            self.AddSingleton<GetMdlxMsetPresets>(
                 sp =>
-                {
-                    return sp.GetRequiredService<LoadXmlUsecase>()
-                        .LoadXmlOrCreateNewOne<MdlxMsetPresets>(
-                            Path.Combine(ConfigDir, "Presets.xml"),
-                            Path.Combine(ConfigDir, "Presets.xsd")
-                        );
-                }
+                    () =>
+                        mdlxMsetPresets
             );
 
-            self.AddSingleton(
+            self.AddSingleton<GetBoneDictElementUsecase>(
                 sp =>
-                {
-                    return sp.GetRequiredService<LoadXmlUsecase>()
-                        .LoadXmlOrCreateNewOne<BoneDictElement>(
-                            Path.Combine(ConfigDir, "BoneDict.xml"),
-                            Path.Combine(ConfigDir, "BoneDict.xsd")
-                        );
-                }
+                    () =>
+                        boneDict
+            );
+
+            self.AddSingleton<ReloadKh2PresetsUsecase>(
+                sp =>
+                    () =>
+                    {
+                        mdlxMsetPresets = sp.GetRequiredService<LoadXmlUsecase>()
+                            .LoadXmlOrCreateNewOne<MdlxMsetPresets>(
+                                Path.Combine(ConfigDir, "Presets.xml"),
+                                Path.Combine(ConfigDir, "Presets.xsd")
+                            )
+                            .GetPresets();
+
+                        boneDict = sp.GetRequiredService<LoadXmlUsecase>()
+                            .LoadXmlOrCreateNewOne<BoneDictElement>(
+                                Path.Combine(ConfigDir, "BoneDict.xml"),
+                                Path.Combine(ConfigDir, "BoneDict.xsd")
+                            );
+
+                        sp.GetRequiredService<LoadedModel>().Kh2PresetsAge.Bump();
+                    }
             );
 
             self.AddSingleton(

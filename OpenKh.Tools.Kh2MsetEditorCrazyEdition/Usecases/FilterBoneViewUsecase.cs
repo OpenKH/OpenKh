@@ -9,8 +9,16 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 {
     public class FilterBoneViewUsecase
     {
+        private readonly GetBoneDictElementUsecase _getBoneDictElementUsecase;
+
+        public FilterBoneViewUsecase(
+            GetBoneDictElementUsecase getBoneDictElementUsecase
+        )
+        {
+            _getBoneDictElementUsecase = getBoneDictElementUsecase;
+        }
+
         public IEnumerable<BoneElement> Filter(
-            IEnumerable<BoneViewElement>? views,
             IEnumerable<string> tokens
         )
         {
@@ -42,7 +50,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                 }
             }
 
-            return (views ?? new BoneViewElement[0])
+            return (_getBoneDictElementUsecase().BoneView ?? new BoneViewElement[0])
                 .Where(view => IsMatch(view.Match))
                 .SelectMany(
                     view => view.Bone ?? Enumerable.Empty<BoneElement>()

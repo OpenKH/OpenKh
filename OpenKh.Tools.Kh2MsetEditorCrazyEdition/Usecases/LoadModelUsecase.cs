@@ -20,12 +20,10 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
         private readonly LoadMotionUsecase _loadMotionUsecase;
         private readonly LoadMotionDataUsecase _loadMotionDataUsecase;
         private readonly FilterBoneViewUsecase _filterBoneViewUsecase;
-        private readonly BoneDictElement _boneDictElement;
         private readonly LoadedModel _loadedModel;
 
         public LoadModelUsecase(
             LoadedModel loadedModel,
-            BoneDictElement boneDictElement,
             FilterBoneViewUsecase filterBoneViewUsecase,
             LoadMotionDataUsecase loadMotionDataUsecase,
             LoadMotionUsecase loadMotionUsecase
@@ -34,7 +32,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             _loadMotionUsecase = loadMotionUsecase;
             _loadMotionDataUsecase = loadMotionDataUsecase;
             _filterBoneViewUsecase = filterBoneViewUsecase;
-            _boneDictElement = boneDictElement;
             _loadedModel = loadedModel;
         }
 
@@ -59,9 +56,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             var modelMotionAttachable = MeshLoader.FromKH2(model);
             var tpose = modelMotionAttachable.MeshDescriptors;
 
-            _loadedModel.ActiveFkBoneViews = _filterBoneViewUsecase
+            _loadedModel.GetActiveFkBoneViews = () => _filterBoneViewUsecase
                 .Filter(
-                    _boneDictElement.BoneView,
                     new string[] { Path.GetFileNameWithoutExtension(mdlxFile) }
                 );
 

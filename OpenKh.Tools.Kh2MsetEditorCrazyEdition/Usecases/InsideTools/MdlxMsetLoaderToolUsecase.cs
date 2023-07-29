@@ -18,6 +18,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
 {
     public class MdlxMsetLoaderToolUsecase : IToolRunnableProvider
     {
+        private readonly GetMdlxMsetPresets _getMdlxMsetPresets;
         private readonly LayoutOnMultiColumnsUsecase _layoutOnMultiColumnsUsecase;
         private readonly LoadMotionDataUsecase _loadMotionDataUsecase;
         private readonly LoadMotionUsecase _loadMotionUsecase;
@@ -25,19 +26,19 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
         private readonly PrintActionResultUsecase _printActionResultUsecase;
         private readonly LoadModelUsecase _loadModelUsecase;
         private readonly LoadedModel _loadedModel;
-        private readonly MdlxMsetPresets _mdlxMsetPresets;
 
         public MdlxMsetLoaderToolUsecase(
-            MdlxMsetPresets mdlxMsetPresets,
             LoadedModel loadedModel,
             LoadModelUsecase loadModelUsecase,
             PrintActionResultUsecase printActionResultUsecase,
             ManageKingdomTextureUsecase manageKingdomTextureUsecase,
             LoadMotionUsecase loadMotionUsecase,
             LoadMotionDataUsecase loadMotionDataUsecase,
-            LayoutOnMultiColumnsUsecase layoutOnMultiColumnsUsecase
+            LayoutOnMultiColumnsUsecase layoutOnMultiColumnsUsecase,
+            GetMdlxMsetPresets getMdlxMsetPresets
         )
         {
+            _getMdlxMsetPresets = getMdlxMsetPresets;
             _layoutOnMultiColumnsUsecase = layoutOnMultiColumnsUsecase;
             _loadMotionDataUsecase = loadMotionDataUsecase;
             _loadMotionUsecase = loadMotionUsecase;
@@ -45,7 +46,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
             _printActionResultUsecase = printActionResultUsecase;
             _loadModelUsecase = loadModelUsecase;
             _loadedModel = loadedModel;
-            _mdlxMsetPresets = mdlxMsetPresets;
         }
 
         public Action CreateToolRunnable()
@@ -53,7 +53,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
             string? mdlxFile = "";
             string? msetFile = "";
             int presetSelectedIndex = -1;
-            var presets = _mdlxMsetPresets.GetPresets();
             ActionResult mdlxResult = new ActionResult(ActionResultType.NotRun, "");
             var selectMotionVisible = false;
             var selectMotionCaption = "Select motion##motionSelector";
@@ -86,6 +85,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
                     var autoLoadOnce = false;
                     string? defaultMotionOnce = null;
 
+                    var presets = _getMdlxMsetPresets();
+
                     if (presets.Any())
                     {
                         if (ImGui.BeginCombo(
@@ -99,7 +100,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
                             )
                         )
                         {
-                            foreach (var (one, index) in _mdlxMsetPresets.GetPresets().SelectWithIndex())
+                            foreach (var (one, index) in presets.SelectWithIndex())
                             {
                                 if (ImGui.Selectable(one.Label, index == presetSelectedIndex))
                                 {

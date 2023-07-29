@@ -8,6 +8,7 @@ using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Interfaces;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools.Old;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Windows;
 using System;
@@ -41,6 +42,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             .AddAllFiles();
 
         private readonly Vector4 BgUiColor = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
+        private readonly ReloadKh2PresetsUsecase _reloadKh2PresetsUsecase;
         private readonly Settings _settings;
         private readonly Action[] _windowRunnables;
         private readonly Action _motionLoaderTool;
@@ -121,11 +123,14 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             RenderModelUsecase modelRenderer,
             MotionLoaderToolUsecase motionLoaderToolUsecase,
             IEnumerable<IWindowRunnableProvider> windowRunnables,
-            Settings settings
+            Settings settings,
+            ReloadKh2PresetsUsecase reloadKh2PresetsUsecase
         )
         {
             var gamePath = getGamePathUsecase();
 
+            _reloadKh2PresetsUsecase = reloadKh2PresetsUsecase;
+            _reloadKh2PresetsUsecase();
             _settings = settings;
             _windowRunnables = windowRunnables
                 .Select(one => one.CreateWindowRunnable())
@@ -297,6 +302,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                         ForEdit("Movement speed", () => EditorSettings.MoveSpeed, x => EditorSettings.MoveSpeed = x);
                         ForEdit("Movement speed (shift)", () => EditorSettings.MoveSpeedShift, x => EditorSettings.MoveSpeedShift = x);
                     });
+                    ImGui.Separator();
+                    ForMenuItem("Reload Kh2Presets", () => _reloadKh2PresetsUsecase());
                     ImGui.Separator();
                     ForMenuItem("Exit", MenuFileExit);
                 });
