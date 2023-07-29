@@ -3,6 +3,7 @@ using OpenKh.Common.Utils;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using System.Reflection;
 using Xe.BinaryMapper;
 using static OpenKh.Kh2.Models.ModelCommon;
 
@@ -271,6 +272,14 @@ namespace OpenKh.Kh2.Models
 
             // Generates the mesh
             return GetSkeletalMeshFromVpuGroup(vpuGroup, boneMatrices);
+        }
+
+        public void recalculateMeshes()
+        {
+            foreach (SkeletalGroup group in Groups)
+            {
+                group.Mesh = getMeshFromGroup(group, GetBoneMatrices(Bones));
+            }
         }
 
         //----------------------------

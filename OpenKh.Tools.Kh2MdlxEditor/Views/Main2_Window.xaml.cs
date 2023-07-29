@@ -79,6 +79,10 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         {
             reloadModelControl();
         }
+        private void Side_ModelBones(object sender, EventArgs e)
+        {
+            contentFrame.Content = new ModelBones_Control(mainVM.ModelFile);
+        }
         private void Side_Texture(object sender, EventArgs e)
         {
             contentFrame.Content = new TextureFile_Control(mainVM.TextureFile);

@@ -20,6 +20,10 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         public Model_Control(ModelSkeletal modelFile, ModelTexture textureFile, ModelCollision? collisionFile = null)
         {
             InitializeComponent();
+
+            // Recalc meshes
+            modelFile.recalculateMeshes();
+
             modelControlModel = new Model_VM(modelFile, textureFile, collisionFile);
             DataContext = modelControlModel;
             List<GeometryModel3D> geometry = new List<GeometryModel3D>();

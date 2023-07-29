@@ -36,7 +36,7 @@
             <!-- Side menu -->
             <StackPanel Grid.Column="1" Background="#2d2d2d">
                 <!-- Model -->
-                <Image x:Name="sideModel" Visibility="Collapsed" Height="50" Source="../Assets/IconModelW.png" MouseLeftButtonUp="Side_Model"></Image>
+                <Image x:Name="sideModel" Visibility="Collapsed" Height="50" Source="../Assets/IconModelW.png" MouseLeftButtonUp="Side_Model" MouseRightButtonUp="Side_ModelBones"></Image>
                 <!-- Texture -->
                 <Image x:Name="sideTexture" Visibility="Collapsed" Height="50" Source="../Assets/IconTextureW.png" MouseLeftButtonUp="Side_Texture"></Image>
                 <!-- Collision -->
