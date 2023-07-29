@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 {
-    public class BigOnePopupUsecase
+    public class BigOneSelectorPopupUsecase
     {
         private readonly LayoutOnMultiColumnsUsecase _layoutOnMultiColumnsUsecase;
 
-        public BigOnePopupUsecase(
+        public BigOneSelectorPopupUsecase(
             LayoutOnMultiColumnsUsecase layoutOnMultiColumnsUsecase
         )
         {

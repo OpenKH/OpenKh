@@ -15,22 +15,22 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 {
     public class InitialPoseManagerWindowUsecase : IWindowRunnableProvider
     {
+        private readonly EditCollectionNoErrorUsecase _editCollectionNoErrorUsecase;
+        private readonly ErrorMessages _errorMessages;
         private readonly string _popupCaption;
-        private readonly BigOnePopupUsecase _bigOnePopupUsecase;
-        private readonly MakeHandyEditorUsecase _makeHandyEditorUsecase;
         private readonly LoadedModel _loadedModel;
         private readonly Settings _settings;
 
         public InitialPoseManagerWindowUsecase(
             Settings settings,
             LoadedModel loadedModel,
-            MakeHandyEditorUsecase makeHandyEditorUsecase,
-            BigOnePopupUsecase bigOnePopupUsecase
+            ErrorMessages errorMessages,
+            EditCollectionNoErrorUsecase editCollectionNoErrorUsecase
         )
         {
+            _editCollectionNoErrorUsecase = editCollectionNoErrorUsecase;
+            _errorMessages = errorMessages;
             _popupCaption = "Select initialPose";
-            _bigOnePopupUsecase = bigOnePopupUsecase;
-            _makeHandyEditorUsecase = makeHandyEditorUsecase;
             _loadedModel = loadedModel;
             _settings = settings;
         }
@@ -40,14 +40,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             var age = _loadedModel.JointDescriptionsAge.Branch(false);
             var list = new List<string>();
             var selectedIndex = -1;
-
-            var editors = new List<HandyEditorController>();
-            Motion.InitialPose? pose = null;
-            editors.Add(_makeHandyEditorUsecase.InputInt("BoneId", () => pose!.BoneId, it => pose!.BoneId = (short)it));
-            editors.Add(_makeHandyEditorUsecase.InputInt("Channel", () => pose!.Channel, it => pose!.Channel = (short)it));
-            editors.Add(_makeHandyEditorUsecase.InputFloat("Value", () => pose!.Value, it => pose!.Value = it));
-
-            var popup = _bigOnePopupUsecase.Popup<string>(_popupCaption, 150);
+            var nextTimeRefresh = new OneTimeOn(false);
 
             return () =>
             {
@@ -55,57 +48,85 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                 {
                     ForWindow("InitialPose manager", () =>
                     {
-                        var refresh = false;
+                        var sourceList = _loadedModel.MotionData?.InitialPoses;
+
+                        var saved = false;
 
                         ForMenuBar(() =>
                         {
-                            ForMenuItem("Apply", () =>
+                            ForMenuItem("Insert", () =>
                             {
-                                if (selectedIndex != -1)
+                                saved = _editCollectionNoErrorUsecase.InsertAt(sourceList, selectedIndex, new Motion.InitialPose());
+                            });
+                            ForMenuItem("Append", () =>
+                            {
+                                if (saved = _editCollectionNoErrorUsecase.Append(sourceList, new Motion.InitialPose()))
                                 {
-                                    pose = _loadedModel.MotionData!.InitialPoses[selectedIndex];
-                                    editors.SaveAll();
-                                    refresh = true;
-
-                                    _loadedModel.SendBackMotionData.TurnOn();
+                                    selectedIndex = sourceList!.Count - 1;
                                 }
+                            });
+                            ForMenuItem("Delete", () =>
+                            {
+                                saved = _editCollectionNoErrorUsecase.DeleteAt(sourceList, selectedIndex);
                             });
                         });
 
-                        if (refresh || age.NeedToCatchUp())
+                        if (saved | nextTimeRefresh.Consume() | age.NeedToCatchUp())
                         {
-                            list.Clear();
-                            list.AddRange(
-                                _loadedModel.MotionData!.InitialPoses
-                                    .Select(it => $"{it}")
-                            );
-
-                            if (!refresh)
+                            try
                             {
-                                selectedIndex = -1;
+                                list.Clear();
+                                list.AddRange(
+                                    sourceList!
+                                        .Select(it => $"{it}")
+                                );
+                            }
+                            catch (Exception ex)
+                            {
+                                _errorMessages.Add(new Exception("InitialPoses has error of ToString().", ex));
                             }
                         }
 
-                        if (ImGui.Button((selectedIndex == -1) ? "..." : list[selectedIndex]))
+                        if (list.Any())
                         {
-                            ImGui.OpenPopup(_popupCaption);
-                        }
-
-                        popup(
-                            list,
-                            (item, index) =>
+                            if (ImGui.DragInt("index", ref selectedIndex, 0.2f, 0, list.Count - 1))
                             {
-                                if (ImGui.Selectable(item, selectedIndex == index))
+
+                            }
+
+                            if (ImGui.BeginCombo($"InitialPose", list.GetAtOrNull(selectedIndex) ?? "..."))
+                            {
+                                foreach (var (item, index) in list.SelectWithIndex())
                                 {
-                                    selectedIndex = index;
-
-                                    pose = _loadedModel.MotionData!.InitialPoses[selectedIndex];
-                                    editors.LoadAll();
+                                    if (ImGui.Selectable(list[index], index == selectedIndex))
+                                    {
+                                        selectedIndex = index;
+                                    }
                                 }
+                                ImGui.EndCombo();
                             }
-                        );
 
-                        editors.RenderAll();
+                            if (_loadedModel.MotionData?.InitialPoses.GetAtOrNull(selectedIndex) is Motion.InitialPose pose)
+                            {
+                                ForEdit("BoneId", () => pose.BoneId, it => { pose.BoneId = it; saved = true; });
+                                ForEdit("Channel", () => pose.Channel, it => { pose.Channel = (short)Math.Max(0, Math.Min(8, it)); saved = true; });
+                                ForEdit("Value", () => pose.Value, it => { pose.Value = it; saved = true; });
+                            }
+                            else
+                            {
+                                ImGui.Text("(Editor will appear after selection)");
+                            }
+                        }
+                        else
+                        {
+                            ImGui.Text("(Collection is empty)");
+                        }
+
+                        if (saved)
+                        {
+                            nextTimeRefresh.TurnOn();
+                            _loadedModel.SendBackMotionData.TurnOn();
+                        }
                     },
                         menuBar: true
                     );

@@ -18,7 +18,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
         )
         {
             int cx = (int)Math.Floor(windowSize.X / Math.Max(1, columnWidth));
-            int cy = (int)(windowSize.Y / Math.Max(1, rowHeight));
+            int cy = (int)((numItems + cx - 1) / cx);
 
             var cells = new List<MultiColumnsLayouted.Cell>();
 
@@ -27,7 +27,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                 for (int x = 0; x < cx; x++)
                 {
                     var index = cy * x + y;
-                    if (numItems == 0 || index < numItems)
+                    if (index < numItems)
                     {
                         cells.Add(new MultiColumnsLayouted.Cell(x, y, index));
                     }
