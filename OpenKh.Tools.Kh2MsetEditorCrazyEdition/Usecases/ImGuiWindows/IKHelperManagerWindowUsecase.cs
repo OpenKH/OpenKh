@@ -41,6 +41,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
         public Action CreateWindowRunnable()
         {
             var jointAge = _loadedModel.SelectedJointIndexAge.Branch(true);
+            var msetAge = _loadedModel.JointDescriptionsAge.Branch(false);
 
             var editor = EditorType.No;
             var jointIndex = 0;
@@ -57,7 +58,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 
             return () =>
             {
-                if (jointAge.NeedToCatchUp())
+                if (jointAge.NeedToCatchUpAnyOf(msetAge))
                 {
                     // load
 
