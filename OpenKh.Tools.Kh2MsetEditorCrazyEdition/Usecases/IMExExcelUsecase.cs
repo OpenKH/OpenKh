@@ -95,6 +95,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                 "FCurveKeys",
                 root.FCurveKeys,
                 sheetDef => sheetDef
+                    .Column(nameof(Motion.Key.Type), (row, cell) => cell.SetCellValue((double)row.Type), (row, cell) => row.Type = (Motion.Interpolation)cell.NumericCellValue)
+                    .Column(nameof(Motion.Key.Time), (row, cell) => cell.SetCellValue(row.Time), (row, cell) => row.Time = (short)cell.NumericCellValue)
+
                     .Column(nameof(Motion.Key.ValueId), (row, cell) => cell.SetCellValue(row.ValueId), (row, cell) => row.ValueId = (short)cell.NumericCellValue)
                     .Column(nameof(Motion.Key.LeftTangentId), (row, cell) => cell.SetCellValue(row.LeftTangentId), (row, cell) => row.LeftTangentId = (short)cell.NumericCellValue)
                     .Column(nameof(Motion.Key.RightTangentId), (row, cell) => cell.SetCellValue(row.RightTangentId), (row, cell) => row.RightTangentId = (short)cell.NumericCellValue)

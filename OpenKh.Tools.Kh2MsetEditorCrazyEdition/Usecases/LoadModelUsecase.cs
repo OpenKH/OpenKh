@@ -42,6 +42,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             _loadedModel.MdlxEntries = File.OpenRead(mdlxFile).Using(Bar.Read);
             _loadedModel.MdlxBytes = File.ReadAllBytes(mdlxFile);
 
+            _loadedModel.MdlxFile = mdlxFile;
+
             var barEntries = _loadedModel.MdlxEntries!;
 
             var model = Mdlx.Read(

@@ -78,7 +78,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                 var motionEntry = barEntries.Single(it => it.Type == Bar.EntryType.Motion);
                 _loadedModel.MotionData = GetCacheOrLoad(motionEntry);
 
-                _loadedModel.PreferredMotionExportXlsx = $"{Path.GetFileNameWithoutExtension(_loadedModel.MsetFile)}_{motionEntry.Name}.xlsx";
+                _loadedModel.PreferredMotionExportXlsx = (_loadedModel.MsetFile != null)
+                    ? $"{Path.GetFileNameWithoutExtension(_loadedModel.MsetFile)}_{motionEntry.Name}.xlsx"
+                    : $"{Path.GetFileNameWithoutExtension(_loadedModel.MdlxFile!)}_{Path.GetFileNameWithoutExtension(_loadedModel.AnbFile)}.xlsx";
 
                 _loadedModel.IKJointDescriptions.Clear();
                 _loadedModel.IKJointDescriptions.AddRange(

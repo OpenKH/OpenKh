@@ -66,6 +66,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
         public AgeManager Kh2PresetsAge { get; set; } = new AgeManager();
 
         public string? PreferredMotionExportXlsx { get; set; }
+        public string? MdlxFile { get; set; }
         public string? MsetFile { get; set; }
         public string? AnbFile { get; set; }
     }
