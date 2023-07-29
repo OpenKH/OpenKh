@@ -54,11 +54,14 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         {
                             ForMenuItem("Apply", () =>
                             {
-                                pose = _loadedModel.MotionData!.InitialPoses[selectedIndex];
-                                editors.SaveAll();
-                                refresh = true;
+                                if (selectedIndex != -1)
+                                {
+                                    pose = _loadedModel.MotionData!.InitialPoses[selectedIndex];
+                                    editors.SaveAll();
+                                    refresh = true;
 
-                                _loadedModel.SendBackMotionData.TurnOn();
+                                    _loadedModel.SendBackMotionData.TurnOn();
+                                }
                             });
                         });
 
