@@ -90,6 +90,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 
                     ImGui.EndPopup();
                 }
+                else
+                {
+                    // closed by user with X button, or already invisible
+                    _errorMessages.Clear();
+                }
             };
         }
     }
