@@ -28,65 +28,136 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             _loadedModel = loadedModel;
         }
 
-        internal void LoadAt(int index)
+        internal UpdateMotionData LoadAt(int index)
         {
-            var barEntries = _loadedModel.AnbEntries = Bar.Read(
-                _loadedModel.MsetEntries![index].Stream
-                    .FromBegin()
-            );
+            Bar barEntries;
+            Action? saveAndReload = null;
 
-            var motionEntry = barEntries.Single(it => it.Type == Bar.EntryType.Motion);
-            _loadedModel.MotionData = GetCacheOrLoad(motionEntry);
-
-            _loadedModel.PreferredMotionExportXlsx = $"{Path.GetFileNameWithoutExtension(_loadedModel.MsetFile)}_{motionEntry.Name}.xlsx";
-
-            _loadedModel.IKJointDescriptions.Clear();
-            _loadedModel.IKJointDescriptions.AddRange(
-                ConvertBones(
-                    _loadedModel.MotionData.IKHelpers,
-                    _loadedModel.FKJointDescriptions.Count
-                )
-            );
-            _loadedModel.JointDescriptionsAge.Bump();
-
-            _loadedModel.GetActiveIkBoneViews = () => _filterBoneViewUsecase
-                .Filter(
-                    _loadedModel.MotionList[index].BoneViewMatcher
-                );
-
+            void Reload()
             {
-                _loadedModel.PoseProvider = null;
-
-                var anbIndir = new AnbIndir(barEntries);
-                if (anbIndir.HasAnimationData)
+                if (_loadedModel.AnbEntries != null)
                 {
-                    var provider = anbIndir.GetAnimProvider(
-                        new MemoryStream(_loadedModel.MdlxBytes!, false)
-                    );
+                    // source is anb file
+                    barEntries = _loadedModel.AnbEntries;
 
-                    _loadedModel.FramePerSecond = provider.FramePerSecond;
-                    _loadedModel.FrameEnd = provider.FrameEnd;
-
-                    var lastFrameTime = float.MinValue;
-                    Matrix4x4[]? lastPose = null;
-
-                    _loadedModel.PoseProvider = frameTime =>
+                    saveAndReload = () =>
                     {
-                        if (lastFrameTime == frameTime)
-                        {
-                            return lastPose!;
-                        }
-                        else
-                        {
-                            provider.ResetGameTimeDelta();
-                            var pose = provider.ProvideMatrices(frameTime);
-                            lastFrameTime = frameTime;
-                            lastPose = pose;
-                            return pose;
-                        }
+                        _loadedModel.AnbEntries = AddOrReplaceBarEntry(
+                            _loadedModel.AnbEntries,
+                            Bar.EntryType.Motion,
+                            _loadedModel.MotionData!.toStream().FromBegin()
+                        );
                     };
                 }
+                else
+                {
+                    // source is mset file
+                    barEntries = Bar.Read(
+                        _loadedModel.MsetEntries![index].Stream
+                            .FromBegin()
+                    );
+
+                    saveAndReload = () =>
+                    {
+                        var subBarStream = _loadedModel.MsetEntries![index].Stream;
+                        subBarStream.SetLength(0);
+
+                        Bar.Write(
+                            subBarStream,
+                            AddOrReplaceBarEntry(
+                                barEntries,
+                                Bar.EntryType.Motion,
+                                _loadedModel.MotionData!.toStream()
+                            )
+                        );
+
+                        subBarStream.FromBegin();
+                    };
+                }
+
+                var motionEntry = barEntries.Single(it => it.Type == Bar.EntryType.Motion);
+                _loadedModel.MotionData = GetCacheOrLoad(motionEntry);
+
+                _loadedModel.PreferredMotionExportXlsx = $"{Path.GetFileNameWithoutExtension(_loadedModel.MsetFile)}_{motionEntry.Name}.xlsx";
+
+                _loadedModel.IKJointDescriptions.Clear();
+                _loadedModel.IKJointDescriptions.AddRange(
+                    ConvertBones(
+                        _loadedModel.MotionData!.IKHelpers,
+                        _loadedModel.FKJointDescriptions.Count
+                    )
+                );
+                _loadedModel.JointDescriptionsAge.Bump();
+
+                _loadedModel.GetActiveIkBoneViews = () => _filterBoneViewUsecase
+                    .Filter(
+                        _loadedModel.MotionList[index].BoneViewMatcher
+                    );
+
+                {
+                    _loadedModel.PoseProvider = null;
+
+                    var anbIndir = new AnbIndir(barEntries);
+                    if (anbIndir.HasAnimationData)
+                    {
+                        var provider = anbIndir.GetAnimProvider(
+                            new MemoryStream(_loadedModel.MdlxBytes!, false)
+                        );
+
+                        _loadedModel.FramePerSecond = provider.FramePerSecond;
+                        _loadedModel.FrameEnd = provider.FrameEnd;
+
+                        var lastFrameTime = float.MinValue;
+                        Matrix4x4[]? lastPose = null;
+
+                        _loadedModel.PoseProvider = frameTime =>
+                        {
+                            if (lastFrameTime == frameTime)
+                            {
+                                return lastPose!;
+                            }
+                            else
+                            {
+                                provider.ResetGameTimeDelta();
+                                var pose = provider.ProvideMatrices(frameTime);
+                                lastFrameTime = frameTime;
+                                lastPose = pose;
+                                return pose;
+                            }
+                        };
+                    }
+                }
             }
+
+            Reload();
+
+            return new UpdateMotionData(
+                () =>
+                {
+                    saveAndReload!();
+                    Reload();
+                }
+            );
+        }
+
+        private Bar AddOrReplaceBarEntry(Bar entries, Bar.EntryType type, Stream stream)
+        {
+            if (entries.SingleOrDefault(it => it.Type == type) is Bar.Entry found)
+            {
+                found.Stream = stream;
+            }
+            else
+            {
+                entries.Add(
+                    new Bar.Entry
+                    {
+                        Name = "xxxx",
+                        Stream = stream,
+                        Type = type,
+                    }
+                );
+            }
+            return entries;
         }
 
         private InterpolatedMotion GetCacheOrLoad(Bar.Entry motionEntry)

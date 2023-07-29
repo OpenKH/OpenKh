@@ -11,6 +11,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 using static OpenKh.Tools.Kh2MsetEditorCrazyEdition.ImGuiExHelpers;
 
@@ -18,6 +19,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
 {
     public class MdlxMsetLoaderToolUsecase : IToolRunnableProvider
     {
+        private readonly SearchForKh2AssetFileUsecase _searchForKh2AssetFileUsecase;
         private readonly GetMdlxMsetPresets _getMdlxMsetPresets;
         private readonly LayoutOnMultiColumnsUsecase _layoutOnMultiColumnsUsecase;
         private readonly LoadMotionDataUsecase _loadMotionDataUsecase;
@@ -35,9 +37,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
             LoadMotionUsecase loadMotionUsecase,
             LoadMotionDataUsecase loadMotionDataUsecase,
             LayoutOnMultiColumnsUsecase layoutOnMultiColumnsUsecase,
-            GetMdlxMsetPresets getMdlxMsetPresets
+            GetMdlxMsetPresets getMdlxMsetPresets,
+            SearchForKh2AssetFileUsecase searchForKh2AssetFileUsecase
         )
         {
+            _searchForKh2AssetFileUsecase = searchForKh2AssetFileUsecase;
             _getMdlxMsetPresets = getMdlxMsetPresets;
             _layoutOnMultiColumnsUsecase = layoutOnMultiColumnsUsecase;
             _loadMotionDataUsecase = loadMotionDataUsecase;
@@ -53,18 +57,20 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
             string? mdlxFile = "";
             string? msetFile = "";
             int presetSelectedIndex = -1;
-            ActionResult mdlxResult = new ActionResult(ActionResultType.NotRun, "");
+            ActionResult mdlxMsetResult = new ActionResult(ActionResultType.NotRun, "");
             var selectMotionVisible = false;
             var selectMotionCaption = "Select motion##motionSelector";
             ActionResult msetResult = new ActionResult(ActionResultType.NotRun, "");
+            Action? reloadMotionData = null;
 
             void LoadMotionAt(int index)
             {
                 try
                 {
-                    _loadMotionDataUsecase.LoadAt(
+                    reloadMotionData = _loadMotionDataUsecase.LoadAt(
                         index
-                    );
+                    )
+                        .SaveAndReload;
 
                     _loadedModel.SelectedMotionIndex = index;
 
@@ -80,6 +86,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
 
             return () =>
             {
+                if (_loadedModel.GetBackMotionData.Consume())
+                {
+                    reloadMotionData?.Invoke();
+                }
+
                 ForHeader("MdlxMsetLoader", () =>
                 {
                     var autoLoadOnce = false;
@@ -127,17 +138,53 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
                         try
                         {
                             _manageKingdomTextureUsecase.ClearCache();
-                            _loadModelUsecase.OpenModel(mdlxFile!);
-                            _loadMotionUsecase.OpenMotion(msetFile!);
-                            mdlxResult = new ActionResult(ActionResultType.Success, "Success");
+                            var mdlxFull = _searchForKh2AssetFileUsecase.ResolveFilePath(mdlxFile!);
+                            _loadModelUsecase.OpenModel(mdlxFull!);
+                            var msetFull = _searchForKh2AssetFileUsecase.ResolveFilePath(msetFile!);
+                            _loadMotionUsecase.OpenMotion(msetFull!);
+                            mdlxMsetResult = new ActionResult(ActionResultType.Success, "Success");
                         }
                         catch (Exception ex)
                         {
-                            mdlxResult = new ActionResult(ActionResultType.Failure, ex.Message);
+                            mdlxMsetResult = new ActionResult(ActionResultType.Failure, ex.Message);
                         }
                     }
 
-                    _printActionResultUsecase.Print(mdlxResult);
+                    ImGui.SameLine();
+                    if (ImGui.Button("Save mset##saveMdlxMset"))
+                    {
+                        try
+                        {
+                            if (MessageBox.Show("Do you really want to save?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) != MessageBoxResult.Yes)
+                            {
+                                mdlxMsetResult = new ActionResult(ActionResultType.Success, "Save cancelled");
+                                return;
+                            }
+
+                            {
+                                if (_loadedModel.AnbFile is string file)
+                                {
+                                    using var stream = File.Create(file);
+                                    Bar.Write(stream, _loadedModel.AnbEntries);
+                                    mdlxMsetResult = new ActionResult(ActionResultType.Success, "Anb wrote");
+                                }
+                            }
+                            {
+                                if (_loadedModel.MsetFile is string file)
+                                {
+                                    using var stream = File.Create(file);
+                                    Bar.Write(stream, _loadedModel.MsetEntries);
+                                    mdlxMsetResult = new ActionResult(ActionResultType.Success, "Mset wrote");
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            mdlxMsetResult = new ActionResult(ActionResultType.Failure, ex.Message);
+                        }
+                    }
+
+                    _printActionResultUsecase.Print(mdlxMsetResult);
 
 
                     if (defaultMotionOnce != null)

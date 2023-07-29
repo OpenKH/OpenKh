@@ -56,7 +56,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
         /// <summary>
         /// Bump if MotionData has been modified
         /// </summary>
-        public AgeManager MotionDataAge { get; set; } = new AgeManager();
+        public OneTimeOn GetBackMotionData { get; set; } = new OneTimeOn(false);
 
         /// <summary>
         /// FK bones, read only, you cannot edit
@@ -67,5 +67,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
 
         public string? PreferredMotionExportXlsx { get; set; }
         public string? MsetFile { get; set; }
+        public string? AnbFile { get; set; }
     }
 }

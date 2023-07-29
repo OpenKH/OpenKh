@@ -60,6 +60,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<IMExExcelUsecase>();
             self.AddSingleton<ErrorMessages>();
             self.AddSingleton<AskOpenFileNowUsecase>();
+            self.AddSingleton<SearchForKh2AssetFileUsecase>();
+
 
 
 
@@ -128,18 +130,36 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
                 sp =>
                     () =>
                     {
-                        mdlxMsetPresets = sp.GetRequiredService<LoadXmlUsecase>()
-                            .LoadXmlOrCreateNewOne<MdlxMsetPresets>(
-                                Path.Combine(ConfigDir, "Presets.xml"),
-                                Path.Combine(ConfigDir, "Presets.xsd")
-                            )
-                            .GetPresets();
-
-                        boneDict = sp.GetRequiredService<LoadXmlUsecase>()
-                            .LoadXmlOrCreateNewOne<BoneDictElement>(
-                                Path.Combine(ConfigDir, "BoneDict.xml"),
-                                Path.Combine(ConfigDir, "BoneDict.xsd")
+                        try
+                        {
+                            mdlxMsetPresets = sp.GetRequiredService<LoadXmlUsecase>()
+                                .LoadXmlOrCreateNewOne<MdlxMsetPresets>(
+                                    Path.Combine(ConfigDir, "Presets.xml"),
+                                    Path.Combine(ConfigDir, "Presets.xsd")
+                                )
+                                .GetPresets();
+                        }
+                        catch (Exception ex)
+                        {
+                            sp.GetRequiredService<ErrorMessages>().Add(
+                                new Exception($"Presets.xml file contains error", ex)
                             );
+                        }
+
+                        try
+                        {
+                            boneDict = sp.GetRequiredService<LoadXmlUsecase>()
+                                .LoadXmlOrCreateNewOne<BoneDictElement>(
+                                    Path.Combine(ConfigDir, "BoneDict.xml"),
+                                    Path.Combine(ConfigDir, "BoneDict.xsd")
+                                );
+                        }
+                        catch (Exception ex)
+                        {
+                            sp.GetRequiredService<ErrorMessages>().Add(
+                                new Exception($"BoneDict.xml file contains error", ex)
+                            );
+                        }
 
                         sp.GetRequiredService<LoadedModel>().Kh2PresetsAge.Bump();
                     }

@@ -16,14 +16,17 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 {
     public class IKHelperManagerWindowUsecase : IWindowRunnableProvider
     {
+        private readonly ErrorMessages _errorMessages;
         private readonly LoadedModel _loadedModel;
         private readonly Settings _settings;
 
         public IKHelperManagerWindowUsecase(
             Settings settings,
-            LoadedModel loadedModel
+            LoadedModel loadedModel,
+            ErrorMessages errorMessages
         )
         {
+            _errorMessages = errorMessages;
             _loadedModel = loadedModel;
             _settings = settings;
         }
@@ -46,7 +49,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             var terminate = false;
             var below = false;
             var enableBias = false;
-            Motion.IKHelper? ikHelper = null;
+            Func<Motion.IKHelper>? getIkHelper = null;
             Vector3 scale = Vector3.Zero;
             Vector3 rotate = Vector3.Zero;
             Vector3 translate = Vector3.Zero;
@@ -63,7 +66,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                     if (numFk <= absIndex)
                     {
                         // ik
-                        ikHelper = _loadedModel.MotionData!.IKHelpers[absIndex - numFk];
+                        getIkHelper = () => _loadedModel.MotionData!.IKHelpers[absIndex - numFk];
+                        var ikHelper = getIkHelper();
                         jointIndex = ikHelper.Index;
                         parentIndex = ikHelper.ParentId;
                         unknown = ikHelper.Unknown;
@@ -102,7 +106,10 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         {
                             ForMenuItem("Apply", () =>
                             {
-                                if (editor == EditorType.Ik && ikHelper != null)
+                                if (true
+                                    && editor == EditorType.Ik
+                                    && getIkHelper?.Invoke() is Motion.IKHelper ikHelper
+                                )
                                 {
                                     // save
 
@@ -122,7 +129,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     ikHelper.TranslateY = translate.Y;
                                     ikHelper.TranslateZ = translate.Z;
 
-                                    _loadedModel.MotionDataAge.Bump();
+                                    _loadedModel.GetBackMotionData.TurnOn();
                                 }
                                 if (editor == EditorType.Fk && fkBone != null)
                                 {
@@ -140,7 +147,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     fkBone.TranslationY = translate.Y;
                                     fkBone.TranslationZ = translate.Z;
 
-                                    //TODO there is no possible way to get back Bone to mdlx
+                                    _errorMessages.Add(new Exception("fkBone is read only"));
                                 }
                             });
                         });

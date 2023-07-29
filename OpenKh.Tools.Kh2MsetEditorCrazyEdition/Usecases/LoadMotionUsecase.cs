@@ -25,24 +25,45 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
         {
             Close();
 
-            _loadedModel.MsetEntries = File.OpenRead(msetFile).Using(Bar.Read);
-            _loadedModel.MsetFile = msetFile;
+            var anbOrMset = File.OpenRead(msetFile).Using(Bar.Read);
+            var isMset = anbOrMset.Any(it => it.Type == Bar.EntryType.Anb);
 
-            var barEntries = _loadedModel.MsetEntries!;
+            if (isMset)
+            {
+                _loadedModel.MsetEntries = anbOrMset;
+                _loadedModel.MsetFile = msetFile;
 
-            _loadedModel.MotionList.AddRange(
-                barEntries
-                    .Select(
-                        (it, index) =>
-                        {
-                            return new MotionDisplay(
-                                $"[{index}] {it.Name} [{(MotionSet.MotionName)(index / 4)}]",
-                                it.Name != "DUMM",
-                                new string[] { Path.GetFileNameWithoutExtension(msetFile), it.Name, index + "", }
-                            );
-                        }
+                var barEntries = _loadedModel.MsetEntries!;
+
+                _loadedModel.MotionList.Clear();
+                _loadedModel.MotionList.AddRange(
+                    barEntries
+                        .Select(
+                            (it, index) =>
+                            {
+                                return new MotionDisplay(
+                                    $"[{index}] {it.Name} [{(MotionSet.MotionName)(index / 4)}]",
+                                    it.Name != "DUMM",
+                                    new string[] { Path.GetFileNameWithoutExtension(msetFile), it.Name, index + "", }
+                                );
+                            }
+                        )
+                );
+            }
+            else
+            {
+                _loadedModel.AnbEntries = anbOrMset;
+                _loadedModel.AnbFile = msetFile;
+
+                _loadedModel.MotionList.Clear();
+                _loadedModel.MotionList.Add(
+                    new MotionDisplay(
+                        Path.GetFileNameWithoutExtension(msetFile),
+                        true,
+                        new string[] { Path.GetFileNameWithoutExtension(msetFile), "0", }
                     )
-            );
+                );
+            }
         }
 
         public void Close()
@@ -53,6 +74,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             _loadedModel.FrameTime = 0;
             _loadedModel.PoseProvider = null;
             _loadedModel.MsetFile = null;
+            _loadedModel.AnbEntries = null;
+            _loadedModel.AnbFile = null;
         }
     }
 }

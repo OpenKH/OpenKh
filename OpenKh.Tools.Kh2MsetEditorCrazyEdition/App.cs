@@ -396,6 +396,10 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                                 )
                             );
                         }
+                        else
+                        {
+                            _loadedModel.GetBackMotionData.TurnOn();
+                        }
                     }
                     catch (Exception ex)
                     {
