@@ -158,12 +158,12 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool ViewJoints {
+        public bool ViewBones {
             get {
-                return ((bool)(this["ViewJoints"]));
+                return ((bool)(this["ViewBones"]));
             }
             set {
-                this["ViewJoints"] = value;
+                this["ViewBones"] = value;
             }
         }
         
@@ -176,6 +176,18 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition {
             }
             set {
                 this["ViewIKHelper"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewInitialPose {
+            get {
+                return ((bool)(this["ViewInitialPose"]));
+            }
+            set {
+                this["ViewInitialPose"] = value;
             }
         }
     }

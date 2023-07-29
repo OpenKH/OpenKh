@@ -30,6 +30,7 @@
         <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
         <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.2" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+        <PackageReference Include="NPOI" Version="2.6.1" />
     </ItemGroup>
 
     <ItemGroup>

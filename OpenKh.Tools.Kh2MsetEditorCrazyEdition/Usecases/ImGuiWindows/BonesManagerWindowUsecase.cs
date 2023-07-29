@@ -12,12 +12,12 @@ using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 {
-    public class JointsManagerWindowUsecase : IWindowRunnableProvider
+    public class BonesManagerWindowUsecase : IWindowRunnableProvider
     {
         private readonly LoadedModel _loadedModel;
         private readonly Settings _settings;
 
-        public JointsManagerWindowUsecase(
+        public BonesManagerWindowUsecase(
             Settings settings,
             LoadedModel loadedModel
         )
@@ -39,9 +39,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 
             return () =>
             {
-                if (_settings.ViewJoints)
+                if (_settings.ViewBones)
                 {
-                    ForWindow("Joints manager", () =>
+                    ForWindow("Bones manager", () =>
                     {
                         if (jointAge.NeedToCatchUpAnyOf(configAge))
                         {

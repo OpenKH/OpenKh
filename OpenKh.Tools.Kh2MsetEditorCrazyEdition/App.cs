@@ -8,7 +8,6 @@ using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Interfaces;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases;
-using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools.Old;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Windows;
 using System;
@@ -42,6 +41,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             .AddAllFiles();
 
         private readonly Vector4 BgUiColor = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
+        private readonly IMExExcelUsecase _imexExcelUsecase;
         private readonly ReloadKh2PresetsUsecase _reloadKh2PresetsUsecase;
         private readonly Settings _settings;
         private readonly Action[] _windowRunnables;
@@ -124,11 +124,13 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             MotionLoaderToolUsecase motionLoaderToolUsecase,
             IEnumerable<IWindowRunnableProvider> windowRunnables,
             Settings settings,
-            ReloadKh2PresetsUsecase reloadKh2PresetsUsecase
+            ReloadKh2PresetsUsecase reloadKh2PresetsUsecase,
+            IMExExcelUsecase imexExcelUsecase
         )
         {
             var gamePath = getGamePathUsecase();
 
+            _imexExcelUsecase = imexExcelUsecase;
             _reloadKh2PresetsUsecase = reloadKh2PresetsUsecase;
             _reloadKh2PresetsUsecase();
             _settings = settings;
@@ -303,7 +305,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                         ForEdit("Movement speed (shift)", () => EditorSettings.MoveSpeedShift, x => EditorSettings.MoveSpeedShift = x);
                     });
                     ImGui.Separator();
-                    ForMenuItem("Reload Kh2Presets", () => _reloadKh2PresetsUsecase());
+                    ForMenuItem("Reload Kh2Presets", ReloadKh2Presets);
+                    ImGui.Separator();
+                    ForMenuItem("Export to Excel", ExportExcel);
                     ImGui.Separator();
                     ForMenuItem("Exit", MenuFileExit);
                 });
@@ -318,14 +322,19 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                     ForMenuCheck("Spawn script BTL", () => EditorSettings.ViewSpawnScriptBattle, x => EditorSettings.ViewSpawnScriptBattle = x);
                     ForMenuCheck("Spawn script EVT", () => EditorSettings.ViewSpawnScriptEvent, x => EditorSettings.ViewSpawnScriptEvent = x);
 
-                    ForMenuCheck("Joints", () => _settings.ViewJoints, it =>
+                    ForMenuCheck("Bones", () => _settings.ViewBones, it =>
                     {
-                        _settings.ViewJoints = it;
+                        _settings.ViewBones = it;
                         _settings.Save();
                     });
                     ForMenuCheck("IKHelper", () => _settings.ViewIKHelper, it =>
                     {
                         _settings.ViewIKHelper = it;
+                        _settings.Save();
+                    });
+                    ForMenuCheck("InitialPose", () => _settings.ViewInitialPose, it =>
+                    {
+                        _settings.ViewInitialPose = it;
                         _settings.Save();
                     });
                 });
@@ -334,6 +343,32 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                     ForMenuItem("About", ShowAboutDialog);
                 });
             });
+        }
+
+        private void ExportExcel()
+        {
+            FileDialog.OnSave(
+                saveTo =>
+                {
+                    _imexExcelUsecase.ExportTo(saveTo);
+                },
+                FileDialogFilterComposer.Compose()
+                    .AddExtensions("Excel xlsx", "xlsx")
+                    .AddAllFiles(),
+                "Export.xlsx"
+            );
+        }
+
+        private void ReloadKh2Presets()
+        {
+            try
+            {
+                _reloadKh2PresetsUsecase();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex + "");
+            }
         }
 
         private void MenuFileOpen() => FileDialog.OnFolder(OpenFolder);
