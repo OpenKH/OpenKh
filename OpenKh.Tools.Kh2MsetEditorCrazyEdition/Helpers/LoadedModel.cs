@@ -56,7 +56,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
         /// <summary>
         /// Bump if MotionData has been modified
         /// </summary>
-        public OneTimeOn GetBackMotionData { get; set; } = new OneTimeOn(false);
+        public OneTimeOn SendBackMotionData { get; set; } = new OneTimeOn(false);
 
         /// <summary>
         /// FK bones, read only, you cannot edit

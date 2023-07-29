@@ -19,6 +19,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
 {
     public class MdlxMsetLoaderToolUsecase : IToolRunnableProvider
     {
+        private readonly ErrorMessages _errorMessages;
         private readonly SearchForKh2AssetFileUsecase _searchForKh2AssetFileUsecase;
         private readonly GetMdlxMsetPresets _getMdlxMsetPresets;
         private readonly LayoutOnMultiColumnsUsecase _layoutOnMultiColumnsUsecase;
@@ -38,9 +39,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
             LoadMotionDataUsecase loadMotionDataUsecase,
             LayoutOnMultiColumnsUsecase layoutOnMultiColumnsUsecase,
             GetMdlxMsetPresets getMdlxMsetPresets,
-            SearchForKh2AssetFileUsecase searchForKh2AssetFileUsecase
+            SearchForKh2AssetFileUsecase searchForKh2AssetFileUsecase,
+            ErrorMessages errorMessages
         )
         {
+            _errorMessages = errorMessages;
             _searchForKh2AssetFileUsecase = searchForKh2AssetFileUsecase;
             _getMdlxMsetPresets = getMdlxMsetPresets;
             _layoutOnMultiColumnsUsecase = layoutOnMultiColumnsUsecase;
@@ -61,16 +64,16 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
             var selectMotionVisible = false;
             var selectMotionCaption = "Select motion##motionSelector";
             ActionResult msetResult = new ActionResult(ActionResultType.NotRun, "");
-            Action? reloadMotionData = null;
+            Action? sendBackMotionData = null;
 
             void LoadMotionAt(int index)
             {
                 try
                 {
-                    reloadMotionData = _loadMotionDataUsecase.LoadAt(
+                    sendBackMotionData = _loadMotionDataUsecase.LoadAt(
                         index
                     )
-                        .SaveAndReload;
+                        .SendBack;
 
                     _loadedModel.SelectedMotionIndex = index;
 
@@ -86,9 +89,16 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
 
             return () =>
             {
-                if (_loadedModel.GetBackMotionData.Consume())
+                if (_loadedModel.SendBackMotionData.Consume())
                 {
-                    reloadMotionData?.Invoke();
+                    try
+                    {
+                        sendBackMotionData?.Invoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessages.Add(new Exception("Send back of motion data failed due to error.", ex));
+                    }
                 }
 
                 ForHeader("MdlxMsetLoader", () =>

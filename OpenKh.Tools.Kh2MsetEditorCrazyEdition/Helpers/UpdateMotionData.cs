@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
 {
-    public record UpdateMotionData(Action SaveAndReload)
+    public record UpdateMotionData(Action SendBack)
     {
     }
 }

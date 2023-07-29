@@ -129,7 +129,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     ikHelper.TranslateY = translate.Y;
                                     ikHelper.TranslateZ = translate.Z;
 
-                                    _loadedModel.GetBackMotionData.TurnOn();
+                                    _loadedModel.SendBackMotionData.TurnOn();
                                 }
                                 if (editor == EditorType.Fk && fkBone != null)
                                 {
