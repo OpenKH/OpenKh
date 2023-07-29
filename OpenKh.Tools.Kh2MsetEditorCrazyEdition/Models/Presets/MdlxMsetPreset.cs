@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
+namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Models.Presets
 {
     public class MdlxMsetPreset
     {

@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
-namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
+namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools.Old
 {
     public class MotionLoaderToolUsecase : IToolRunnableProvider
     {

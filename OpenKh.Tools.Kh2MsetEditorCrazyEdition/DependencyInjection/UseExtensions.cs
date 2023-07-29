@@ -3,8 +3,14 @@ using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Tools.Common.CustomImGui;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Interfaces;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Models.BoneDictSpec;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Models.Presets;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools.Old;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -15,9 +21,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
+namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
 {
-    internal static class EditorExtensions
+    internal static class UseExtensions
     {
         public static void UseKh2MsetEditorCrazyEdition(
             this IServiceCollection self,
@@ -27,6 +33,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
             string ConfigDir
         )
         {
+            Directory.CreateDirectory(ConfigDir);
+
             self.AddSingleton<GetGamePathUsecase>(
                 sp => () => GamePath
             );
@@ -43,6 +51,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
             self.AddSingleton<LoadMotionUsecase>();
             self.AddSingleton<LoadMotionDataUsecase>();
             self.AddSingleton<LayoutOnMultiColumnsUsecase>();
+            self.AddSingleton<GenerateXsdUsecase>();
+            self.AddSingleton<LoadXmlUsecase>();
+            self.AddSingleton<FilterBoneViewUsecase>();
             
 
 
@@ -74,9 +85,16 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
                 sp => sp.GetRequiredService<MonoGameImGuiBootstrap>().Content
             );
 
+            // windows
+            self.AddSingleton<IWindowRunnableProvider, JointsManagerWindowUsecase>();
+            self.AddSingleton<IWindowRunnableProvider, IKHelperManagerWindowUsecase>();
+
+            // tools
             self.AddSingleton<IToolRunnableProvider, MdlxMsetLoaderToolUsecase>();
             self.AddSingleton<IToolRunnableProvider, MotionPlayerToolUsecase>();
-            
+
+            self.AddSingleton(Settings.Default);
+
             self.AddSingleton<GetWhiteTextureUsecase>(
                 sp =>
                     () =>
@@ -90,17 +108,22 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
             self.AddSingleton(
                 sp =>
                 {
-                    var xmlFile = Path.Combine(ConfigDir, "Presets.xml");
-                    if (File.Exists(xmlFile))
-                    {
-                        using var stream = File.OpenRead(xmlFile);
-                        return (MdlxMsetPresets)new XmlSerializer(typeof(MdlxMsetPresets))
-                            .Deserialize(stream)!;
-                    }
-                    else
-                    {
-                        return new MdlxMsetPresets { };
-                    }
+                    return sp.GetRequiredService<LoadXmlUsecase>()
+                        .LoadXmlOrCreateNewOne<MdlxMsetPresets>(
+                            Path.Combine(ConfigDir, "Presets.xml"),
+                            Path.Combine(ConfigDir, "Presets.xsd")
+                        );
+                }
+            );
+
+            self.AddSingleton(
+                sp =>
+                {
+                    return sp.GetRequiredService<LoadXmlUsecase>()
+                        .LoadXmlOrCreateNewOne<BoneDictElement>(
+                            Path.Combine(ConfigDir, "BoneDict.xml"),
+                            Path.Combine(ConfigDir, "BoneDict.xsd")
+                        );
                 }
             );
 

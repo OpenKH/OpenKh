@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
 {
-    public record MotionDisplay(string Label, bool Valid)
+    public record MotionDisplay(string Label, bool Valid, IEnumerable<string> BoneViewMatcher)
     {
     }
 }

@@ -2,8 +2,10 @@ using ImGuiNET;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Interfaces;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Models.Presets;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -12,7 +14,7 @@ using System.Threading.Tasks;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 using static OpenKh.Tools.Kh2MsetEditorCrazyEdition.ImGuiExHelpers;
 
-namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
+namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
 {
     public class MdlxMsetLoaderToolUsecase : IToolRunnableProvider
     {
@@ -54,16 +56,20 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             var presets = _mdlxMsetPresets.GetPresets();
             ActionResult mdlxResult = new ActionResult(ActionResultType.NotRun, "");
             var selectMotionVisible = false;
-            var selectMotionTitle = "Select motion##motionSelector";
+            var selectMotionCaption = "Select motion##motionSelector";
             ActionResult msetResult = new ActionResult(ActionResultType.NotRun, "");
 
             void LoadMotionAt(int index)
             {
                 try
                 {
-                    _loadMotionDataUsecase.LoadAt(index);
+                    _loadMotionDataUsecase.LoadAt(
+                        index
+                    );
 
                     _loadedModel.SelectedMotionIndex = index;
+
+                    _loadedModel.OpenMotionPlayerOnce.TurnOn();
 
                     msetResult = ActionResult.Success;
                 }
@@ -83,8 +89,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                     if (presets.Any())
                     {
                         if (ImGui.BeginCombo(
-                            "preset",
-                            (presetSelectedIndex == -1)
+                            "presets",
+                            presetSelectedIndex == -1
                             ? "..."
                             : presets
                                 .Skip(presetSelectedIndex)
@@ -143,19 +149,19 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 
                     if (_loadedModel.MotionList.Any())
                     {
-                        var selectedMotionName = (_loadedModel.SelectedMotionIndex == -1)
+                        var selectedMotionName = _loadedModel.SelectedMotionIndex == -1
                             ? "..."
                             : _loadedModel.MotionList[_loadedModel.SelectedMotionIndex].Label;
 
                         if (ImGui.Button($"{selectedMotionName}##selectMotion"))
                         {
-                            ImGui.OpenPopup(selectMotionTitle);
+                            ImGui.OpenPopup(selectMotionCaption);
                             selectMotionVisible = true;
                         }
                         ImGui.SameLine();
                         ImGui.Text("motion");
 
-                        if (ImGui.BeginPopupModal(selectMotionTitle, ref selectMotionVisible,
+                        if (ImGui.BeginPopupModal(selectMotionCaption, ref selectMotionVisible,
                             ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal))
                         {
                             var list = _loadedModel.MotionList;
@@ -204,7 +210,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 
                         msetResult = ActionResult.NotRun;
                     }
-                });
+                },
+                    openByDefault: true
+                );
             };
         }
     }

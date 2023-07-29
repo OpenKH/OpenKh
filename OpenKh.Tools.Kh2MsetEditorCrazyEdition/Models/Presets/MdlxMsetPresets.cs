@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
+namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Models.Presets
 {
     [XmlRoot("Presets")]
     public class MdlxMsetPresets
@@ -13,5 +13,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
         [XmlElement("Preset")] public MdlxMsetPreset[]? Preset { get; set; }
 
         public IEnumerable<MdlxMsetPreset> GetPresets() => Preset ?? Enumerable.Empty<MdlxMsetPreset>();
+
+        [XmlAttribute("noNamespaceSchemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
+        public string xsiNoNamespaceSchemaLocation = "Presets.xsd";
     }
 }

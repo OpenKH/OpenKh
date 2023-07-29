@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 using static OpenKh.Tools.Kh2MsetEditorCrazyEdition.ImGuiExHelpers;
 
-namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
+namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
 {
     public class MotionPlayerToolUsecase : IToolRunnableProvider
     {
@@ -39,6 +39,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             return () =>
             {
                 frame += motionSpeed * (1 / Math.Max(1, _loadedModel.FramePerSecond) / 2.0f);
+
+                if (_loadedModel.OpenMotionPlayerOnce.Consume())
+                {
+                    ImGui.SetNextItemOpen(true);
+                }
 
                 ForHeader("MotionPlayer", () =>
                 {

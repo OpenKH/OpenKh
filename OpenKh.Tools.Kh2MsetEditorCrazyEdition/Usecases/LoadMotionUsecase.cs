@@ -36,7 +36,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                         {
                             return new MotionDisplay(
                                 $"[{index}] {it.Name} [{(MotionSet.MotionName)(index / 4)}]",
-                                it.Name != "DUMM"
+                                it.Name != "DUMM",
+                                new string[] { Path.GetFileNameWithoutExtension(msetFile), it.Name, index + "", }
                             );
                         }
                     )

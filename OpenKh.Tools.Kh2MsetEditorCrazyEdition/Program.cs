@@ -1,8 +1,9 @@
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 using OpenKh.Tools.Common.CustomImGui;
-using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection;
 using System;
+using System.IO;
 using System.Reflection;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
@@ -28,7 +29,10 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
         [Argument(0, "KH2 GamePath")]
-        public string GamePath { get; }
+        public string? GamePath { get; }
+
+        [Option(Description = "Path to Kh2Presets dir", ShortName = "d", LongName = "kh2-presets")]
+        public string? Kh2PresetsDir { get; }
         #endregion
 
         const int InitialWindowWidth = 1000;
@@ -42,7 +46,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                 InitialWindowWidth,
                 InitialWindowHeight,
                 GamePath,
-                AppDomain.CurrentDomain.BaseDirectory
+                Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Kh2PresetsDir ?? "Kh2Presets"))
             );
 
             using var container = builder.BuildServiceProvider();

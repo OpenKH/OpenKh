@@ -8,6 +8,7 @@ using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Interfaces;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools.Old;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Windows;
 using System;
 using System.Collections.Generic;
@@ -40,6 +41,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             .AddAllFiles();
 
         private readonly Vector4 BgUiColor = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
+        private readonly Settings _settings;
+        private readonly Action[] _windowRunnables;
         private readonly Action _motionLoaderTool;
         private readonly RenderModelUsecase _modelRenderer;
         private readonly IEnumerable<Action> _toolRunnables;
@@ -116,11 +119,17 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             GraphicsDevice graphicsDevice,
             IEnumerable<IToolRunnableProvider> toolRunnables,
             RenderModelUsecase modelRenderer,
-            MotionLoaderToolUsecase motionLoaderToolUsecase
+            MotionLoaderToolUsecase motionLoaderToolUsecase,
+            IEnumerable<IWindowRunnableProvider> windowRunnables,
+            Settings settings
         )
         {
             var gamePath = getGamePathUsecase();
 
+            _settings = settings;
+            _windowRunnables = windowRunnables
+                .Select(one => one.CreateWindowRunnable())
+                .ToArray();
             _motionLoaderTool = motionLoaderToolUsecase.CreateToolRunnable();
             _modelRenderer = modelRenderer;
             _toolRunnables = toolRunnables
@@ -203,6 +212,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                     }
                 }
             });
+
+            foreach (var runnable in _windowRunnables)
+            {
+                runnable();
+            }
 
             ImGui.PopStyleColor();
 
@@ -296,6 +310,17 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                     ForMenuCheck("Spawn script MAP", () => EditorSettings.ViewSpawnScriptMap, x => EditorSettings.ViewSpawnScriptMap = x);
                     ForMenuCheck("Spawn script BTL", () => EditorSettings.ViewSpawnScriptBattle, x => EditorSettings.ViewSpawnScriptBattle = x);
                     ForMenuCheck("Spawn script EVT", () => EditorSettings.ViewSpawnScriptEvent, x => EditorSettings.ViewSpawnScriptEvent = x);
+
+                    ForMenuCheck("Joints", () => _settings.ViewJoints, it =>
+                    {
+                        _settings.ViewJoints = it;
+                        _settings.Save();
+                    });
+                    ForMenuCheck("IKHelper", () => _settings.ViewIKHelper, it =>
+                    {
+                        _settings.ViewIKHelper = it;
+                        _settings.Save();
+                    });
                 });
                 ForMenu("Help", () =>
                 {

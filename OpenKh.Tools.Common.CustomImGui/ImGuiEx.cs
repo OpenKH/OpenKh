@@ -194,8 +194,28 @@ namespace OpenKh.Tools.Common.CustomImGui
                 return dummy;
             }, ImGui.End, action);
 
+        public static bool ForWindow(string name, Action action, bool menuBar = false) =>
+            ForControl(() =>
+            {
+                var dummy = true;
+                ImGui.Begin(name, ref dummy, ImGuiWindowFlags.None
+                    | (menuBar ? ImGuiWindowFlags.MenuBar : ImGuiWindowFlags.None)
+                );
+                return dummy;
+            }, ImGui.End, action);
+
         public static bool ForHeader(string name, Action action) =>
             ForControl(() => ImGui.CollapsingHeader(name), action);
+
+        public static bool ForHeader(string name, Action action, bool openByDefault = false) =>
+            ForControl(
+                () => ImGui.CollapsingHeader(
+                    name,
+                    ImGuiTreeNodeFlags.None
+                    | (openByDefault ? ImGuiTreeNodeFlags.DefaultOpen : ImGuiTreeNodeFlags.None)
+                ),
+                action
+            );
 
         public static void ForEdit(string name, Func<bool> getter, Action<bool> setter)
         {
