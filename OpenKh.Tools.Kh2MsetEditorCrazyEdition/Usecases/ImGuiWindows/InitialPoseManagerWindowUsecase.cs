@@ -15,6 +15,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 {
     public class InitialPoseManagerWindowUsecase : IWindowRunnableProvider
     {
+        private readonly string _popupCaption;
+        private readonly BigOnePopupUsecase _bigOnePopupUsecase;
         private readonly MakeHandyEditorUsecase _makeHandyEditorUsecase;
         private readonly LoadedModel _loadedModel;
         private readonly Settings _settings;
@@ -22,9 +24,12 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
         public InitialPoseManagerWindowUsecase(
             Settings settings,
             LoadedModel loadedModel,
-            MakeHandyEditorUsecase makeHandyEditorUsecase
+            MakeHandyEditorUsecase makeHandyEditorUsecase,
+            BigOnePopupUsecase bigOnePopupUsecase
         )
         {
+            _popupCaption = "Select initialPose";
+            _bigOnePopupUsecase = bigOnePopupUsecase;
             _makeHandyEditorUsecase = makeHandyEditorUsecase;
             _loadedModel = loadedModel;
             _settings = settings;
@@ -41,6 +46,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             editors.Add(_makeHandyEditorUsecase.InputInt("BoneId", () => pose!.BoneId, it => pose!.BoneId = (short)it));
             editors.Add(_makeHandyEditorUsecase.InputInt("Channel", () => pose!.Channel, it => pose!.Channel = (short)it));
             editors.Add(_makeHandyEditorUsecase.InputFloat("Value", () => pose!.Value, it => pose!.Value = it));
+
+            var popup = _bigOnePopupUsecase.Popup<string>(_popupCaption, 150);
 
             return () =>
             {
@@ -79,11 +86,16 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             }
                         }
 
-                        if (ImGui.BeginCombo("", (selectedIndex == -1) ? "..." : list[selectedIndex]))
+                        if (ImGui.Button((selectedIndex == -1) ? "..." : list[selectedIndex]))
                         {
-                            foreach (var (one, index) in list.SelectWithIndex())
+                            ImGui.OpenPopup(_popupCaption);
+                        }
+
+                        popup(
+                            list,
+                            (item, index) =>
                             {
-                                if (ImGui.Selectable(one, selectedIndex == index))
+                                if (ImGui.Selectable(item, selectedIndex == index))
                                 {
                                     selectedIndex = index;
 
@@ -91,8 +103,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     editors.LoadAll();
                                 }
                             }
-                            ImGui.EndCombo();
-                        }
+                        );
 
                         editors.RenderAll();
                     },
