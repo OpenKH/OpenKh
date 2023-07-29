@@ -61,6 +61,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<ErrorMessages>();
             self.AddSingleton<AskOpenFileNowUsecase>();
             self.AddSingleton<SearchForKh2AssetFileUsecase>();
+            self.AddSingleton<MakeHandyEditorUsecase>();
 
 
 
