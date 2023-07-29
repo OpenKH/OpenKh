@@ -57,5 +57,10 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
         /// Bump if MotionData has been modified
         /// </summary>
         public AgeManager MotionDataAge { get; set; } = new AgeManager();
+
+        /// <summary>
+        /// FK bones, read only, you cannot edit
+        /// </summary>
+        public List<Mdlx.Bone> InternalFkBones { get; set; } = new List<Mdlx.Bone>();
     }
 }

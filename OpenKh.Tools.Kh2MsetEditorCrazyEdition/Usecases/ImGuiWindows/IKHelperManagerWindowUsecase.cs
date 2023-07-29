@@ -28,11 +28,18 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             _settings = settings;
         }
 
+        private enum EditorType
+        {
+            No,
+            Fk,
+            Ik,
+        }
+
         public Action CreateWindowRunnable()
         {
             var jointAge = _loadedModel.SelectedJointIndexAge.Branch(true);
 
-            var editorAvail = false;
+            var editor = EditorType.No;
             var jointIndex = 0;
             var parentIndex = 0;
             var unknown = 0;
@@ -43,6 +50,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             Vector3 scale = Vector3.Zero;
             Vector3 rotate = Vector3.Zero;
             Vector3 translate = Vector3.Zero;
+            Mdlx.Bone? fkBone = null;
 
             return () =>
             {
@@ -54,6 +62,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                     var numFk = _loadedModel.FKJointDescriptions.Count;
                     if (numFk <= absIndex)
                     {
+                        // ik
                         ikHelper = _loadedModel.MotionData!.IKHelpers[absIndex - numFk];
                         jointIndex = ikHelper.Index;
                         parentIndex = ikHelper.ParentId;
@@ -65,11 +74,23 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         rotate = new Vector3(ikHelper.RotateX, ikHelper.RotateY, ikHelper.RotateZ);
                         translate = new Vector3(ikHelper.TranslateX, ikHelper.TranslateY, ikHelper.TranslateZ);
 
-                        editorAvail = true;
+                        editor = EditorType.Ik;
+                    }
+                    else if (0 <= absIndex)
+                    {
+                        // fk
+                        fkBone = _loadedModel.InternalFkBones![absIndex];
+                        jointIndex = fkBone.Index;
+                        parentIndex = fkBone.Parent;
+                        scale = new Vector3(fkBone.ScaleX, fkBone.ScaleY, fkBone.ScaleZ);
+                        rotate = new Vector3(fkBone.RotationX, fkBone.RotationY, fkBone.RotationZ);
+                        translate = new Vector3(fkBone.TranslationX, fkBone.TranslationY, fkBone.TranslationZ);
+
+                        editor = EditorType.Fk;
                     }
                     else
                     {
-                        editorAvail = false;
+                        editor = EditorType.No;
                     }
                 }
 
@@ -81,7 +102,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         {
                             ForMenuItem("Apply", () =>
                             {
-                                if (ikHelper != null)
+                                if (editor == EditorType.Ik && ikHelper != null)
                                 {
                                     // save
 
@@ -103,10 +124,37 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 
                                     _loadedModel.MotionDataAge.Bump();
                                 }
+                                if (editor == EditorType.Fk && fkBone != null)
+                                {
+                                    // save
+
+                                    fkBone.Index = (short)jointIndex;
+                                    fkBone.Parent = (short)parentIndex;
+                                    fkBone.ScaleX = scale.X;
+                                    fkBone.ScaleY = scale.Y;
+                                    fkBone.ScaleZ = scale.Z;
+                                    fkBone.RotationX = rotate.X;
+                                    fkBone.RotationY = rotate.Y;
+                                    fkBone.RotationZ = rotate.Z;
+                                    fkBone.TranslationX = translate.X;
+                                    fkBone.TranslationY = translate.Y;
+                                    fkBone.TranslationZ = translate.Z;
+
+                                    //TODO there is no possible way to get back Bone to mdlx
+                                }
                             });
                         });
 
-                        if (editorAvail)
+                        if (editor == EditorType.Fk)
+                        {
+                            ImGui.InputInt("joint index", ref jointIndex);
+                            ImGui.InputInt("parent index", ref parentIndex);
+                            ForEdit3("scale", () => scale, it => scale = it);
+                            ForEdit3("rotate", () => rotate, it => rotate = it);
+                            ForEdit3("translate", () => translate, it => translate = it);
+                        }
+
+                        if (editor == EditorType.Ik)
                         {
                             ImGui.InputInt("joint index", ref jointIndex);
                             ImGui.InputInt("parent index", ref parentIndex);
@@ -115,6 +163,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             ImGui.Checkbox("below", ref below);
                             ImGui.Checkbox("enableBias", ref enableBias);
                             ForEdit3("scale", () => scale, it => scale = it);
+                            ForEdit3("rotate", () => rotate, it => rotate = it);
+                            ForEdit3("translate", () => translate, it => translate = it);
                         }
                     },
                         menuBar: true

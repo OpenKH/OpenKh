@@ -69,6 +69,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             _loadedModel.FKJointDescriptions.AddRange(
                 ConvertBones(modelMotionAttachable.Bones)
             );
+            _loadedModel.InternalFkBones.Clear();
+            _loadedModel.InternalFkBones.AddRange(modelMotionAttachable.Bones);
             _loadedModel.JointDescriptionsAge.Bump();
 
             _loadedModel.MdlxRenderableList.Add(
