@@ -41,6 +41,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             .AddAllFiles();
 
         private readonly Vector4 BgUiColor = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
+        private readonly LoadedModel _loadedModel;
+        private readonly AskOpenFileNowUsecase _askOpenFileNowUsecase;
+        private readonly ErrorMessages _errorMessages;
         private readonly IMExExcelUsecase _imexExcelUsecase;
         private readonly ReloadKh2PresetsUsecase _reloadKh2PresetsUsecase;
         private readonly Settings _settings;
@@ -125,11 +128,17 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             IEnumerable<IWindowRunnableProvider> windowRunnables,
             Settings settings,
             ReloadKh2PresetsUsecase reloadKh2PresetsUsecase,
-            IMExExcelUsecase imexExcelUsecase
+            IMExExcelUsecase imexExcelUsecase,
+            ErrorMessages errorMessages,
+            AskOpenFileNowUsecase askOpenFileNowUsecase,
+            LoadedModel loadedModel
         )
         {
             var gamePath = getGamePathUsecase();
 
+            _loadedModel = loadedModel;
+            _askOpenFileNowUsecase = askOpenFileNowUsecase;
+            _errorMessages = errorMessages;
             _imexExcelUsecase = imexExcelUsecase;
             _reloadKh2PresetsUsecase = reloadKh2PresetsUsecase;
             _reloadKh2PresetsUsecase();
@@ -307,7 +316,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                     ImGui.Separator();
                     ForMenuItem("Reload Kh2Presets", ReloadKh2Presets);
                     ImGui.Separator();
-                    ForMenuItem("Export to Excel", ExportExcel);
+                    ForMenuItem("Export current motion to Excel", ExportExcel);
+                    ForMenuItem("Import current motion from Excel", ImportExcel);
                     ImGui.Separator();
                     ForMenuItem("Exit", MenuFileExit);
                 });
@@ -350,12 +360,52 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             FileDialog.OnSave(
                 saveTo =>
                 {
-                    _imexExcelUsecase.ExportTo(saveTo);
+                    try
+                    {
+                        _imexExcelUsecase.ExportTo(saveTo);
+
+                        _askOpenFileNowUsecase.AskAndOpen(saveTo);
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessages.Add(ex);
+                    }
                 },
                 FileDialogFilterComposer.Compose()
                     .AddExtensions("Excel xlsx", "xlsx")
                     .AddAllFiles(),
-                "Export.xlsx"
+                _loadedModel.PreferredMotionExportXlsx ?? "Export.xlsx"
+            );
+        }
+
+        private void ImportExcel()
+        {
+            FileDialog.OnOpen(
+                loadFrom =>
+                {
+                    try
+                    {
+                        var result = _imexExcelUsecase.ImportFrom(loadFrom);
+
+                        if (result.Errors.Any())
+                        {
+                            _errorMessages.Add(
+                                new AggregateException(
+                                    $"{result.Errors.Count} error(s) detected while import from Excel file.",
+                                    result.Errors
+                                )
+                            );
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessages.Add(ex);
+                    }
+                },
+                FileDialogFilterComposer.Compose()
+                    .AddExtensions("Excel xlsx", "xlsx")
+                    .AddAllFiles(),
+                _loadedModel.PreferredMotionExportXlsx ?? "Export.xlsx"
             );
         }
 

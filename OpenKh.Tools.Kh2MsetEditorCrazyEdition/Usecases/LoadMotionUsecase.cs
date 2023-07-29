@@ -26,6 +26,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             Close();
 
             _loadedModel.MsetEntries = File.OpenRead(msetFile).Using(Bar.Read);
+            _loadedModel.MsetFile = msetFile;
 
             var barEntries = _loadedModel.MsetEntries!;
 
@@ -51,6 +52,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             _loadedModel.MotionData = null;
             _loadedModel.FrameTime = 0;
             _loadedModel.PoseProvider = null;
+            _loadedModel.MsetFile = null;
         }
     }
 }

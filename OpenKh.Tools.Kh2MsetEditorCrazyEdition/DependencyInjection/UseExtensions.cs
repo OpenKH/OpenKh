@@ -58,7 +58,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<LoadXmlUsecase>();
             self.AddSingleton<FilterBoneViewUsecase>();
             self.AddSingleton<IMExExcelUsecase>();
-            
+            self.AddSingleton<ErrorMessages>();
+            self.AddSingleton<AskOpenFileNowUsecase>();
+
 
 
 
@@ -92,6 +94,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<IWindowRunnableProvider, BonesManagerWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, IKHelperManagerWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, InitialPoseManagerWindowUsecase>();
+            self.AddSingleton<IWindowRunnableProvider, ErrorMessagesWindowUsecase>();
 
             // tools
             self.AddSingleton<IToolRunnableProvider, MdlxMsetLoaderToolUsecase>();

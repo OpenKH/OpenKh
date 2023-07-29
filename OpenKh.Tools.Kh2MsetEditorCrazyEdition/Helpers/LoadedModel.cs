@@ -64,5 +64,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
         public List<Mdlx.Bone> InternalFkBones { get; set; } = new List<Mdlx.Bone>();
 
         public AgeManager Kh2PresetsAge { get; set; } = new AgeManager();
+
+        public string? PreferredMotionExportXlsx { get; set; }
+        public string? MsetFile { get; set; }
     }
 }
