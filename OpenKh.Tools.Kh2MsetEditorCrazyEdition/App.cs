@@ -347,6 +347,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                         _settings.ViewInitialPose = it;
                         _settings.Save();
                     });
+                    ForMenuCheck("Expression", () => _settings.ViewExpression, it =>
+                    {
+                        _settings.ViewExpression = it;
+                        _settings.Save();
+                    });
                 });
                 ForMenu("Help", () =>
                 {

@@ -190,5 +190,17 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition {
                 this["ViewInitialPose"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewExpression {
+            get {
+                return ((bool)(this["ViewExpression"]));
+            }
+            set {
+                this["ViewExpression"] = value;
+            }
+        }
     }
 }

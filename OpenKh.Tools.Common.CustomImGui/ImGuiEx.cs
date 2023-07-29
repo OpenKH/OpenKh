@@ -1,5 +1,6 @@
 using ImGuiNET;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
@@ -294,6 +295,13 @@ namespace OpenKh.Tools.Common.CustomImGui
             ImGui.EndChild();
 
             return ret;
+        }
+
+        public static void ForCombo(string name, string[] items, Func<int> getter, Action<int> setter)
+        {
+            var value = getter();
+            if (ImGui.Combo(name, ref value, items, items.Length))
+                setter(value);
         }
     }
 }

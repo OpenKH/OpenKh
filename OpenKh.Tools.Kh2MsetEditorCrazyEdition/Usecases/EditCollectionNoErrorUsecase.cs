@@ -37,7 +37,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 
         public bool InsertAt<T>(List<T>? list, int index, T item)
         {
-            if (list != null && (uint)list.Count < (uint)index)
+            if (list != null && (uint)index <= (uint)list.Count)
             {
                 list.Insert(index, item);
                 return true;
