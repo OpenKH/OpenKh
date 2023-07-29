@@ -538,7 +538,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                         }
                         catch (Exception ex)
                         {
-                            addError(new Exception($"A {SheetName} sheet cell at R{2 + y}C{2 + x} cannot be imported due to error.", ex));
+                            addError(new Exception($"A {SheetName} sheet {headerNames[x]} cell at R{2 + y}C{2 + x} cannot be imported due to error.", ex));
                         }
                     }
                 }
