@@ -36,6 +36,13 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
             {
                 frame += motionSpeed * (1 / Math.Max(1, _loadedModel.FramePerSecond) / 2.0f);
 
+                var lastKeyTime = 60f / _loadedModel.FramePerSecond * _loadedModel.FrameEnd;
+
+                if (lastKeyTime < frame)
+                {
+                    frame -= lastKeyTime - (60f / _loadedModel.FramePerSecond * _loadedModel.FrameLoop);
+                }
+
                 if (_loadedModel.OpenMotionPlayerOnce.Consume())
                 {
                     ImGui.SetNextItemOpen(true);
@@ -46,7 +53,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
                     ImGui.Text("Player --");
                     ForEdit("frame", () => frame, it => frame = it);
 
-                    ForEdit("motionSpeed", () => motionSpeed, it => motionSpeed = it);
+                    ForEdit("motionSpeed", () => motionSpeed, it => motionSpeed = it, speed: 0.1f);
 
                     if (ImGui.Button("zero"))
                     {
@@ -67,8 +74,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
                     }
 
                     ImGui.Text("Anb --");
-                    ForEdit("FramePerSecond", () => _loadedModel.FramePerSecond, it => _loadedModel.FramePerSecond = it);
-                    ForEdit("FrameEnd", () => _loadedModel.FrameEnd, it => _loadedModel.FrameEnd = it);
+                    ForEdit("FrameLoop", () => _loadedModel.FrameLoop, it => { });
+                    ForEdit("FramePerSecond", () => _loadedModel.FramePerSecond, it => { });
+                    ForEdit("FrameEnd", () => _loadedModel.FrameEnd, it => { });
 
                 });
 

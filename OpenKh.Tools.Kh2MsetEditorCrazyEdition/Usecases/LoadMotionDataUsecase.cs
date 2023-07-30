@@ -106,6 +106,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                             new MemoryStream(_loadedModel.MdlxBytes!, false)
                         );
 
+                        _loadedModel.FrameLoop = provider.FrameLoop;
                         _loadedModel.FramePerSecond = provider.FramePerSecond;
                         _loadedModel.FrameEnd = provider.FrameEnd;
 

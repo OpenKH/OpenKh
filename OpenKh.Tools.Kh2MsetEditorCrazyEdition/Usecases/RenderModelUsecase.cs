@@ -105,18 +105,14 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                 }
             }
 
+            var matrices = _loadedModel.PoseProvider?.Invoke(_loadedModel.FrameTime);
+
             _shader.Pass(pass =>
             {
                 _shader.SetProjectionView(_camera.Projection);
                 _shader.SetWorldView(_camera.World);
                 _shader.SetModelViewIdentity();
                 pass.Apply();
-
-                float validFrameTime = (1 <= _loadedModel.FrameEnd)
-                    ? (float)MathEx.Modulus(_loadedModel.FrameTime, _loadedModel.FrameEnd)
-                    : _loadedModel.FrameTime;
-
-                var matrices = _loadedModel.PoseProvider?.Invoke(validFrameTime);
 
                 foreach (var one in ones)
                 {

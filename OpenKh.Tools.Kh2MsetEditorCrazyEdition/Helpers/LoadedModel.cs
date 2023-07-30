@@ -31,13 +31,17 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
         public Dictionary<ModelTexture.Texture, KingdomTexture> KingdomTextureCache { get; set; } = new Dictionary<ModelTexture.Texture, KingdomTexture>();
 
         /// <summary>
-        /// From anb
+        /// Local data, from anb
         /// </summary>
         public float FramePerSecond { get; set; } = 0;
         /// <summary>
-        /// From anb
+        /// Local data, from anb
         /// </summary>
         public float FrameEnd { get; set; } = 0;
+        /// <summary>
+        /// Local data, from anb
+        /// </summary>
+        public float FrameLoop { get; set; }
 
         public OneTimeOn OpenMotionPlayerOnce { get; set; } = new OneTimeOn(false);
 
