@@ -120,6 +120,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                     if (windowClosed)
                     {
                         _settings.ViewIKHelper = false;
+                        _settings.Save();
                     }
                 }
             };

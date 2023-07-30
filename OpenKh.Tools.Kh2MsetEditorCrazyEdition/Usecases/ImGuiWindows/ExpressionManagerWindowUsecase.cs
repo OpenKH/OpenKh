@@ -316,6 +316,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                     if (windowClosed)
                     {
                         _settings.ViewExpression = false;
+                        _settings.Save();
                     }
                 }
             };

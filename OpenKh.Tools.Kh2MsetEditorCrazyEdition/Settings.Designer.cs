@@ -214,5 +214,17 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition {
                 this["ViewConstraint"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewFkBones {
+            get {
+                return ((bool)(this["ViewFkBones"]));
+            }
+            set {
+                this["ViewFkBones"] = value;
+            }
+        }
     }
 }

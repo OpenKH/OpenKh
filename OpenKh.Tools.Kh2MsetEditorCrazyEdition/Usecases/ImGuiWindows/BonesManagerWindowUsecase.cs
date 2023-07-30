@@ -40,6 +40,15 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                 {
                     var windowClosed = !ForWindow("Bones manager", () =>
                     {
+                        {
+                            var state = _settings.ViewFkBones;
+                            if (ImGui.Checkbox("showFk", ref state))
+                            {
+                                _settings.ViewFkBones = state;
+                                _settings.Save();
+                            }
+                        }
+
                         if (jointAge.NeedToCatchUpAnyOf(configAge))
                         {
                             var fkView = _loadedModel.GetActiveFkBoneViews?.Invoke();
@@ -86,27 +95,33 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 
                         var needToScroll = scrollAge.NeedToCatchUp();
 
-                        foreach (var jointDef in jointDefs)
+                        if (ImGui.BeginChild("bonesList"))
                         {
-                            var isSelected = _loadedModel.SelectedJointIndex == jointDef.AbsIndex;
-
-                            if (ImGui.Selectable(jointDef.Display, isSelected))
+                            foreach (var jointDef in jointDefs)
                             {
-                                _loadedModel.SelectedJointIndex = jointDef.AbsIndex;
-                                _loadedModel.SelectedJointIndexAge.Bump();
-                                scrollAge.CatchUp();
+                                var isSelected = _loadedModel.SelectedJointIndex == jointDef.AbsIndex;
+
+                                if (ImGui.Selectable(jointDef.Display, isSelected))
+                                {
+                                    _loadedModel.SelectedJointIndex = jointDef.AbsIndex;
+                                    _loadedModel.SelectedJointIndexAge.Bump();
+                                    scrollAge.CatchUp();
+                                }
+
+                                if (isSelected && needToScroll)
+                                {
+                                    ImGui.SetScrollHereY();
+                                }
                             }
 
-                            if (isSelected && needToScroll)
-                            {
-                                ImGui.SetScrollHereY();
-                            }
+                            ImGui.EndChild();
                         }
                     });
 
                     if (windowClosed)
                     {
                         _settings.ViewBones = false;
+                        _settings.Save();
                     }
                 }
             };

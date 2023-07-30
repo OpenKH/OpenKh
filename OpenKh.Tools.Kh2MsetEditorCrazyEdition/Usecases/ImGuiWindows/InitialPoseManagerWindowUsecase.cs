@@ -130,6 +130,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                     if (windowClosed)
                     {
                         _settings.ViewInitialPose = false;
+                        _settings.Save();
                     }
                 }
             };

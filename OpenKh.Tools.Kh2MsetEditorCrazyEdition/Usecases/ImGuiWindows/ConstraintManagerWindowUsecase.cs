@@ -381,6 +381,7 @@ true
                     if (windowClosed)
                     {
                         _settings.ViewConstraint = false;
+                        _settings.Save();
                     }
                 }
             };
