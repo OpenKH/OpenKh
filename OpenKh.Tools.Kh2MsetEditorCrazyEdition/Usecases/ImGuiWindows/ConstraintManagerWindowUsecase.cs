@@ -117,7 +117,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         {
                             if (names.Any())
                             {
-                                if (ImGui.DragInt("index##constraintsIndex", ref selectedIndex, 0.1f, 0, names.Count - 1))
+                                if (ImGui.DragInt("index ↔##constraintsIndex", ref selectedIndex, 0.1f, 0, names.Count - 1))
                                 {
 
                                 }
@@ -187,6 +187,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                         }
                                     }
 
+                                    ImGui.Separator();
+                                    ImGui.Text("Manipulator:");
+
                                     if (ImGui.Button("Alloc activation"))
                                     {
                                         AllocActivation(index =>
@@ -197,17 +200,36 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     }
 
                                     ImGui.SameLine();
-                                    if (ImGui.Button("Append activation"))
+                                    if (ImGui.Button("Inject one more"))
                                     {
-                                        AllocActivation(index =>
+                                        if (constraint.ActivationCount == 0)
                                         {
-                                            if (constraint.ActivationStartId + constraint.ActivationCount + 1 == activationList!.Count)
+                                            AllocActivation(index =>
                                             {
-                                                ++constraint.ActivationCount;
-                                            }
+                                                activationSelectedIndex = constraint.ActivationStartId = (short)index;
+                                                constraint.ActivationCount = 1;
+                                            });
+                                        }
+                                        else if (activationList != null)
+                                        {
+                                            var at = constraint.ActivationStartId + constraint.ActivationCount;
+                                            activationList.Insert(at, new Motion.ConstraintActivation { });
+                                            ++constraint.ActivationCount;
 
-                                            activationSelectedIndex = (short)index;
-                                        });
+                                            activationSelectedIndex = at;
+
+                                            sourceList
+                                                .ForEach(
+                                                    one =>
+                                                    {
+                                                        one.ActivationStartId = (at <= one.ActivationStartId)
+                                                            ? (short)(one.ActivationStartId + 1)
+                                                            : one.ActivationStartId;
+                                                    }
+                                                );
+
+                                            saved = true;
+                                        }
                                     }
 
                                     ImGui.SameLine();
@@ -234,7 +256,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         {
                             if (activationList?.Any() ?? false)
                             {
-                                if (ImGui.DragInt("index##activationIndex", ref activationSelectedIndex, 0.05f, 0, activationNames.Count - 1))
+                                if (ImGui.DragInt("index ↔##activationIndex", ref activationSelectedIndex, 0.05f, 0, activationNames.Count - 1))
                                 {
 
                                 }
@@ -274,7 +296,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         {
                             if (limiterList?.Any() ?? false)
                             {
-                                if (ImGui.DragInt("index##limiterIndex", ref limiterSelectedIndex, 0.05f, 0, limiterNames.Count - 1))
+                                if (ImGui.DragInt("index ↔##limiterIndex", ref limiterSelectedIndex, 0.05f, 0, limiterNames.Count - 1))
                                 {
 
                                 }
