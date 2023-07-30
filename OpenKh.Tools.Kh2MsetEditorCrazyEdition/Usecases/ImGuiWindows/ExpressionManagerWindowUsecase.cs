@@ -175,27 +175,47 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     ImGui.Text("Goto:");
 
                                     ImGui.SameLine();
-                                    if (ImGui.Button("RootNode"))
+                                    if (ImGui.Button("TargetId##gotoTargetId"))
+                                    {
+                                        _loadedModel.SelectedJointIndex = expression.TargetId;
+                                        _loadedModel.SelectedJointIndexAge.Bump();
+                                    }
+
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("RootNode##gotoRootNode"))
                                     {
                                         expressionNodeSelectedIndex = expression.NodeId;
                                     }
 
                                     ImGui.SameLine();
-                                    if (ImGui.Button("CAR"))
+                                    if (ImGui.Button("CAR##gotoCAR"))
                                     {
                                         enterCar = true;
                                     }
 
                                     ImGui.SameLine();
-                                    if (ImGui.Button("CDR"))
+                                    if (ImGui.Button("CDR##gotoCDR"))
                                     {
                                         enterCdr = true;
                                     }
 
+                                    ImGui.SameLine();
+                                    ImGui.Text("Other:");
+
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("Copy expr"))
+                                    {
+                                        ClipboardService.SetText(
+                                            string.Concat(
+                                                tokens.Select(token => token.Text)
+                                            )
+                                        );
+                                    }
 
                                     ImGui.Separator();
                                     ImGui.Text("Manipulator:");
 
+                                    ImGui.SameLine();
                                     if (ImGui.Button("Alloc RootNode"))
                                     {
                                         AllocNode(nodeId => expression.NodeId = nodeId);
@@ -211,13 +231,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     if (ImGui.Button("Alloc CDR"))
                                     {
                                         allocCdr = true;
-                                    }
-
-                                    ImGui.SameLine();
-                                    if (ImGui.Button("Go TargetId"))
-                                    {
-                                        _loadedModel.SelectedJointIndex = expression.TargetId;
-                                        _loadedModel.SelectedJointIndexAge.Bump();
                                     }
                                 }
                                 else

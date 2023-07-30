@@ -190,6 +190,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     ImGui.Separator();
                                     ImGui.Text("Manipulator:");
 
+                                    ImGui.SameLine();
                                     if (ImGui.Button("Alloc activation"))
                                     {
                                         AllocActivation(index =>

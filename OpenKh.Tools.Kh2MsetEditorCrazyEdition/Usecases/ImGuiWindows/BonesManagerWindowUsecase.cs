@@ -36,6 +36,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             var jointAge = _loadedModel.JointDescriptionsAge.Branch().MarkDirty();
             var jointDefs = new List<JointDef>();
             var configAge = _loadedModel.Kh2PresetsAge.Branch().MarkDirty();
+            var scrollAge = _loadedModel.SelectedJointIndexAge.Branch(false);
 
             return () =>
             {
@@ -87,12 +88,22 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             );
                         }
 
+                        var needToScroll = scrollAge.NeedToCatchUp();
+
                         foreach (var jointDef in jointDefs)
                         {
-                            if (ImGui.Selectable(jointDef.Display, _loadedModel.SelectedJointIndex == jointDef.AbsIndex))
+                            var isSelected = _loadedModel.SelectedJointIndex == jointDef.AbsIndex;
+
+                            if (ImGui.Selectable(jointDef.Display, isSelected))
                             {
                                 _loadedModel.SelectedJointIndex = jointDef.AbsIndex;
                                 _loadedModel.SelectedJointIndexAge.Bump();
+                                scrollAge.CatchUp();
+                            }
+
+                            if (isSelected && needToScroll)
+                            {
+                                ImGui.SetScrollHereY();
                             }
                         }
                     });
