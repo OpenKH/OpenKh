@@ -28,7 +28,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 
         public string FormatExpression(Expression it, string[] targetChannels)
         {
-            return $"TargetId {it.TargetId} {targetChannels.GetAtOrNull(it.TargetChannel) ?? it.TargetChannel.ToString()} Node {it.NodeId}";
+            return $"TargetId {it.TargetId} ({targetChannels.GetAtOrNull(it.TargetChannel) ?? it.TargetChannel.ToString()}) Node {it.NodeId}";
         }
 
         public string FormatExpressionNode(ExpressionNode it)

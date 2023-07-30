@@ -89,7 +89,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 
                         if (list.Any())
                         {
-                            if (ImGui.DragInt("index", ref selectedIndex, 0.2f, 0, list.Count - 1))
+                            if (ImGui.DragInt("index (slider)", ref selectedIndex, 0.2f, 0, list.Count - 1))
                             {
 
                             }

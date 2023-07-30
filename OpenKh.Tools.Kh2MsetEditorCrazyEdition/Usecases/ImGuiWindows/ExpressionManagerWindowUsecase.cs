@@ -127,7 +127,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         {
                             if (names.Any())
                             {
-                                if (ImGui.DragInt("index##expressionIndex", ref selectedIndex, 0.05f, 0, names.Count - 1))
+                                if (ImGui.DragInt("index (slider)##expressionIndex", ref selectedIndex, 0.05f, 0, names.Count - 1))
                                 {
 
                                 }
@@ -238,7 +238,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         {
                             if (expressionNodeNames.Any())
                             {
-                                if (ImGui.DragInt("index##nodeIndex", ref expressionNodeSelectedIndex, 0.05f, 0, expressionNodeNames.Count - 1))
+                                if (ImGui.DragInt("index (slider)##nodeIndex", ref expressionNodeSelectedIndex, 0.05f, 0, expressionNodeNames.Count - 1))
                                 {
 
                                 }

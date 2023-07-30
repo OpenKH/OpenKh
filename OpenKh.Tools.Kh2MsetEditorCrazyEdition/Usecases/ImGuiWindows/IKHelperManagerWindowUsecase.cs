@@ -53,6 +53,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         { }
                         else if (_loadedModel.InternalFkBones?.GetAtOrNull(absIndex) is Mdlx.Bone fk)
                         {
+                            ImGui.Text("(fkBone is readonly!)");
                             ForEdit("joint index", () => fk.Index, it => { });
                             ForEdit("parent index", () => fk.Parent, it => { });
                             ForEdit3("scale",

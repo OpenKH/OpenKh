@@ -117,7 +117,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         {
                             if (names.Any())
                             {
-                                if (ImGui.DragInt("index ↔##constraintsIndex", ref selectedIndex, 0.1f, 0, names.Count - 1))
+                                if (ImGui.DragInt("index (slider)##constraintsIndex", ref selectedIndex, 0.1f, 0, names.Count - 1))
                                 {
 
                                 }
@@ -256,7 +256,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         {
                             if (activationList?.Any() ?? false)
                             {
-                                if (ImGui.DragInt("index ↔##activationIndex", ref activationSelectedIndex, 0.05f, 0, activationNames.Count - 1))
+                                if (ImGui.DragInt("index (slider)##activationIndex", ref activationSelectedIndex, 0.05f, 0, activationNames.Count - 1))
                                 {
 
                                 }
@@ -296,7 +296,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         {
                             if (limiterList?.Any() ?? false)
                             {
-                                if (ImGui.DragInt("index ↔##limiterIndex", ref limiterSelectedIndex, 0.05f, 0, limiterNames.Count - 1))
+                                if (ImGui.DragInt("index (slider)##limiterIndex", ref limiterSelectedIndex, 0.05f, 0, limiterNames.Count - 1))
                                 {
 
                                 }

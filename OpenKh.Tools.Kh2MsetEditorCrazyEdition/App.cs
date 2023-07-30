@@ -8,7 +8,6 @@ using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Interfaces;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases;
-using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools.Old;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Windows;
 using System;
 using System.Collections.Generic;
@@ -124,7 +123,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             GraphicsDevice graphicsDevice,
             IEnumerable<IToolRunnableProvider> toolRunnables,
             RenderModelUsecase modelRenderer,
-            MotionLoaderToolUsecase motionLoaderToolUsecase,
             IEnumerable<IWindowRunnableProvider> windowRunnables,
             Settings settings,
             ReloadKh2PresetsUsecase reloadKh2PresetsUsecase,
@@ -146,7 +144,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             _windowRunnables = windowRunnables
                 .Select(one => one.CreateWindowRunnable())
                 .ToArray();
-            _motionLoaderTool = motionLoaderToolUsecase.CreateToolRunnable();
             _modelRenderer = modelRenderer;
             _toolRunnables = toolRunnables
                 .Select(one => one.CreateToolRunnable())

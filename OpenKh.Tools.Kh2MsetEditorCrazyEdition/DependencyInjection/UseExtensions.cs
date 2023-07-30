@@ -10,7 +10,6 @@ using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Models.Presets;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools;
-using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools.Old;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -50,7 +49,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<ManageKingdomTextureUsecase>();
             self.AddSingleton<LoadModelUsecase>();
             self.AddSingleton<PrintActionResultUsecase>();
-            self.AddSingleton<MotionLoaderToolUsecase>();
             self.AddSingleton<LoadMotionUsecase>();
             self.AddSingleton<LoadMotionDataUsecase>();
             self.AddSingleton<LayoutOnMultiColumnsUsecase>();
