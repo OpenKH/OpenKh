@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenKh.Kh2;
 using System.Numerics;
+using Assimp;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 {
@@ -21,6 +22,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
         private readonly LoadedModel _loadedModel;
         private readonly Settings _settings;
         private readonly string[] _expressionNodeTypes;
+        private readonly string[] _targetChannels;
         private Vector4 _highlightedTextColor = new Vector4(0, 1, 0, 1);
 
         public ExpressionManagerWindowUsecase(
@@ -39,6 +41,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             _expressionNodeTypes = Enumerable.Range(0, 44)
                 .Select(index => ((Motion.ExpressionType)index).ToString())
                 .ToArray();
+            _targetChannels = "Sx,Sy,Sz,Rx,Ry,Rz,Tx,Ty,Tz".Split(',');
         }
 
         public Action CreateWindowRunnable()
@@ -87,7 +90,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                 list.Clear();
                                 list.AddRange(
                                     sourceList!
-                                        .Select(it => $"T# {it.TargetId} TC {it.TargetChannel} N# {it.NodeId}")
+                                        .Select(it => $"T# {it.TargetId} {FormatTargetChannel(it.TargetChannel)} N# {it.NodeId}")
                                 );
 
                                 expressionNodeList.Clear();
@@ -101,6 +104,21 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                 _errorMessages.Add(new Exception("Expression has error of ToString().", ex));
                             }
                         }
+
+                        void AllocNode(Action<short> onNodeId)
+                        {
+                            if (nodeList != null)
+                            {
+                                onNodeId((short)(expressionNodeSelectedIndex = nodeList.Count));
+                                nodeList.Add(new Motion.ExpressionNode { CAR = -1, CDR = -1, Type = (byte)Motion.ExpressionType.CONSTANT_NUM, });
+                                saved = true;
+                            }
+                        }
+
+                        var allocCar = false;
+                        var allocCdr = false;
+                        var enterCar = false;
+                        var enterCdr = false;
 
                         if (list.Any())
                         {
@@ -126,7 +144,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                 if (sourceList?.GetAtOrNull(selectedIndex) is Motion.Expression expression)
                                 {
                                     ForEdit("TargetId", () => expression.TargetId, it => { expression.TargetId = it; saved = true; });
-                                    ForEdit("TargetChannel", () => expression.TargetChannel, it => { expression.TargetChannel = it; saved = true; });
+                                    ForCombo("TargetChannel", _targetChannels, () => expression.TargetChannel, it => { expression.TargetChannel = (short)it; saved = true; });
                                     ForEdit("NodeId", () => expression.NodeId, it => { expression.NodeId = it; saved = true; });
 
                                     ImGui.Text("ExpressionNodes --");
@@ -154,6 +172,49 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     if (ImGui.Button("Explore"))
                                     {
                                         expressionNodeSelectedIndex = expression.NodeId;
+                                    }
+
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("Enter CAR"))
+                                    {
+                                        enterCar = true;
+                                    }
+
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("Enter CDR"))
+                                    {
+                                        enterCdr = true;
+                                    }
+
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("Alloc RootNode"))
+                                    {
+                                        AllocNode(
+                                            nodeId =>
+                                            {
+                                                expression.NodeId = nodeId;
+                                                saved = true;
+                                            }
+                                        );
+                                    }
+
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("Alloc CAR"))
+                                    {
+                                        allocCar = true;
+                                    }
+
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("Alloc CDR"))
+                                    {
+                                        allocCdr = true;
+                                    }
+
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("Go TargetId"))
+                                    {
+                                        _loadedModel.SelectedJointIndex = expression.TargetId;
+                                        _loadedModel.SelectedJointIndexAge.Bump();
                                     }
                                 }
                                 else
@@ -193,20 +254,38 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 
                                 if (nodeList?.GetAtOrNull(expressionNodeSelectedIndex) is Motion.ExpressionNode node)
                                 {
-                                    if (ImGui.Button("Enter CAR"))
+                                    if (enterCar)
                                     {
                                         expressionNodeSelectedIndex = node.CAR;
                                     }
-                                    ImGui.SameLine();
-                                    if (ImGui.Button("Enter CDR"))
+                                    if (enterCdr)
                                     {
                                         expressionNodeSelectedIndex = node.CDR;
+                                    }
+                                    if (allocCar)
+                                    {
+                                        AllocNode(
+                                            nodeId =>
+                                            {
+                                                node.CAR = nodeId;
+                                                saved = true;
+                                            }
+                                        );
+                                    }
+                                    if (allocCdr)
+                                    {
+                                        AllocNode(
+                                            nodeId =>
+                                            {
+                                                node.CDR = nodeId;
+                                                saved = true;
+                                            }
+                                        );
                                     }
 
                                     ForCombo("Type", _expressionNodeTypes, () => node.Type, it => { node.Type = (byte)it; saved = true; });
                                     ForEdit("IsGlobal", () => node.IsGlobal, it => { node.IsGlobal = it; saved = true; });
                                     ForEdit("Element", () => node.Element, it => { node.Element = it; saved = true; });
-                                    ForEdit("Type", () => node.Type, it => { node.Type = it; saved = true; });
                                     ForEdit("Value", () => node.Value, it => { node.Value = it; saved = true; });
                                     ForEdit("CAR", () => node.CAR, it => { node.CAR = it; saved = true; });
                                     ForEdit("CDR", () => node.CDR, it => { node.CDR = it; saved = true; });
@@ -235,6 +314,18 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                     );
                 }
             };
+        }
+
+        private string FormatTargetChannel(short type)
+        {
+            if (0 <= type && type < 9)
+            {
+                return _targetChannels[type];
+            }
+            else
+            {
+                return type.ToString();
+            }
         }
     }
 }
