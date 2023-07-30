@@ -16,6 +16,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 {
     public class ExpressionManagerWindowUsecase : IWindowRunnableProvider
     {
+        private readonly FormatListItemUsecase _formatListItemUsecase;
         private readonly FormatExpressionNodesUsecase _formatExpressionNodesUsecase;
         private readonly EditCollectionNoErrorUsecase _editCollectionNoErrorUsecase;
         private readonly ErrorMessages _errorMessages;
@@ -30,9 +31,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             LoadedModel loadedModel,
             ErrorMessages errorMessages,
             EditCollectionNoErrorUsecase editCollectionNoErrorUsecase,
-            FormatExpressionNodesUsecase formatExpressionNodesUsecase
+            FormatExpressionNodesUsecase formatExpressionNodesUsecase,
+            FormatListItemUsecase formatListItemUsecase
         )
         {
+            _formatListItemUsecase = formatListItemUsecase;
             _formatExpressionNodesUsecase = formatExpressionNodesUsecase;
             _editCollectionNoErrorUsecase = editCollectionNoErrorUsecase;
             _errorMessages = errorMessages;
@@ -47,8 +50,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
         public Action CreateWindowRunnable()
         {
             var age = _loadedModel.JointDescriptionsAge.Branch(false);
-            var list = new List<string>();
-            var expressionNodeList = new List<string>();
+            var names = new List<string>();
+            var expressionNodeNames = new List<string>();
             var selectedIndex = -1;
             var nextTimeRefresh = new OneTimeOn(false);
             var expressionNodeSelectedIndex = -1;
@@ -87,16 +90,16 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         {
                             try
                             {
-                                list.Clear();
-                                list.AddRange(
+                                names.Clear();
+                                names.AddRange(
                                     sourceList!
-                                        .Select(it => $"T# {it.TargetId} {FormatTargetChannel(it.TargetChannel)} N# {it.NodeId}")
+                                        .Select(it => _formatListItemUsecase.FormatExpression(it, _targetChannels))
                                 );
 
-                                expressionNodeList.Clear();
-                                expressionNodeList.AddRange(
+                                expressionNodeNames.Clear();
+                                expressionNodeNames.AddRange(
                                     nodeList!
-                                        .Select(it => $"{(Motion.ExpressionType)it.Type}, {it.Value}, {it.CAR}, {it.CDR}, {it.Element}, {(it.IsGlobal ? "Global" : "Local")}")
+                                        .Select(_formatListItemUsecase.FormatExpressionNode)
                                 );
                             }
                             catch (Exception ex)
@@ -120,20 +123,20 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         var enterCar = false;
                         var enterCdr = false;
 
-                        ForHeader("Expressions --", () =>
+                        ForHeader("Expressions", () =>
                         {
-                            if (list.Any())
+                            if (names.Any())
                             {
-                                if (ImGui.DragInt("index", ref selectedIndex, 0.05f, 0, list.Count - 1))
+                                if (ImGui.DragInt("index", ref selectedIndex, 0.05f, 0, names.Count - 1))
                                 {
 
                                 }
 
-                                if (ImGui.BeginCombo($"Expression", list.GetAtOrNull(selectedIndex) ?? "..."))
+                                if (ImGui.BeginCombo($"Expression", names.GetAtOrNull(selectedIndex) ?? "..."))
                                 {
-                                    foreach (var (item, index) in list.SelectWithIndex())
+                                    foreach (var (item, index) in names.SelectWithIndex())
                                     {
-                                        if (ImGui.Selectable(list[index], index == selectedIndex))
+                                        if (ImGui.Selectable(names[index], index == selectedIndex))
                                         {
                                             selectedIndex = index;
                                         }
@@ -169,33 +172,34 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                         }
                                     }
 
-                                    if (ImGui.Button("Goto RootNode"))
+                                    ImGui.Text("Goto:");
+
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("RootNode"))
                                     {
                                         expressionNodeSelectedIndex = expression.NodeId;
                                     }
 
                                     ImGui.SameLine();
-                                    if (ImGui.Button("Goto CAR"))
+                                    if (ImGui.Button("CAR"))
                                     {
                                         enterCar = true;
                                     }
 
                                     ImGui.SameLine();
-                                    if (ImGui.Button("Goto CDR"))
+                                    if (ImGui.Button("CDR"))
                                     {
                                         enterCdr = true;
                                     }
 
-                                    ImGui.SameLine();
+
                                     if (ImGui.Button("Alloc RootNode"))
                                     {
-                                        AllocNode(
-                                                nodeId =>
-                                                {
-                                                    expression.NodeId = nodeId;
-                                                    saved = true;
-                                                }
-                                            );
+                                        AllocNode(nodeId =>
+                                        {
+                                            expression.NodeId = nodeId;
+                                            saved = true;
+                                        });
                                     }
 
                                     ImGui.SameLine();
@@ -231,20 +235,20 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         );
 
 
-                        ForHeader("ExpressionNodes --", () =>
+                        ForHeader("ExpressionNodes", () =>
                         {
-                            if (expressionNodeList.Any())
+                            if (expressionNodeNames.Any())
                             {
-                                if (ImGui.DragInt("nodeIndex", ref expressionNodeSelectedIndex, 0.05f, 0, expressionNodeList.Count - 1))
+                                if (ImGui.DragInt("nodeIndex", ref expressionNodeSelectedIndex, 0.05f, 0, expressionNodeNames.Count - 1))
                                 {
 
                                 }
 
-                                if (ImGui.BeginCombo($"expressionNode", expressionNodeList.GetAtOrNull(expressionNodeSelectedIndex) ?? "..."))
+                                if (ImGui.BeginCombo($"expressionNode", expressionNodeNames.GetAtOrNull(expressionNodeSelectedIndex) ?? "..."))
                                 {
-                                    foreach (var (item, index) in expressionNodeList.SelectWithIndex())
+                                    foreach (var (item, index) in expressionNodeNames.SelectWithIndex())
                                     {
-                                        if (ImGui.Selectable(expressionNodeList[index], index == expressionNodeSelectedIndex))
+                                        if (ImGui.Selectable(expressionNodeNames[index], index == expressionNodeSelectedIndex))
                                         {
                                             expressionNodeSelectedIndex = index;
                                         }
@@ -319,18 +323,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                     }
                 }
             };
-        }
-
-        private string FormatTargetChannel(short type)
-        {
-            if (0 <= type && type < 9)
-            {
-                return _targetChannels[type];
-            }
-            else
-            {
-                return type.ToString();
-            }
         }
     }
 }

@@ -65,7 +65,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<BigOneSelectorPopupUsecase>();
             self.AddSingleton<EditCollectionNoErrorUsecase>();
             self.AddSingleton<FormatExpressionNodesUsecase>();
-            
+            self.AddSingleton<FormatListItemUsecase>();
+            // next
 
 
 

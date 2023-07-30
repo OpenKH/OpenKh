@@ -16,25 +16,23 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 {
     public class ConstraintManagerWindowUsecase : IWindowRunnableProvider
     {
-        private readonly FormatExpressionNodesUsecase _formatExpressionNodesUsecase;
+        private readonly FormatListItemUsecase _formatListItemUsecase;
         private readonly EditCollectionNoErrorUsecase _editCollectionNoErrorUsecase;
         private readonly ErrorMessages _errorMessages;
         private readonly LoadedModel _loadedModel;
         private readonly Settings _settings;
         private readonly string[] _constraintTypes;
-        private readonly string[] _targetChannels;
         private readonly string[] _limiterTypes;
-        private Vector4 _highlightedTextColor = new Vector4(0, 1, 0, 1);
 
         public ConstraintManagerWindowUsecase(
             Settings settings,
             LoadedModel loadedModel,
             ErrorMessages errorMessages,
             EditCollectionNoErrorUsecase editCollectionNoErrorUsecase,
-            FormatExpressionNodesUsecase formatExpressionNodesUsecase
+            FormatListItemUsecase formatListItemUsecase
         )
         {
-            _formatExpressionNodesUsecase = formatExpressionNodesUsecase;
+            _formatListItemUsecase = formatListItemUsecase;
             _editCollectionNoErrorUsecase = editCollectionNoErrorUsecase;
             _errorMessages = errorMessages;
             _loadedModel = loadedModel;
@@ -42,7 +40,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             _constraintTypes = Enumerable.Range(0, 14)
                 .Select(index => ((Motion.ConstraintType)index).ToString())
                 .ToArray();
-            _targetChannels = "Sx,Sy,Sz,Rx,Ry,Rz,Tx,Ty,Tz".Split(',');
             _limiterTypes = "None,Rot,Sphere,Box".Split(',');
         }
 
@@ -95,19 +92,19 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                 names.Clear();
                                 names.AddRange(
                                     sourceList!
-                                        .Select(it => $"{(Motion.ConstraintType)it.Type}, {it.SourceJointId}, {it.ConstrainedJointId}")
+                                        .Select(it => _formatListItemUsecase.FormatConstraint(it))
                                 );
 
                                 activationNames.Clear();
                                 activationNames.AddRange(
                                     activationList!
-                                        .Select(it => $"{it.Time}, {it.Active}")
+                                        .Select(it => _formatListItemUsecase.FormatConstraintActivation(it))
                                 );
 
                                 limiterNames.Clear();
                                 limiterNames.AddRange(
                                     limiterList!
-                                        .Select(it => $"{it}")
+                                        .Select(it => _formatListItemUsecase.FormatLimiter(it))
                                 );
                             }
                             catch (Exception ex)
@@ -116,11 +113,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             }
                         }
 
-                        ForHeader("Constraints --", () =>
+                        ForHeader("Constraints", () =>
                         {
                             if (names.Any())
                             {
-                                if (ImGui.DragInt("index", ref selectedIndex, 0.1f, 0, names.Count - 1))
+                                if (ImGui.DragInt("index##constraintsIndex", ref selectedIndex, 0.1f, 0, names.Count - 1))
                                 {
 
                                 }
@@ -146,6 +143,76 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     ForEdit("LimiterId", () => constraint.LimiterId, it => { constraint.LimiterId = it; saved = true; });
                                     ForEdit("ActivationCount", () => constraint.ActivationCount, it => { constraint.ActivationCount = it; saved = true; });
                                     ForEdit("ActivationStartId", () => constraint.ActivationStartId, it => { constraint.ActivationStartId = it; saved = true; });
+
+                                    ImGui.Text("Goto:");
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("ConstrainedJoint##gotoConstrainedJoint"))
+                                    {
+                                        _loadedModel.SelectedJointIndex = constraint.ConstrainedJointId;
+                                        _loadedModel.SelectedJointIndexAge.Bump();
+                                    }
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("SourceJoint##gotoSourceJoint"))
+                                    {
+                                        _loadedModel.SelectedJointIndex = constraint.SourceJointId;
+                                        _loadedModel.SelectedJointIndexAge.Bump();
+                                    }
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("Activation##gotoActivation"))
+                                    {
+                                        activationSelectedIndex = constraint.ActivationStartId;
+                                    }
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("Limiter##gotoLimiter"))
+                                    {
+                                        limiterSelectedIndex = constraint.LimiterId;
+                                    }
+
+                                    void AllocActivation(Action<int> onAdd)
+                                    {
+                                        if (activationList != null)
+                                        {
+                                            activationList.Add(new Motion.ConstraintActivation { });
+                                            onAdd(activationList.Count - 1);
+                                        }
+                                    }
+                                    void AllocLimiter(Action<int> onAdd)
+                                    {
+                                        if (limiterList != null)
+                                        {
+                                            limiterList.Add(new Motion.Limiter { });
+                                            onAdd(limiterList.Count - 1);
+                                        }
+                                    }
+
+                                    if (ImGui.Button("Alloc activation"))
+                                    {
+                                        AllocActivation(index =>
+                                        {
+                                            activationSelectedIndex = constraint.ActivationStartId = (short)index;
+                                            saved = true;
+                                        });
+                                    }
+
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("Append activation"))
+                                    {
+                                        AllocActivation(index =>
+                                        {
+                                            activationSelectedIndex = (short)index;
+                                            saved = true;
+                                        });
+                                    }
+
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("Alloc limiter"))
+                                    {
+                                        AllocLimiter(index =>
+                                        {
+                                            limiterSelectedIndex = constraint.LimiterId = (short)index;
+                                            saved = true;
+                                        });
+                                    }
                                 }
                                 else
                                 {
@@ -161,11 +228,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         );
 
 
-                        ForHeader("ConstraintActivations --", () =>
+                        ForHeader("ConstraintActivations", () =>
                         {
                             if (activationList?.Any() ?? false)
                             {
-                                if (ImGui.DragInt("activationIndex", ref activationSelectedIndex, 0.05f, 0, activationNames.Count - 1))
+                                if (ImGui.DragInt("index##activationIndex", ref activationSelectedIndex, 0.05f, 0, activationNames.Count - 1))
                                 {
 
                                 }
@@ -201,11 +268,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         );
 
 
-                        ForHeader("Limiters --", () =>
+                        ForHeader("Limiters", () =>
                         {
                             if (limiterList?.Any() ?? false)
                             {
-                                if (ImGui.DragInt("limiterIndex", ref limiterSelectedIndex, 0.05f, 0, limiterNames.Count - 1))
+                                if (ImGui.DragInt("index##limiterIndex", ref limiterSelectedIndex, 0.05f, 0, limiterNames.Count - 1))
                                 {
 
                                 }
@@ -297,16 +364,5 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             };
         }
 
-        private string FormatTargetChannel(short type)
-        {
-            if (0 <= type && type < 9)
-            {
-                return _targetChannels[type];
-            }
-            else
-            {
-                return type.ToString();
-            }
-        }
     }
 }
