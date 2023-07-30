@@ -352,6 +352,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                         _settings.ViewExpression = it;
                         _settings.Save();
                     });
+                    ForMenuCheck("Constraint", () => _settings.ViewConstraint, it =>
+                    {
+                        _settings.ViewConstraint = it;
+                        _settings.Save();
+                    });
                 });
                 ForMenu("Help", () =>
                 {

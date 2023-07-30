@@ -41,7 +41,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             {
                 if (_settings.ViewBones)
                 {
-                    ForWindow("Bones manager", () =>
+                    var windowClosed = !ForWindow("Bones manager", () =>
                     {
                         if (jointAge.NeedToCatchUpAnyOf(configAge))
                         {
@@ -96,6 +96,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             }
                         }
                     });
+
+                    if (windowClosed)
+                    {
+                        _settings.ViewBones = false;
+                    }
                 }
             };
         }

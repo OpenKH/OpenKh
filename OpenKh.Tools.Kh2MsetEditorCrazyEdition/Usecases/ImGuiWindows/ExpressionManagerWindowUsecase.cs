@@ -57,7 +57,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             {
                 if (_settings.ViewExpression)
                 {
-                    ForWindow("Expression manager", () =>
+                    var windowClosed = !ForWindow("Expression manager", () =>
                     {
                         var sourceList = _loadedModel.MotionData?.Expressions;
                         var nodeList = _loadedModel.MotionData?.ExpressionNodes;
@@ -120,9 +120,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                         var enterCar = false;
                         var enterCdr = false;
 
-                        if (list.Any())
+                        ForHeader("Expressions --", () =>
                         {
-                            ForHeader("Expressions --", () =>
+                            if (list.Any())
                             {
                                 if (ImGui.DragInt("index", ref selectedIndex, 0.05f, 0, list.Count - 1))
                                 {
@@ -150,9 +150,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     ImGui.Text("ExpressionNodes --");
 
                                     var tokens = _formatExpressionNodesUsecase.ToTree(
-                                        expression.NodeId,
-                                        index => nodeList?.GetAtOrNull(index)
-                                    );
+                                            expression.NodeId,
+                                            index => nodeList?.GetAtOrNull(index)
+                                        );
 
                                     ImGui.Text("");
 
@@ -169,19 +169,19 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                         }
                                     }
 
-                                    if (ImGui.Button("Explore"))
+                                    if (ImGui.Button("Goto RootNode"))
                                     {
                                         expressionNodeSelectedIndex = expression.NodeId;
                                     }
 
                                     ImGui.SameLine();
-                                    if (ImGui.Button("Enter CAR"))
+                                    if (ImGui.Button("Goto CAR"))
                                     {
                                         enterCar = true;
                                     }
 
                                     ImGui.SameLine();
-                                    if (ImGui.Button("Enter CDR"))
+                                    if (ImGui.Button("Goto CDR"))
                                     {
                                         enterCdr = true;
                                     }
@@ -190,12 +190,12 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     if (ImGui.Button("Alloc RootNode"))
                                     {
                                         AllocNode(
-                                            nodeId =>
-                                            {
-                                                expression.NodeId = nodeId;
-                                                saved = true;
-                                            }
-                                        );
+                                                nodeId =>
+                                                {
+                                                    expression.NodeId = nodeId;
+                                                    saved = true;
+                                                }
+                                            );
                                     }
 
                                     ImGui.SameLine();
@@ -221,19 +221,19 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                 {
                                     ImGui.Text("(Editor will appear after selection)");
                                 }
-                            },
-                                openByDefault: true
-                            );
-                        }
-                        else
-                        {
-                            ImGui.Text("(Collection is empty)");
-                        }
+                            }
+                            else
+                            {
+                                ImGui.Text("(Collection is empty)");
+                            }
+                        },
+                            openByDefault: true
+                        );
 
 
-                        if (expressionNodeList.Any())
+                        ForHeader("ExpressionNodes --", () =>
                         {
-                            ForHeader("ExpressionNodes --", () =>
+                            if (expressionNodeList.Any())
                             {
                                 if (ImGui.DragInt("nodeIndex", ref expressionNodeSelectedIndex, 0.05f, 0, expressionNodeList.Count - 1))
                                 {
@@ -265,22 +265,22 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     if (allocCar)
                                     {
                                         AllocNode(
-                                            nodeId =>
-                                            {
-                                                node.CAR = nodeId;
-                                                saved = true;
-                                            }
-                                        );
+                                                nodeId =>
+                                                {
+                                                    node.CAR = nodeId;
+                                                    saved = true;
+                                                }
+                                            );
                                     }
                                     if (allocCdr)
                                     {
                                         AllocNode(
-                                            nodeId =>
-                                            {
-                                                node.CDR = nodeId;
-                                                saved = true;
-                                            }
-                                        );
+                                                nodeId =>
+                                                {
+                                                    node.CDR = nodeId;
+                                                    saved = true;
+                                                }
+                                            );
                                     }
 
                                     ForCombo("Type", _expressionNodeTypes, () => node.Type, it => { node.Type = (byte)it; saved = true; });
@@ -294,14 +294,14 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                 {
                                     ImGui.Text("(Editor will appear after selection)");
                                 }
-                            },
-                                openByDefault: true
-                            );
-                        }
-                        else
-                        {
-                            ImGui.Text("(Collection is empty)");
-                        }
+                            }
+                            else
+                            {
+                                ImGui.Text("(Collection is empty)");
+                            }
+                        },
+                            openByDefault: true
+                        );
 
 
                         if (saved)
@@ -312,6 +312,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                     },
                         menuBar: true
                     );
+
+                    if (windowClosed)
+                    {
+                        _settings.ViewExpression = false;
+                    }
                 }
             };
         }

@@ -102,6 +102,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<IWindowRunnableProvider, InitialPoseManagerWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, ErrorMessagesWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, ExpressionManagerWindowUsecase>();
+            self.AddSingleton<IWindowRunnableProvider, ConstraintManagerWindowUsecase>();
             
 
             // tools

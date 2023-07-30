@@ -46,7 +46,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             {
                 if (_settings.ViewInitialPose)
                 {
-                    ForWindow("InitialPose manager", () =>
+                    var windowClosed = !ForWindow("InitialPose manager", () =>
                     {
                         var sourceList = _loadedModel.MotionData?.InitialPoses;
 
@@ -130,6 +130,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                     },
                         menuBar: true
                     );
+
+                    if (windowClosed)
+                    {
+                        _settings.ViewInitialPose = false;
+                    }
                 }
             };
         }

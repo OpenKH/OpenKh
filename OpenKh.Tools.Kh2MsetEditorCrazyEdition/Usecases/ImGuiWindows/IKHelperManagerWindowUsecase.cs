@@ -42,7 +42,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
             {
                 if (_settings.ViewIKHelper)
                 {
-                    ForWindow("IKHelper manager", () =>
+                    var windowClosed = !ForWindow("IKHelper manager", () =>
                     {
                         var saved = false;
 
@@ -123,6 +123,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             _loadedModel.SendBackMotionData.TurnOn();
                         }
                     });
+
+                    if (windowClosed)
+                    {
+                        _settings.ViewIKHelper = false;
+                    }
                 }
             };
         }
