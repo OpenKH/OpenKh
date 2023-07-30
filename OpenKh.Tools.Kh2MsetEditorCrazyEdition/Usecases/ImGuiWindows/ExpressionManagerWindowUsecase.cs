@@ -195,11 +195,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 
                                     if (ImGui.Button("Alloc RootNode"))
                                     {
-                                        AllocNode(nodeId =>
-                                        {
-                                            expression.NodeId = nodeId;
-                                            saved = true;
-                                        });
+                                        AllocNode(nodeId => expression.NodeId = nodeId);
                                     }
 
                                     ImGui.SameLine();
@@ -268,23 +264,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     }
                                     if (allocCar)
                                     {
-                                        AllocNode(
-                                                nodeId =>
-                                                {
-                                                    node.CAR = nodeId;
-                                                    saved = true;
-                                                }
-                                            );
+                                        AllocNode(nodeId => node.CAR = nodeId);
                                     }
                                     if (allocCdr)
                                     {
-                                        AllocNode(
-                                                nodeId =>
-                                                {
-                                                    node.CDR = nodeId;
-                                                    saved = true;
-                                                }
-                                            );
+                                        AllocNode(nodeId => node.CDR = nodeId);
                                     }
 
                                     ForCombo("Type", _expressionNodeTypes, () => node.Type, it => { node.Type = (byte)it; saved = true; });

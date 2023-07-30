@@ -174,6 +174,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                         {
                                             activationList.Add(new Motion.ConstraintActivation { });
                                             onAdd(activationList.Count - 1);
+                                            saved = true;
                                         }
                                     }
                                     void AllocLimiter(Action<int> onAdd)
@@ -182,6 +183,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                         {
                                             limiterList.Add(new Motion.Limiter { });
                                             onAdd(limiterList.Count - 1);
+                                            saved = true;
                                         }
                                     }
 
@@ -190,7 +192,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                         AllocActivation(index =>
                                         {
                                             activationSelectedIndex = constraint.ActivationStartId = (short)index;
-                                            saved = true;
+                                            constraint.ActivationCount = 1;
                                         });
                                     }
 
@@ -199,19 +201,19 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     {
                                         AllocActivation(index =>
                                         {
+                                            if (constraint.ActivationStartId + constraint.ActivationCount + 1 == activationList!.Count)
+                                            {
+                                                ++constraint.ActivationCount;
+                                            }
+
                                             activationSelectedIndex = (short)index;
-                                            saved = true;
                                         });
                                     }
 
                                     ImGui.SameLine();
                                     if (ImGui.Button("Alloc limiter"))
                                     {
-                                        AllocLimiter(index =>
-                                        {
-                                            limiterSelectedIndex = constraint.LimiterId = (short)index;
-                                            saved = true;
-                                        });
+                                        AllocLimiter(index => limiterSelectedIndex = constraint.LimiterId = (short)index);
                                     }
                                 }
                                 else
@@ -353,7 +355,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             _loadedModel.SendBackMotionData.TurnOn();
                         }
                     },
-                        menuBar: true
+                        menuBar:
+true
                     );
 
                     if (windowClosed)
