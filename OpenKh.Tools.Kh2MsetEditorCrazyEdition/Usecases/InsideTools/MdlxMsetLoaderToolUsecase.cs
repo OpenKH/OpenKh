@@ -2,18 +2,12 @@ using ImGuiNET;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Interfaces;
-using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Models.Presets;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
-using static OpenKh.Tools.Kh2MsetEditorCrazyEdition.ImGuiExHelpers;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
 {

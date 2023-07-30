@@ -1,15 +1,11 @@
 using ImGuiNET;
-using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
-using xna = Microsoft.Xna.Framework;
+using OpenKh.Kh2;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
-using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers.HandyEditorSpec;
-using OpenKh.Kh2;
+using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 {

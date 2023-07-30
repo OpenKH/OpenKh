@@ -1,16 +1,9 @@
 using ImGuiNET;
-using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
-using static OpenKh.Tools.Kh2MsetEditorCrazyEdition.ImGuiExHelpers;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
-using System.Numerics;
-using Xe.Tools.Wpf.Dialogs;
 using System.IO;
+using Xe.Tools.Wpf.Dialogs;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 {

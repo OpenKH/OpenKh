@@ -3,11 +3,7 @@ using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
-using static OpenKh.Tools.Kh2MsetEditorCrazyEdition.ImGuiExHelpers;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
 {
