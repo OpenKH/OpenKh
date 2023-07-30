@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine;
 using OpenKh.Engine.MonoGame;
@@ -64,6 +65,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<EditCollectionNoErrorUsecase>();
             self.AddSingleton<FormatExpressionNodesUsecase>();
             self.AddSingleton<FormatListItemUsecase>();
+            self.AddSingleton<ITextureBinder, TextureBinderProxy>();
+            self.AddSingleton<ComputeSpriteIconUvUsecase>();
+            self.AddSingleton<PrintDebugInfo>();
+            self.AddSingleton<ConvertVectorSpaceUsecase>();
+            
             // next
 
 
@@ -102,7 +108,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<IWindowRunnableProvider, ErrorMessagesWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, ExpressionManagerWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, ConstraintManagerWindowUsecase>();
+            self.AddSingleton<IWindowRunnableProvider, PrintDebugInfoManagerWindowUsecase>();
             
+
 
             // tools
             self.AddSingleton<IToolRunnableProvider, MdlxMsetLoaderToolUsecase>();
@@ -110,13 +118,21 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
 
             self.AddSingleton(Settings.Default);
 
-            self.AddSingleton<GetWhiteTextureUsecase>(
+            self.AddSingleton<CreateWhiteTextureUsecase>(
                 sp =>
                     () =>
                     {
                         var whiteTexture = new Texture2D(sp.GetRequiredService<GraphicsDevice>(), 2, 2);
                         whiteTexture.SetData(Enumerable.Range(0, 2 * 2 * sizeof(int)).Select(_ => (byte)0xff).ToArray());
                         return whiteTexture;
+                    }
+            );
+
+            self.AddSingleton<CreateSpriteIconsTextureUsecase>(
+                sp =>
+                    () =>
+                    {
+                        return sp.GetRequiredService<ContentManager>().Load<Texture2D>("SpriteIcons");
                     }
             );
 
@@ -178,10 +194,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
                     var bootstrap = new MonoGameImGuiBootstrap(
                         InitialWindowWidth,
                         InitialWindowHeight,
-                        bootstrap =>
-                        {
-                            var app = lazyApp.Value;
-                        }
+                        bootstrap => { }
                     );
                     bootstrap.MainLoop = _ =>
                     {

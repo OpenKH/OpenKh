@@ -13,7 +13,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
     {
         private readonly EditCollectionNoErrorUsecase _editCollectionNoErrorUsecase;
         private readonly ErrorMessages _errorMessages;
-        private readonly string _popupCaption;
         private readonly LoadedModel _loadedModel;
         private readonly Settings _settings;
 
@@ -26,7 +25,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
         {
             _editCollectionNoErrorUsecase = editCollectionNoErrorUsecase;
             _errorMessages = errorMessages;
-            _popupCaption = "Select initialPose";
             _loadedModel = loadedModel;
             _settings = settings;
         }

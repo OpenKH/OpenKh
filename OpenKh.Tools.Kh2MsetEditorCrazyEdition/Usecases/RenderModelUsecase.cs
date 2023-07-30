@@ -1,3 +1,4 @@
+using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Engine;
@@ -19,6 +20,9 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 {
     public class RenderModelUsecase
     {
+        private readonly ConvertVectorSpaceUsecase _convertVectorSpaceUsecase;
+        private readonly PrintDebugInfo _printDebugInfo;
+        private readonly ComputeSpriteIconUvUsecase _computeSpriteIconUvUsecase;
         private readonly Settings _settings;
         private readonly ManageKingdomTextureUsecase _manageKingdomTextureUsecase;
         private readonly Camera _camera;
@@ -39,17 +43,26 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             MultiSampleMask = int.MaxValue,
             IndependentBlendEnable = false
         };
+        private readonly SpriteBatch _spriteBatch;
+        private readonly Texture2D _spriteIcons;
 
         public RenderModelUsecase(
             LoadedModel loadedModel,
             GraphicsDevice graphics,
             KingdomShader shader,
             Camera camera,
-            GetWhiteTextureUsecase getWhiteTextureUsecase,
+            CreateWhiteTextureUsecase getWhiteTextureUsecase,
             ManageKingdomTextureUsecase manageKingdomTextureUsecase,
-            Settings settings
+            Settings settings,
+            CreateSpriteIconsTextureUsecase createSpriteIconsTextureUsecase,
+            ComputeSpriteIconUvUsecase computeSpriteIconUvUsecase,
+            PrintDebugInfo printDebugInfo,
+            ConvertVectorSpaceUsecase convertVectorSpaceUsecase
         )
         {
+            _convertVectorSpaceUsecase = convertVectorSpaceUsecase;
+            _printDebugInfo = printDebugInfo;
+            _computeSpriteIconUvUsecase = computeSpriteIconUvUsecase;
             _settings = settings;
             _manageKingdomTextureUsecase = manageKingdomTextureUsecase;
             _camera = camera;
@@ -59,6 +72,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             _whiteTexture = getWhiteTextureUsecase();
             _effectForBoneLines = new BasicEffect(_graphics);
             _effectForBoneLines.VertexColorEnabled = true;
+            _spriteBatch = new SpriteBatch(_graphics);
+            _spriteIcons = createSpriteIconsTextureUsecase();
         }
 
         public void Draw()
@@ -74,6 +89,21 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             _graphics.BlendState = DefaultBlendState;
 
             var ones = _loadedModel.MdlxRenderableList.Where(it => it.IsVisible);
+
+            var fkView = _loadedModel.GetActiveFkBoneViews?.Invoke();
+            int FindSpriteIconIndex(int index)
+            {
+                if (index == _loadedModel.SelectedJointIndex)
+                {
+                    return 255;
+                }
+                else
+                {
+                    return fkView?
+                        .FirstOrDefault(it => it.I == index)?
+                        .SpriteIcon ?? 0;
+                }
+            }
 
             _shader.Pass(pass =>
             {
@@ -94,7 +124,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 
                     if (_settings.ViewFkBones && matrices != null)
                     {
-                        RenderFkBone(matrices, _loadedModel.InternalFkBones);
+                        RenderFkBone(
+                            matrices,
+                            index => _loadedModel.InternalFkBones[index].Parent,
+                            FindSpriteIconIndex
+                        );
                     }
                 }
                 foreach (var one in ones)
@@ -106,17 +140,17 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             });
         }
 
-        private void RenderFkBone(Matrix4x4[] matrices, List<Mdlx.Bone> internalFkBones)
+        private void RenderFkBone(Matrix4x4[] matrices, Func<int, int> getParent, Func<int, int> getSpriteIconIndex)
         {
-            var points = new VertexPositionColor[2 * internalFkBones.Count];
+            var points = new VertexPositionColor[2 * matrices.Length];
             var pointIdx = 0;
 
-            for (int x = 0; x < internalFkBones.Count; x++)
+            for (int x = 0; x < matrices.Length; x++)
             {
-                var one = internalFkBones[x];
+                var parent = getParent(x);
 
-                var from = matrices[(one.Parent < 0) ? one.Index : one.Parent].Translation;
-                var to = matrices[one.Index].Translation;
+                var from = matrices[(parent < 0) ? x : parent].Translation;
+                var to = matrices[x].Translation;
 
                 points[pointIdx++] = new VertexPositionColor(new xna.Vector3(from.X, from.Y, from.Z), xna.Color.Green);
                 points[pointIdx++] = new VertexPositionColor(new xna.Vector3(to.X, to.Y, to.Z), xna.Color.Green);
@@ -143,8 +177,80 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                 );
             }
 
+            {
+                _spriteBatch.Begin(blendState: BlendState.AlphaBlend, depthStencilState: DepthStencilState.None);
+
+                for (int x = 0; x < matrices.Length; x++)
+                {
+                    var spriteIconIndex = getSpriteIconIndex(x);
+                    if (1 <= spriteIconIndex)
+                    {
+                        var sourceRect = _computeSpriteIconUvUsecase.ComputeDrawSourceRect(spriteIconIndex & 255, _spriteIcons.Width, _spriteIcons.Height);
+
+                        var (position, scale, visible) = _convertVectorSpaceUsecase.FromLocalSpaceToWindowsPixelSpace(
+                            matrices[x].Translation,
+                            _graphics.Viewport.Bounds,
+                            _camera.World * _camera.Projection
+                        );
+
+                        if (visible)
+                        {
+                            var length = 32 * 150 * scale;
+
+                            _spriteBatch.Draw(
+                                _spriteIcons,
+                                new xna.Rectangle(
+                                    (int)(position.X - length / 2),
+                                    (int)(position.Y - length / 2),
+                                    (int)length,
+                                    (int)length
+                                ),
+                                sourceRect,
+                                xna.Color.White
+                            );
+                        }
+                    }
+                }
+
+                _spriteBatch.End();
+            }
+
+            {
+                var writer = new StringWriter();
+
+                foreach (var (matrix, index) in new Matrix4x4[] {
+                    //_camera.Projection,
+                    //_camera.World,
+                    //_camera.Projection * _camera.World,
+                    _camera.World * _camera.Projection,
+                }
+                    .SelectWithIndex()
+                )
+                {
+                    //writer.WriteLine($"#{index}.xyz: {Vector3.Transform(Vector3.Zero, matrix)}");
+                    //writer.WriteLine($"#{index}.xyz_: {Vector4.Transform(Vector3.Zero, matrix)}");
+                    //writer.WriteLine($"#{index}.xyz0: {Vector4.Transform(Vector4.Zero, matrix)}");
+                    //writer.WriteLine($"#{index}.xyz1: {Vector4.Transform(new Vector4(0, 0, 0, 1), matrix)}");
+                    writer.WriteLine($"#{index}.xyz1: {WTo1(Vector4.Transform(new Vector4(0, 0, 0, 1), matrix))}");
+                }
+
+                _printDebugInfo.Printers["ProjectionWorldMatrix"] = () =>
+                {
+                    ImGui.Text(writer.ToString());
+                };
+            }
+
             _graphics.DepthStencilState = prevDepthStencilState;
             _graphics.BlendState = prevBlendState;
+        }
+
+        private Vector3 WTo1(Vector4 vector4)
+        {
+            return new Vector3(
+                vector4.X / vector4.W,
+                vector4.Y / vector4.W,
+                vector4.Z / vector4.W
+            );
         }
 
         private void Render(EffectPass pass, MdlxRenderSource mesh, Matrix4x4[]? matrices, bool passRenderOpaque)

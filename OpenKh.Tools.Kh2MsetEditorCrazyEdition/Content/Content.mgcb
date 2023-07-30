@@ -19,3 +19,8 @@
 /processorParam:DebugMode=Auto
 /build:KingdomShader.fx
 
+# Build a texture
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=false
+/build:SpriteIcons.png

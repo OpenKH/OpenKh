@@ -1,28 +1,41 @@
 using ImGuiNET;
+using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 {
     public class BonesManagerWindowUsecase : IWindowRunnableProvider
     {
+        private readonly ComputeSpriteIconUvUsecase _computeSpriteIconUvUsecase;
+        private readonly ITextureBinder _textureBinder;
+        private readonly Texture2D _spriteIcons;
         private readonly LoadedModel _loadedModel;
         private readonly Settings _settings;
+        private readonly IntPtr _spriteIconsPtr;
 
         public BonesManagerWindowUsecase(
             Settings settings,
-            LoadedModel loadedModel
+            LoadedModel loadedModel,
+            CreateSpriteIconsTextureUsecase createSpriteIconsTextureUsecase,
+            ITextureBinder textureBinder,
+            ComputeSpriteIconUvUsecase computeSpriteIconUvUsecase
         )
         {
+            _computeSpriteIconUvUsecase = computeSpriteIconUvUsecase;
+            _textureBinder = textureBinder;
+            _spriteIcons = createSpriteIconsTextureUsecase();
             _loadedModel = loadedModel;
             _settings = settings;
+            _spriteIconsPtr = _textureBinder.BindTexture(_spriteIcons);
         }
 
-        private record JointDef(int AbsIndex, string Display)
+        private record JointDef(int AbsIndex, string Display, int SpriteIconIndex)
         {
 
         }
@@ -40,19 +53,25 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                 {
                     var windowClosed = !ForWindow("Bones manager", () =>
                     {
+                        ForEdit("showFk", () => _settings.ViewFkBones, it =>
                         {
-                            var state = _settings.ViewFkBones;
-                            if (ImGui.Checkbox("showFk", ref state))
-                            {
-                                _settings.ViewFkBones = state;
-                                _settings.Save();
-                            }
-                        }
+                            _settings.ViewFkBones = it;
+                            _settings.Save();
+                        });
 
                         if (jointAge.NeedToCatchUpAnyOf(configAge))
                         {
                             var fkView = _loadedModel.GetActiveFkBoneViews?.Invoke();
                             var ikView = _loadedModel.GetActiveIkBoneViews?.Invoke();
+
+                            int FindSpriteIconIndex(int index)
+                            {
+                                return fkView?
+                                    .LastOrDefault(
+                                        it => it.I == index
+                                    )?
+                                    .SpriteIcon ?? 0;
+                            }
 
                             string FindFkJointName(int index)
                             {
@@ -78,7 +97,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     .Select(
                                         (joint, index) => new JointDef(
                                             index,
-                                            $"FK<{joint.Index}> {new string('.', joint.Depth)} {FindFkJointName(index)}"
+                                            $"FK<{joint.Index}> {new string('.', joint.Depth)} {FindFkJointName(index)}",
+                                            FindSpriteIconIndex(joint.Index)
                                         )
                                     )
                             );
@@ -87,7 +107,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                     .Select(
                                         (joint, index) => new JointDef(
                                             joint.Index,
-                                            $"IK<{joint.Index}> {new string('.', joint.Depth)} {FindIkJointName(joint.Index)}"
+                                            $"IK<{joint.Index}> {new string('.', joint.Depth)} {FindIkJointName(joint.Index)}",
+                                            FindSpriteIconIndex(joint.Index)
                                         )
                                     )
                             );
@@ -101,6 +122,10 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             {
                                 var isSelected = _loadedModel.SelectedJointIndex == jointDef.AbsIndex;
 
+                                var uv = _computeSpriteIconUvUsecase.Compute(jointDef.SpriteIconIndex & 255);
+                                ImGui.Image(_spriteIconsPtr, new Vector2(16, 16), uv.Uv0, uv.Uv1);
+
+                                ImGui.SameLine();
                                 if (ImGui.Selectable(jointDef.Display, isSelected))
                                 {
                                     _loadedModel.SelectedJointIndex = jointDef.AbsIndex;

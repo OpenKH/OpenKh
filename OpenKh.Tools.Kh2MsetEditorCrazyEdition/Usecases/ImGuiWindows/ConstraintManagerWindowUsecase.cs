@@ -216,6 +216,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                             activationSelectedIndex = at;
 
                                             sourceList
+                                                .Where(it => !ReferenceEquals(it, constraint))
+                                                .ToList()
                                                 .ForEach(
                                                     one =>
                                                     {
@@ -374,8 +376,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             _loadedModel.SendBackMotionData.TurnOn();
                         }
                     },
-                        menuBar:
-true
+                        menuBar:true
                     );
 
                     if (windowClosed)

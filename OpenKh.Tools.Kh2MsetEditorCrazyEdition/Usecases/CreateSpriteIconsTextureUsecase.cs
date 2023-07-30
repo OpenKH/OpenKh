@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 {
-    public delegate Texture2D GetWhiteTextureUsecase();
+    public delegate Texture2D CreateSpriteIconsTextureUsecase();
 }

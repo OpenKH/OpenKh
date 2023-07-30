@@ -14,5 +14,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Models.BoneDictSpec
         /// </summary>
         [XmlAttribute] public int I { get; set; }
         [XmlAttribute] public string? Name { get; set; }
+        [XmlAttribute] public int SpriteIcon { get; set; }
     }
 }
