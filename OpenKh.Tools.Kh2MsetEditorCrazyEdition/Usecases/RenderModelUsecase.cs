@@ -180,6 +180,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             {
                 _spriteBatch.Begin(blendState: BlendState.AlphaBlend, depthStencilState: DepthStencilState.None);
 
+                var fromLocalSpaceToWindowsPixelSpace = _convertVectorSpaceUsecase.GetFromLocalSpaceToWindowsPixelSpace(
+                    _graphics.Viewport.Bounds,
+                    _camera.World * _camera.Projection
+                );
+
                 for (int x = 0; x < matrices.Length; x++)
                 {
                     var spriteIconIndex = getSpriteIconIndex(x);
@@ -187,11 +192,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                     {
                         var sourceRect = _computeSpriteIconUvUsecase.ComputeDrawSourceRect(spriteIconIndex & 255, _spriteIcons.Width, _spriteIcons.Height);
 
-                        var (position, scale, visible) = _convertVectorSpaceUsecase.FromLocalSpaceToWindowsPixelSpace(
-                            matrices[x].Translation,
-                            _graphics.Viewport.Bounds,
-                            _camera.World * _camera.Projection
-                        );
+                        var (position, scale, visible) = fromLocalSpaceToWindowsPixelSpace(matrices[x].Translation);
 
                         if (visible)
                         {
