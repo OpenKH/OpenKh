@@ -35,5 +35,15 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
         {
             return $"{(Motion.ExpressionType)it.Type}, {it.Value}, {it.CAR}, {it.CDR}, {it.Element}, {(it.IsGlobal ? "Global" : "Local")}";
         }
+
+        public string FormatJoint(Joint it)
+        {
+            return $"{it.JointId} {it.IK} {(it.ExtEffector ? "Ext" : "")} {(it.CalcMatrix2Rot ? "M2R" : "")} {(it.Calculated ? "Calc" : "")} {(it.Fixed ? "Fix" : "")} {(it.Rotation ? "Rot" : "")} {(it.Trans ? "Tra" : "")}";
+        }
+
+        public string FormatFCurve(FCurve it)
+        {
+            return $"{it.JointId}, {it.ChannelValue}, {it.Pre}, {it.Post}, {it.KeyStartId}, {it.KeyCount}";
+        }
     }
 }

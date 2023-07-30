@@ -207,6 +207,21 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                         _settings.ViewDebugInfo = it;
                         _settings.Save();
                     });
+                    ForMenuCheck("Joint", () => _settings.ViewJoint, it =>
+                    {
+                        _settings.ViewJoint = it;
+                        _settings.Save();
+                    });
+                    ForMenuCheck("FCurvesForward", () => _settings.ViewFCurvesForward, it =>
+                    {
+                        _settings.ViewFCurvesForward = it;
+                        _settings.Save();
+                    });
+                    ForMenuCheck("FCurvesInverse", () => _settings.ViewFCurvesInverse, it =>
+                    {
+                        _settings.ViewFCurvesInverse = it;
+                        _settings.Save();
+                    });
                 });
                 ForMenu("Help", () =>
                 {

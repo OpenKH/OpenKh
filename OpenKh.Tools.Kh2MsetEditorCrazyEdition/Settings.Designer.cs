@@ -238,5 +238,41 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition {
                 this["ViewDebugInfo"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewJoint {
+            get {
+                return ((bool)(this["ViewJoint"]));
+            }
+            set {
+                this["ViewJoint"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewFCurvesForward {
+            get {
+                return ((bool)(this["ViewFCurvesForward"]));
+            }
+            set {
+                this["ViewFCurvesForward"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewFCurvesInverse {
+            get {
+                return ((bool)(this["ViewFCurvesInverse"]));
+            }
+            set {
+                this["ViewFCurvesInverse"] = value;
+            }
+        }
     }
 }

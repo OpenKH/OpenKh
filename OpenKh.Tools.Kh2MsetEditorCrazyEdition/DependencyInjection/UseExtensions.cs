@@ -68,6 +68,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<ComputeSpriteIconUvUsecase>();
             self.AddSingleton<PrintDebugInfo>();
             self.AddSingleton<ConvertVectorSpaceUsecase>();
+            self.AddSingleton<FCurvesManagerUsecase>();
             
             // next
 
@@ -108,7 +109,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<IWindowRunnableProvider, ExpressionManagerWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, ConstraintManagerWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, PrintDebugInfoManagerWindowUsecase>();
-            
+            self.AddSingleton<IWindowRunnableProvider, JointManagerWindowUsecase>();
+            self.AddSingleton<IWindowRunnableProvider, FCurvesForwardManagerWindowUsecase>();
+            self.AddSingleton<IWindowRunnableProvider, FCurvesInverseManagerWindowUsecase>();
+
+
 
 
             // tools
