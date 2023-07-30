@@ -116,6 +116,14 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                                 ForEdit("Trans", () => joint.Trans, it => { joint.Trans = it; saved = true; });
 
                                 ForEdit("Reserved", () => joint.Reserved, it => { joint.Reserved = it; saved = true; });
+
+                                ImGui.Text("Goto:");
+                                ImGui.SameLine();
+                                if (ImGui.Button("Joint##gotoJoint"))
+                                {
+                                    _loadedModel.SelectedJointIndex = joint.JointId;
+                                    _loadedModel.SelectedJointIndexAge.Bump();
+                                }
                             }
                             else
                             {

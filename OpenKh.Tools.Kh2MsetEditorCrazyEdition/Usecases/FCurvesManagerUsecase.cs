@@ -123,6 +123,16 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 
                                 ForEdit("KeyStartId", () => joint.KeyStartId, it => { joint.KeyStartId = it; saved = true; });
                                 ForEdit("KeyCount", () => joint.KeyCount, it => { joint.KeyCount = it; saved = true; });
+
+                                ImGui.Text("Goto:");
+                                ImGui.SameLine();
+                                if (ImGui.Button("Joint##gotoJoint"))
+                                {
+                                    _loadedModel.SelectedJointIndex = forward
+                                        ? joint.JointId
+                                        : _loadedModel.FKJointDescriptions.Count + joint.JointId;
+                                    _loadedModel.SelectedJointIndexAge.Bump();
+                                }
                             }
                             else
                             {
