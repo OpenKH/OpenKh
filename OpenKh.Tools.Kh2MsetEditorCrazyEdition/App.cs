@@ -222,6 +222,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
                         _settings.ViewFCurvesInverse = it;
                         _settings.Save();
                     });
+                    ForMenuCheck("FCurveKey", () => _settings.ViewFCurveKey, it =>
+                    {
+                        _settings.ViewFCurveKey = it;
+                        _settings.Save();
+                    });
                 });
                 ForMenu("Help", () =>
                 {

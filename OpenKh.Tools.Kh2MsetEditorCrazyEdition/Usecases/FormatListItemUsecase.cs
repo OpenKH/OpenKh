@@ -45,5 +45,20 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
         {
             return $"{it.JointId}, {it.ChannelValue}, {it.Pre}, {it.Post}, {it.KeyStartId}, {it.KeyCount}";
         }
+
+        public string FormatKey(Key it)
+        {
+            return $"{it.Time}, {it.Type}, {it.LeftTangentId}, {it.RightTangentId}";
+        }
+
+        public string FormatTime(float it)
+        {
+            return $"{it}";
+        }
+
+        public string FormatTangent(float it)
+        {
+            return $"{it}";
+        }
     }
 }

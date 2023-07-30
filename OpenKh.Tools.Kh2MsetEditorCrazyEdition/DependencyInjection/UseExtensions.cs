@@ -112,7 +112,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<IWindowRunnableProvider, JointManagerWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, FCurvesForwardManagerWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, FCurvesInverseManagerWindowUsecase>();
-
+            self.AddSingleton<IWindowRunnableProvider, FCurveKeyManagerWindowUsecase>();
+            
 
 
 

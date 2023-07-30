@@ -274,5 +274,17 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition {
                 this["ViewFCurvesInverse"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewFCurveKey {
+            get {
+                return ((bool)(this["ViewFCurveKey"]));
+            }
+            set {
+                this["ViewFCurveKey"] = value;
+            }
+        }
     }
 }
