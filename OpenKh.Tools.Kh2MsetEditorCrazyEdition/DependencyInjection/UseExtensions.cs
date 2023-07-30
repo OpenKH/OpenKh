@@ -43,7 +43,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             );
 
             self.AddSingleton<App>();
-            self.AddSingleton<MapRenderer>();
             self.AddSingleton<RenderModelUsecase>();
             self.AddSingleton<LoadedModel>();
             self.AddSingleton<KingdomShader>();
