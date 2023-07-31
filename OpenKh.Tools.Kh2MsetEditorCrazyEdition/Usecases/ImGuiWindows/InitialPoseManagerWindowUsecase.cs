@@ -70,8 +70,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             try
                             {
                                 list.Clear();
-                                list.AddRange(
-                                    sourceList!
+                                list.AddRangeIfNotNull(
+                                    sourceList?
                                         .Select(it => $"{it}")
                                 );
                             }

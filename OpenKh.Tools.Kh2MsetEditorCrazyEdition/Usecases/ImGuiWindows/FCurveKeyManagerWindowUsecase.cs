@@ -83,20 +83,20 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             try
                             {
                                 names.Clear();
-                                names.AddRange(
-                                    sourceList!
+                                names.AddRangeIfNotNull(
+                                    sourceList?
                                         .Select(_formatListItemUsecase.FormatKey)
                                 );
 
                                 timeNames.Clear();
-                                timeNames.AddRange(
-                                    timeList!
+                                timeNames.AddRangeIfNotNull(
+                                    timeList?
                                         .Select(_formatListItemUsecase.FormatTime)
                                 );
 
                                 tangentNames.Clear();
-                                tangentNames.AddRange(
-                                    tangentList!
+                                tangentNames.AddRangeIfNotNull(
+                                    tangentList?
                                         .Select(_formatListItemUsecase.FormatTangent)
                                 );
                             }

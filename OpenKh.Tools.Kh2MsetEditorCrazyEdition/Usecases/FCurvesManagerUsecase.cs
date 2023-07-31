@@ -83,8 +83,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                             try
                             {
                                 names.Clear();
-                                names.AddRange(
-                                    sourceList!
+                                names.AddRangeIfNotNull(
+                                    sourceList?
                                         .Select(_formatListItemUsecase.FormatFCurve)
                                 );
                             }

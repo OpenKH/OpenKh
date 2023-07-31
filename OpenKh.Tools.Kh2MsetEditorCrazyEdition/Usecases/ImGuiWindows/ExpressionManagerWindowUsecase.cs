@@ -87,14 +87,14 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             try
                             {
                                 names.Clear();
-                                names.AddRange(
-                                    sourceList!
+                                names.AddRangeIfNotNull(
+                                    sourceList?
                                         .Select(it => _formatListItemUsecase.FormatExpression(it, _targetChannels))
                                 );
 
                                 expressionNodeNames.Clear();
-                                expressionNodeNames.AddRange(
-                                    nodeList!
+                                expressionNodeNames.AddRangeIfNotNull(
+                                    nodeList?
                                         .Select(_formatListItemUsecase.FormatExpressionNode)
                                 );
                             }

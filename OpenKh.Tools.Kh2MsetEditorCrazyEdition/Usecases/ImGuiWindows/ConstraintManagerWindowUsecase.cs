@@ -86,20 +86,20 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             try
                             {
                                 names.Clear();
-                                names.AddRange(
-                                    sourceList!
+                                names.AddRangeIfNotNull(
+                                    sourceList?
                                         .Select(it => _formatListItemUsecase.FormatConstraint(it))
                                 );
 
                                 activationNames.Clear();
-                                activationNames.AddRange(
-                                    activationList!
+                                activationNames.AddRangeIfNotNull(
+                                    activationList?
                                         .Select(it => _formatListItemUsecase.FormatConstraintActivation(it))
                                 );
 
                                 limiterNames.Clear();
-                                limiterNames.AddRange(
-                                    limiterList!
+                                limiterNames.AddRangeIfNotNull(
+                                    limiterList?
                                         .Select(it => _formatListItemUsecase.FormatLimiter(it))
                                 );
                             }
