@@ -75,9 +75,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             FileDialogFilterComposer.Compose()
                                 .AddExtensions("Text", "txt")
                                 .AddAllFiles(),
-                            OperatingSystem.IsWindows()
-                                ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ErrorMessages.txt")
-                                : "ErrorMessages.txt"
+                            "ErrorMessages.txt"
                         );
                     }
 
