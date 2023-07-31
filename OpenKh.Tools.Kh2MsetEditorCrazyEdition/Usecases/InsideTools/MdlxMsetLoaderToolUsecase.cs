@@ -51,8 +51,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
 
         public Action CreateToolRunnable()
         {
-            string? mdlxFile = "";
-            string? msetFile = "";
+            string? mdlxFile = Settings.Default.LastLoadedMdlxFile;
+            string? msetFile = Settings.Default.LastLoadedMsetFile;
             int presetSelectedIndex = -1;
             ActionResult mdlxMsetResult = new ActionResult(ActionResultType.NotRun, "");
             var selectMotionVisible = false;
@@ -142,10 +142,27 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
                         try
                         {
                             _manageKingdomTextureUsecase.ClearCache();
+
                             var mdlxFull = _searchForKh2AssetFileUsecase.ResolveFilePath(mdlxFile!);
                             _loadModelUsecase.OpenModel(mdlxFull!);
+
+                            if (string.IsNullOrEmpty(mdlxFile))
+                            {
+                                mdlxFile = mdlxFull;
+                            }
+                            Settings.Default.LastLoadedMdlxFile = mdlxFile;
+                            Settings.Default.Save();
+
                             var msetFull = _searchForKh2AssetFileUsecase.ResolveFilePath(msetFile!);
                             _loadMotionUsecase.OpenMotion(msetFull!);
+
+                            if (string.IsNullOrEmpty(msetFile))
+                            {
+                                msetFile = msetFull;
+                            }
+                            Settings.Default.LastLoadedMsetFile = msetFile;
+                            Settings.Default.Save();
+
                             mdlxMsetResult = new ActionResult(ActionResultType.Success, "Success");
                         }
                         catch (Exception ex)

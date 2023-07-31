@@ -286,5 +286,29 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition {
                 this["ViewFCurveKey"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastLoadedMdlxFile {
+            get {
+                return ((string)(this["LastLoadedMdlxFile"]));
+            }
+            set {
+                this["LastLoadedMdlxFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastLoadedMsetFile {
+            get {
+                return ((string)(this["LastLoadedMsetFile"]));
+            }
+            set {
+                this["LastLoadedMsetFile"] = value;
+            }
+        }
     }
 }
