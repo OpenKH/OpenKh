@@ -69,6 +69,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<PrintDebugInfo>();
             self.AddSingleton<ConvertVectorSpaceUsecase>();
             self.AddSingleton<FCurvesManagerUsecase>();
+            self.AddSingleton<LogCrashStatusUsecase>();
             
             // next
 

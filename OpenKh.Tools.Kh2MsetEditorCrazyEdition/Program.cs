@@ -2,9 +2,11 @@ using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection;
+using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
 {
@@ -53,7 +55,24 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
 
             var bootstrap = container.GetRequiredService<MonoGameImGuiBootstrap>();
 
-            bootstrap.Run();
+            try
+            {
+                bootstrap.Run();
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    container.GetRequiredService<LogCrashStatusUsecase>().Log(ex, "Kh2MsetEditorCrazyEdition");
+                }
+                catch
+                {
+                    // ignore
+                }
+
+                ExceptionDispatchInfo.Capture(ex).Throw();
+                throw;
+            }
         }
 
         public void Dispose()

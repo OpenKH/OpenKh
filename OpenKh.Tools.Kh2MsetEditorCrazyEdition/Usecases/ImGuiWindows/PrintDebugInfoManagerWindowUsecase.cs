@@ -1,3 +1,5 @@
+// #define PLACE_CRASH_BUTTON
+
 using ImGuiNET;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers;
@@ -31,6 +33,13 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                 {
                     var windowClosed = !ForWindow("PrintDebugInfo manager", () =>
                     {
+#if PLACE_CRASH_BUTTON
+                        if (ImGui.Button("Crash"))
+                        {
+                            throw new Exception("Crash");
+                        }
+#endif
+
                         foreach (var pair in _printDebugInfo.Printers)
                         {
                             ForHeader(pair.Key, pair.Value, openByDefault: true);
