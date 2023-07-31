@@ -1,4 +1,5 @@
 using System.Windows.Controls;
+using OpenKh.Tools.Kh2ObjectEditor.ViewModel;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Views
 {
@@ -10,17 +11,16 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         {
             InitializeComponent();
             ThisVM = new Viewport_ViewModel();
+            ThisVM.ViewportControl = Viewport;
             DataContext = ThisVM;
         }
 
-        public Viewport_Control(Main_ViewModel mainVM)
+        private void Button_PreviousFrame(object sender, System.Windows.RoutedEventArgs e)
         {
-            InitializeComponent();
-            ThisVM = new Viewport_ViewModel(mainVM, Viewport);
-            DataContext = ThisVM;
+            ThisVM.previousFrame();
         }
 
-        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void Button_NextFrame(object sender, System.Windows.RoutedEventArgs e)
         {
             ThisVM.nextFrame();
         }

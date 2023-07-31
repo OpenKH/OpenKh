@@ -14,11 +14,11 @@
             <Label FontWeight="Bold">Filters</Label>
             <StackPanel Orientation="Horizontal">
                 <Label>Name:</Label>
-                <TextBox x:Name="FilterName" Width="200" VerticalContentAlignment="Center"></TextBox>
+                <TextBox Text="{Binding FilterName}" Width="200" VerticalContentAlignment="Center"></TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label>Hide Dummies:</Label>
-                <CheckBox x:Name="FilterHideDummies" VerticalAlignment="Center"/>
+                <CheckBox IsChecked="{Binding FilterHideDummies}" VerticalAlignment="Center"/>
             </StackPanel>
             <Button Width="100" HorizontalAlignment="Right" Click="Button_ApplyFilters">Apply filters</Button>
         </StackPanel>

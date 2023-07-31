@@ -1,0 +1,369 @@
+using OpenKh.Kh2;
+using OpenKh.Kh2.Models;
+using OpenKh.Kh2Anim.Mset;
+using OpenKh.Kh2Anim.Mset.Interfaces;
+using OpenKh.Tools.Kh2ObjectEditor.Classes;
+using OpenKh.Tools.Kh2ObjectEditor.Utils;
+using Simple3DViewport.Controls;
+using Simple3DViewport.Objects;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Media3D;
+
+namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
+{
+    public class Viewport_ViewModel : NotifyPropertyChangedBase
+    {
+        public SimpleModel ThisModel { get; set; }
+        public SimpleModel ThisCollisions { get; set; }
+
+        // Animation
+        public bool _animationRunning { get; set; }
+        public bool AnimationRunning
+        {
+            get { return _animationRunning; }
+            set
+            {
+                _animationRunning = value;
+                OnPropertyChanged("AnimationRunning");
+            }
+        }
+        public int currentAnim { get; set; }
+        private int _currentFrame { get; set; }
+        public int CurrentFrame
+        {
+            get { return _currentFrame; }
+            set
+            {
+                _currentFrame = value;
+                OnPropertyChanged("CurrentFrame");
+            }
+        }
+
+        public Matrix4x4[] currentPose { get; set; }
+        public Matrix4x4[] extraPose { get; set; }
+        private AnbIndir currentAnb { get; set; }
+        private IAnimMatricesProvider AnimMatricesProvider { get; set; }
+
+        public Simple3DViewport_Control ViewportControl { get; set; }
+
+        public Viewport_ViewModel()
+        {
+            AnimationRunning = false;
+            startAnimationTicker();
+
+            subscribe_ObjectSelected();
+            subscribe_MotionSelected();
+        }
+
+        public void loadModel()
+        {
+            if (App_Context.Instance.ModelFile != null)
+            {
+                ThisModel = ViewportHelper.getModel(App_Context.Instance.ModelFile, App_Context.Instance.TextureFile);
+                ViewportControl.VPModels.Clear();
+                if (ThisModel != null)
+                    ViewportControl.VPModels.Add(ThisModel);
+                ViewportControl.render();
+                ViewportControl.restartCamera();
+            }
+        }
+
+        private void loadAnb()
+        {
+            if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(App_Context.Instance.MsetPath, "mset") || App_Context.Instance.LoadedMotion == null)
+                return;
+
+            App_Context.Instance.LoadedMotion.Entry.Stream.Position = 0;
+            Bar anbBarFile = Bar.Read(App_Context.Instance.LoadedMotion.Entry.Stream);
+
+            currentAnb = new AnbIndir(anbBarFile);
+        }
+
+        private void loadAnimProvider()
+        {
+            using var mdlxStream = File.Open(App_Context.Instance.MdlxPath, FileMode.Open);
+
+            if (!mdlxStream.CanRead || !mdlxStream.CanSeek)
+                throw new InvalidDataException($"Read or seek must be supported.");
+
+            AnimMatricesProvider = currentAnb.GetAnimProvider(mdlxStream);
+        }
+
+        public void getMatricesForFrame(int frame)
+        {
+            loadAnimProvider();
+
+            Matrix4x4[] matrices = AnimMatricesProvider.ProvideMatrices(frame);
+
+            foreach (ModelSkeletal.SkeletalGroup group in App_Context.Instance.ModelFile.Groups)
+            {
+                group.Mesh = ModelSkeletal.getMeshFromGroup(group, matrices);
+            }
+        }
+
+        public void loadFrame()
+        {
+            loadAnimProvider();
+
+            ThisCollisions = new SimpleModel(new List<SimpleMesh>(), "COLLISIONS_1", new List<string> { "COLLISION", "COLLISION_GROUP" });
+
+            if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath,"mdlx") || !ObjectEditorUtils.isFilePathValid(App_Context.Instance.MsetPath, "mset") || App_Context.Instance.LoadedMotion == null)
+                return;
+
+            if(App_Context.Instance.AnimBinary?.MotionFile?.KeyTimes == null || App_Context.Instance.AnimBinary.MotionFile.KeyTimes.IsEmpty())
+            {
+                return;
+            }
+
+            int realFrameStart = (int)App_Context.Instance.AnimBinary.MotionFile.KeyTimes[0];
+            int realFrameEnd = (int)App_Context.Instance.AnimBinary.MotionFile.KeyTimes[App_Context.Instance.AnimBinary.MotionFile.KeyTimes.Count-1];
+
+            if (CurrentFrame < realFrameStart)
+                CurrentFrame = realFrameStart;
+
+            if (CurrentFrame > realFrameEnd)
+                CurrentFrame = 0;
+
+            Matrix4x4[] matrices = AnimMatricesProvider.ProvideMatrices(CurrentFrame);
+
+            foreach (ModelSkeletal.SkeletalGroup group in App_Context.Instance.ModelFile.Groups)
+            {
+                group.Mesh = ModelSkeletal.getMeshFromGroup(group, matrices);
+            }
+
+            // Render the animated model
+            loadCollisions(matrices);
+            ThisModel = ViewportHelper.getModel(App_Context.Instance.ModelFile, App_Context.Instance.TextureFile);
+            ViewportControl.VPModels.Clear();
+            if (ThisModel != null)
+                ViewportControl.VPModels.Add(ThisModel);
+            if (ThisCollisions != null)
+                ViewportControl.VPModels.Add(ThisCollisions);
+            ViewportControl.render();
+        }
+
+        public void nextFrame()
+        {
+            int timeTicked = 1;
+            CurrentFrame += timeTicked;
+            loadCollisions(null);
+            loadFrame();
+        }
+        public void previousFrame()
+        {
+            int timeTicked = 1;
+            CurrentFrame -= timeTicked;
+            loadCollisions(null);
+            loadFrame();
+        }
+
+        public void loadCollisions(Matrix4x4[] matrices)
+        {
+            if (App_Context.Instance.CollisionFile != null)
+            {
+                App_Context.Instance.LoadedMotion.Entry.Stream.Position = 0;
+                AnimationBinary animBinary = App_Context.Instance.AnimBinary;
+                App_Context.Instance.LoadedMotion.Entry.Stream.Position = 0;
+
+                List<short> collisionGroupsToLoad = new List<short>();
+
+                if (animBinary.MotionTriggerFile?.RangeTriggerList == null)
+                {
+                    return;
+                }
+
+                foreach (MotionTrigger.RangeTrigger trigger in animBinary.MotionTriggerFile.RangeTriggerList)
+                {
+                    if((trigger.StartFrame <= CurrentFrame || trigger.StartFrame == -1) && (trigger.EndFrame >= CurrentFrame || trigger.EndFrame == -1))
+                    {
+                        // Attack 1 hitbox
+                        if (trigger.Trigger == 10)
+                        {
+                            // Param 1 is atkp entry
+                            short hitbox1 = (short)(trigger.Param2);
+                            if (!collisionGroupsToLoad.Contains(hitbox1))
+                                collisionGroupsToLoad.Add(hitbox1);
+                        }
+                        // Attack 2 hitboxes
+                        if (trigger.Trigger == 33)
+                        {
+                            // Param 1 is atkp entry
+                            short hitbox1 = (short)(trigger.Param2);
+                            short hitbox2 = (short)(trigger.Param3);
+                            if (!collisionGroupsToLoad.Contains(hitbox1))
+                                collisionGroupsToLoad.Add(hitbox1);
+                            if (!collisionGroupsToLoad.Contains(hitbox2))
+                                collisionGroupsToLoad.Add(hitbox2);
+                        }
+                        // Reaction collision
+                        if (trigger.Trigger == 4)
+                        {
+                            short hitbox1 = (short)(trigger.Param1);
+                            if (!collisionGroupsToLoad.Contains(hitbox1))
+                                collisionGroupsToLoad.Add(hitbox1);
+                        }
+                    }
+                }
+
+                List<Collision_Wrapper> attackCollisions = new List<Collision_Wrapper>();
+                for (int i = 0; i < App_Context.Instance.CollisionFile.EntryList.Count; i++)
+                {
+                    ObjectCollision collision = App_Context.Instance.CollisionFile.EntryList[i];
+                    /*if (collision.Type == (byte)ObjectCollision.TypeEnum.ATTACK)
+                    {
+                        attackCollisions.Add(new Collision_Wrapper("COLLISION_" + i, collision));
+                    }*/
+                    if (collisionGroupsToLoad.Contains(collision.Group))
+                    {
+                        attackCollisions.Add(new Collision_Wrapper("COLLISION_" + i, collision));
+                    }
+                }
+
+                /*List<Collision_Wrapper> finalAttackCollisions = new List<Collision_Wrapper>();
+                foreach (short ctl in collisionGroupsToLoad)
+                {
+                    finalAttackCollisions.Add(attackCollisions[ctl]);
+                }*/
+                //loadAttackCollisions(finalAttackCollisions, matrices);
+                loadAttackCollisions(attackCollisions, matrices);
+            }
+        }
+
+        public void subscribe_ObjectSelected()
+        {
+            App_Context.Instance.Event_ObjectSelected += new App_Context.EventHandler(sub_ObjectSelected);
+        }
+        private void sub_ObjectSelected(App_Context m, EventArgs e)
+        {
+            loadModel();
+        }
+        public void subscribe_MotionSelected()
+        {
+            App_Context.Instance.Event_MotionSelected += new App_Context.EventHandler(sub_MotionSelected);
+        }
+        private void sub_MotionSelected(App_Context m, EventArgs e)
+        {
+            loadAnb();
+            loadAnimProvider();
+            CurrentFrame = 0;
+            loadFrame();
+            //AnimationRunning = true;
+        }
+
+        // Animation ticker
+        async Task startAnimationTicker()
+        {
+            TimeSpan timeInMs = TimeSpan.FromMilliseconds(67);
+
+            PeriodicTimer animationTimer = new PeriodicTimer(timeInMs);
+            while (await animationTimer.WaitForNextTickAsync())
+            {
+                try
+                {
+                    animationTicker();
+                }
+                catch (Exception e) { }
+            }
+        }
+
+        public void animationTicker()
+        {
+            if (!AnimationRunning)
+            {
+                //CurrentFrame = 0;
+                return;
+            }
+
+            if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(App_Context.Instance.MsetPath, "mset") || App_Context.Instance.LoadedMotion == null)
+                return;
+
+            int timeTicked = 2;
+
+            CurrentFrame += timeTicked;
+            loadFrame();
+        }
+
+        public void loadAttackCollisions(List<Collision_Wrapper> attackCollisions, Matrix4x4[] matrices)
+        {
+            if (App_Context.Instance.CollisionFile != null)
+            {
+                Matrix4x4[] boneMatrices = new Matrix4x4[0];
+
+                if (matrices != null)
+                    boneMatrices = matrices;
+                else if (App_Context.Instance.ModelFile != null)
+                    boneMatrices = ModelCommon.GetBoneMatrices(App_Context.Instance.ModelFile.Bones);
+
+                List<SimpleMesh> simpleMeshes = new List<SimpleMesh>();
+
+                for (int i = 0; i < attackCollisions.Count; i++)
+                {
+                    ObjectCollision collision = attackCollisions[i].Collision;
+
+                    Vector3 basePosition = Vector3.Zero;
+                    if (collision.Bone != 16384 && boneMatrices.Length != 0)
+                    {
+                        basePosition = Vector3.Transform(new Vector3(collision.PositionX, collision.PositionY, collision.PositionZ), boneMatrices[collision.Bone]);
+                    }
+
+
+                    Color color = new Color();
+                    if (collision.Type == (byte)ObjectCollision.TypeEnum.HIT)
+                    {
+                        color = Color.FromArgb(100, 0, 0, 255);
+                    }
+                    else if (collision.Type == (byte)ObjectCollision.TypeEnum.REACTION)
+                    {
+                        color = Color.FromArgb(100, 0, 255, 0);
+                    }
+                    else
+                    {
+                        color = Color.FromArgb(100, 255, 0, 0);
+                    }
+
+                    if (collision.Shape == (byte)ObjectCollision.ShapeEnum.ELLIPSOID)
+                    {
+                        simpleMeshes.Add(new SimpleMesh(
+                            Simple3DViewport.Utils.GeometryShapes.getEllipsoid(collision.Radius, collision.Height, 10, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), color),
+                            "COLLISION_" + i,
+                            new List<string> { "COLLISION", "COLLISION_SINGLE" }
+                            ));
+                    }
+                    else if (collision.Shape == (byte)ObjectCollision.ShapeEnum.COLUMN)
+                    {
+                        simpleMeshes.Add(new SimpleMesh(
+                            Simple3DViewport.Utils.GeometryShapes.getCylinder(collision.Radius, collision.Height, 10, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), color),
+                            "COLLISION_" + i,
+                            new List<string> { "COLLISION", "COLLISION_SINGLE" }
+                            ));
+                    }
+                    else if (collision.Shape == (byte)ObjectCollision.ShapeEnum.CUBE)
+                    {
+                        simpleMeshes.Add(new SimpleMesh(
+                            Simple3DViewport.Utils.GeometryShapes.getCuboid(collision.Radius, collision.Height, collision.Radius, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), color),
+                            "COLLISION_" + i,
+                            new List<string> { "COLLISION", "COLLISION_SINGLE" }
+                            ));
+                    }
+                    else if (collision.Shape == (byte)ObjectCollision.ShapeEnum.SPHERE)
+                    {
+                        simpleMeshes.Add(new SimpleMesh(
+                            Simple3DViewport.Utils.GeometryShapes.getSphere(collision.Radius, 10, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), color),
+                            "COLLISION_" + i,
+                            new List<string> { "COLLISION", "COLLISION_SINGLE" }
+                            ));
+                    }
+                }
+
+                ThisCollisions = new SimpleModel(simpleMeshes, "COLLISIONS_1", new List<string> { "COLLISION", "COLLISION_GROUP" });
+            }
+        }
+    }
+}

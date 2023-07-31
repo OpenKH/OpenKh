@@ -9,7 +9,9 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top" Height="20">
-            <MenuItem Header="TEST"></MenuItem>
+            <MenuItem Header="TEST" Click="Menu_Test"></MenuItem>
+            <MenuItem Header="Save Motion changes" Click="Menu_SaveMotion"></MenuItem>
+            <MenuItem Header="Save Mset File" Click="Menu_SaveMset"></MenuItem>
         </Menu>
 
         <Grid AllowDrop="True" Drop="Window_Drop">
@@ -19,9 +21,16 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <!-- SELECTOR  -->
-            <local:ObjectSelector_Control Grid.Column="0" x:Name="ObjectSelector"/>
+            <local:ObjectSelector_Control Grid.Column="0"/>
             <local:Viewport_Control Grid.Column="1" x:Name="Viewport" />
-            <local:MotionSelector_Control Grid.Column="2" x:Name="MotionSelector"/>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <local:MotionSelector_Control Grid.Row="0"/>
+                <local:DataViewer_Control Grid.Row="1"/>
+            </Grid>
             <!-- CONTROLS  -->
         </Grid>
     </DockPanel>

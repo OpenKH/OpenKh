@@ -36,6 +36,64 @@ namespace OpenKh.Kh2
                 get { return (ParamSize > 3) ? Param[3] : null; }
                 set { if (ParamSize > 3) Param[3] = (short)value; }
             }
+
+            public enum RangeEnum
+            {
+                u0 = 0,
+                u1 = 1,
+                u2 = 2,
+                u3 = 3,
+                u4 = 4,
+                u5 = 5,
+                u6 = 6,
+                u7 = 7,
+                u8 = 8,
+                u9 = 9,
+                u10 = 10,
+                u11 = 11,
+                u12 = 12,
+                u13 = 13,
+                u14 = 14,
+                u15 = 15,
+                u16 = 16,
+                u17 = 17,
+                u18 = 18,
+                u19 = 19,
+                u20 = 20,
+                u21 = 21,
+                u22 = 22,
+                u23 = 23,
+                u24 = 24,
+                u25 = 25,
+                u26 = 26,
+                u27 = 27,
+                u28 = 28,
+                u29 = 29,
+                u30 = 30,
+                u31 = 31,
+                u32 = 32,
+                u33 = 33,
+                u34 = 34,
+                u35 = 35,
+                u36 = 36,
+                u37 = 37,
+                u38 = 38,
+                u39 = 39,
+                u40 = 40,
+                u41 = 41,
+                u42 = 42,
+                u43 = 43,
+                u44 = 44,
+                u45 = 45,
+                u46 = 46,
+                u47 = 47,
+                u48 = 48,
+                u49 = 49,
+                u50 = 50,
+                u51 = 51,
+                u52 = 52,
+                u53 = 53
+            }
         }
 
         public class FrameTrigger
@@ -64,6 +122,46 @@ namespace OpenKh.Kh2
             {
                 get { return (ParamSize > 3) ? Param[3] : null; }
                 set { if (ParamSize > 3) Param[3] = (short)value; }
+            }
+
+            public enum FrameEnum
+            {
+                u0 = 0,
+                u1 = 1,
+                u2 = 2,
+                u3 = 3,
+                u4 = 4,
+                u5 = 5,
+                u6 = 6,
+                u7 = 7,
+                u8 = 8,
+                u9 = 9,
+                u10 = 10,
+                u11 = 11,
+                u12 = 12,
+                u13 = 13,
+                u14 = 14,
+                u15 = 15,
+                u16 = 16,
+                u17 = 17,
+                u18 = 18,
+                u19 = 19,
+                u20 = 20,
+                u21 = 21,
+                u22 = 22,
+                u23 = 23,
+                u24 = 24,
+                u25 = 25,
+                u26 = 26,
+                u27 = 27,
+                u28 = 28,
+                u29 = 29,
+                u30 = 30,
+                u31 = 31,
+                u32 = 32,
+                u33 = 33,
+                u34 = 34,
+                u35 = 35
             }
         }
 

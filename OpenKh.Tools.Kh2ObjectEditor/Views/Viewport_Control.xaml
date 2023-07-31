@@ -8,10 +8,17 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <DockPanel Background="Red">
-        <Grid DockPanel.Dock="Bottom">
-            <Button Click="Button_Click">Next frame</Button>
-        </Grid>
+    <DockPanel Background="LightGray">
+        <StackPanel DockPanel.Dock="Bottom" Margin="10">
+            <ContentControl HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <Button Click="Button_PreviousFrame">&lt;</Button>
+                    <Label Content="{Binding CurrentFrame}" Width="50" HorizontalContentAlignment="Center"></Label>
+                    <Button Click="Button_NextFrame">&gt;</Button>
+                </StackPanel>
+            </ContentControl>
+            <CheckBox IsChecked="{Binding AnimationRunning}"></CheckBox>
+        </StackPanel>
 
         <S3V:Simple3DViewport_Control Grid.Column="0" x:Name="Viewport"/>
     </DockPanel>
