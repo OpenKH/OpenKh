@@ -7,6 +7,7 @@ namespace OpenKh.Kh2Anim.Mset.Interfaces
 {
     public interface IAnimMatricesProvider
     {
+        void ResetGameTimeDelta();
         Matrix4x4[] ProvideMatrices(double gameTimeDelta);
 
         float FrameLoop { get; }

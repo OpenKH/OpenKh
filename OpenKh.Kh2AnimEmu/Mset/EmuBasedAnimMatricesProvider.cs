@@ -47,6 +47,11 @@ namespace OpenKh.Kh2Anim.Mset
 
         int IAnimMatricesProvider.MatrixCount => animReader.cntb2;
 
+        public void ResetGameTimeDelta()
+        {
+            absTime = 0;
+        }
+
         Matrix4x4[] IAnimMatricesProvider.ProvideMatrices(double delta)
         {
             absTime += delta;
