@@ -225,6 +225,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.InsideTools
                         if (ImGui.Button($"{selectedMotionName}##selectMotion"))
                         {
                             ImGui.OpenPopup(selectMotionCaption);
+                            ImGui.SetNextWindowSize(new Vector2(400, 300), ImGuiCond.FirstUseEver);
                             selectMotionVisible = true;
                         }
                         ImGui.SameLine();

@@ -18,7 +18,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
         )
         {
             int cx = (int)Math.Floor(windowSize.X / Math.Max(1, columnWidth));
-            int cy = (int)((numItems + cx - 1) / cx);
+            int cy = (int)((numItems + cx - 1) / Math.Max(1, cx));
 
             var cells = new List<MultiColumnsLayouted.Cell>();
 
