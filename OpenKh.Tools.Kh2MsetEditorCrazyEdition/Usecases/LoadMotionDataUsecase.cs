@@ -111,7 +111,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                         _loadedModel.FrameEnd = provider.FrameEnd;
 
                         var lastFrameTime = float.MinValue;
-                        Matrix4x4[]? lastPose = null;
+                        FkIkMatrices? lastPose = null;
 
                         _loadedModel.PoseProvider = frameTime =>
                         {
@@ -122,10 +122,13 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                             else
                             {
                                 provider.ResetGameTimeDelta();
-                                var pose = provider.ProvideMatrices(frameTime);
+                                var pair = provider.ProvideMatrices2(frameTime);
                                 lastFrameTime = frameTime;
-                                lastPose = pose;
-                                return pose;
+                                lastPose = new FkIkMatrices(
+                                    pair.Fk,
+                                    pair.Ik
+                                );
+                                return lastPose;
                             }
                         };
                     }

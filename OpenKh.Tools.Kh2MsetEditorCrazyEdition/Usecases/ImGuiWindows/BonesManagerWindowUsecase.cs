@@ -58,6 +58,12 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
                             _settings.ViewFkBones = it;
                             _settings.Save();
                         });
+                        ImGui.SameLine();
+                        ForEdit("showIk", () => _settings.ViewIkBones, it =>
+                        {
+                            _settings.ViewIkBones = it;
+                            _settings.Save();
+                        });
 
                         if (jointAge.NeedToCatchUpAnyOf(configAge))
                         {

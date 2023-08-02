@@ -108,7 +108,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                 }
             }
 
-            var matrices = _loadedModel.PoseProvider?.Invoke(_loadedModel.FrameTime);
+            var fkIk = _loadedModel.PoseProvider?.Invoke(_loadedModel.FrameTime);
 
             _shader.Pass(pass =>
             {
@@ -119,40 +119,69 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 
                 foreach (var one in ones)
                 {
-                    Render(pass, one, matrices, true);
+                    Render(pass, one, fkIk?.Fk, true);
 
-                    if (_settings.ViewFkBones && matrices != null)
+                    if (fkIk != null && _loadedModel.MotionData?.IKHelpers is List<Motion.IKHelper> ikHelperList)
                     {
-                        RenderFkBone(
-                            matrices,
-                            index => _loadedModel.InternalFkBones[index].Parent,
-                            FindSpriteIconIndex
-                        );
+                        var viewFk = _settings.ViewFkBones;
+                        var viewIk = _settings.ViewIkBones;
+
+                        if (viewFk || viewIk)
+                        {
+                            var numFk = fkIk.Fk.Length;
+                            var numIk = fkIk.Ik.Length;
+
+                            RenderBones(
+                                numFk + numIk,
+                                index => false
+                                    || (viewFk ? index < numFk : false)
+                                    || (viewIk ? numFk <= index : false),
+                                index => (index < numFk)
+                                    ? xna.Color.Green
+                                    : xna.Color.DarkMagenta,
+                                index => (index < numFk)
+                                    ? fkIk.Fk[index]
+                                    : fkIk.Ik[index - numFk],
+                                index => (index < numFk)
+                                    ? _loadedModel.InternalFkBones[index].Parent
+                                    : ikHelperList[index - numFk].ParentId,
+                                FindSpriteIconIndex
+                            );
+                        }
                     }
                 }
                 foreach (var one in ones)
                 {
-                    Render(pass, one, matrices, false);
+                    Render(pass, one, fkIk?.Fk, false);
                 }
 
                 _shader.SetRenderTexture(pass, _whiteTexture);
             });
         }
 
-        private void RenderFkBone(Matrix4x4[] matrices, Func<int, int> getParent, Func<int, int> getSpriteIconIndex)
+        private void RenderBones(
+            int numMatrices,
+            Func<int, bool> isVisible,
+            Func<int, xna.Color> getColor,
+            Func<int, Matrix4x4> getMatrix,
+            Func<int, int> getParent,
+            Func<int, int> getSpriteIconIndex
+        )
         {
-            var points = new VertexPositionColor[2 * matrices.Length];
+            var points = new VertexPositionColor[2 * numMatrices];
             var pointIdx = 0;
 
-            for (int x = 0; x < matrices.Length; x++)
+            for (int x = 0; x < numMatrices; x++)
             {
                 var parent = getParent(x);
 
-                var from = matrices[(parent < 0) ? x : parent].Translation;
-                var to = matrices[x].Translation;
+                var from = getMatrix((parent < 0 || !isVisible(x)) ? x : parent).Translation;
+                var to = getMatrix(x).Translation;
 
-                points[pointIdx++] = new VertexPositionColor(new xna.Vector3(from.X, from.Y, from.Z), xna.Color.Green);
-                points[pointIdx++] = new VertexPositionColor(new xna.Vector3(to.X, to.Y, to.Z), xna.Color.Green);
+                var color = getColor(x);
+
+                points[pointIdx++] = new VertexPositionColor(new xna.Vector3(from.X, from.Y, from.Z), color);
+                points[pointIdx++] = new VertexPositionColor(new xna.Vector3(to.X, to.Y, to.Z), color);
             }
 
             _effectForBoneLines.Projection = _camera.Projection.ToXnaMatrix();
@@ -184,14 +213,19 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                     _camera.World * _camera.Projection
                 );
 
-                for (int x = 0; x < matrices.Length; x++)
+                for (int x = 0; x < numMatrices; x++)
                 {
+                    if (!isVisible(x))
+                    {
+                        continue;
+                    }
+
                     var spriteIconIndex = getSpriteIconIndex(x);
                     if (1 <= spriteIconIndex)
                     {
                         var sourceRect = _computeSpriteIconUvUsecase.ComputeDrawSourceRect(spriteIconIndex & 255, _spriteIcons.Width, _spriteIcons.Height);
 
-                        var (position, scale, visible) = fromLocalSpaceToWindowsPixelSpace(matrices[x].Translation);
+                        var (position, scale, visible) = fromLocalSpaceToWindowsPixelSpace(getMatrix(x).Translation);
 
                         if (visible)
                         {

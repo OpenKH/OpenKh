@@ -9,6 +9,7 @@ namespace OpenKh.Kh2Anim.Mset.Interfaces
     {
         void ResetGameTimeDelta();
         Matrix4x4[] ProvideMatrices(double gameTimeDelta);
+        (Matrix4x4[] Fk, Matrix4x4[] Ik) ProvideMatrices2(double gameTimeDelta);
 
         float FrameLoop { get; }
         float FrameEnd { get; }

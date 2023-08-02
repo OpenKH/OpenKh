@@ -21,7 +21,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
         public int SelectedMotionIndex { get; set; } = -1;
         public InterpolatedMotion? MotionData { get; set; }
         public float FrameTime { get; set; }
-        public Func<float, Matrix4x4[]>? PoseProvider { get; set; }
+        public Func<float, FkIkMatrices>? PoseProvider { get; set; }
 
         /// <summary>
         /// Needed for Kh2AnimEmu
