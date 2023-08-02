@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using System;
 using System.Collections.Generic;
@@ -174,25 +174,35 @@ namespace OpenKh.Kh2
         public Size Size { get; }
 
         /// <summary>
-        /// Bitmap data
+        /// Raw data affected by IsSwizzled flag. If IsSwizzled is true, it is encoded data.
         /// </summary>
         /// <remarks>
-        /// In the following case, this `Data` is not same bitmap data stored in imgd file.
-        /// 
-        /// In OpenKh:
-        /// - NOT IsSwizzled && Format4bpp = storing Windows pixel order ([1, 2] to 0x12)
-        /// 
-        /// In IMGD file:
-        /// - NOT IsSwizzled && Format4bpp = storing reversed pixel order ([1, 2] to 0x21)
+        /// Accept pixel order in the following styles for unswizzled data:
+        /// - `Indexed4`: The first pixel is high byte. The second pixel is low byte.
+        /// - `Indexed8`: No conversion, one byte is one pixel.
+        /// - `Rgba8888`: `RR GG BB AA`
         /// </remarks>
 		public byte[] Data { get; }
 
+        /// <summary>
+        /// Represents color look at table in this order: `RR GG BB AA`, for `Indexed4` or `Indexed8` images.
+        /// `AA` uses Ps2 alpha range (0 to 128).
+        /// </summary>
         public byte[] Clut { get; }
 
         public bool IsSwizzled => (swizzled & 4) != 0;
 
         public PixelFormat PixelFormat => GetPixelFormat(format);
 
+        /// <summary>
+        /// Get pixels
+        /// </summary>
+        /// <returns>
+        /// Return bitmap pixels in these orders.
+        /// - `Indexed4`: The first pixel is high byte. The second pixel is low byte.
+        /// - `Indexed8`: No conversion, one byte is one pixel.
+        /// - `Rgba8888`: `BB GG RR AA` (same as Format32bppArgb)
+        /// </returns>
         public byte[] GetData()
 		{
 			switch (format)
@@ -208,6 +218,10 @@ namespace OpenKh.Kh2
 			}
         }
 
+        /// <summary>
+        /// Get color look at table in this order: `RR GG BB AA`, for `Indexed4` or `Indexed8` images.
+        /// `AA` uses normal alpha range (0 to 255).
+        /// </summary>
         public byte[] GetClut()
         {
             switch (format)
