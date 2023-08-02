@@ -20,6 +20,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
 {
     public class RenderModelUsecase
     {
+        private readonly GlobalInfo _globalInfo;
         private readonly ConvertVectorSpaceUsecase _convertVectorSpaceUsecase;
         private readonly PrintDebugInfo _printDebugInfo;
         private readonly ComputeSpriteIconUvUsecase _computeSpriteIconUvUsecase;
@@ -57,9 +58,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
             CreateSpriteIconsTextureUsecase createSpriteIconsTextureUsecase,
             ComputeSpriteIconUvUsecase computeSpriteIconUvUsecase,
             PrintDebugInfo printDebugInfo,
-            ConvertVectorSpaceUsecase convertVectorSpaceUsecase
+            ConvertVectorSpaceUsecase convertVectorSpaceUsecase,
+            GlobalInfo globalInfo
         )
         {
+            _globalInfo = globalInfo;
             _convertVectorSpaceUsecase = convertVectorSpaceUsecase;
             _printDebugInfo = printDebugInfo;
             _computeSpriteIconUvUsecase = computeSpriteIconUvUsecase;

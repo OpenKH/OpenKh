@@ -70,7 +70,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.DependencyInjection
             self.AddSingleton<ConvertVectorSpaceUsecase>();
             self.AddSingleton<FCurvesManagerUsecase>();
             self.AddSingleton<LogCrashStatusUsecase>();
-            
+            self.AddSingleton<GlobalInfo>();
+
             // next
 
 

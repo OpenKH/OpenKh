@@ -39,6 +39,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             .AddAllFiles();
 
         private readonly Vector4 BgUiColor = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
+        private readonly GlobalInfo _globalInfo;
         private readonly Engine.Camera _camera;
         private readonly LoadedModel _loadedModel;
         private readonly AskOpenFileNowUsecase _askOpenFileNowUsecase;
@@ -83,9 +84,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             ErrorMessages errorMessages,
             AskOpenFileNowUsecase askOpenFileNowUsecase,
             LoadedModel loadedModel,
-            Camera camera
+            Camera camera,
+            GlobalInfo globalInfo
         )
         {
+            _globalInfo = globalInfo;
             _camera = camera;
             _loadedModel = loadedModel;
             _askOpenFileNowUsecase = askOpenFileNowUsecase;
@@ -141,6 +144,8 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition
             }
 
             ImGui.PopStyleColor();
+
+            ++_globalInfo.Ticks;
 
             return _exitFlag;
         }
