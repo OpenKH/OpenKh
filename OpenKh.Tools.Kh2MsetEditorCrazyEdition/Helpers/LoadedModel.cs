@@ -73,5 +73,6 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Helpers
         public string? MdlxFile { get; set; }
         public string? MsetFile { get; set; }
         public string? AnbFile { get; set; }
+        public int SelectFCurveKey { get; set; } = -1;
     }
 }

@@ -49,6 +49,13 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 
             return () =>
             {
+                if (_loadedModel.SelectFCurveKey != -1)
+                {
+                    _settings.ViewFCurveKey = true;
+                    selectedIndex = _loadedModel.SelectFCurveKey;
+                    _loadedModel.SelectFCurveKey = -1;
+                }
+
                 if (_settings.ViewFCurveKey)
                 {
                     var windowClosed = !ForWindow("FCurveKey manager", () =>
@@ -115,7 +122,7 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases.ImGuiWindows
 
                                 }
 
-                                if (ImGui.BeginCombo($"FCurveKey", names.GetAtOrNull(selectedIndex) ?? "..."))
+                                if (ImGui.BeginCombo($"FCurveKey##names", names.GetAtOrNull(selectedIndex) ?? "..."))
                                 {
                                     foreach (var (item, index) in names.SelectWithIndex())
                                     {

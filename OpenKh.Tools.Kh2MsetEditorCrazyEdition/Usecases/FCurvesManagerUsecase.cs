@@ -133,6 +133,11 @@ namespace OpenKh.Tools.Kh2MsetEditorCrazyEdition.Usecases
                                         : _loadedModel.FKJointDescriptions.Count + joint.JointId;
                                     _loadedModel.SelectedJointIndexAge.Bump();
                                 }
+                                ImGui.SameLine();
+                                if (ImGui.Button("FCurveKey##goto"))
+                                {
+                                    _loadedModel.SelectFCurveKey = joint.KeyStartId;
+                                }
                             }
                             else
                             {
