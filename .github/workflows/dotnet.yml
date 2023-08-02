@@ -52,6 +52,7 @@ jobs:
         path: openkh
 
     - name: "GitHub release latest"
+      if: ${{ github.ref_name == 'master' }}
       uses: "marvinpinto/action-automatic-releases@latest"
       continue-on-error: true # at non master branch this will always fail
       with:
@@ -69,6 +70,6 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "release2-${{github.run_number}}"
         prerelease: true
-        title: "OpenKh Build ${{github.run_number}}"
+        title: "OpenKh Build ${{github.run_number}} (${{github.ref_name}})"
         files: |
           openkh.zip
