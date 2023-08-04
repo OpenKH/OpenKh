@@ -60,13 +60,13 @@ else
 
 Interfaces are a powerful instrument used for **inversion of control** and **contract** definition.
 
-A good example is [`OpenKh.Imaging.IImage`](https://github.com/Xeeynamo/OpenKh/blob/master/OpenKh.Imaging/IImage.cs), which defines the minimum amount of information to represent an image. All the methods that accept `IImage` as a parameter can accept any image class that implements the `IImage` interface.
+A good example is [`OpenKh.Imaging.IImage`](https://github.com/OpenKH/OpenKh/blob/master/OpenKh.Imaging/IImage.cs), which defines the minimum amount of information to represent an image. All the methods that accept `IImage` as a parameter can accept any image class that implements the `IImage` interface.
 
 ## Helper methods
 
 C# comes with this excellent feature called [extension methods](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/extension-methods) that allow the addition of any member to existing classes or interfaces.
 
-Taking [`OpenKh.Imaging.IImageRead`](https://github.com/Xeeynamo/OpenKh/blob/master/OpenKh.Imaging/IImageRead.cs), which is a super set of `IImage`, the class [`OpenKh.Imaging.ImageHelpers`](https://github.com/Xeeynamo/OpenKh/blob/master/OpenKh.Imaging/ImageHelpers.cs) contains a bunch of methods that can be used with any ``IImageRead`.
+Taking [`OpenKh.Imaging.IImageRead`](https://github.com/OpenKH/OpenKh/blob/master/OpenKh.Imaging/IImageRead.cs), which is a super set of `IImage`, the class [`OpenKh.Imaging.ImageHelpers`](https://github.com/OpenKH/OpenKh/blob/master/OpenKh.Imaging/ImageHelpers.cs) contains a bunch of methods that can be used with any ``IImageRead`.
 
 If we take `public static void SaveImage(this IImageRead imageRead, string fileName)` as an example, it is possible to invoke `IImageRead.SaveImage(fileName)` without having that method implemented in any of the interface implementations. Now, all the classes that implement `IImageRead` can use `SaveImage` (E.g. `new Imgd(input).SaveImage(output)`).
 
