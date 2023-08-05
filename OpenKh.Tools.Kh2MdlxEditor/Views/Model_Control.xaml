@@ -39,12 +39,13 @@
         <Grid Grid.Column="2" Background="#202020">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="2" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             
             <!-- Meshes -->
-            <ListView Grid.Row="0" ItemsSource="{Binding Groups}" Background="#1d1d1d" Foreground="White">
+            <ListView Name="LV_Meshes" Grid.Row="0" ItemsSource="{Binding Groups}" Background="#1d1d1d" Foreground="White">
                 <ListView.Resources>
                     <Style TargetType="GridViewColumnHeader">
                         <Setter Property="Visibility" Value="Collapsed" />
@@ -84,9 +85,20 @@
                 </ListView.View>
             </ListView>
             
-            <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" />
+            <DockPanel Grid.Row="1">
+                <!-- Buttons to reorder the meshes -->
+                <Button DockPanel.Dock="Right" Margin="5" HorizontalAlignment="Right" Width="40" Height="25" Click="Mesh_MoveDown"
+                        ToolTip="Move the selected mesh up. This uses an fbx export and import behind the scenes, make sure the settings in `File > Import > Replace Mesh...` are correct." >
+                    \/
+                </Button>
+                <Button DockPanel.Dock="Right" Margin="5" HorizontalAlignment="Right" Width="40" Height="25" Click="Mesh_MoveUp" 
+                        ToolTip="Move the selected mesh down. This uses an fbx export and import behind the scenes, make sure the settings in `File > Import > Replace Mesh...` are correct." >
+                    /\
+                </Button>
+            </DockPanel>
+            <GridSplitter Grid.Row="2" VerticalAlignment="Stretch"/>
 
-            <ContentControl Grid.Row="2" Background="#2d2d2d" x:Name="meshPropertiesFrame"/>
+            <ContentControl Grid.Row="3" Background="#2d2d2d" x:Name="meshPropertiesFrame"/>
             
         </Grid>
         

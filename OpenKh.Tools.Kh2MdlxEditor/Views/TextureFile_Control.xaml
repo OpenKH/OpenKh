@@ -30,6 +30,7 @@
         <Grid Grid.Column="3" Background="#222222">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             
@@ -51,10 +52,20 @@
                         </Style>
                     </ListView.ItemContainerStyle>
                 </ListView>
+                
+            </DockPanel>
+            <DockPanel Grid.Row="1">
+                <!-- Buttons to move the texture up and down -->
+                <Button DockPanel.Dock="Right" Margin="5" HorizontalAlignment="Right" Width="40" Height="25" Click="Texture_MoveDown" ToolTip="Move the active texture up">
+                    \/
+                </Button>
+                <Button DockPanel.Dock="Right" Margin="5" HorizontalAlignment="Right" Width="40" Height="25" Click="Texture_MoveUp" ToolTip="Move the active texture down">
+                    /\
+                </Button>
             </DockPanel>
 
             <!-- Texture animation list -->
-            <DockPanel Grid.Row="1" LastChildFill="True">
+            <DockPanel Grid.Row="2" LastChildFill="True">
                 <Label DockPanel.Dock="Top" Foreground="White" HorizontalAlignment="Center">Texture animations</Label>
                 <ListView Grid.Row="1" Name="LV_Animations" ItemsSource="{Binding textureData.TextureFooterData.TextureAnimationList}" DisplayMemberPath="TextureIndex">
                     <ListView.ContextMenu>

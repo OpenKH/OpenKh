@@ -817,6 +817,14 @@ namespace OpenKh.Kh2
             }
         }
 
+        public void SwapTextures(int index, int swapIndex)
+        {
+            (Images[index], Images[swapIndex]) = (Images[swapIndex], Images[index]);
+            (_textureTransfer[index], _textureTransfer[swapIndex]) =
+                (_textureTransfer[swapIndex], _textureTransfer[index]);
+            (_gsInfo[index], _gsInfo[swapIndex]) = (_gsInfo[swapIndex], _gsInfo[index]);
+        }
+        
         private static void AddOffset(Stream stream, int fileOffset, int delta)
         {
             var buff = new byte[4];

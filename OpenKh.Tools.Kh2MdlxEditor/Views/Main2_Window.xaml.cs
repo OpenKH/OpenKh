@@ -81,7 +81,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         }
         private void Side_Texture(object sender, EventArgs e)
         {
-            contentFrame.Content = new TextureFile_Control(mainVM.TextureFile);
+            contentFrame.Content = new TextureFile_Control(mainVM.TextureFile, mainVM.ModelFile);
         }
         private void Side_Collision(object sender, EventArgs e)
         {
@@ -99,7 +99,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         public void loadFile(string filePath)
         {
             contentFrame.Content = null;
-            mainVM = (filePath != null) ? new Main2_VM(filePath) : new Main2_VM();
+            mainVM = (filePath != null) ? new Main2_VM(this, filePath) : new Main2_VM(this);
             DataContext = mainVM;
 
             if(mainVM.ModelFile != null)
@@ -186,7 +186,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         {
             if (mainVM.ModelFile != null)
             {
-                contentFrame.Content = new Model_Control(mainVM.ModelFile, mainVM.TextureFile, mainVM.CollisionFile);
+                contentFrame.Content = new Model_Control(mainVM);
             }
         }
     }

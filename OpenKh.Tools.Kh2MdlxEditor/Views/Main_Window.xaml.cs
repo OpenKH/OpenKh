@@ -120,7 +120,8 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                     contentFrame.Content = new ModelFile_Control(mainWiewModel.ModelFile);
                     break;
                 case Bar.EntryType.ModelTexture:
-                    contentFrame.Content = new TextureFile_Control(mainWiewModel.TextureFile);
+                    // TODO the second parameter should be the texture file, but it's not available here. 
+                    contentFrame.Content = new TextureFile_Control(mainWiewModel.TextureFile, null);
                     break;
                 case Bar.EntryType.ModelCollision:
                     contentFrame.Content = new Collision_Control(mainWiewModel.CollisionFile);

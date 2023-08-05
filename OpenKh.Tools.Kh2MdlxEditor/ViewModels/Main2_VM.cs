@@ -1,9 +1,13 @@
+using System;
+using System.IO;
+using System.Linq;
+using Assimp;
 using OpenKh.AssimpUtils;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Models;
+using OpenKh.Kh2.Models.VIF;
 using OpenKh.Tools.Kh2MdlxEditor.Utils;
-using System;
-using System.IO;
+using OpenKh.Tools.Kh2MdlxEditor.Views;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
 {
@@ -15,6 +19,8 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
         public string FileName { get; set; }
         public Bar BarFile { get; set; }
 
+        private Main2_Window mainWindow { get; set; }
+        
         // Files for available editors
         public ModelSkeletal ModelFile { get; set; }
         public ModelTexture TextureFile { get; set; }
@@ -22,10 +28,14 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
 
         // CONSTRUCTORS
         //-----------------------------------------------------------------------
-        public Main2_VM() { }
-        public Main2_VM(string filePath)
+        public Main2_VM(Main2_Window mainWindow)
+        {
+            this.mainWindow = mainWindow;
+        }
+        public Main2_VM(Main2_Window mainWindow, string filePath)
         {
             LoadFile(filePath);
+            this.mainWindow = mainWindow;
         }
 
         // FUNCTIONS
@@ -36,8 +46,8 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
             if (!isValidFilepath(filePath))
                 return;
 
-            this.FilePath = filePath;
-            this.FileName = Path.GetFileNameWithoutExtension(FilePath);
+            FilePath = filePath;
+            FileName = Path.GetFileNameWithoutExtension(FilePath);
             LoadFile();
         }
         public void LoadFile()
@@ -69,8 +79,6 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                         case Bar.EntryType.ModelCollision:
                             CollisionFile = new ModelCollision(barEntry.Stream);
                             break;
-                        default:
-                            break;
                     }
                 }
                 catch (Exception e) { }
@@ -95,8 +103,6 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                     case Bar.EntryType.ModelCollision:
                         barEntry.Stream = CollisionFile.toStream();
                         break;
-                    default:
-                        break;
                 }
             }
         }
@@ -105,9 +111,42 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
         {
             return (filePath != null && filePath.EndsWith(".mdlx"));
         }
+
+        public void reloadModelFromFbx()
+        {
+            // Switching the order of meshes and directly exporting the mdlx right now doesn't work.
+            // the exported mdlx file is corrupt. It can still be opened in this editor, and exported to fbx,
+            // but cannot be opened in another mdlx viewer or used in the game (the game crashes immediately).
+            //
+            // However, if you change the mesh order, export the fbx, and import the same fbx, it works.
+            // So, we're going to do that. By doing that process here in the code, we also keep the texture
+            // animations.
+            //
+            // Caveat: We need to store it in a temporary file, and this sucks.
+            // just creating a Assimp scene and passing it to the Assimp importer doesn't work - the model
+            // gets corrupted in some circumstances. (for me it happened with P_EX100)
+            // The exporting process to a temporary file actually produces a different scene,
+            // which is not corrupted and is otherwise identical.
+            // 
+            // I'd like this to not have to reload the entire window, but might complicate the code.
+            Scene scene = Kh2MdlxAssimp.getAssimpScene(ModelFile);
+            
+            string fileName = Path.GetTempPath() + Guid.NewGuid() + ".fbx";
+            AssimpGeneric.ExportScene(scene, AssimpGeneric.FileFormat.fbx, fileName);
+
+            scene = AssimpGeneric.getAssimpSceneFromFile(fileName);
+
+            MdlxEditorImporter.materialToTexture = ModelFile.Groups
+                .Select((item, index) => new { item.Header.TextureIndex, index })
+                .ToDictionary(x => x.index, x => (int)x.TextureIndex);
+            
+            ModelFile = MdlxEditorImporter.replaceMeshModelSkeletal(scene, ModelFile, null);
+            mainWindow.reloadModelControl();
+        }
+        
         public void replaceModel(string filePath)
         {
-            Assimp.Scene scene = AssimpGeneric.getAssimpSceneFromFile(filePath);
+            Scene scene = AssimpGeneric.getAssimpSceneFromFile(filePath);
 
             TextureFile = MdlxEditorImporter.createModelTexture(scene, filePath);
 

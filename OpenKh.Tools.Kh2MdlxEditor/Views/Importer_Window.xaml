@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.Kh2MdlxEditor.Views"
         mc:Ignorable="d"
-        Title="Import and Replace Mesh" Height="320" Width="460">
+        Title="Import and Replace Mesh" Height="320" Width="460"
+        Closing="Importer_WindowClose_StoreValues">
     <StackPanel Margin="10">
         <CheckBox Margin="5" IsChecked="{Binding Path=KeepShadow, Mode=TwoWay}">Keep shadow</CheckBox>
         <StackPanel Margin="10" Orientation="Horizontal">

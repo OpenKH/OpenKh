@@ -2,6 +2,7 @@ using OpenKh.Kh2.Models.VIF;
 using OpenKh.Tools.Kh2MdlxEditor.Utils;
 using OpenKh.Tools.Kh2MdlxEditor.ViewModels;
 using System;
+using System.ComponentModel;
 using System.Windows;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.Views
@@ -54,6 +55,14 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 }
                     
             }
+        }
+
+        private void Importer_WindowClose_StoreValues(object? sender, CancelEventArgs e)
+        {
+            // keeps track of the values of the importer window without having to execute the import
+            MdlxEditorImporter.KEEP_ORIGINAL_SHADOW = importerVM.KeepShadow;
+            VifProcessor.VERTEX_LIMIT = importerVM.VertexLimitPerPacket;
+            VifProcessor.MEMORY_LIMIT = importerVM.MemoryLimitPerPacket;
         }
     }
 }
