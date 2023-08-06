@@ -97,7 +97,7 @@ namespace OpenKh.Command.ImgTool.Utils
             };
         }
 
-        private class LocalIndexedBitmap : IImageRead
+        private class LocalImager : IImageRead
         {
             public Size Size { get; set; }
             public PixelFormat PixelFormat { get; set; }
@@ -115,7 +115,7 @@ namespace OpenKh.Command.ImgTool.Utils
             switch (output.BitsPixel)
             {
                 case 4:
-                    return new LocalIndexedBitmap
+                    return new LocalImager
                     {
                         Size = size,
                         PixelFormat = PixelFormat.Indexed4,
@@ -123,7 +123,7 @@ namespace OpenKh.Command.ImgTool.Utils
                         Data = ConvertDataFrom(output.PixelLines, (output.Width + 1) / 2, output.Height),
                     };
                 case 8:
-                    return new LocalIndexedBitmap
+                    return new LocalImager
                     {
                         Size = size,
                         PixelFormat = PixelFormat.Indexed8,
