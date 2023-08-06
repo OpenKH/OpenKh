@@ -180,7 +180,7 @@ namespace OpenKh.Engine.MonoGame
         {
             var size = image.Size;
             var texture = new RenderTarget2D(_graphicsDevice, size.Width, size.Height);
-            texture.SetData(image.AsBgra8888());
+            texture.SetData(image.AsRgba8888());
 
             return new CSpriteTexture(texture);
         }

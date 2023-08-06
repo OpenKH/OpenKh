@@ -126,7 +126,7 @@ namespace OpenKh.Command.Bdxio.Utils
                     {
                         if (argContext.numberdata() is NumberdataContext numberdata)
                         {
-                            return float.Parse(numberdata.GetText());
+                            return float.Parse(numberdata.GetText(), invariantNumberFormat);
                         }
                         else if (argContext.id() is IdContext id)
                         {
@@ -621,7 +621,7 @@ namespace OpenKh.Command.Bdxio.Utils
                     {
                         var body = floatnumber.Text;
 
-                        if (float.TryParse(body, NumberStyles.HexNumber, null, out float floatVal))
+                        if (float.TryParse(body, NumberStyles.HexNumber, invariantNumberFormat, out float floatVal))
                         {
                             return (float)floatVal;
                         }
@@ -855,5 +855,7 @@ namespace OpenKh.Command.Bdxio.Utils
             bool First,
             bool Last
         );
+
+        private static readonly IFormatProvider invariantNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
     }
 }

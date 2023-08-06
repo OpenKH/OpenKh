@@ -10,6 +10,10 @@ Name: aaa
 ---
  section .text
 TR0:
+ pushImm 123456789
+ drop
+ pushImmf 123.45
+ drop
  pushFromPWp W0
  drop 
  pushFromPWp W12
