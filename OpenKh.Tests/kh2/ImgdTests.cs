@@ -14,6 +14,8 @@ namespace OpenKh.Tests.kh2
         private const string FilePath = "kh2/res/image-8bit-128-128.imd";
         private const string FacFilePath = "kh2/res/image.fac";
 
+        private const bool GenerateTestData = false;
+
         [Fact]
         public void IsValidTest()
         {
@@ -236,6 +238,241 @@ namespace OpenKh.Tests.kh2
                 },
                 imgd.Data
             );
+        }
+
+        [Fact]
+        public void CreateSampleImdFiles()
+        {
+            // A stateless swizzle process will always consume 8192 bytes.
+            // 128 x 128 x 4 bpp → 8192 bytes
+            // 128 x  64 x 8 bpp → 8192 bytes
+
+            foreach (var (isSwizzled, swizzledMark) in new (bool, string)[] { (false, "Unswizzled"), (true, "Swizzled") })
+            {
+                {
+                    var imgd = new Imgd(
+                        new Size(128, 128),
+                        PixelFormat.Indexed4,
+                        Enumerable.Range(0, 64 * 128)
+                            .Select(it => (byte)((it & 15) | ((it & 15) << 4)))
+                            .ToArray(),
+                        // Clut
+                        // RR GG BB AA
+                        // 60 70 222 255
+                        Enumerable.Repeat(new byte[] { 60, 70, 222, 255 }, 16)
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        isSwizzled
+                    );
+
+                    if (!isSwizzled)
+                    {
+                        Assert.Equal(
+                            expected: Enumerable.Range(0, 64 * 128)
+                                .Select(it => (byte)((it & 15) | ((it & 15) << 4)))
+                                .ToArray(),
+                            actual: imgd.Data
+                        );
+                    }
+                    Assert.Equal(
+                        expected: Enumerable.Repeat(new byte[] { 60, 70, 222, 128 }, 16)
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        actual: imgd.Clut
+                    );
+
+                    Deal($"R60G70B222A255.Indexed4.newImgd.{swizzledMark}.imd", imgd);
+                }
+
+                {
+                    var imgd = Imgd.Create(
+                        new Size(128, 128),
+                        PixelFormat.Indexed4,
+                        Enumerable.Range(0, 64 * 128)
+                            .Select(it => (byte)((it & 15) | ((it & 15) << 4)))
+                            .ToArray(),
+                        // Clut
+                        // RR GG BB AA
+                        // 60 70 222 255
+                        Enumerable.Repeat(new byte[] { 60, 70, 222, 255 }, 16)
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        isSwizzled
+                    );
+
+                    if (!isSwizzled)
+                    {
+                        Assert.Equal(
+                            expected: Enumerable.Range(0, 64 * 128)
+                                .Select(it => (byte)((it & 15) | ((it & 15) << 4)))
+                                .ToArray(),
+                            actual: imgd.Data
+                        );
+                    }
+                    Assert.Equal(
+                        expected: Enumerable.Repeat(new byte[] { 60, 70, 222, 128 }, 16)
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        actual: imgd.Clut
+                    );
+
+                    Deal($"R60G70B222A255.Indexed4.ImgdCreate.{swizzledMark}.imd", imgd);
+                }
+
+                {
+                    var imgd = new Imgd(
+                        new Size(128, 64),
+                        PixelFormat.Indexed8,
+                        Enumerable.Range(0, 128 * 64)
+                            .Select(it => (byte)it)
+                            .ToArray(),
+                        // Clut
+                        // RR GG BB AA
+                        // 60 70 222 255
+                        Enumerable.Repeat(new byte[] { 60, 70, 222, 255 }, 256)
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        isSwizzled
+                    );
+
+                    if (!isSwizzled)
+                    {
+                        Assert.Equal(
+                            expected: Enumerable.Range(0, 128 * 64)
+                                .Select(it => (byte)it)
+                                .ToArray(),
+                            actual: imgd.Data
+                        );
+                    }
+                    Assert.Equal(
+                        expected: Enumerable.Repeat(new byte[] { 60, 70, 222, 128 }, 256)
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        actual: imgd.Clut
+                    );
+
+                    Deal($"R60G70B222A255.Indexed8.newImgd.{swizzledMark}.imd", imgd);
+                }
+                {
+                    var imgd = Imgd.Create(
+                        new Size(128, 64),
+                        PixelFormat.Indexed8,
+                        Enumerable.Range(0, 128 * 64)
+                            .Select(it => (byte)it)
+                            .ToArray(),
+                        // Clut
+                        // RR GG BB AA
+                        // 60 70 222 255
+                        Enumerable.Repeat(new byte[] { 60, 70, 222, 255 }, 256)
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        isSwizzled
+                    );
+
+                    if (!isSwizzled)
+                    {
+                        Assert.Equal(
+                            expected: Enumerable.Range(0, 128 * 64)
+                                .Select(it => (byte)it)
+                                .ToArray(),
+                            actual: imgd.Data
+                        );
+                    }
+                    Assert.Equal(
+                        expected: Enumerable.Repeat(new byte[] { 60, 70, 222, 128 }, 256)
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        actual: imgd.Clut
+                    );
+
+                    Deal($"R60G70B222A255.Indexed8.ImgdCreate.{swizzledMark}.imd", imgd);
+                }
+                {
+                    // Raw pixels are placed in this order, at the unswizzled file.
+                    // RR GG BB AA
+                    // 60 70 222 255
+
+                    var imgd = new Imgd(
+                        new Size(64, 32),
+                        PixelFormat.Rgba8888,
+                        Enumerable.Repeat(new byte[] { 60, 70, 222, 255 }, 64 * 32) // RR GG BB AA
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        new byte[0],
+                        isSwizzled
+                    );
+
+                    Assert.Equal(
+                        expected: Enumerable.Repeat(new byte[] { 60, 70, 222, 255 }, 64 * 32) // RR GG BB AA
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        actual: imgd.Data // RR GG BB AA
+                    );
+                    Assert.Equal(
+                        expected: Enumerable.Repeat(new byte[] { 222, 70, 60, 255 }, 64 * 32) // BB GG RR AA
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        actual: imgd.GetData() // BB GG RR AA
+                    );
+                    Assert.Null(imgd.Clut);
+
+                    Deal($"R60G70B222A255.Rgba8888.newImgd.{swizzledMark}.imd", imgd);
+                }
+                {
+                    // Raw pixels are placed in this order, at the unswizzled file.
+                    // RR GG BB AA
+                    // 60 70 222 255
+
+                    var imgd = Imgd.Create(
+                        new Size(64, 32),
+                        PixelFormat.Rgba8888,
+                        Enumerable.Repeat(new byte[] { 222, 70, 60, 255 }, 64 * 32) // BB GG RR AA
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        new byte[0],
+                        isSwizzled
+                    );
+
+                    Assert.Equal(
+                        expected: Enumerable.Repeat(new byte[] { 60, 70, 222, 255 }, 64 * 32) // RR GG BB AA
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        actual: imgd.Data // RR GG BB AA
+                    );
+                    Assert.Equal(
+                        expected: Enumerable.Repeat(new byte[] { 222, 70, 60, 255 }, 64 * 32) // BB GG RR AA
+                            .SelectMany(it => it)
+                            .ToArray(),
+                        actual: imgd.GetData() // BB GG RR AA
+                    );
+                    Assert.Null(imgd.Clut);
+
+                    Deal($"R60G70B222A255.Rgba8888.ImgdCreate.{swizzledMark}.imd", imgd);
+                }
+            }
+        }
+
+        private void Deal(string fileName, Imgd imgd)
+        {
+            var filePath = $"kh2/res/{fileName}";
+
+            if (GenerateTestData)
+            {
+#pragma warning disable CS0162 // Unreachable code detected
+                using var stream = File.Create(filePath);
+#pragma warning restore CS0162 // Unreachable code detected
+                imgd.Write(stream);
+            }
+            else
+            {
+                using var stream = new MemoryStream();
+                imgd.Write(stream);
+
+                Assert.Equal(
+                    expected: File.ReadAllBytes(filePath),
+                    actual: stream.ToArray()
+                );
+            }
         }
     }
 }
