@@ -1,0 +1,50 @@
+<Window x:Class="OpenKh.Tools.Kh2FontImageEditor.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.Kh2FontImageEditor"
+        xmlns:UserControls="clr-namespace:OpenKh.Tools.Kh2FontImageEditor.UserControls"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="Kh2FontImageEditor" Height="388" Width="885">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open" Command="{Binding OpenCommand}"/>
+                <MenuItem Header="_Save" Command="{Binding SaveCommand}"/>
+                <MenuItem Header="Save _as..." Command="{Binding SaveAsCommand}"/>
+                <Separator/>
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" Command="{Binding AboutCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <StatusBar Grid.Row="2">
+        </StatusBar>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <UserControls:ImagerTablet Grid.Column="0" Caption="{Binding System1.Caption}" Image="{Binding System1.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding System1}" ExportCommandParameter="{Binding System1}" />
+            <UserControls:ImagerTablet Grid.Column="1" Caption="{Binding System2.Caption}" Image="{Binding System2.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding System2}" ExportCommandParameter="{Binding System2}" />
+            <UserControls:ImagerTablet Grid.Column="2" Caption="{Binding Event1.Caption}" Image="{Binding Event1.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding Event1}" ExportCommandParameter="{Binding Event1}" />
+            <UserControls:ImagerTablet Grid.Column="3" Caption="{Binding Event2.Caption}" Image="{Binding Event2.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding Event2}" ExportCommandParameter="{Binding Event2}" />
+            <UserControls:ImagerTablet Grid.Column="4" Caption="{Binding Icon.Caption}" Image="{Binding Icon.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding Icon}" ExportCommandParameter="{Binding Icon}" />
+
+        </Grid>
+    </Grid>
+</Window>
