@@ -11,7 +11,7 @@
         <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
         <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.2" />
         <PackageReference Include="System.Interactive" Version="6.0.1" />
-        <PackageReference Include="NLog" Version="5.2.2" />
+        <PackageReference Include="NLog" Version="5.2.3" />
     </ItemGroup>
 
     <ItemGroup>
