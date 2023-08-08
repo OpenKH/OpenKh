@@ -88,7 +88,7 @@ ForEach-Object {
     Set-NodeValue $project "Authors" "OpenKH contributors"
     Set-NodeValue $project "Company" "OpenKH"
     Set-NodeValue $project "Copyright" "Copyright (C) OpenKH $($date.Year)"
-    Set-NodeValue $project "Description" "https://github.com/Xeeynamo/OpenKh"
+    Set-NodeValue $project "Description" "https://github.com/OpenKH/OpenKh"
 
     $document = $project.Node.OwnerDocument
     $document.PreserveWhitespace = $true
