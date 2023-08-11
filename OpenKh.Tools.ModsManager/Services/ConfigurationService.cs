@@ -69,6 +69,7 @@ namespace OpenKh.Tools.ModsManager.Services
         private static string EnabledModsPathBBS = Path.Combine(StoragePath, "mods-BBS.txt");
         private static string EnabledModsPathRECOM = Path.Combine(StoragePath, "mods-ReCoM.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
+        public static string PresetPath = Path.Combine(StoragePath, "presets");
 
         static ConfigurationService()
         {
@@ -81,6 +82,8 @@ namespace OpenKh.Tools.ModsManager.Services
                 Directory.CreateDirectory(Path.Combine(modsPath, "bbs"));
             if (!Directory.Exists(Path.Combine(modsPath, "Recom")))
                 Directory.CreateDirectory(Path.Combine(modsPath, "Recom"));
+            if(!Directory.Exists(PresetPath))
+                Directory.CreateDirectory(PresetPath);
            
 
             Task.Run(async () =>

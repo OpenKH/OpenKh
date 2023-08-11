@@ -126,6 +126,10 @@
                 <MenuItem Header="Dev View" IsCheckable="True" IsChecked="{Binding DevView}"/>
                 <MenuItem Header="Check for update" Command="{Binding CheckOpenkhUpdateCommand}"/>
             </MenuItem>
+            <MenuItem Header="Presets">
+                <MenuItem Header="Save Preset as" Command="{Binding SavePreset}"/>
+                <MenuItem Header="Load Preset" Name="PresetMenu"/>
+            </MenuItem>
             <MenuItem Header="PC Version" Focusable="False" IsHitTestVisible="False" Visibility="{Binding isPC}"/>
             <MenuItem Header="Emulator" Focusable="False" IsHitTestVisible="False" Visibility="{Binding notPC}"/>
         </Menu>
