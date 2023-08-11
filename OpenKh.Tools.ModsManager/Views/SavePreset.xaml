@@ -24,7 +24,7 @@
         <StackPanel Grid.Row="0">
             <TextBlock Margin="0 0 0 3">Name Preset</TextBlock>
             <Grid Margin="0 0 0 5" Background="White">
-                <TextBlock Margin="5,1" MinWidth="50" Text="eg. openkh/my-kingdomhearts-mod" 
+                <TextBlock Margin="5,1" MinWidth="50" Text="Enter Preset Name" 
                    Foreground="Gray" Visibility="{Binding ElementName=txtSourceModUrl, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" IsHitTestVisible="False"/>
                 <TextBox Name="txtSourceModUrl" Background="Transparent" Text="{Binding PresetName, UpdateSourceTrigger=PropertyChanged}" KeyUp="txtSourceModUrl_KeyUp" />
             </Grid>
