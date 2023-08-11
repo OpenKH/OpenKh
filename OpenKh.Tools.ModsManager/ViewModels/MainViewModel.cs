@@ -413,21 +413,25 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 var view = new SavePreset();
                 if (view.ShowDialog() != true)
                     return;
-                var name = Regex.Replace(view.PresetName, @"[^0-9a-zA-Z]+", "+");
+                string name = Regex.Replace(view.PresetName, @"[^0-9a-zA-Z]+", "+");
                 var enabledMods =  ModsList
                 .Where(x => x.Enabled)
                 .Select(x => x.Source)
                 .ToList();
-                File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name.ToString() + ".txt"), enabledMods);                
+                File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name + ".txt"), enabledMods);                
             });            
 
             LoadPreset = new RelayCommand(_ =>
             {
-                var name = _.ToString();
+                string name = _.ToString();
                 if (File.Exists(Path.Combine(ConfigurationService.PresetPath, name + ".txt")))
                 {
                     ConfigurationService.EnabledMods = File.ReadAllLines(Path.Combine(ConfigurationService.PresetPath, name.ToString() + ".txt"));
                     ReloadModsList();
+                }
+                else
+                {
+                    MessageBox.Show("Cannot find preset", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 }
             });
 
