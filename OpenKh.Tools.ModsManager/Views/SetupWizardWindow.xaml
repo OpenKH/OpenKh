@@ -258,7 +258,10 @@
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PCLaunchOption}">
             <StackPanel>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">If you already have Lua Engine installed or wish to install Lua Engine outside of Mod Manager choose the filepath below.</TextBlock>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding LuaEngineNotFoundVisibility}">If you already have Lua Engine installed or wish to install Lua Engine outside of OpenKH folder select the folder location below.</TextBlock>
+                <TextBlock Margin="0 0 0 6" Visibility="{Binding LuaEngineFoundVisibility}" TextWrapping="Wrap">
+                Lua Engine is installed! If you wish to configure it so it automatically runs scripts from mods installed into OpenKH press the configure button below.
+                </TextBlock>
                 <Grid Margin="0 0 0 3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -270,11 +273,8 @@
                     </Button>
                 </Grid>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding LuaEngineNotFoundVisibility}">
-                It seems you have not installed or selected a filepath with Lua Engine installed. Please install Lua Engine using the button below or navigate to where it is installed using the file selector above.               
-                </TextBlock>
-                <TextBlock Margin="0 0 0 6" Visibility="{Binding LuaEngineFoundVisibility}" TextWrapping="Wrap">
-                Lua Engine is installed! If you wish to configure it so it automatically runs scripts from openkh mods press the configure button below.
-                </TextBlock>
+                It seems you have not installed Lua Engine or selected a filepath with Lua Engine installed. Please install Lua Engine using the button below or navigate to where it is installed using the file selector above.               
+                </TextBlock>                
                 <Button Margin="0 0 0 6" Content="Install and Configure Lua Engine" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaEngineCommand}" CommandParameter="false" Visibility="{Binding LuaEngineNotFoundVisibility}"/>
                 <Button Margin="0 0 0 6" Content="Configure Lua Engine" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaEngineCommand}" CommandParameter="true" Visibility="{Binding LuaEngineFoundVisibility}"/>
             </StackPanel>
