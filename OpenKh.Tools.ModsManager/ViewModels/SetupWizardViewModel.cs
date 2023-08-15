@@ -1,3 +1,4 @@
+using Octokit;
 using OpenKh.Common;
 using OpenKh.Kh1;
 using OpenKh.Kh2;
@@ -7,12 +8,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using Xe.IO;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
+using Ionic.Zip;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
 {
@@ -42,6 +45,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _pcReleaseLocation;
         private string _pcReleaseLanguage;
         private string _gameDataLocation;
+        private string _luaEngineLocation;
         private bool _isEGSVersion;
         private bool _kh2 = ConfigurationService.kh2;
         private bool _kh1 = ConfigurationService.kh1;
@@ -71,6 +75,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Xceed.Wpf.Toolkit.WizardPage PageIsoSelection { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageEosInstall { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageEosConfig { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PageLuaEngineInstall { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageRegion { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PCLaunchOption { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage LastPage { get; internal set; }
@@ -281,8 +286,24 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
             }
         }
+        public RelayCommand SelectLuaEngineLocationCommand { get; }
+        public string LuaEngineLocation
+        {
+            get => _luaEngineLocation;
+            set
+            {
+                _luaEngineLocation = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(LuaEngineFoundVisibility));
+                OnPropertyChanged(nameof(LuaEngineNotFoundVisibility));
+            }
+        }
 
         public bool IsNotExtracting { get; private set; }
+        public bool IsLuaEngineInstalled
+        {
+            get => LuaEngineInstalled = File.Exists(Path.Combine(LuaEngineLocation, "LuaEngine.exe"));
+        }
         public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) || 
             (GameEdition == EpicGames && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) || 
             GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) || 
@@ -292,6 +313,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ProgressBarVisibility => IsNotExtracting ? Visibility.Collapsed : Visibility.Visible;
         public Visibility ExtractionCompleteVisibility => ExtractionProgress == 1f ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility LuaEngineFoundVisibility => IsLuaEngineInstalled ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility LuaEngineNotFoundVisibility => IsLuaEngineInstalled ? Visibility.Collapsed: Visibility.Visible;
         public RelayCommand ExtractGameDataCommand { get; set; }
         public float ExtractionProgress { get; set; }
 
@@ -299,6 +322,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public RelayCommand InstallPanaceaCommand { get; }
         public RelayCommand RemovePanaceaCommand { get; }
+        public RelayCommand InstallLuaEngineCommand { get; set; }
+        private string LuaEngineInstall => ConfigurationService.LuaEngineLocation;
+        public bool LuaEngineInstalled {  get; set; }
         public bool PanaceaInstalled { get; set; }
         private string PanaceaSourceLocation => Path.Combine(AppContext.BaseDirectory, PanaceaDllName);
         private string PanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "DBGHELP.dll");
@@ -350,7 +376,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     CalculateChecksum(PanaceaSourceLocation),
                     CalculateChecksum(PanaceaDestinationLocation));
             }
-        }
+        }     
 
         public SetupWizardViewModel()
         {
@@ -403,6 +429,48 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
                 PanaceaInstalled = false;
+            });
+            SelectLuaEngineLocationCommand = new RelayCommand(_ =>
+                FileDialog.OnFolder(path => LuaEngineLocation = path));
+            InstallLuaEngineCommand = new RelayCommand(installed =>
+            {
+                if (!Convert.ToBoolean(installed))
+                {
+                    string DownPath = Path.GetTempPath() + "LuaEngine.zip";
+                    if (!Directory.Exists(ConfigurationService.LuaEngineLocation))
+                        Directory.CreateDirectory(ConfigurationService.LuaEngineLocation);
+                    var gitClient = new GitHubClient(new ProductHeaderValue("LuaEngine.exe"));
+                    var releases = gitClient.Repository.Release.GetLatest(owner: "TopazTK", name: "LuaEngine").Result;
+                    var _client = new WebClient();
+                    _client.DownloadFile(new System.Uri(releases.Assets[0].BrowserDownloadUrl), DownPath);
+                    using (ZipFile zip = new ZipFile(DownPath))
+                    {
+                        zip.ExtractAll(LuaEngineInstall, ExtractExistingFileAction.OverwriteSilently);
+                    }
+                    string config = File.ReadAllText(Path.Combine(LuaEngineInstall, "gameFile.yml"));
+                    int index = config.IndexOf("script_paths:", config.IndexOf("- name: \"KINGDOM HEARTS II FINAL MIX\"")) + 15;
+                    File.WriteAllText(Path.Combine(LuaEngineInstall, "gameFile.yml"), 
+                        config.Insert(index, "      - \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\"\r\n").Replace("\\", "/")));
+                    File.Delete(DownPath);
+                    ConfigurationService.LuaEngineInstalled = true;
+                    OnPropertyChanged(nameof(IsLuaEngineInstalled));
+                    OnPropertyChanged(nameof(LuaEngineFoundVisibility));
+                    OnPropertyChanged(nameof(LuaEngineNotFoundVisibility));
+                }
+                else
+                {
+                    if (File.Exists(Path.Combine(LuaEngineInstall, "gameFile.yml")))
+                    {
+                        string config = File.ReadAllText(Path.Combine(LuaEngineInstall, "gameFile.yml"));
+                        int index = config.IndexOf("script_paths:", config.IndexOf("- name: \"KINGDOM HEARTS II FINAL MIX\"")) + 15;
+                        File.WriteAllText(Path.Combine(LuaEngineInstall, "gameFile.yml"),
+                            config.Insert(index, "      - \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\"\r\n").Replace("\\", "/")));
+                        ConfigurationService.LuaEngineInstalled = true;
+                        OnPropertyChanged(nameof(IsLuaEngineInstalled));
+                        OnPropertyChanged(nameof(LuaEngineFoundVisibility));
+                        OnPropertyChanged(nameof(LuaEngineNotFoundVisibility));
+                    }                    
+                }
             });
         }
 
@@ -467,7 +535,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             OnPropertyChanged(nameof(ExtractionProgress));
                         }
 
-                        Application.Current.Dispatcher.Invoke(() =>
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
                         {
                             IsNotExtracting = true;
                             ExtractionProgress = 1.0f;
@@ -527,7 +595,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             for (int i = 0; i < 5; i++)
                             {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"), FileMode.Open);
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"), System.IO.FileMode.Open);
                                 var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                                 _totalFiles += _hedFile.Count();
                             }
@@ -536,7 +604,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             for (int i = 0; i < 6; i++)
                             {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"), FileMode.Open);
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"), System.IO.FileMode.Open);
                                 var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                                 _totalFiles += _hedFile.Count();
                             }
@@ -545,14 +613,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             for (int i = 0; i < 4; i++)
                             {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".hed"), FileMode.Open);
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".hed"), System.IO.FileMode.Open);
                                 var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                                 _totalFiles += _hedFile.Count();
                             }
                         }
                         if (ConfigurationService.recom)
                         {
-                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"), FileMode.Open);
+                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"), System.IO.FileMode.Open);
                             var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                             _totalFiles += _hedFile.Count();
                         }
@@ -713,7 +781,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 }
                             }
                         }                        
-                        Application.Current.Dispatcher.Invoke(() =>
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
                         {
                             IsNotExtracting = true;
                             ExtractionProgress = 1.0f;

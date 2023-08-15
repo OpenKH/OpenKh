@@ -103,12 +103,24 @@ namespace OpenKh.Tools.ModsManager.Services
         public static Task InstallMod(
             string name,
             bool isZipFile,
+            bool isLuaFile,
             Action<string> progressOutput = null,
             Action<float> progressNumber = null)
         {
-            return isZipFile ?
-                Task.Run(() => InstallModFromZip(name, progressOutput, progressNumber)) :
-                InstallModFromGithub(name, progressOutput, progressNumber);
+            if (!isZipFile && !isLuaFile)
+            {
+                return Task.Run(() => InstallModFromGithub(name, progressOutput, progressNumber));
+            }
+            else if (isZipFile && !isLuaFile)
+            {
+                return Task.Run(() => InstallModFromZip(name, progressOutput, progressNumber));
+            }
+            else
+            {
+                return Task.Run(() => InstallModFromLua(name));
+            }
+            
+                
         }
 
         public static void InstallModFromZip(
@@ -280,6 +292,55 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 Repository.Clone($"https://github.com/{repositoryName}", modPath, options);
             });
+        }
+
+        public static void InstallModFromLua(string fileName)
+        {
+            string modName = Path.GetFileNameWithoutExtension(fileName);
+            string modAuthor = null;
+            string modDescription = null;
+
+            if (!fileName.Contains(".lua"))
+                throw new ModNotValidException(modName);
+
+            string modPath = GetModPath(modName);
+            if (Directory.Exists(modPath))
+                throw new ModAlreadyExistsExceptions(modName);
+            Directory.CreateDirectory(modPath);
+            File.Copy(fileName,Path.Combine(modPath, Path.GetFileName(fileName)));
+
+            StreamReader r = new StreamReader(Path.Combine(modPath, Path.GetFileName(fileName)));
+            while (!r.EndOfStream)
+            {
+                
+                string line = r.ReadLine();
+                if (line.Contains("LUAGUI"))
+                {
+                    if (line.Contains("NAME"))
+                    {
+                        modName = line.Substring(line.IndexOf("'"));
+                    }
+                    else if (line.Contains("AUTH"))
+                    {
+                        modAuthor = line.Substring(line.IndexOf("'"));
+                    }
+                    else if (line.Contains("DESC"))
+                    {
+                        modDescription = line.Substring(line.IndexOf("'"));
+                    }
+                    if (modName!= null  && modAuthor != null && modDescription != null)
+                    {
+                        break;
+                    }
+                }
+            }
+            r.Close();
+            modDescription ??= "This is an automatically generated metadata for a Lua Zip Mod";
+            string yaml = $"title: {modName}\r\n{(modAuthor != null ? $"author: {modAuthor}\r\n": "")}description: {modDescription}\r\n" +
+                $"assets:\r\n- name: scripts/{Path.GetFileName(fileName)}\r\n  method: copy\r\n  source:\r\n  - name: {Path.GetFileName(fileName)}";
+            string _yamlPath = Path.Combine(modPath + "/mod.yml");
+
+            File.WriteAllText(_yamlPath, yaml);            
         }
 
         public static string GetModPath(string author, string repo) =>

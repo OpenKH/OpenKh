@@ -251,6 +251,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         var name = view.RepositoryName;
                         var isZipFile = view.IsZipFile;
+                        var isLuaFile = view.IsLuaFile;
                         progressWindow = Application.Current.Dispatcher.Invoke(() =>
                         {
                             var progressWindow = new InstallModProgressWindow
@@ -263,7 +264,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             return progressWindow;
                         });
 
-                        await ModsService.InstallMod(name, isZipFile, progress =>
+                        await ModsService.InstallMod(name, isZipFile, isLuaFile, progress =>
                         {
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
                         }, nProgress =>
@@ -271,7 +272,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
                         });
 
-                        var actualName = isZipFile ? Path.GetFileNameWithoutExtension(name) : name;
+                        var actualName = isZipFile || isLuaFile ? Path.GetFileNameWithoutExtension(name) : name;
                         var mod = ModsService.GetMods(new string[] { actualName }).First();
                         Application.Current.Dispatcher.Invoke(() =>
                         {
@@ -373,6 +374,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigRegionId = ConfigurationService.RegionId,
                     ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
                     ConfigIsEGSVersion = ConfigurationService.IsEGSVersion,
+                    ConfigLuaEngineLocation = ConfigurationService.LuaEngineLocation,
                 };
                 if (dialog.ShowDialog() == true)
                 {
@@ -385,6 +387,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
                     ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
                     ConfigurationService.IsEGSVersion = dialog.ConfigIsEGSVersion;
+                    ConfigurationService.LuaEngineLocation = dialog.ConfigLuaEngineLocation;
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
 
                     const int EpicGamesPC = 2;
@@ -555,6 +558,20 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     Process.Start(processStartInfo);
                     CloseAllWindows();
+                    if(ConfigurationService.LuaEngineInstalled)
+                    {
+                        string startFile = ConfigurationService.LuaEngineLocation + "/LuaEngine.exe";
+                        if(File.Exists(startFile))
+                        {
+                            processStartInfo = new ProcessStartInfo
+                            {
+                                FileName = startFile,
+                                WorkingDirectory = ConfigurationService.LuaEngineLocation,
+                                UseShellExecute = false,
+                            };
+                            Process.Start(processStartInfo);
+                        }
+                    }
                     return Task.CompletedTask;
                 default:
                     return Task.CompletedTask;
