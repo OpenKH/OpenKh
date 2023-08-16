@@ -286,6 +286,20 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
             }
         }
+
+        public bool IsNotExtracting { get; private set; }
+        public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) || 
+            (GameEdition == EpicGames && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) || 
+            GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) || 
+            File.Exists(Path.Combine(GameDataLocation, "bbs", "message")) ||
+            File.Exists(Path.Combine(GameDataLocation, "Recom", "SYS")))));
+        public Visibility GameDataNotFoundVisibility => !IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility ProgressBarVisibility => IsNotExtracting ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility ExtractionCompleteVisibility => ExtractionProgress == 1f ? Visibility.Visible : Visibility.Collapsed;
+        public RelayCommand ExtractGameDataCommand { get; set; }
+        public float ExtractionProgress { get; set; }
+        public int RegionId { get; set; }
         public RelayCommand SelectLuaEngineLocationCommand { get; }
         public string LuaEngineLocation
         {
@@ -298,33 +312,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(LuaEngineNotFoundVisibility));
             }
         }
-
-        public bool IsNotExtracting { get; private set; }
         public bool IsLuaEngineInstalled
         {
             get => LuaEngineInstalled = File.Exists(Path.Combine(LuaEngineLocation, "LuaEngine.exe"));
         }
-        public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) || 
-            (GameEdition == EpicGames && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) || 
-            GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) || 
-            File.Exists(Path.Combine(GameDataLocation, "bbs", "message")) ||
-            File.Exists(Path.Combine(GameDataLocation, "Recom", "SYS")))));
-        public Visibility GameDataNotFoundVisibility => !IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility ProgressBarVisibility => IsNotExtracting ? Visibility.Collapsed : Visibility.Visible;
-        public Visibility ExtractionCompleteVisibility => ExtractionProgress == 1f ? Visibility.Visible : Visibility.Collapsed;
+        public RelayCommand InstallLuaEngineCommand { get; set; }
+        public bool LuaEngineInstalled { get; set; }
         public Visibility LuaEngineFoundVisibility => IsLuaEngineInstalled ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility LuaEngineNotFoundVisibility => IsLuaEngineInstalled ? Visibility.Collapsed: Visibility.Visible;
-        public RelayCommand ExtractGameDataCommand { get; set; }
-        public float ExtractionProgress { get; set; }
-
-        public int RegionId { get; set; }
+        public Visibility LuaEngineNotFoundVisibility => IsLuaEngineInstalled ? Visibility.Collapsed : Visibility.Visible;
+        private string LuaEngineInstall => ConfigurationService.LuaEngineLocation;
 
         public RelayCommand InstallPanaceaCommand { get; }
         public RelayCommand RemovePanaceaCommand { get; }
-        public RelayCommand InstallLuaEngineCommand { get; set; }
-        private string LuaEngineInstall => ConfigurationService.LuaEngineLocation;
-        public bool LuaEngineInstalled {  get; set; }
         public bool PanaceaInstalled { get; set; }
         private string PanaceaSourceLocation => Path.Combine(AppContext.BaseDirectory, PanaceaDllName);
         private string PanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "DBGHELP.dll");
@@ -462,9 +461,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     if (File.Exists(Path.Combine(LuaEngineInstall, "gameFile.yml")))
                     {
                         string config = File.ReadAllText(Path.Combine(LuaEngineInstall, "gameFile.yml"));
-                        int index = config.IndexOf("script_paths:", config.IndexOf("- name: \"KINGDOM HEARTS II FINAL MIX\"")) + 15;
-                        File.WriteAllText(Path.Combine(LuaEngineInstall, "gameFile.yml"),
+                        if (!config.Contains("      - \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\"\r\n").Replace("\\", "/")))
+                        {
+                            int index = config.IndexOf("script_paths:", config.IndexOf("- name: \"KINGDOM HEARTS II FINAL MIX\"")) + 15;
+                            File.WriteAllText(Path.Combine(LuaEngineInstall, "gameFile.yml"),
                             config.Insert(index, "      - \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\"\r\n").Replace("\\", "/")));
+                        }
                         ConfigurationService.LuaEngineInstalled = true;
                         OnPropertyChanged(nameof(IsLuaEngineInstalled));
                         OnPropertyChanged(nameof(LuaEngineFoundVisibility));
