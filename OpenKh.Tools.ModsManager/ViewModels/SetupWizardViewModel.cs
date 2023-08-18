@@ -314,7 +314,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
         public bool IsLuaEngineInstalled
         {
-            get => LuaEngineInstalled = File.Exists(Path.Combine(LuaEngineLocation, "LuaEngine.exe"));
+            get => ConfigurationService.LuaEngineInstalled;
         }
         public RelayCommand InstallLuaEngineCommand { get; set; }
         public bool LuaEngineInstalled { get; set; }
@@ -435,16 +435,26 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 if (!Convert.ToBoolean(installed))
                 {
-                    string DownPath = Path.GetTempPath() + "LuaEngine.zip";
-                    if (!Directory.Exists(ConfigurationService.LuaEngineLocation))
-                        Directory.CreateDirectory(ConfigurationService.LuaEngineLocation);
                     var gitClient = new GitHubClient(new ProductHeaderValue("LuaEngine.exe"));
                     var releases = gitClient.Repository.Release.GetLatest(owner: "TopazTK", name: "LuaEngine").Result;
+                    string DownPath = Path.GetTempPath() + "LuaEngine" + Path.GetExtension(releases.Assets[0].Name);
+                    if (!Directory.Exists(ConfigurationService.LuaEngineLocation))
+                        Directory.CreateDirectory(ConfigurationService.LuaEngineLocation);
                     var _client = new WebClient();
                     _client.DownloadFile(new System.Uri(releases.Assets[0].BrowserDownloadUrl), DownPath);
-                    using (ZipFile zip = new ZipFile(DownPath))
+                    try
                     {
-                        zip.ExtractAll(LuaEngineInstall, ExtractExistingFileAction.OverwriteSilently);
+                        using (ZipFile zip = new ZipFile(DownPath))
+                        {
+                            zip.ExtractAll(LuaEngineInstall, ExtractExistingFileAction.OverwriteSilently);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(
+                                $"Unable to extract \"{Path.GetFileName(DownPath)}\" as it is not a zip file. You may have to install it manually and extract it to the LuaEngine folder inside of OpenKH.",
+                                "Run error", MessageBoxButton.OK, MessageBoxImage.Error);                        
+                        File.Delete(DownPath);
                     }
                     string config = File.ReadAllText(Path.Combine(LuaEngineInstall, "gameFile.yml"));
                     int index = config.IndexOf("script_paths:", config.IndexOf("- name: \"KINGDOM HEARTS II FINAL MIX\"")) + 15;
