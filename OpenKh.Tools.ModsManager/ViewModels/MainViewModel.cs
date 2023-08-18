@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
-using System.Text.RegularExpressions;
 using static OpenKh.Tools.ModsManager.Helpers;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
@@ -413,12 +412,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 var view = new SavePreset();
                 if (view.ShowDialog() != true)
                     return;
-                string name = Regex.Replace(view.PresetName, @"[^0-9a-zA-Z]+", "+");
+                string name = string.Join("+", view.PresetName.Split(Path.GetInvalidFileNameChars()));
                 var enabledMods =  ModsList
                 .Where(x => x.Enabled)
                 .Select(x => x.Source)
                 .ToList();
-                File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name + ".txt"), enabledMods);                
+                File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name + ".txt"), enabledMods);
             });            
 
             LoadPreset = new RelayCommand(_ =>
