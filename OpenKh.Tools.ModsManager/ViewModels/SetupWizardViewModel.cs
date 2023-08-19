@@ -16,6 +16,7 @@ using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 using Ionic.Zip;
+using System.Diagnostics;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
 {
@@ -314,7 +315,21 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
         public bool IsLuaEngineInstalled
         {
-            get => ConfigurationService.LuaEngineInstalled;
+            get
+            {
+                if (File.Exists(Path.Combine(ConfigurationService.LuaEngineLocation, "LuaEngine.exe")))
+                {
+                    if (FileVersionInfo.GetVersionInfo(Path.Combine(ConfigurationService.LuaEngineLocation, "LuaEngine.exe")).ProductVersion == MainViewModel.releases.TagName ||
+                        MainViewModel.releases.TagName == "v1.01" && File.Exists(Path.Combine(ConfigurationService.LuaEngineLocation, "LuaEngine.exe")))
+                    {
+                        return ConfigurationService.LuaEngineInstalled = true;
+                    }
+                    else
+                        return ConfigurationService.LuaEngineInstalled = false;
+                }
+                else
+                    return ConfigurationService.LuaEngineInstalled = false;
+            }
         }
         public RelayCommand InstallLuaEngineCommand { get; set; }
         public bool LuaEngineInstalled { get; set; }

@@ -66,6 +66,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public string Title => ApplicationName;
         public string CurrentVersion => ApplicationVersion;
+        public static Release releases = new GitHubClient(new ProductHeaderValue("LuaEngine.exe")).Repository.Release.GetLatest(owner: "TopazTK", name: "LuaEngine").Result;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AddModCommand { get; set; }
@@ -229,7 +230,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             if (_supportedGames.Contains(ConfigurationService.LaunchGame) && PC)
                 _launchGame = ConfigurationService.LaunchGame;
             else
-                ConfigurationService.LaunchGame = _launchGame;
+                ConfigurationService.LaunchGame = _launchGame;           
 
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
