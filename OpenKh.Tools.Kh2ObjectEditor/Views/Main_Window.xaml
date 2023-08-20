@@ -5,33 +5,43 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Views"
         mc:Ignorable="d"
-        Title="Main_Window" Height="900" Width="1600">
+        Title="KH2 Object Editor" Height="900" Width="1600">
 
     <DockPanel>
         <Menu DockPanel.Dock="Top" Height="20">
-            <MenuItem Header="TEST" Click="Menu_Test"></MenuItem>
-            <MenuItem Header="Save Motion changes" Click="Menu_SaveMotion"></MenuItem>
-            <MenuItem Header="Save Mset File" Click="Menu_SaveMset"></MenuItem>
+            <MenuItem Header="TEST">
+                <MenuItem Header="Check App Context" Click="Menu_Test"/>
+                <MenuItem Header="Run Code" Click="Menu_Test_RunCode"/>
+                <MenuItem Header="Test Effects" Click="Menu_Test_Effects"/>
+                <MenuItem Header="Test Mdlxs" Click="Menu_Test_Mdlxs"/>
+                <MenuItem Header="Test Msets" Click="Menu_Test_Msets"/>
+            </MenuItem>
+            <MenuItem Header="Save">
+                <MenuItem Header="Save Mdlx" Click="Menu_Save_Mdlx"/>
+                <MenuItem Header="Save Mset" Click="Menu_Save_Mset"/>
+                <MenuItem Header="Save Apdx" Click="Menu_Save_Apdx"/>
+            </MenuItem>
+            <MenuItem Header="Attach mdlx" Click="Menu_AttachMdlx"></MenuItem>
         </Menu>
 
         <Grid AllowDrop="True" Drop="Window_Drop">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="300" />
+                <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <!-- SELECTOR  -->
             <local:ObjectSelector_Control Grid.Column="0"/>
-            <local:Viewport_Control Grid.Column="1" x:Name="Viewport" />
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <local:MotionSelector_Control Grid.Row="0"/>
-                <local:DataViewer_Control Grid.Row="1"/>
-            </Grid>
-            <!-- CONTROLS  -->
+            
+            <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
+            
+            <local:Viewport_Control Grid.Column="2" x:Name="Viewport" />
+            
+            <GridSplitter Grid.Column="3" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
+            
+            <local:ModuleLoader_Control Grid.Column="4"/>
         </Grid>
     </DockPanel>
     

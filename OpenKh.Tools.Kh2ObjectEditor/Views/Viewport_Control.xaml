@@ -10,14 +10,23 @@
 
     <DockPanel Background="LightGray">
         <StackPanel DockPanel.Dock="Bottom" Margin="10">
-            <ContentControl HorizontalAlignment="Center">
+            <ContentControl HorizontalAlignment="Center" Height="30">
                 <StackPanel Orientation="Horizontal">
                     <Button Click="Button_PreviousFrame">&lt;</Button>
                     <Label Content="{Binding CurrentFrame}" Width="50" HorizontalContentAlignment="Center"></Label>
                     <Button Click="Button_NextFrame">&gt;</Button>
                 </StackPanel>
             </ContentControl>
-            <CheckBox IsChecked="{Binding AnimationRunning}"></CheckBox>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <CheckBox Grid.Column="0" IsChecked="{Binding AnimationRunning}">Auto advance</CheckBox>
+                <Button Grid.Column="1" HorizontalAlignment="Right" Click="Button_Reload">Reload</Button>
+            </Grid>
+            <CheckBox IsChecked="{Binding RenderCollisions}">Collisions</CheckBox>
+            <CheckBox IsChecked="{Binding RenderHitCollisions}">Hit Collisions</CheckBox>
         </StackPanel>
 
         <S3V:Simple3DViewport_Control Grid.Column="0" x:Name="Viewport"/>

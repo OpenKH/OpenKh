@@ -3,6 +3,7 @@ using OpenKh.Kh2.Models;
 using OpenKh.Kh2Anim.Mset;
 using OpenKh.Kh2Anim.Mset.Interfaces;
 using OpenKh.Tools.Kh2ObjectEditor.Classes;
+using OpenKh.Tools.Kh2ObjectEditor.Services;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
 using Simple3DViewport.Controls;
 using Simple3DViewport.Objects;
@@ -15,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using static OpenKh.Kh2.Models.ModelCommon;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 {
@@ -34,9 +36,29 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
                 OnPropertyChanged("AnimationRunning");
             }
         }
-        public int currentAnim { get; set; }
-        private int _currentFrame { get; set; }
-        public int CurrentFrame
+        public bool _renderCollisions { get; set; }
+        public bool RenderCollisions
+        {
+            get { return _renderCollisions; }
+            set
+            {
+                _renderCollisions = value;
+                OnPropertyChanged("RenderCollisions");
+            }
+        }
+        public bool _renderHitCollisions { get; set; }
+        public bool RenderHitCollisions
+        {
+            get { return _renderHitCollisions; }
+            set
+            {
+                _renderHitCollisions = value;
+                OnPropertyChanged("RenderHitCollisions");
+            }
+        }
+        public int? currentAnim { get; set; }
+        private int? _currentFrame { get; set; }
+        public int? CurrentFrame
         {
             get { return _currentFrame; }
             set
@@ -52,43 +74,99 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
         private IAnimMatricesProvider AnimMatricesProvider { get; set; }
 
         public Simple3DViewport_Control ViewportControl { get; set; }
+        public bool enable_frameCommands
+        {
+            get
+            {
+                return Mset_Service.Instance.LoadedMotion != null;
+            }
+        }
+        public bool enable_reload
+        {
+            get
+            {
+                return Mdlx_Service.Instance.ModelFile != null;
+            }
+        }
 
         public Viewport_ViewModel()
         {
             AnimationRunning = false;
+            RenderCollisions = true;
+            RenderHitCollisions = false;
+            CurrentFrame = 0;
             startAnimationTicker();
 
             subscribe_ObjectSelected();
             subscribe_MotionSelected();
         }
 
-        public void loadModel()
+        public void clearViewport()
         {
-            if (App_Context.Instance.ModelFile != null)
+            ViewportControl.VPModels.Clear();
+            ThisModel = null;
+            ThisCollisions = null;
+            _animationRunning = false;
+            currentAnim = null;
+            CurrentFrame = null;
+            currentPose = null;
+            extraPose = null;
+            currentAnb = null;
+            AnimMatricesProvider = null;
+        }
+
+        public void loadModel(bool doCameraRestart)
+        {
+            foreach (ModelSkeletal.SkeletalGroup group in Mdlx_Service.Instance.ModelFile.Groups)
             {
-                ThisModel = ViewportHelper.getModel(App_Context.Instance.ModelFile, App_Context.Instance.TextureFile);
+                group.Mesh = ModelSkeletal.getMeshFromGroup(group, GetBoneMatrices(Mdlx_Service.Instance.ModelFile.Bones));
+            }
+
+            if (Mdlx_Service.Instance.ModelFile != null)
+            {
+                ThisModel = ViewportHelper.getModel(Mdlx_Service.Instance.ModelFile, Mdlx_Service.Instance.TextureFile);
                 ViewportControl.VPModels.Clear();
                 if (ThisModel != null)
                     ViewportControl.VPModels.Add(ThisModel);
+
+                // Attachable
+                if (Attachment_Service.Instance.Attach_ModelFile != null)
+                {
+                    ViewportControl.VPModels.Add(ViewportHelper.getModel(Attachment_Service.Instance.Attach_ModelFile, Attachment_Service.Instance.Attach_TextureFile));
+                }
+
+                // Hit Collisions
+                if (RenderHitCollisions && Mdlx_Service.Instance.CollisionFile != null)
+                {
+                    SimpleModel model = new SimpleModel(getHitCollisions(null));
+                    ViewportControl.VPModels.Add(model);
+                }
+
                 ViewportControl.render();
-                ViewportControl.restartCamera();
+                if (doCameraRestart) ViewportControl.restartCamera();
             }
         }
 
         private void loadAnb()
         {
-            if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(App_Context.Instance.MsetPath, "mset") || App_Context.Instance.LoadedMotion == null)
+            if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(Mset_Service.Instance.MsetPath, "mset") || Mset_Service.Instance.LoadedMotion == null)
                 return;
 
-            App_Context.Instance.LoadedMotion.Entry.Stream.Position = 0;
-            Bar anbBarFile = Bar.Read(App_Context.Instance.LoadedMotion.Entry.Stream);
+            Mset_Service.Instance.MsetBar[Mset_Service.Instance.LoadedMotionId].Stream.Position = 0;
+            Bar anbBarFile = Bar.Read(Mset_Service.Instance.MsetBar[Mset_Service.Instance.LoadedMotionId].Stream);
 
             currentAnb = new AnbIndir(anbBarFile);
         }
 
         private void loadAnimProvider()
         {
-            using var mdlxStream = File.Open(App_Context.Instance.MdlxPath, FileMode.Open);
+            //using var mdlxStream = File.Open(Mdlx_Service.Instance.MdlxPath, FileMode.Open);
+
+            // This is a test, model should be saved in the model module
+            Mdlx_Service.Instance.saveModel();
+            Stream mdlxStream = new MemoryStream();
+            Bar.Write(mdlxStream, Mdlx_Service.Instance.MdlxBar);
+            mdlxStream.Position = 0;
 
             if (!mdlxStream.CanRead || !mdlxStream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");
@@ -102,7 +180,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
             Matrix4x4[] matrices = AnimMatricesProvider.ProvideMatrices(frame);
 
-            foreach (ModelSkeletal.SkeletalGroup group in App_Context.Instance.ModelFile.Groups)
+            foreach (ModelSkeletal.SkeletalGroup group in Mdlx_Service.Instance.ModelFile.Groups)
             {
                 group.Mesh = ModelSkeletal.getMeshFromGroup(group, matrices);
             }
@@ -114,72 +192,129 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
             ThisCollisions = new SimpleModel(new List<SimpleMesh>(), "COLLISIONS_1", new List<string> { "COLLISION", "COLLISION_GROUP" });
 
-            if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath,"mdlx") || !ObjectEditorUtils.isFilePathValid(App_Context.Instance.MsetPath, "mset") || App_Context.Instance.LoadedMotion == null)
+            if (!ObjectEditorUtils.isFilePathValid(Mdlx_Service.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(Mset_Service.Instance.MsetPath, "mset") || Mset_Service.Instance.LoadedMotion == null)
                 return;
 
-            if(App_Context.Instance.AnimBinary?.MotionFile?.KeyTimes == null || App_Context.Instance.AnimBinary.MotionFile.KeyTimes.IsEmpty())
+            if (Mset_Service.Instance.LoadedMotion?.MotionFile?.KeyTimes == null || Mset_Service.Instance.LoadedMotion.MotionFile.KeyTimes.IsEmpty())
             {
                 return;
             }
 
-            int realFrameStart = (int)App_Context.Instance.AnimBinary.MotionFile.KeyTimes[0];
-            int realFrameEnd = (int)App_Context.Instance.AnimBinary.MotionFile.KeyTimes[App_Context.Instance.AnimBinary.MotionFile.KeyTimes.Count-1];
+            int realFrameStart = (int)Mset_Service.Instance.LoadedMotion.MotionFile.KeyTimes[0];
+            if (realFrameStart < 0) realFrameStart = 0;
+            int realFrameEnd = (int)Mset_Service.Instance.LoadedMotion.MotionFile.KeyTimes[Mset_Service.Instance.LoadedMotion.MotionFile.KeyTimes.Count - 1];
 
             if (CurrentFrame < realFrameStart)
-                CurrentFrame = realFrameStart;
+                CurrentFrame = realFrameEnd;
 
             if (CurrentFrame > realFrameEnd)
-                CurrentFrame = 0;
+                CurrentFrame = realFrameStart;
 
-            Matrix4x4[] matrices = AnimMatricesProvider.ProvideMatrices(CurrentFrame);
+            Matrix4x4[] matrices = AnimMatricesProvider.ProvideMatrices(CurrentFrame.Value);
 
-            foreach (ModelSkeletal.SkeletalGroup group in App_Context.Instance.ModelFile.Groups)
+            foreach (ModelSkeletal.SkeletalGroup group in Mdlx_Service.Instance.ModelFile.Groups)
             {
                 group.Mesh = ModelSkeletal.getMeshFromGroup(group, matrices);
             }
 
             // Render the animated model
-            loadCollisions(matrices);
-            ThisModel = ViewportHelper.getModel(App_Context.Instance.ModelFile, App_Context.Instance.TextureFile);
+            ThisModel = ViewportHelper.getModel(Mdlx_Service.Instance.ModelFile, Mdlx_Service.Instance.TextureFile);
             ViewportControl.VPModels.Clear();
             if (ThisModel != null)
                 ViewportControl.VPModels.Add(ThisModel);
-            if (ThisCollisions != null)
-                ViewportControl.VPModels.Add(ThisCollisions);
+
+            if (RenderCollisions)
+            {
+                loadCollisions(matrices);
+                if (ThisCollisions != null)
+                    ViewportControl.VPModels.Add(ThisCollisions);
+            }
+
+            if (Attachment_Service.Instance.Attach_ModelFile != null)
+            {
+                foreach (SimpleModel model in getAttachmentModel(matrices))
+                {
+                    ViewportControl.VPModels.Add(model);
+                }
+            }
+
+            if(RenderHitCollisions && Mdlx_Service.Instance.CollisionFile != null)
+            {
+                SimpleModel model = new SimpleModel(getHitCollisions(matrices));
+                ViewportControl.VPModels.Add(model);
+            }
+
             ViewportControl.render();
+        }
+
+        // Ideally you'd parent bone 0 to the bone to be attached, however I can't get it to work, so this is the best approximation I could do. Not good enough for hitboxes, just for show
+        public List<SimpleModel> getAttachmentModel(Matrix4x4[] modelMatrices)
+        {
+            App_Context test = App_Context.Instance;
+
+            Stream temp_mdlxStream = new MemoryStream();
+            Bar.Write(temp_mdlxStream, Attachment_Service.Instance.Attach_MdlxBar);
+
+            if (!temp_mdlxStream.CanRead || !temp_mdlxStream.CanSeek)
+                throw new InvalidDataException($"Read or seek must be supported.");
+
+
+            Bar attach_AnbBarFile = new Bar();
+            try // Some animations don't use the weapon
+            {
+                attach_AnbBarFile = Bar.Read(Attachment_Service.Instance.Attach_MsetEntries[Mset_Service.Instance.LoadedMotionId].Entry.Stream);
+            }
+            catch (Exception ex)
+            {
+                return new List<SimpleModel>();
+            }
+
+            Attachment_Service.Instance.Attach_MsetEntries[Mset_Service.Instance.LoadedMotionId].Entry.Stream.Position = 0;
+            AnbIndir attach_Anb = new AnbIndir(attach_AnbBarFile);
+
+            IAnimMatricesProvider attach_AnimMatricesProvider = attach_Anb.GetAnimProvider(temp_mdlxStream);
+
+            Matrix4x4[] matrices = attach_AnimMatricesProvider.ProvideMatrices(CurrentFrame.Value);
+
+            foreach (ModelSkeletal.SkeletalGroup group in Attachment_Service.Instance.Attach_ModelFile.Groups)
+            {
+                group.Mesh = ModelSkeletal.getMeshFromGroup(group, matrices);
+            }
+
+            SimpleModel model = ViewportHelper.getModel(Attachment_Service.Instance.Attach_ModelFile, Attachment_Service.Instance.Attach_TextureFile);
+
+            List<SimpleModel> modelList = new List<SimpleModel>();
+            Simple3DViewport.Utils.Simple3DUtils.applyTransform(model.Meshes[0].Geometry, modelMatrices[Attachment_Service.Instance.Attach_BoneId]);
+            modelList.Add(model);
+
+            return modelList;
         }
 
         public void nextFrame()
         {
-            int timeTicked = 1;
-            CurrentFrame += timeTicked;
+            CurrentFrame += 1;
             loadCollisions(null);
             loadFrame();
         }
         public void previousFrame()
         {
-            int timeTicked = 1;
-            CurrentFrame -= timeTicked;
+            CurrentFrame -= 1;
             loadCollisions(null);
             loadFrame();
         }
 
         public void loadCollisions(Matrix4x4[] matrices)
         {
-            if (App_Context.Instance.CollisionFile != null)
+            if (Mdlx_Service.Instance.CollisionFile != null)
             {
-                App_Context.Instance.LoadedMotion.Entry.Stream.Position = 0;
-                AnimationBinary animBinary = App_Context.Instance.AnimBinary;
-                App_Context.Instance.LoadedMotion.Entry.Stream.Position = 0;
-
                 List<short> collisionGroupsToLoad = new List<short>();
 
-                if (animBinary.MotionTriggerFile?.RangeTriggerList == null)
+                if (Mset_Service.Instance.LoadedMotion.MotionTriggerFile?.RangeTriggerList == null)
                 {
                     return;
                 }
 
-                foreach (MotionTrigger.RangeTrigger trigger in animBinary.MotionTriggerFile.RangeTriggerList)
+                foreach (MotionTrigger.RangeTrigger trigger in Mset_Service.Instance.LoadedMotion.MotionTriggerFile.RangeTriggerList)
                 {
                     if((trigger.StartFrame <= CurrentFrame || trigger.StartFrame == -1) && (trigger.EndFrame >= CurrentFrame || trigger.EndFrame == -1))
                     {
@@ -213,25 +348,14 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
                 }
 
                 List<Collision_Wrapper> attackCollisions = new List<Collision_Wrapper>();
-                for (int i = 0; i < App_Context.Instance.CollisionFile.EntryList.Count; i++)
+                for (int i = 0; i < Mdlx_Service.Instance.CollisionFile.EntryList.Count; i++)
                 {
-                    ObjectCollision collision = App_Context.Instance.CollisionFile.EntryList[i];
-                    /*if (collision.Type == (byte)ObjectCollision.TypeEnum.ATTACK)
-                    {
-                        attackCollisions.Add(new Collision_Wrapper("COLLISION_" + i, collision));
-                    }*/
+                    ObjectCollision collision = Mdlx_Service.Instance.CollisionFile.EntryList[i];
                     if (collisionGroupsToLoad.Contains(collision.Group))
                     {
                         attackCollisions.Add(new Collision_Wrapper("COLLISION_" + i, collision));
                     }
                 }
-
-                /*List<Collision_Wrapper> finalAttackCollisions = new List<Collision_Wrapper>();
-                foreach (short ctl in collisionGroupsToLoad)
-                {
-                    finalAttackCollisions.Add(attackCollisions[ctl]);
-                }*/
-                //loadAttackCollisions(finalAttackCollisions, matrices);
                 loadAttackCollisions(attackCollisions, matrices);
             }
         }
@@ -242,7 +366,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
         }
         private void sub_ObjectSelected(App_Context m, EventArgs e)
         {
-            loadModel();
+            clearViewport();
+            loadModel(true);
         }
         public void subscribe_MotionSelected()
         {
@@ -250,9 +375,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
         }
         private void sub_MotionSelected(App_Context m, EventArgs e)
         {
+            CurrentFrame = 0;
             loadAnb();
             loadAnimProvider();
-            CurrentFrame = 0;
             loadFrame();
             //AnimationRunning = true;
         }
@@ -281,7 +406,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
                 return;
             }
 
-            if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(App_Context.Instance.MsetPath, "mset") || App_Context.Instance.LoadedMotion == null)
+            if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(Mset_Service.Instance.MsetPath, "mset") || Mset_Service.Instance.LoadedMotion == null)
                 return;
 
             int timeTicked = 2;
@@ -290,16 +415,58 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
             loadFrame();
         }
 
+        public List<SimpleMesh> getHitCollisions(Matrix4x4[] matrices)
+        {
+            List <SimpleMesh> list_hitMeshes = new List<SimpleMesh>();
+
+            if (Mdlx_Service.Instance.CollisionFile == null)
+                return list_hitMeshes;
+
+            Matrix4x4[] boneMatrices = new Matrix4x4[0];
+
+            if (matrices != null)
+                boneMatrices = matrices;
+            else if (Mdlx_Service.Instance.ModelFile != null)
+                boneMatrices = ModelCommon.GetBoneMatrices(Mdlx_Service.Instance.ModelFile.Bones);
+
+            for (int i = 0; i < Mdlx_Service.Instance.CollisionFile.EntryList.Count; i++)
+            {
+                ObjectCollision collision = Mdlx_Service.Instance.CollisionFile.EntryList[i];
+
+                if(collision.Type == (byte)ObjectCollision.TypeEnum.HIT)
+                {
+
+                    Vector3 basePosition = Vector3.Zero;
+                    if (collision.Bone != 16384 && boneMatrices.Length != 0)
+                    {
+                        basePosition = Vector3.Transform(new Vector3(collision.PositionX, collision.PositionY, collision.PositionZ), boneMatrices[collision.Bone]);
+                    }
+
+                    list_hitMeshes.Add(getCollisionMesh(
+                        "COLLISION_HIT_" + i,
+                        new List<string> { "COLLISION", "COLLISION_HIT_SINGLE" },
+                        collision.Shape,
+                        new Vector3D(basePosition.X, basePosition.Y, basePosition.Z),
+                        Color.FromArgb(100, 0, 0, 255),
+                    collision.Radius,
+                        collision.Height
+                        ));
+                }
+            }
+
+            return list_hitMeshes;
+        }
+
         public void loadAttackCollisions(List<Collision_Wrapper> attackCollisions, Matrix4x4[] matrices)
         {
-            if (App_Context.Instance.CollisionFile != null)
+            if (Mdlx_Service.Instance.CollisionFile != null)
             {
                 Matrix4x4[] boneMatrices = new Matrix4x4[0];
 
                 if (matrices != null)
                     boneMatrices = matrices;
-                else if (App_Context.Instance.ModelFile != null)
-                    boneMatrices = ModelCommon.GetBoneMatrices(App_Context.Instance.ModelFile.Bones);
+                else if (Mdlx_Service.Instance.ModelFile != null)
+                    boneMatrices = ModelCommon.GetBoneMatrices(Mdlx_Service.Instance.ModelFile.Bones);
 
                 List<SimpleMesh> simpleMeshes = new List<SimpleMesh>();
 
@@ -328,42 +495,52 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
                         color = Color.FromArgb(100, 255, 0, 0);
                     }
 
-                    if (collision.Shape == (byte)ObjectCollision.ShapeEnum.ELLIPSOID)
-                    {
-                        simpleMeshes.Add(new SimpleMesh(
-                            Simple3DViewport.Utils.GeometryShapes.getEllipsoid(collision.Radius, collision.Height, 10, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), color),
-                            "COLLISION_" + i,
-                            new List<string> { "COLLISION", "COLLISION_SINGLE" }
-                            ));
-                    }
-                    else if (collision.Shape == (byte)ObjectCollision.ShapeEnum.COLUMN)
-                    {
-                        simpleMeshes.Add(new SimpleMesh(
-                            Simple3DViewport.Utils.GeometryShapes.getCylinder(collision.Radius, collision.Height, 10, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), color),
-                            "COLLISION_" + i,
-                            new List<string> { "COLLISION", "COLLISION_SINGLE" }
-                            ));
-                    }
-                    else if (collision.Shape == (byte)ObjectCollision.ShapeEnum.CUBE)
-                    {
-                        simpleMeshes.Add(new SimpleMesh(
-                            Simple3DViewport.Utils.GeometryShapes.getCuboid(collision.Radius, collision.Height, collision.Radius, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), color),
-                            "COLLISION_" + i,
-                            new List<string> { "COLLISION", "COLLISION_SINGLE" }
-                            ));
-                    }
-                    else if (collision.Shape == (byte)ObjectCollision.ShapeEnum.SPHERE)
-                    {
-                        simpleMeshes.Add(new SimpleMesh(
-                            Simple3DViewport.Utils.GeometryShapes.getSphere(collision.Radius, 10, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), color),
-                            "COLLISION_" + i,
-                            new List<string> { "COLLISION", "COLLISION_SINGLE" }
-                            ));
-                    }
+
+                    simpleMeshes.Add(getCollisionMesh(
+                        "COLLISION_" + i,
+                        new List<string> { "COLLISION", "COLLISION_SINGLE" },
+                        collision.Shape,
+                        new Vector3D(basePosition.X, basePosition.Y, basePosition.Z),
+                        color,
+                        collision.Radius,
+                        collision.Height
+                        ));
                 }
 
                 ThisCollisions = new SimpleModel(simpleMeshes, "COLLISIONS_1", new List<string> { "COLLISION", "COLLISION_GROUP" });
             }
+        }
+
+        public static SimpleMesh getCollisionMesh(string id, List<string> labels, byte shape, Vector3D position, Color color, short width, short height)
+        {
+            SimpleMesh thisMesh = null;
+
+            if (shape == (byte)ObjectCollision.ShapeEnum.ELLIPSOID)
+            {
+                thisMesh = new SimpleMesh( Simple3DViewport.Utils.GeometryShapes.getEllipsoid(width, height, 10, position, color), id, labels );
+            }
+            else if (shape == (byte)ObjectCollision.ShapeEnum.COLUMN)
+            {
+                thisMesh = new SimpleMesh( Simple3DViewport.Utils.GeometryShapes.getCylinder(width, height, 10, position, color), id, labels );
+            }
+            else if (shape == (byte)ObjectCollision.ShapeEnum.CUBE)
+            {
+                thisMesh = new SimpleMesh( Simple3DViewport.Utils.GeometryShapes.getCuboid(width, height, width, position, color), id, labels );
+            }
+            else if (shape == (byte)ObjectCollision.ShapeEnum.SPHERE)
+            {
+                thisMesh = new SimpleMesh( Simple3DViewport.Utils.GeometryShapes.getSphere(width, 10, position, color), id, labels );
+            }
+
+            return thisMesh;
+        }
+
+        public void reload()
+        {
+            AnimationRunning = false;
+            CurrentFrame = 0;
+            clearViewport();
+            loadModel(false);
         }
     }
 }

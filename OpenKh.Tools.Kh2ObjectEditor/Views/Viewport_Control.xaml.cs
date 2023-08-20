@@ -17,12 +17,23 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
 
         private void Button_PreviousFrame(object sender, System.Windows.RoutedEventArgs e)
         {
+            if (!ThisVM.enable_frameCommands)
+                return;
             ThisVM.previousFrame();
         }
 
         private void Button_NextFrame(object sender, System.Windows.RoutedEventArgs e)
         {
+            if (!ThisVM.enable_frameCommands)
+                return;
             ThisVM.nextFrame();
+        }
+
+        private void Button_Reload(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (!ThisVM.enable_reload)
+                return;
+            ThisVM.reload();
         }
     }
 }

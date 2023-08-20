@@ -14,27 +14,14 @@ namespace OpenKh.Kh2
             public short EndFrame { get; set; }
             public byte Trigger { get; set; }
             public byte ParamSize { get; set; }
-            public List<short> Param { get; set; }
+            public short Param1 { get; set; }
+            public short Param2 { get; set; }
+            public short Param3 { get; set; }
+            public short Param4 { get; set; }
 
-            public short? Param1
+
+            public RangeTrigger()
             {
-                get { return (ParamSize > 0) ? Param[0] : null; }
-                set { if (ParamSize > 0) Param[0] = (short)value; }
-            }
-            public short? Param2
-            {
-                get { return (ParamSize > 1) ? Param[1] : null; }
-                set { if (ParamSize > 1) Param[1] = (short)value; }
-            }
-            public short? Param3
-            {
-                get { return (ParamSize > 2) ? Param[2] : null; }
-                set { if (ParamSize > 2) Param[2] = (short)value; }
-            }
-            public short? Param4
-            {
-                get { return (ParamSize > 3) ? Param[3] : null; }
-                set { if (ParamSize > 3) Param[3] = (short)value; }
             }
 
             public enum RangeEnum
@@ -101,7 +88,7 @@ namespace OpenKh.Kh2
             public short Frame { get; set; }
             public byte Trigger { get; set; }
             public byte ParamSize { get; set; }
-            public List<short> Param { get; set; }
+            /*public List<short> Param { get; set; }
 
             public short? Param1
             {
@@ -122,6 +109,14 @@ namespace OpenKh.Kh2
             {
                 get { return (ParamSize > 3) ? Param[3] : null; }
                 set { if (ParamSize > 3) Param[3] = (short)value; }
+            }*/
+            public short Param1 { get; set; }
+            public short Param2 { get; set; }
+            public short Param3 { get; set; }
+            public short Param4 { get; set; }
+
+            public FrameTrigger()
+            {
             }
 
             public enum FrameEnum
@@ -176,6 +171,12 @@ namespace OpenKh.Kh2
             Binary = 1
         }
 
+        public MotionTrigger()
+        {
+            RangeTriggerList = new List<RangeTrigger>();
+            FrameTriggerList = new List<FrameTrigger>();
+        }
+
         public MotionTrigger(Stream stream)
         {
             if (!stream.CanRead || !stream.CanSeek)
@@ -195,11 +196,20 @@ namespace OpenKh.Kh2
                 rangeTrigger.EndFrame = reader.ReadInt16();
                 rangeTrigger.Trigger = reader.ReadByte();
                 rangeTrigger.ParamSize = reader.ReadByte();
-                rangeTrigger.Param = new List<short>();
+                /*rangeTrigger.Param = new List<short>();
                 for (int j = 0; j < rangeTrigger.ParamSize; j++)
                 {
                     rangeTrigger.Param.Add(reader.ReadInt16());
-                }
+                }*/
+                if(rangeTrigger.ParamSize > 0)
+                    rangeTrigger.Param1 = reader.ReadInt16();
+                if (rangeTrigger.ParamSize > 1)
+                    rangeTrigger.Param2 = reader.ReadInt16();
+                if (rangeTrigger.ParamSize > 2)
+                    rangeTrigger.Param3 = reader.ReadInt16();
+                if (rangeTrigger.ParamSize > 3)
+                    rangeTrigger.Param4 = reader.ReadInt16();
+
                 RangeTriggerList.Add(rangeTrigger);
             }
 
@@ -210,11 +220,21 @@ namespace OpenKh.Kh2
                 frameTrigger.Frame = reader.ReadInt16();
                 frameTrigger.Trigger = reader.ReadByte();
                 frameTrigger.ParamSize = reader.ReadByte();
-                frameTrigger.Param = new List<short>();
+                /*frameTrigger.Param = new List<short>();
                 for (int j = 0; j < frameTrigger.ParamSize; j++)
                 {
                     frameTrigger.Param.Add(reader.ReadInt16());
-                }
+                }*/
+
+                if (frameTrigger.ParamSize > 0)
+                    frameTrigger.Param1 = reader.ReadInt16();
+                if (frameTrigger.ParamSize > 1)
+                    frameTrigger.Param2 = reader.ReadInt16();
+                if (frameTrigger.ParamSize > 2)
+                    frameTrigger.Param3 = reader.ReadInt16();
+                if (frameTrigger.ParamSize > 3)
+                    frameTrigger.Param4 = reader.ReadInt16();
+
                 FrameTriggerList.Add(frameTrigger);
             }
         }
@@ -242,10 +262,18 @@ namespace OpenKh.Kh2
                 writer.Write(rangeTrigger.EndFrame);
                 writer.Write(rangeTrigger.Trigger);
                 writer.Write(rangeTrigger.ParamSize);
-                foreach (short par in rangeTrigger.Param)
+                /*foreach (short par in rangeTrigger.Param)
                 {
                     writer.Write(par);
-                }
+                }*/
+                if (rangeTrigger.ParamSize > 0)
+                    writer.Write(rangeTrigger.Param1);
+                if (rangeTrigger.ParamSize > 1)
+                    writer.Write(rangeTrigger.Param2);
+                if (rangeTrigger.ParamSize > 2)
+                    writer.Write(rangeTrigger.Param3);
+                if (rangeTrigger.ParamSize > 3)
+                    writer.Write(rangeTrigger.Param4);
             }
 
             foreach (FrameTrigger frameTrigger in FrameTriggerList)
@@ -253,10 +281,18 @@ namespace OpenKh.Kh2
                 writer.Write(frameTrigger.Frame);
                 writer.Write(frameTrigger.Trigger);
                 writer.Write(frameTrigger.ParamSize);
-                foreach (short par in frameTrigger.Param)
+                /*foreach (short par in frameTrigger.Param)
                 {
                     writer.Write(par);
-                }
+                }*/
+                if (frameTrigger.ParamSize > 0)
+                    writer.Write(frameTrigger.Param1);
+                if (frameTrigger.ParamSize > 1)
+                    writer.Write(frameTrigger.Param2);
+                if (frameTrigger.ParamSize > 2)
+                    writer.Write(frameTrigger.Param3);
+                if (frameTrigger.ParamSize > 3)
+                    writer.Write(frameTrigger.Param4);
             }
 
             stream.Position = 0;

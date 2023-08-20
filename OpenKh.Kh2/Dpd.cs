@@ -1,21 +1,22 @@
-﻿using System.Collections.Generic;
+using OpenKh.Common;
+using OpenKh.Kh2.Utils;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Xe.IO;
 
 namespace OpenKh.Kh2
 {
-	public partial class Dpd
+    public partial class Dpd
 	{
 		private const uint Version = 0x00000096U;
 
-		public List<int> OffsetPdt { get; set; }
-		public List<int> OffsetTextures { get; set; }
-		public List<int> Offset3 { get; set; }
-		public List<int> Offset4 { get; set; }
-		public List<int> Offset5 { get; set; }
+        public List<ParticleData> ParticleDataList { get; set; }
+        public List<Texture> TexturesList { get; set; }
+        public List<Shape> ShapesList { get; set; }
+        public List<Model> ModelsList { get; set; }
+        public List<Vsf> VsfList { get; set; }
+        public byte[] Unk { get; set; } // A lot of times 16 FFs
 
-		public Dpd(Stream stream)
+        public Dpd(Stream stream)
 		{
 			if (!stream.CanRead || !stream.CanSeek)
 				throw new InvalidDataException($"Read or seek must be supported.");
@@ -24,28 +25,269 @@ namespace OpenKh.Kh2
 			if (stream.Length < 16L || reader.ReadUInt32() != Version)
 				throw new InvalidDataException("Invalid header");
 
-			// dpd_h_init_datainfo
-			OffsetPdt = ReadOffsetsList(reader);
-			OffsetTextures = ReadOffsetsList(reader);
-			Offset3 = ReadOffsetsList(reader);
-			Offset4 = ReadOffsetsList(reader);
-			Offset5 = ReadOffsetsList(reader);
+            // dpd_h_init_datainfo
+            List<int> offsetParticleData = ReadOffsetsList(reader);
+			List<int> offsetTextures = ReadOffsetsList(reader);
+			List<int> offsetShapes = ReadOffsetsList(reader);
+			List<int> offsetModels = ReadOffsetsList(reader);
+            List<int> offsetVsf = ReadOffsetsList(reader);
 
+            Unk = new byte[16];
+            reader.Read(Unk, 0, 16);
+
+            // PARTICLE DATA
 			// pppInitPdt
-			// OffsetPdt, Table 1
-			foreach (var offset in OffsetPdt)
+			foreach (var offset in offsetParticleData) // RESEARCH
 			{
 				// 9648E0
 				pppInitPdt(reader, offset, 0x354BF0);
 			}
+            ParticleDataList = new List<ParticleData>();
+            for (int i = 0; i < offsetParticleData.Count; i++)
+            {
+                int nextOffset = i + 1 < offsetParticleData.Count ? i + 1 : 0;
+                if (i + 1 < offsetParticleData.Count)
+                {
+                    nextOffset = offsetParticleData[i + 1];
+                }
+                else if (offsetTextures.Count > 0)
+                {
+                    nextOffset = offsetTextures[0];
+                }
+                else if (offsetShapes.Count > 0)
+                {
+                    nextOffset = offsetShapes[0];
+                }
+                else if (offsetModels.Count > 0)
+                {
+                    nextOffset = offsetModels[0];
+                }
+                else if (offsetVsf.Count > 0)
+                {
+                    nextOffset = offsetVsf[0];
+                }
+                else
+                {
+                    nextOffset = (int)stream.Length;
+                }
 
-			Textures = OffsetTextures
-				.Select(x => new Texture(new BinaryReader(new SubStream(reader.BaseStream, x, 0))));
-		}
+                stream.Position = offsetParticleData[i];
+                int size = nextOffset - (int)stream.Position;
+                byte[] particleData = stream.ReadBytes(size);
 
-		public IEnumerable<Texture> Textures { get; }
+                ParticleDataList.Add(new ParticleData(particleData));
+            }
 
-		private void pppInitPdt(BinaryReader reader, int offset, int unk)
+
+            // TEXTURE
+            TexturesList = new List<Texture>();
+            for (int i = 0; i < offsetTextures.Count; i++)
+            {
+                stream.Position = offsetTextures[i];
+                TexturesList.Add(new Texture(stream));
+            }
+
+            // SHAPE
+            ShapesList = new List<Shape>();
+            for (int i = 0; i < offsetShapes.Count; i++)
+            {
+                stream.Position = offsetShapes[i];
+                ShapesList.Add(new Shape(stream));
+            }
+
+            // MODEL
+            ModelsList = new List<Model>();
+            for (int i = 0; i < offsetModels.Count; i++)
+            {
+                int nextOffset = i + 1 < offsetModels.Count ? i+1 : 0;
+                if(i + 1 < offsetModels.Count)
+                {
+                    nextOffset = offsetModels[i + 1];
+                }
+                else if (offsetVsf.Count > 0)
+                {
+                    nextOffset = offsetVsf[0];
+                }
+                else
+                {
+                    nextOffset = (int)stream.Length;
+                }
+
+                stream.Position = offsetModels[i];
+                int size = nextOffset - (int)stream.Position;
+                byte[] model = stream.ReadBytes(size);
+
+                ModelsList.Add(new Model(model));
+            }
+
+            // VSF
+            VsfList = new List<Vsf>();
+            for (int i = 0; i < offsetVsf.Count; i++)
+            {
+                int nextOffset = i + 1 < offsetVsf.Count ? i + 1 : 0;
+                if (i + 1 < offsetVsf.Count)
+                {
+                    nextOffset = offsetVsf[i + 1];
+                }
+                else
+                {
+                    nextOffset = (int)stream.Length;
+                }
+
+                stream.Position = offsetVsf[i];
+                int size = nextOffset - (int)stream.Position ;
+                byte[] vsf = stream.ReadBytes(size);
+
+                VsfList.Add(new Vsf(vsf));
+            }
+        }
+
+        public Stream getAsStream()
+        {
+            Stream fileStream = new MemoryStream();
+            BinaryWriter writer = new BinaryWriter(fileStream, System.Text.Encoding.UTF8, true);
+
+            long POINTER_particleDataOffsets = 0;
+            List<long> particleDataOffsets = new List<long>();
+
+            long POINTER_textureOffsets = 0;
+            List<long> textureOffsets = new List<long>();
+
+            long POINTER_shapeOffsets = 0;
+            List<long> shapeOffsets = new List<long>();
+
+            long POINTER_modelOffsets = 0;
+            List<long> modelOffsets = new List<long>();
+
+            long POINTER_vsfOffsets = 0;
+            List<long> vsfOffsets = new List<long>();
+
+            // BUILD FILES
+            List<Stream> particleDataStreams = new List<Stream>();
+            foreach(ParticleData particleData in ParticleDataList)
+            {
+                particleDataStreams.Add(particleData.getAsStream());
+            }
+            List<Stream> textureStreams = new List<Stream>();
+            foreach (Texture texture in TexturesList)
+            {
+                textureStreams.Add(texture.getAsStream());
+            }
+            List<Stream> shapeStreams = new List<Stream>();
+            foreach (Shape shape in ShapesList)
+            {
+                shapeStreams.Add(shape.getAsStream());
+            }
+            List<Stream> modelStreams = new List<Stream>();
+            foreach (Model model in ModelsList)
+            {
+                modelStreams.Add(model.getAsStream());
+            }
+            List<Stream> vsfStreams = new List<Stream>();
+            foreach (Vsf vsf in VsfList)
+            {
+                vsfStreams.Add(vsf.getAsStream());
+            }
+
+            // WRITE FILE
+            // Version and counts
+            writer.Write(Version);
+
+            writer.Write(particleDataStreams.Count);
+            POINTER_particleDataOffsets = fileStream.Position;
+            foreach (Stream stream in particleDataStreams)
+            {
+                writer.Write((int)0);
+            }
+            writer.Write(textureStreams.Count);
+            POINTER_textureOffsets = fileStream.Position;
+            foreach (Stream stream in textureStreams)
+            {
+                writer.Write((int)0);
+            }
+            writer.Write(shapeStreams.Count);
+            POINTER_shapeOffsets = fileStream.Position;
+            foreach (Stream stream in shapeStreams)
+            {
+                writer.Write((int)0);
+            }
+            writer.Write(modelStreams.Count);
+            POINTER_modelOffsets = fileStream.Position;
+            foreach (Stream stream in modelStreams)
+            {
+                writer.Write((int)0);
+            }
+            writer.Write(vsfStreams.Count);
+            POINTER_vsfOffsets = fileStream.Position;
+            foreach (Stream stream in vsfStreams)
+            {
+                writer.Write((int)0);
+            }
+
+            // Padding and reserved
+            writer.Write(Unk);
+            ReadWriteUtils.alignStreamToByte(fileStream, 16);
+            ReadWriteUtils.addBytesToStream(fileStream, 16, 0x00);
+
+            // Files
+            foreach (Stream stream in particleDataStreams)
+            {
+                particleDataOffsets.Add(fileStream.Position);
+                writer.Write(((MemoryStream)stream).ToArray());
+            }
+            foreach (Stream stream in textureStreams)
+            {
+                textureOffsets.Add(fileStream.Position);
+                writer.Write(((MemoryStream)stream).ToArray());
+            }
+            foreach (Stream stream in shapeStreams)
+            {
+                shapeOffsets.Add(fileStream.Position);
+                writer.Write(((MemoryStream)stream).ToArray());
+            }
+            foreach (Stream stream in modelStreams)
+            {
+                modelOffsets.Add(fileStream.Position);
+                writer.Write(((MemoryStream)stream).ToArray());
+            }
+            foreach (Stream stream in vsfStreams)
+            {
+                vsfOffsets.Add(fileStream.Position);
+                writer.Write(((MemoryStream)stream).ToArray());
+            }
+
+            // Write offsets
+            fileStream.Position = POINTER_particleDataOffsets;
+            foreach (long offset in particleDataOffsets)
+            {
+                writer.Write((int)offset);
+            }
+            fileStream.Position = POINTER_textureOffsets;
+            foreach (long offset in textureOffsets)
+            {
+                writer.Write((int)offset);
+            }
+            fileStream.Position = POINTER_shapeOffsets;
+            foreach (long offset in shapeOffsets)
+            {
+                writer.Write((int)offset);
+            }
+            fileStream.Position = POINTER_modelOffsets;
+            foreach (long offset in modelOffsets)
+            {
+                writer.Write((int)offset);
+            }
+            fileStream.Position = POINTER_vsfOffsets;
+            foreach (long offset in vsfOffsets)
+            {
+                writer.Write((int)offset);
+            }
+
+            fileStream.Position = 0;
+            return fileStream;
+        }
+
+        private void pppInitPdt(BinaryReader reader, int offset, int unk)
 		{
 			int a0, a1, a2, a3, a4, a5, a6, a7;
 			int t0, t1, t2, t3, t4, t5, t6, t7;

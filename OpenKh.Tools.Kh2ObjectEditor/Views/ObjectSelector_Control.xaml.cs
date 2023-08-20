@@ -20,7 +20,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             ObjectSelector_Wrapper item = (ObjectSelector_Wrapper)(sender as ListView).SelectedItem;
             if (item != null)
             {
-                App_Context.Instance.loadObject(item.FilePath);
+                App_Context.Instance.MdlxPath = item.FilePath;
+                App_Context.Instance.openObject();
             }
         }
 

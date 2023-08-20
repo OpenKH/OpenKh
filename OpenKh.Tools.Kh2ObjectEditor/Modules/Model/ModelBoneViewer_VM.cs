@@ -1,6 +1,6 @@
 using OpenKh.Kh2.Models;
 
-namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
+namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Model
 {
     public class ModelBoneViewer_VM
     {

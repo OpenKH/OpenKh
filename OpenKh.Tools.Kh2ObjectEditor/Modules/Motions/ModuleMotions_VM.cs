@@ -1,14 +1,18 @@
 using OpenKh.Tools.Kh2ObjectEditor.Classes;
+using OpenKh.Tools.Kh2ObjectEditor.Services;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
-using OpenKh.Tools.Kh2ObjectEditor.ViewModel;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace OpenKh.Tools.Kh2ObjectEditor.Views
+namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
 {
-    public class MotionSelector_ViewModel : NotifyPropertyChangedBase
+    public class ModuleMotions_VM : NotifyPropertyChangedBase
     {
+        // MOTIONS
+        public List<MotionSelector_Wrapper> Motions { get; set; }
+        public ObservableCollection<MotionSelector_Wrapper> MotionsView { get; set; }
+
+        // FILTERS
         private string _filterName { get; set; }
         public string FilterName
         {
@@ -30,28 +34,27 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             }
         }
 
-        public List<MotionSelector_Wrapper> Motions { get; set; }
-        public ObservableCollection<MotionSelector_Wrapper> MotionsView { get; set; }
-
-        public MotionSelector_ViewModel()
+        // CONSTRUCTOR
+        public ModuleMotions_VM()
         {
             Motions = new List<MotionSelector_Wrapper>();
             MotionsView = new ObservableCollection<MotionSelector_Wrapper>();
             loadMotions();
             applyFilters();
-            subscribe_ObjectSelected();
         }
 
+        // FUNCTIONS
         public void loadMotions()
         {
             Motions.Clear();
 
-            if (App_Context.Instance.MsetEntries == null)
+            if (Mset_Service.Instance.MsetBar == null)
                 return;
 
-            foreach (MotionSelector_Wrapper msetEntry in App_Context.Instance.MsetEntries)
+            Motions = new List<MotionSelector_Wrapper>();
+            for (int i = 0; i < Mset_Service.Instance.MsetBar.Count; i++)
             {
-                Motions.Add(msetEntry);
+                Motions.Add(new MotionSelector_Wrapper(i, Mset_Service.Instance.MsetBar[i]));
             }
         }
 
@@ -71,16 +74,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
 
                 MotionsView.Add(iMotion);
             }
-        }
-
-        public void subscribe_ObjectSelected()
-        {
-            App_Context.Instance.Event_ObjectSelected += new App_Context.EventHandler(MyFunction);
-        }
-        private void MyFunction(App_Context m, EventArgs e)
-        {
-            loadMotions();
-            applyFilters();
         }
     }
 }

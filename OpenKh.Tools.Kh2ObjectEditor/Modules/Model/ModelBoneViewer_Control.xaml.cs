@@ -1,5 +1,6 @@
 using OpenKh.Kh2.Models;
-using OpenKh.Tools.Kh2ObjectEditor.ViewModel;
+using OpenKh.Tools.Kh2ObjectEditor.Modules.Model;
+using OpenKh.Tools.Kh2ObjectEditor.Services;
 using System.Windows.Controls;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Views
@@ -11,6 +12,11 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         public ModelBoneViewer_Control()
         {
             InitializeComponent();
+            if(Mdlx_Service.Instance.ModelFile != null)
+            {
+                ThisVM = new ModelBoneViewer_VM(Mdlx_Service.Instance.ModelFile);
+                DataContext = ThisVM;
+            }
         }
         public ModelBoneViewer_Control(ModelSkeletal modelFile)
         {
