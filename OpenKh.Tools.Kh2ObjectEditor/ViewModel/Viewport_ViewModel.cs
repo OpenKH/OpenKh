@@ -188,6 +188,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
         public void loadFrame()
         {
+            if (currentAnb == null)
+                return;
+
             loadAnimProvider();
 
             ThisCollisions = new SimpleModel(new List<SimpleMesh>(), "COLLISIONS_1", new List<string> { "COLLISION", "COLLISION_GROUP" });

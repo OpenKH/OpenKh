@@ -15,13 +15,13 @@
                 <MenuItem Header="Test Effects" Click="Menu_Test_Effects"/>
                 <MenuItem Header="Test Mdlxs" Click="Menu_Test_Mdlxs"/>
                 <MenuItem Header="Test Msets" Click="Menu_Test_Msets"/>
+                <MenuItem Header="Attach mdlx" Click="Menu_AttachMdlx"/>
             </MenuItem>
             <MenuItem Header="Save">
                 <MenuItem Header="Save Mdlx" Click="Menu_Save_Mdlx"/>
                 <MenuItem Header="Save Mset" Click="Menu_Save_Mset"/>
                 <MenuItem Header="Save Apdx" Click="Menu_Save_Apdx"/>
             </MenuItem>
-            <MenuItem Header="Attach mdlx" Click="Menu_AttachMdlx"></MenuItem>
         </Menu>
 
         <Grid AllowDrop="True" Drop="Window_Drop">

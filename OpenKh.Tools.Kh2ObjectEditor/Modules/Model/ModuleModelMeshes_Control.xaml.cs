@@ -12,6 +12,11 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             InitializeComponent();
             ThisVM = new ModuleModelMeshes_VM();
             DataContext = ThisVM;
+            if(ThisVM.Meshes.Count > 0)
+            {
+                List_Meshes.SelectedIndex = 0;
+                MeshFrame.Content = new ModuleModelMesh_Control(ThisVM.Meshes[0].Group);
+            }
         }
 
         private void list_doubleCLick(object sender, System.Windows.Input.MouseButtonEventArgs e)
