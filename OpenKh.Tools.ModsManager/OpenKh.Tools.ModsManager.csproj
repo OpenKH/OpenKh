@@ -6,7 +6,12 @@
     <UseWPF>true</UseWPF>
     <AssemblyTitle>Mods Manager</AssemblyTitle>
     <Product>Mods Manager - OpenKH</Product>
+    <ApplicationIcon>OpenKhModManager.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="OpenKhModManager.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.5.1" />
