@@ -6,11 +6,11 @@
     <UseWPF>true</UseWPF>
     <AssemblyTitle>Mods Manager</AssemblyTitle>
     <Product>Mods Manager - OpenKH</Product>
-    <ApplicationIcon>OpenKhModManager.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\OpenKhModManager.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="OpenKhModManager.ico" />
+    <Content Include="Assets\OpenKhModManager.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +32,12 @@
     <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\OpenKhModManager.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
