@@ -422,7 +422,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 .Where(x => x.Enabled)
                 .Select(x => x.Source)
                 .ToList();
-                File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name + ".txt"), enabledMods);                
+                File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name + ".txt"), enabledMods);
             });            
 
             LoadPreset = new RelayCommand(_ =>
