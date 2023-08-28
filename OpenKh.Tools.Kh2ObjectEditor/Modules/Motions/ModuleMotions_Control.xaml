@@ -48,7 +48,13 @@
             </StackPanel>
 
             <!-- Motion list -->
-            <ListView ItemsSource="{Binding MotionsView}" SelectedItem="{Binding SelectedMotion}"  MouseDoubleClick="list_doubleCLick">
+            <ListView Name="MotionList" ItemsSource="{Binding MotionsView}" SelectedItem="{Binding SelectedMotion}"  MouseDoubleClick="list_doubleCLick">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Copy motion" Click="Motion_Copy"/>
+                        <MenuItem Header="Replace with copied motion" Click="Motion_Replace"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Grid.Column="0" Text="{Binding Path=Name}"/>

@@ -22,9 +22,9 @@ namespace OpenKh.Kh2
 
         public class DpxParticleEffect
         {
-            [Data] public uint DpdOffset { get; set; }
-            [Data] public uint ParticleDataId { get; set; }
-            [Data] public uint EffectNumber { get; set; }
+            [Data] public uint DpdOffset { get; set; } // Identifies the associated DPD
+            [Data] public uint ParticleDataId { get; set; } // Particle Data to be used inside of the DPD
+            [Data] public uint EffectNumber { get; set; } // Identifier
             [Data] public int Reserve1 { get; set; }
             [Data] public uint CategoryFlag1 { get; set; }
             [Data] public uint CategoryFlag2 { get; set; }

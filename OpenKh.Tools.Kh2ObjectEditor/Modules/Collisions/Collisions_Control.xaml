@@ -8,15 +8,24 @@
              d:DesignHeight="450" d:DesignWidth="800">
     
     <DockPanel Background="#2d2d2d">
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <Label Foreground="White">Enabled:</Label>
-            <TextBox MinWidth="40" Text="{Binding Path=Enable}"/>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="10" HorizontalAlignment="Right">
+            <Button Width="50" Click="Button_Save">Save</Button>
         </StackPanel>
 
         <DataGrid Name="DataTable"
                 AutoGenerateColumns="False"
-                ItemsSource="{Binding EntryList}"
-                CanUserAddRows="True">
+                ItemsSource="{Binding Collisions}"
+                CanUserAddRows="False">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Add collision" Click="Collision_Add"/>
+                    <MenuItem Header="Remove collision" Click="Collision_Remove"/>
+                    <MenuItem Header="Copy collision" Click="Collision_Copy"/>
+                    <MenuItem Header="Copy collision group" Click="CollisionGroup_Copy"/>
+                    <MenuItem Header="Replace with copied collision" Click="Collision_Replace"/>
+                    <MenuItem Header="Add copied collision group" Click="Collision_AddGroup"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Path=Group}" Header="Group" />
                 <DataGridTextColumn Binding="{Binding Path=Parts}" Header="Parts" />

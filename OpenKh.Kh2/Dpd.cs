@@ -2,6 +2,7 @@ using OpenKh.Common;
 using OpenKh.Kh2.Utils;
 using System.Collections.Generic;
 using System.IO;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2
 {
@@ -14,7 +15,15 @@ namespace OpenKh.Kh2
         public List<Shape> ShapesList { get; set; }
         public List<Model> ModelsList { get; set; }
         public List<Vsf> VsfList { get; set; }
-        public byte[] Unk { get; set; } // A lot of times 16 FFs
+        public EtcData DpdEtcData { get; set; }
+
+        public class EtcData
+        {
+            [Data] public int TexVramMin { get; set; }
+            [Data] public int TexVramMax { get; set; }
+            [Data] public int ClutVramMin { get; set; }
+            [Data] public int ClutVramMax { get; set; }
+        }
 
         public Dpd(Stream stream)
 		{
@@ -32,8 +41,7 @@ namespace OpenKh.Kh2
 			List<int> offsetModels = ReadOffsetsList(reader);
             List<int> offsetVsf = ReadOffsetsList(reader);
 
-            Unk = new byte[16];
-            reader.Read(Unk, 0, 16);
+            DpdEtcData = BinaryMapping.ReadObject<EtcData>(stream);
 
             // PARTICLE DATA
 			// pppInitPdt
@@ -45,39 +53,9 @@ namespace OpenKh.Kh2
             ParticleDataList = new List<ParticleData>();
             for (int i = 0; i < offsetParticleData.Count; i++)
             {
-                int nextOffset = i + 1 < offsetParticleData.Count ? i + 1 : 0;
-                if (i + 1 < offsetParticleData.Count)
-                {
-                    nextOffset = offsetParticleData[i + 1];
-                }
-                else if (offsetTextures.Count > 0)
-                {
-                    nextOffset = offsetTextures[0];
-                }
-                else if (offsetShapes.Count > 0)
-                {
-                    nextOffset = offsetShapes[0];
-                }
-                else if (offsetModels.Count > 0)
-                {
-                    nextOffset = offsetModels[0];
-                }
-                else if (offsetVsf.Count > 0)
-                {
-                    nextOffset = offsetVsf[0];
-                }
-                else
-                {
-                    nextOffset = (int)stream.Length;
-                }
-
                 stream.Position = offsetParticleData[i];
-                int size = nextOffset - (int)stream.Position;
-                byte[] particleData = stream.ReadBytes(size);
-
-                ParticleDataList.Add(new ParticleData(particleData));
+                ParticleDataList.Add(new ParticleData(stream));
             }
-
 
             // TEXTURE
             TexturesList = new List<Texture>();
@@ -140,6 +118,8 @@ namespace OpenKh.Kh2
 
                 VsfList.Add(new Vsf(vsf));
             }
+
+            stream.Position = 0;
         }
 
         public Stream getAsStream()
@@ -225,7 +205,7 @@ namespace OpenKh.Kh2
             }
 
             // Padding and reserved
-            writer.Write(Unk);
+            BinaryMapping.WriteObject(fileStream, DpdEtcData);
             ReadWriteUtils.alignStreamToByte(fileStream, 16);
             ReadWriteUtils.addBytesToStream(fileStream, 16, 0x00);
 

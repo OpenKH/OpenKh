@@ -2,7 +2,6 @@ using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.IO;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Services
@@ -17,6 +16,11 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         public ModelTexture TextureFile { get; set; }
         public Stream BdxFile { get; set; }
         // May also contain Pax files (Uncommon, 46/2121 files)
+
+
+        // Note: Copied as JSON in order to not copy the reference
+        public string CopiedCollision { get; set; }
+        public List<string> CopiedCollisionList { get; set; }
 
         public void loadMdlx(string mdlxPath)
         {
@@ -121,7 +125,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         }
         public static void reset()
         {
+            string copiedCollision = instance.CopiedCollision;
+            List<string> copiedCollisionList = instance.CopiedCollisionList;
+
             instance = new Mdlx_Service();
+            instance.CopiedCollision = copiedCollision;
+            instance.CopiedCollisionList = copiedCollisionList;
         }
     }
 }

@@ -48,6 +48,10 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         {
             Apdx_Service.Instance.saveFile();
         }
+        private void Menu_Overwrite_Apdx(object sender, RoutedEventArgs e)
+        {
+            Apdx_Service.Instance.overwriteFile();
+        }
 
         public Main_Window()
         {

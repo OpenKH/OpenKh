@@ -26,7 +26,7 @@ namespace OpenKh.Kh2
 
 		public class Element
 		{
-            [Data] public ushort Number { get; set; }
+            [Data] public ushort EffectNumber { get; set; }
             [Data] public ushort Id { get; set; }
 			[Data] public byte Group { get; set; }
             [Data] public byte FadeoutFrame { get; set; }
@@ -80,7 +80,7 @@ namespace OpenKh.Kh2
 
 			internal void Save(BinaryWriter writer)
 			{
-				writer.Write((ushort)Number);
+				writer.Write((ushort)EffectNumber);
 				writer.Write((ushort)Id);
 				writer.Write((byte)Group);
                 writer.Write((byte)FadeoutFrame);
@@ -106,7 +106,7 @@ namespace OpenKh.Kh2
 
             public override string ToString()
             {
-                return "No: "+ Number + " | Id: " + Id + " | Gr: " + Group + " | Bone: " + BoneId + " | SEno: " + SoundEffectNumber;
+                return "No: "+ EffectNumber + " | Id: " + Id + " | Gr: " + Group + " | Bone: " + BoneId + " | SEno: " + SoundEffectNumber;
             }
         }
 

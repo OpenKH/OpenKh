@@ -3,6 +3,7 @@ using OpenKh.Tools.Kh2ObjectEditor.Classes;
 using OpenKh.Tools.Kh2ObjectEditor.Modules.Motions;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
 using OpenKh.Tools.Kh2ObjectEditor.ViewModel;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Views
@@ -45,6 +46,22 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         {
             Frame_Metadata.Content = new MotionMetadata_Control(animBinary);
             Frame_Triggers.Content = new MotionTriggers_Control(animBinary);
+        }
+        public void Motion_Copy(object sender, RoutedEventArgs e)
+        {
+            if (MotionList.SelectedItem != null)
+            {
+                MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
+                ThisVM.Motion_Copy(item.Index);
+            }
+        }
+        public void Motion_Replace(object sender, RoutedEventArgs e)
+        {
+            if (MotionList.SelectedItem != null)
+            {
+                MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
+                ThisVM.Motion_Replace(item.Index);
+            }
         }
     }
 }

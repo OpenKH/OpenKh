@@ -3,6 +3,7 @@ using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Shapes;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Services
 {
@@ -18,14 +19,21 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         {
             //Apdx_Service.Instance.loadFile(Apdx_Service.Instance.ApdxPath);
 
-            Mset_Service.Instance.loadMotion(0);
+            //Mset_Service.Instance.loadMotion(0);
+
+            Mdlx_Service.Instance.loadMdlx(Mdlx_Service.Instance.MdlxPath);
 
             // OPEN FILE
             /*OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Multiselect = false;
             if (openFileDialog.ShowDialog() == true && openFileDialog.FileNames != null && openFileDialog.FileNames.Length > 0)
             {
-                Mdlx_Service.Instance.TextureFile.TextureFooterData.TextureAnimationList.Add(ImageUtils.CreateTextureAnimation(openFileDialog.FileNames[0]));
+                //Mdlx_Service.Instance.TextureFile.TextureFooterData.TextureAnimationList.Add(ImageUtils.CreateTextureAnimation(openFileDialog.FileNames[0]));
+                using (FileStream fs = File.OpenRead(openFileDialog.FileNames[0]))
+                {
+                    Dpx testDpx = new Dpx(fs);
+                }
+                
             }*/
         }
         public void testApdx()

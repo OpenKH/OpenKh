@@ -22,6 +22,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 {
     public class Viewport_ViewModel : NotifyPropertyChangedBase
     {
+        public static FpsMode MODE_30_FPS = new FpsMode(33, 1);
+        public static FpsMode MODE_15_FPS = new FpsMode(67, 2);
+        public static FpsMode MODE_10_FPS = new FpsMode(100, 3);
+        public static FpsMode MODE_5_FPS = new FpsMode(200, 6);
+        public FpsMode currentFpsMode = MODE_10_FPS;
+
         public SimpleModel ThisModel { get; set; }
         public SimpleModel ThisCollisions { get; set; }
 
@@ -117,6 +123,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
         public void loadModel(bool doCameraRestart)
         {
+            AnimationRunning = false;
             foreach (ModelSkeletal.SkeletalGroup group in Mdlx_Service.Instance.ModelFile.Groups)
             {
                 group.Mesh = ModelSkeletal.getMeshFromGroup(group, GetBoneMatrices(Mdlx_Service.Instance.ModelFile.Bones));
@@ -241,7 +248,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
                 }
             }
 
-            if(RenderHitCollisions && Mdlx_Service.Instance.CollisionFile != null)
+            if (RenderHitCollisions && Mdlx_Service.Instance.CollisionFile != null)
             {
                 SimpleModel model = new SimpleModel(getHitCollisions(matrices));
                 ViewportControl.VPModels.Add(model);
@@ -319,7 +326,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
                 foreach (MotionTrigger.RangeTrigger trigger in Mset_Service.Instance.LoadedMotion.MotionTriggerFile.RangeTriggerList)
                 {
-                    if((trigger.StartFrame <= CurrentFrame || trigger.StartFrame == -1) && (trigger.EndFrame >= CurrentFrame || trigger.EndFrame == -1))
+                    if ((trigger.StartFrame <= CurrentFrame || trigger.StartFrame == -1) && (trigger.EndFrame >= CurrentFrame || trigger.EndFrame == -1))
                     {
                         // Attack 1 hitbox
                         if (trigger.Trigger == 10)
@@ -388,7 +395,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
         // Animation ticker
         async Task startAnimationTicker()
         {
-            TimeSpan timeInMs = TimeSpan.FromMilliseconds(67);
+            TimeSpan timeInMs = currentFpsMode.MsBetweenTicks;
 
             PeriodicTimer animationTimer = new PeriodicTimer(timeInMs);
             while (await animationTimer.WaitForNextTickAsync())
@@ -412,7 +419,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
             if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(Mset_Service.Instance.MsetPath, "mset") || Mset_Service.Instance.LoadedMotion == null)
                 return;
 
-            int timeTicked = 2;
+            int timeTicked = currentFpsMode.FrameStep;
 
             CurrentFrame += timeTicked;
             loadFrame();
@@ -420,7 +427,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
         public List<SimpleMesh> getHitCollisions(Matrix4x4[] matrices)
         {
-            List <SimpleMesh> list_hitMeshes = new List<SimpleMesh>();
+            List<SimpleMesh> list_hitMeshes = new List<SimpleMesh>();
 
             if (Mdlx_Service.Instance.CollisionFile == null)
                 return list_hitMeshes;
@@ -436,7 +443,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
             {
                 ObjectCollision collision = Mdlx_Service.Instance.CollisionFile.EntryList[i];
 
-                if(collision.Type == (byte)ObjectCollision.TypeEnum.HIT)
+                if (collision.Type == (byte)ObjectCollision.TypeEnum.HIT)
                 {
 
                     Vector3 basePosition = Vector3.Zero;
@@ -520,19 +527,19 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
             if (shape == (byte)ObjectCollision.ShapeEnum.ELLIPSOID)
             {
-                thisMesh = new SimpleMesh( Simple3DViewport.Utils.GeometryShapes.getEllipsoid(width, height, 10, position, color), id, labels );
+                thisMesh = new SimpleMesh(Simple3DViewport.Utils.GeometryShapes.getEllipsoid(width, height, 10, position, color), id, labels);
             }
             else if (shape == (byte)ObjectCollision.ShapeEnum.COLUMN)
             {
-                thisMesh = new SimpleMesh( Simple3DViewport.Utils.GeometryShapes.getCylinder(width, height, 10, position, color), id, labels );
+                thisMesh = new SimpleMesh(Simple3DViewport.Utils.GeometryShapes.getCylinder(width, height, 10, position, color), id, labels);
             }
             else if (shape == (byte)ObjectCollision.ShapeEnum.CUBE)
             {
-                thisMesh = new SimpleMesh( Simple3DViewport.Utils.GeometryShapes.getCuboid(width, height, width, position, color), id, labels );
+                thisMesh = new SimpleMesh(Simple3DViewport.Utils.GeometryShapes.getCuboid(width, height, width, position, color), id, labels);
             }
             else if (shape == (byte)ObjectCollision.ShapeEnum.SPHERE)
             {
-                thisMesh = new SimpleMesh( Simple3DViewport.Utils.GeometryShapes.getSphere(width, 10, position, color), id, labels );
+                thisMesh = new SimpleMesh(Simple3DViewport.Utils.GeometryShapes.getSphere(width, 10, position, color), id, labels);
             }
 
             return thisMesh;
@@ -544,6 +551,14 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
             CurrentFrame = 0;
             clearViewport();
             loadModel(false);
+        }
+
+        public class FpsMode
+        {
+            public TimeSpan MsBetweenTicks { get; set; }
+            public int FrameStep { get; set; }
+
+            public FpsMode(int msBetweenTicks, int frameStep) { MsBetweenTicks = TimeSpan.FromMilliseconds(msBetweenTicks); FrameStep = frameStep; }
         }
     }
 }

@@ -1,8 +1,10 @@
+using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Classes;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
 {
@@ -11,6 +13,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
         // MOTIONS
         public List<MotionSelector_Wrapper> Motions { get; set; }
         public ObservableCollection<MotionSelector_Wrapper> MotionsView { get; set; }
+        public Bar.Entry copiedMotion { get; set; }
 
         // FILTERS
         private string _filterName { get; set; }
@@ -74,6 +77,34 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
 
                 MotionsView.Add(iMotion);
             }
+        }
+
+        public void Motion_Copy(int index)
+        {
+            Bar.Entry item = Mset_Service.Instance.MsetBar[index];
+            copiedMotion = new Bar.Entry();
+            copiedMotion.Index = item.Index;
+            copiedMotion.Name = item.Name;
+            copiedMotion.Type = item.Type;
+            item.Stream.Position = 0;
+            copiedMotion.Stream = new MemoryStream();
+            item.Stream.CopyTo(copiedMotion.Stream);
+            item.Stream.Position = 0;
+            copiedMotion.Stream.Position = 0;
+        }
+
+        public void Motion_Replace(int index)
+        {
+            if (copiedMotion == null)
+                return;
+
+            Mset_Service.Instance.MsetBar[index] = copiedMotion;
+            loadMotions();
+            applyFilters();
+        }
+        public void Motion_Rename(int index)
+        {
+            Bar.Entry item = Mset_Service.Instance.MsetBar[index];
         }
     }
 }

@@ -21,6 +21,7 @@
                 <MenuItem Header="Save Mdlx" Click="Menu_Save_Mdlx"/>
                 <MenuItem Header="Save Mset" Click="Menu_Save_Mset"/>
                 <MenuItem Header="Save Apdx" Click="Menu_Save_Apdx"/>
+                <MenuItem Header="Overwrite Apdx" Click="Menu_Overwrite_Apdx"/>
             </MenuItem>
         </Menu>
 

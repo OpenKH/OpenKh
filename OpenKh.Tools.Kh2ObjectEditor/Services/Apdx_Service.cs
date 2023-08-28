@@ -105,6 +105,15 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             }
         }
 
+        public void overwriteFile()
+        {
+            saveToBar();
+
+            MemoryStream memStream = new MemoryStream();
+            Bar.Write(memStream, ApdxBar);
+            File.WriteAllBytes(ApdxPath, memStream.ToArray());
+        }
+
         // SINGLETON
         private Apdx_Service() { }
         private static Apdx_Service instance = null;
