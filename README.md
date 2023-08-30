@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./images/OpenKH.png" width="540">
+  <img src="./images/OpenKH.png">
 </p>
 
 Aims to centralize all the technical knowledge of the 'Kingdom Hearts' game series in one place, providing documentation, tools, code libraries, and the foundation for modding the commercial games.
@@ -19,16 +19,18 @@ New builds of OpenKH are automatically generated every time one of the contribut
 All the builds from `master` and from pull requestes are generated from [GitHub Actions](https://github.com/OpenKh/OpenKh/actions).
 
 OpenKH tools require the instllation of the [.NET 6.0 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0). All the UI tools are designed to work on Windows, while command line tools will work on any operating system.
-Note: All CLI and GUI programs **should** be cross-platform, though extensive testing primarily happens on Windows systems.
+
 
 <p align="center">
-  <img src="./images/Runtime.jpg" width="400">
+  <img src="./images/Runtime.jpg" width="540">
 </p>
+
+Note: All CLI and GUI programs **should** be cross-platform, though extensive testing primarily happens on Windows systems. As such, users may be required to run GUI programs under a WINE prefix for Linux, Mac, BSD, etc.
 
 ## OpenKH in depth
 
 <p align="center">
-  <img src="./images/diagram.png" width="908">
+  <img src="./images/diagram.png" width="720">
 </p>
 
 From an architectural point of view, the code is structured to abstract low-level implementation such as file parsers and infrastructural logic to high-level functionalties such as 3D rendering or tools. The projects are layered to be able to share as much as code possible, but isolated in order to avoid coupling.
