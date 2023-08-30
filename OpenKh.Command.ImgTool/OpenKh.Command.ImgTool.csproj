@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.2" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.0" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
-    <PackageReference Include="YamlDotNet" Version="13.2.0" />
+    <PackageReference Include="YamlDotNet" Version="13.3.1" />
   </ItemGroup>
 
   <ItemGroup>

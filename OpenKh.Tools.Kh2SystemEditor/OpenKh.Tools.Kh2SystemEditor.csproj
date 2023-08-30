@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.5.1" />
-    <PackageReference Include="YamlDotNet" Version="13.2.0" />
+    <PackageReference Include="YamlDotNet" Version="13.3.1" />
     <PackageReference Include="NPOI" Version="2.6.1" />
   </ItemGroup>
 
