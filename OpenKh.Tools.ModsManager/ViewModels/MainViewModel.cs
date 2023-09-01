@@ -866,11 +866,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 foreach (var mod in ModsList)
                 {
                     if (mod.UpdateCount > 0)
-                    {
-                        await ModsService.Update(mod.Source);
-                        ReloadModsList();
-                    }
+                        await ModsService.Update(mod.Source);                    
                 }
+                ReloadModsList();
             }
         }
 
