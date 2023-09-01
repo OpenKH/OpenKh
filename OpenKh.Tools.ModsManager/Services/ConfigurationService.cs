@@ -39,6 +39,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public int RegionId { get; internal set; }
             public bool PanaceaInstalled { get; internal set; }
             public bool DevView { get; internal set; }
+            public bool AutoUpdateMods { get; internal set; }
             public bool isEGSVersion { get; internal set; } = true;
             public bool kh1 { get; internal set; }
             public bool kh2 { get; internal set; } = true;
@@ -279,6 +280,15 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.DevView = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool AutoUpdateMods
+        {
+            get => _config.AutoUpdateMods;
+            set
+            {
+                _config.AutoUpdateMods = value;
                 _config.Save(ConfigPath);
             }
         }

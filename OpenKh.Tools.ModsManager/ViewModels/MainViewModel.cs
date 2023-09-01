@@ -10,9 +10,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Xe.Tools;
@@ -41,6 +38,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private bool _pc;
         private bool _panaceaInstalled;
         private bool _devView;
+        private bool _autoUpdateMods = false;
         private string _launchGame = "kh2";
         private List<string> _supportedGames = new List<string>()
         {
@@ -117,6 +115,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _devView = value;
                 ConfigurationService.DevView = DevView;
                 OnPropertyChanged(nameof(PatchVisible));
+            }
+        }
+        public bool AutoUpdateMods
+        {
+            get => _autoUpdateMods;
+            set
+            {
+                _autoUpdateMods = value;
+                ConfigurationService.AutoUpdateMods = _autoUpdateMods;
             }
         }
         public bool PanaceaInstalled
@@ -227,6 +234,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _launchGame = ConfigurationService.LaunchGame;
             else
                 ConfigurationService.LaunchGame = _launchGame;
+
+            AutoUpdateMods = ConfigurationService.AutoUpdateMods;
 
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
@@ -848,6 +857,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                 Application.Current.Dispatcher.Invoke(() =>
                     mod.UpdateCount = modUpdate.UpdateCount);
+            }
+            if (AutoUpdateMods)
+            {
+                foreach (var mod in ModsList)
+                {
+                    if (mod.UpdateCount > 0)
+                        await ModsService.Update(mod.Source);                    
+                }
+                ReloadModsList();
             }
         }
 

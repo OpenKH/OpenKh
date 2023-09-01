@@ -79,6 +79,7 @@
             </MenuItem>
             <MenuItem Header="_Settings">
                 <MenuItem Header="Run _wizard" Command="{Binding WizardCommand}"  InputGestureText="Alt+W"/>
+                <MenuItem Header="Auto Update Mods" IsCheckable="True" ToolTip="When enabled Mod Manager will automatically update all mods on startup." IsChecked="{Binding AutoUpdateMods}"/>
             </MenuItem>
             <MenuItem Header="_Info">
                 <MenuItem IsEnabled="False">
