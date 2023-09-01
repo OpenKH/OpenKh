@@ -41,6 +41,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private bool _pc;
         private bool _panaceaInstalled;
         private bool _devView;
+        private bool _autoUpdate = false;
         private string _launchGame = "kh2";
         private List<string> _supportedGames = new List<string>()
         {
@@ -117,6 +118,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _devView = value;
                 ConfigurationService.DevView = DevView;
                 OnPropertyChanged(nameof(PatchVisible));
+            }
+        }
+        public bool AutoUpdate
+        {
+            get => _autoUpdate;
+            set
+            {
+                _autoUpdate = value;
+                ConfigurationService.AutoUpdate = _autoUpdate;
             }
         }
         public bool PanaceaInstalled
@@ -227,6 +237,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _launchGame = ConfigurationService.LaunchGame;
             else
                 ConfigurationService.LaunchGame = _launchGame;
+
+            AutoUpdate = ConfigurationService.AutoUpdate;
 
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
@@ -848,6 +860,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                 Application.Current.Dispatcher.Invoke(() =>
                     mod.UpdateCount = modUpdate.UpdateCount);
+            }
+            if (AutoUpdate)
+            {
+                foreach (var mod in ModsList)
+                {
+                    if (mod.UpdateCount > 0)
+                    {
+                        await ModsService.Update(mod.Source);
+                        ReloadModsList();
+                    }
+                }
             }
         }
 

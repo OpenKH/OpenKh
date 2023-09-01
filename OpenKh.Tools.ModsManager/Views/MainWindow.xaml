@@ -124,6 +124,7 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="Dev View" IsCheckable="True" IsChecked="{Binding DevView}"/>
+                <MenuItem Header="Auto Update" IsCheckable="True" ToolTip="When enabled Mod Manager will automatically update all mods on startup." IsChecked="{Binding AutoUpdate}"/>
                 <MenuItem Header="Check for update" Command="{Binding CheckOpenkhUpdateCommand}"/>
             </MenuItem>
             <MenuItem Header="PC Version" Focusable="False" IsHitTestVisible="False" Visibility="{Binding isPC}"/>
