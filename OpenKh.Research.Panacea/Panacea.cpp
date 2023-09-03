@@ -14,6 +14,8 @@
 #include "Panacea.h"
 #include "OpenKH.h"
 #include <cstdarg>
+#include "bass.h"
+#include "bass_vgmstream.h"
 
 template <class TFunc>
 class Hook
@@ -229,11 +231,16 @@ Hook<PFN_Axa_CFileMan_GetFileSize>* Hook_Axa_CFileMan_GetFileSize;
 Hook<PFN_Axa_CFileMan_GetRemasteredCount>* Hook_Axa_CFileMan_GetRemasteredCount;
 Hook<PFN_Axa_CFileMan_GetRemasteredEntry>* Hook_Axa_CFileMan_GetRemasteredEntry;
 Hook<PFN_Axa_PackageFile_GetRemasteredAsset>* Hook_Axa_PackageFile_GetRemasteredAsset;
-Hook<PFN_Axa_AxaSoundStream__threadProc>* Hook_Axa_AxaSoundStream__threadProc;
+Hook<PFN_VAG_STREAM_play>* Hook_VAG_STREAM_play;
+Hook<PFN_VAG_STREAM_fadeOut>* Hook_VAG_STREAM_fadeOut;
+Hook<PFN_VAG_STREAM_setVolume>* Hook_VAG_STREAM_setVolume;
+Hook<PFN_VAG_STREAM_exit>* Hook_VAG_STREAM_exit;
 Hook<PFN_Axa_DebugPrint>* Hook_Axa_DebugPrint;
 Hook<PFN_Bbs_File_load>* Hook_Bbs_File_load;
 Hook<PFN_Bbs_CRsrcData_loadCallback>* Hook_CRsrcData_loadCallback;
 std::vector<void(*)()> framefuncs;
+int bassinit;
+int basschan;
 
 void Panacea::Initialize()
 {
@@ -269,7 +276,10 @@ void Panacea::Initialize()
     Hook_Axa_CFileMan_GetRemasteredCount = NewHook(pfn_Axa_CFileMan_GetRemasteredCount, Panacea::GetRemasteredCount, "Axa::CFileMan::GetRemasteredCount");
     Hook_Axa_CFileMan_GetRemasteredEntry = NewHook(pfn_Axa_CFileMan_GetRemasteredEntry, Panacea::GetRemasteredEntry, "Axa::CFileMan::GetRemasteredEntry");
     Hook_Axa_PackageFile_GetRemasteredAsset = NewHook(pfn_Axa_PackageFile_GetRemasteredAsset, Panacea::GetRemasteredAsset, "Axa::PackageFile::GetRemasteredAsset");
-    Hook_Axa_AxaSoundStream__threadProc = NewHook(pfn_Axa_AxaSoundStream__threadProc, Panacea::_threadProc, "Axa::AxaSoundStream::_threadProc");
+    Hook_VAG_STREAM_play = NewHook(pfn_VAG_STREAM_play, Panacea::VAG_STREAM::play, "VAG_STREAM::play");
+    Hook_VAG_STREAM_fadeOut = NewHook(pfn_VAG_STREAM_fadeOut, Panacea::VAG_STREAM::fadeOut, "VAG_STREAM::fadeOut");
+    Hook_VAG_STREAM_setVolume = NewHook(pfn_VAG_STREAM_setVolume, Panacea::VAG_STREAM::setVolume, "VAG_STREAM::setVolume");
+    Hook_VAG_STREAM_exit = NewHook(pfn_VAG_STREAM_exit, Panacea::VAG_STREAM::exit, "VAG_STREAM::exit");
     Hook_Axa_DebugPrint = NewHook(pfn_Axa_DebugPrint, Panacea::DebugPrint, "Axa::DebugPrint");
     //Hook_Bbs_File_load = NewHook(pfn_Bbs_File_load, Panacea::BbsFileLoad, "Bbs::File::Load");
     //Hook_CRsrcData_loadCallback = NewHook(pfn_Bbs_CRsrcData_loadCallback, Panacea::BbsCRsrcDataloadCallback, "Bbs::CRsrcData::loadCallback");
@@ -336,20 +346,24 @@ void Panacea::FreeAllPackages()
     Hook_Axa_FreeAllPackages->Patch();
 }
 
+bool FileExists(wchar_t* path)
+{
+    auto attr = GetFileAttributesW(path);
+    return attr != INVALID_FILE_ATTRIBUTES && !(attr & FILE_ATTRIBUTE_DIRECTORY);
+}
+
 bool Panacea::GetRawFile(wchar_t* strOutPath, int maxLength, const char* originalPath)
 {
     const char* actualFileName = originalPath + strlen(BasePath) + 1;
     swprintf_s(strOutPath, maxLength, L"%ls\\raw\\%hs", OpenKH::m_ModPath.c_str(), actualFileName);
-
-    return GetFileAttributesW(strOutPath) != INVALID_FILE_ATTRIBUTES;
+    return FileExists(strOutPath);
 }
 
 bool Panacea::TransformFilePath(wchar_t* strOutPath, int maxLength, const char* originalPath)
 {
     const char* actualFileName = originalPath + strlen(BasePath) + 1;
     swprintf_s(strOutPath, maxLength, L"%ls\\%hs", OpenKH::m_ModPath.c_str(), actualFileName);
-
-    return GetFileAttributesW(strOutPath) != INVALID_FILE_ATTRIBUTES;
+    return FileExists(strOutPath);
 }
 
 std::unordered_map<std::string, std::vector<Axa::RemasteredEntry>> RemasteredData;
@@ -982,13 +996,18 @@ long __cdecl Panacea::GetFileSize(Axa::CFileMan* _this, const char* filename)
     }
 
     FILE* file = _wfopen(path, L"rb");
-    fseek(file, 0, SEEK_END);
-    auto length = ftell(file);
-    fclose(file);
+    if (file)
+    {
+        fseek(file, 0, SEEK_END);
+        auto length = ftell(file);
+        fclose(file);
 
-    if (OpenKH::m_DebugLog)
-        fwprintf(stdout, L"GetFileSize(\"%ls\") = %d\n", path, length);
-    return length;
+        if (OpenKH::m_DebugLog)
+            fwprintf(stdout, L"GetFileSize(\"%ls\") = %d\n", path, length);
+        return length;
+    }
+
+    return FileNotFound;
 }
 
 __int64 __cdecl Panacea::GetRemasteredCount()
@@ -1094,12 +1113,86 @@ void* Panacea::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizeP
     return ret;
 }
 
-__int64 Panacea::_threadProc(unsigned int* instance)
+float GetMusicVol()
 {
-    instance[61] = 1;
-    auto ret = Hook_Axa_AxaSoundStream__threadProc->Unpatch()(instance);
-    Hook_Axa_AxaSoundStream__threadProc->Patch();
-    return ret;
+    Axa::PCSettings& pcset = PCSettingsPtr;
+    return VolumeLevels[pcset.MasterVolume] * VolumeLevels[pcset.MusicVolume];
+}
+
+void BassEndSync(HSYNC handle, DWORD channel, DWORD data, void* user)
+{
+    BASS_ChannelFree(channel);
+    basschan = 0;
+}
+
+void Panacea::VAG_STREAM::play(const char* fileName, int volume, int fadeVolume, int time)
+{
+    if (basschan)
+        return;
+    if (!bassinit)
+        bassinit = BASS_Init(-1, 44100, 0, nullptr, nullptr) ? 1 : -1;
+    char path[MAX_PATH];
+    sprintf_s(path, "%ls\\%s", OpenKH::m_ModPath.c_str(), fileName);
+    if (bassinit == -1 || GetFileAttributesA(path) == INVALID_FILE_ATTRIBUTES)
+    {
+        if (OpenKH::m_DebugLog)
+            fprintf(stdout, "VAG_STREAM::play(\"%s\", %d, %d, %d)\n", fileName, volume, fadeVolume, time);
+        Hook_VAG_STREAM_play->Unpatch()(fileName, volume, fadeVolume, time);
+        Hook_VAG_STREAM_play->Patch();
+        return;
+    }
+    basschan = BASS_VGMSTREAM_StreamCreate(path, BASS_SAMPLE_LOOP);
+    if (basschan == 0)
+        basschan = BASS_StreamCreateFile(false, path, 0, 0, BASS_SAMPLE_LOOP);
+    if (basschan != 0)
+    {
+        // Stream opened!
+        BASS_ChannelPlay(basschan, false);
+        BASS_ChannelSetAttribute(basschan, BASS_ATTRIB_VOL, GetMusicVol());
+    }
+}
+
+void Panacea::VAG_STREAM::fadeOut(unsigned int time)
+{
+    if (basschan)
+    {
+        BASS_ChannelSlideAttribute(basschan, BASS_ATTRIB_VOL, -1, time);
+        BASS_ChannelSetSync(basschan, BASS_SYNC_SLIDE, 0, BassEndSync, nullptr);
+    }
+    else
+    {
+        Hook_VAG_STREAM_fadeOut->Unpatch()(time);
+        Hook_VAG_STREAM_fadeOut->Patch();
+    }
+}
+
+void Panacea::VAG_STREAM::setVolume(int volume)
+{
+    if (basschan)
+        BASS_ChannelSetAttribute(basschan, BASS_ATTRIB_VOL, (volume / 16383.0f) * GetMusicVol());
+    else
+    {
+        Hook_VAG_STREAM_setVolume->Unpatch()(volume);
+        Hook_VAG_STREAM_setVolume->Patch();
+    }
+}
+
+void Panacea::VAG_STREAM::exit()
+{
+    if (basschan)
+    {
+        if (!BASS_ChannelIsSliding(basschan, BASS_ATTRIB_VOL))
+        {
+            BASS_ChannelStop(basschan);
+            BASS_StreamFree(basschan);
+            basschan = 0;
+        }
+    }
+    else
+    {
+        Hook_VAG_STREAM_exit->Unpatch()();
+        Hook_VAG_STREAM_exit->Patch();
+    }
 }
 
 void Panacea::DebugPrint(const char* format, ...)
