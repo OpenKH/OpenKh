@@ -388,8 +388,50 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             InstallPanaceaCommand = new RelayCommand(_ =>
             {
                 if (File.Exists(PanaceaSourceLocation))
+                {               
                     // Again, do not bother in debug mode
                     File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation, true);
+                    try
+                    {   
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "avcodec-vgmstream-59.dll"), Path.Combine(PcReleaseLocation, "avcodec-vgmstream-59.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "avformat-vgmstream-59.dll"), Path.Combine(PcReleaseLocation, "avformat-vgmstream-59.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "avutil-vgmstream-57.dll"), Path.Combine(PcReleaseLocation, "avutil-vgmstream-57.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "bass.dll"), Path.Combine(PcReleaseLocation, "bass.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "bass_vgmstream.dll"), Path.Combine(PcReleaseLocation, "bass_vgmstream.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libatrac9.dll"), Path.Combine(PcReleaseLocation, "libatrac9.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0061.dll"), Path.Combine(PcReleaseLocation, "libcelt-0061.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0110.dll"), Path.Combine(PcReleaseLocation, "libcelt-0110.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libg719_decode.dll"), Path.Combine(PcReleaseLocation, "libg719_decode.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libmpg123-0.dll"), Path.Combine(PcReleaseLocation, "libmpg123-0.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libspeex-1.dll"), Path.Combine(PcReleaseLocation, "libspeex-1.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libvorbis.dll"), Path.Combine(PcReleaseLocation, "libvorbis.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "swresample-vgmstream-4.dll"), Path.Combine(PcReleaseLocation, "swresample-vgmstream-4.dll"), true);
+                    }
+                    catch (Exception e) 
+                    {
+                        MessageBox.Show(
+                            $"Missing panacea dependencies. Unable to fully install panacea.",
+                            "Extraction error",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                        File.Delete(PanaceaDestinationLocation);
+                        File.Delete(Path.Combine(PcReleaseLocation, "avcodec-vgmstream-59.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "avformat-vgmstream-59.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "avutil-vgmstream-57.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "bass.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "bass_vgmstream.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "libatrac9.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "libcelt-0061.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "libcelt-0110.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "libg719_decode.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "libmpg123-0.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "libspeex-1.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "libvorbis.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "swresample-vgmstream-4.dll"));
+                        PanaceaInstalled = false;
+                        return;
+                    }
+                }
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
@@ -398,7 +440,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             RemovePanaceaCommand = new RelayCommand(_ =>
             {
                 if (File.Exists(PanaceaDestinationLocation))
+                {
                     File.Delete(PanaceaDestinationLocation);
+                    File.Delete(Path.Combine(PcReleaseLocation, "avcodec-vgmstream-59.dll"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "avformat-vgmstream-59.dll"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "avutil-vgmstream-57.dll"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "bass.dll"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "bass_vgmstream.dll"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "libatrac9.dll"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "libcelt-0061.dll"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "libcelt-0110.dll"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "libg719_decode.dll"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "libmpg123-0.dll"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "libspeex-1.dll"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "libvorbis.dll"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "swresample-vgmstream-4.dll"));
+                }
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
