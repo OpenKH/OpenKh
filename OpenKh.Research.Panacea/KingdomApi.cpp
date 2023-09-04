@@ -19,6 +19,10 @@ PFN_DEFINE(Axa_OpenFile);
 PFN_DEFINE(Axa_DebugPrint);
 PFN_DEFINE(Axa_DecryptFile);
 PFN_DEFINE(Axa_DecompressFile);
+PFN_DEFINE(VAG_STREAM_play);
+PFN_DEFINE(VAG_STREAM_fadeOut);
+PFN_DEFINE(VAG_STREAM_setVolume);
+PFN_DEFINE(VAG_STREAM_exit);
 PFN_DEFINE(Bbs_File_load);
 PFN_DEFINE(Bbs_CRsrcData_loadCallback);
 
@@ -92,6 +96,26 @@ __int64 Axa::DecompressFile(void* outBuf, int* decSizePtr, void* inBuf, int comp
     return pfn_Axa_DecompressFile(outBuf, decSizePtr, inBuf, compSize);
 }
 
+void VAG_STREAM::play(const char* fileName, int volume, int fadeVolume, int time)
+{
+    pfn_VAG_STREAM_play(fileName, volume, fadeVolume, time);
+}
+
+void VAG_STREAM::fadeOut(unsigned int time)
+{
+    pfn_VAG_STREAM_fadeOut(time);
+}
+
+void VAG_STREAM::setVolume(int volume)
+{
+    pfn_VAG_STREAM_setVolume(volume);
+}
+
+void VAG_STREAM::exit()
+{
+    pfn_VAG_STREAM_exit();
+}
+
 size_t Bbs::File::load(const char* filename, long long a2) {
     return pfn_Bbs_File_load(filename, a2);
 }
@@ -107,3 +131,5 @@ PVAR_DEFINE(int, PackageFileCount);
 PVAR_DEFINE(int, LastOpenedPackage);
 PARR_DEFINE(Axa::PackageFile*, PackageFiles, 16);
 PARR_DEFINE(char, BasePath, 128);
+PVAR_DEFINE(Axa::PCSettings, PCSettingsPtr);
+PARR_DEFINE(float, VolumeLevels, 11);
