@@ -16,16 +16,16 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Model
 
         public void loadMeshes()
         {
-            if (Mdlx_Service.Instance.ModelFile?.Groups == null || Mdlx_Service.Instance.ModelFile.Groups.Count < 0)
+            if (MdlxService.Instance.ModelFile?.Groups == null || MdlxService.Instance.ModelFile.Groups.Count < 0)
                 return;
 
             Meshes.Clear();
-            for (int i = 0; i < Mdlx_Service.Instance.ModelFile.Groups.Count; i++)
+            for (int i = 0; i < MdlxService.Instance.ModelFile.Groups.Count; i++)
             {
                 MeshWrapper wrapper = new MeshWrapper();
                 wrapper.Id = i;
                 wrapper.Name = "Mesh " + i;
-                wrapper.Group = Mdlx_Service.Instance.ModelFile.Groups[i];
+                wrapper.Group = MdlxService.Instance.ModelFile.Groups[i];
 
                 Meshes.Add(wrapper);
             }
@@ -54,11 +54,11 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Model
 
         public void moveMesh(MeshWrapper wrapper, int index)
         {
-            ModelSkeletal.SkeletalGroup tempGroup = Mdlx_Service.Instance.ModelFile.Groups[wrapper.Id];
+            ModelSkeletal.SkeletalGroup tempGroup = MdlxService.Instance.ModelFile.Groups[wrapper.Id];
 
 
-            Mdlx_Service.Instance.ModelFile.Groups.RemoveAt(wrapper.Id);
-            Mdlx_Service.Instance.ModelFile.Groups.Insert(index, tempGroup);
+            MdlxService.Instance.ModelFile.Groups.RemoveAt(wrapper.Id);
+            MdlxService.Instance.ModelFile.Groups.Insert(index, tempGroup);
         }
 
         public class MeshWrapper

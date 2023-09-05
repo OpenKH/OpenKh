@@ -16,16 +16,16 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
 
         public void loadTextures()
         {
-            if (Mdlx_Service.Instance.TextureFile?.Images == null || Mdlx_Service.Instance.TextureFile.Images.Count <= 0)
+            if (MdlxService.Instance.TextureFile?.Images == null || MdlxService.Instance.TextureFile.Images.Count <= 0)
                 return;
 
             Textures.Clear();
-            for (int i = 0; i < Mdlx_Service.Instance.TextureFile.Images.Count; i++)
+            for (int i = 0; i < MdlxService.Instance.TextureFile.Images.Count; i++)
             {
                 TextureWrapper wrapper = new TextureWrapper();
                 wrapper.Id = i;
                 wrapper.Name = "Texture " + i;
-                wrapper.Texture = Mdlx_Service.Instance.TextureFile.Images[i];
+                wrapper.Texture = MdlxService.Instance.TextureFile.Images[i];
 
                 Textures.Add(wrapper);
             }
@@ -54,9 +54,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
 
         public void moveTexture(TextureWrapper wrapper, int index)
         {
-            ModelTexture.Texture tempTexture = Mdlx_Service.Instance.TextureFile.Images[wrapper.Id];
-            Mdlx_Service.Instance.TextureFile.Images.RemoveAt(wrapper.Id);
-            Mdlx_Service.Instance.TextureFile.Images.Insert(index, tempTexture);
+            ModelTexture.Texture tempTexture = MdlxService.Instance.TextureFile.Images[wrapper.Id];
+            MdlxService.Instance.TextureFile.Images.RemoveAt(wrapper.Id);
+            MdlxService.Instance.TextureFile.Images.Insert(index, tempTexture);
         }
 
         public class TextureWrapper

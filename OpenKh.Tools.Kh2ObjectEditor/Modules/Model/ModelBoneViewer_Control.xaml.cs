@@ -12,9 +12,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         public ModelBoneViewer_Control()
         {
             InitializeComponent();
-            if(Mdlx_Service.Instance.ModelFile != null)
+            if(MdlxService.Instance.ModelFile != null)
             {
-                ThisVM = new ModelBoneViewer_VM(Mdlx_Service.Instance.ModelFile);
+                ThisVM = new ModelBoneViewer_VM(MdlxService.Instance.ModelFile);
                 DataContext = ThisVM;
             }
         }

@@ -1,12 +1,12 @@
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Windows.Forms;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Services
 {
-    public class Mdlx_Service
+    public class MdlxService
     {
         // Apdx File
         public string MdlxPath { get; set; }
@@ -17,12 +17,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         public Stream BdxFile { get; set; }
         // May also contain Pax files (Uncommon, 46/2121 files)
 
-
-        // Note: Copied as JSON in order to not copy the reference
-        public string CopiedCollision { get; set; }
-        public List<string> CopiedCollisionList { get; set; }
-
-        public void loadMdlx(string mdlxPath)
+        public void LoadMdlx(string mdlxPath)
         {
             if (!ObjectEditorUtils.isFilePathValid(mdlxPath, "mdlx"))
                 throw new FileNotFoundException("Mdlx does not exist: " + mdlxPath);
@@ -35,8 +30,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
 
             MdlxBar = Bar.Read(streamMdlx);
 
-            Mset_Service.reset();
-            Apdx_Service.reset();
+            MsetService.Reset();
+            ApdxService.Reset();
 
             foreach (Bar.Entry barEntry in MdlxBar)
             {
@@ -60,7 +55,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             }
         }
 
-        public void saveModel()
+        public void SaveModel()
         {
             foreach (Bar.Entry barEntry in MdlxBar)
             {
@@ -93,11 +88,11 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             }
         }
 
-        public void saveFile()
+        public void SaveFile()
         {
-            saveModel();
-            System.Windows.Forms.SaveFileDialog sfd;
-            sfd = new System.Windows.Forms.SaveFileDialog();
+            SaveModel();
+            SaveFileDialog sfd;
+            sfd = new SaveFileDialog();
             sfd.Title = "Save file";
             sfd.FileName = Path.GetFileNameWithoutExtension(MdlxPath) + ".out.mdlx";
             sfd.ShowDialog();
@@ -109,28 +104,35 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             }
         }
 
+        public void OverwriteFile()
+        {
+            if (MdlxPath == null)
+                return;
+
+            SaveModel();
+
+            MemoryStream memStream = new MemoryStream();
+            Bar.Write(memStream, MdlxBar);
+            File.WriteAllBytes(MdlxPath, memStream.ToArray());
+        }
+
         // SINGLETON
-        private Mdlx_Service() { }
-        private static Mdlx_Service instance = null;
-        public static Mdlx_Service Instance
+        private MdlxService() { }
+        private static MdlxService _instance = null;
+        public static MdlxService Instance
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    instance = new Mdlx_Service();
+                    _instance = new MdlxService();
                 }
-                return instance;
+                return _instance;
             }
         }
-        public static void reset()
+        public static void Reset()
         {
-            string copiedCollision = instance.CopiedCollision;
-            List<string> copiedCollisionList = instance.CopiedCollisionList;
-
-            instance = new Mdlx_Service();
-            instance.CopiedCollision = copiedCollision;
-            instance.CopiedCollisionList = copiedCollisionList;
+            _instance = new MdlxService();
         }
     }
 }

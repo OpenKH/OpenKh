@@ -13,10 +13,10 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 
         public void loadElements()
         {
-            if (Apdx_Service.Instance.PaxFile?.Elements == null)
+            if (ApdxService.Instance.PaxFile?.Elements == null)
                 return;
 
-            DataTable.ItemsSource = Apdx_Service.Instance.PaxFile.Elements;
+            DataTable.ItemsSource = ApdxService.Instance.PaxFile.Elements;
         }
     }
 }

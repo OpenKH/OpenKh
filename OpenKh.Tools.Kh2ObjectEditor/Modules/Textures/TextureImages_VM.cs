@@ -25,16 +25,16 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
 
         public void loadTextures()
         {
-            if (Mdlx_Service.Instance.TextureFile?.Images == null || Mdlx_Service.Instance.TextureFile.Images.Count < 0)
+            if (MdlxService.Instance.TextureFile?.Images == null || MdlxService.Instance.TextureFile.Images.Count < 0)
                 return;
 
             Textures.Clear();
-            for (int i = 0; i < Mdlx_Service.Instance.TextureFile.Images.Count; i++)
+            for (int i = 0; i < MdlxService.Instance.TextureFile.Images.Count; i++)
             {
                 TextureWrapper wrapper = new TextureWrapper();
                 wrapper.Id = i;
                 wrapper.Name = "Texture " + i;
-                wrapper.Texture = Mdlx_Service.Instance.TextureFile.Images[i];
+                wrapper.Texture = MdlxService.Instance.TextureFile.Images[i];
                 wrapper.SizeX = wrapper.Texture.Size.Width;
                 wrapper.SizeY = wrapper.Texture.Size.Height;
 
@@ -129,7 +129,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
         private List<Imgd> getAsImgdList()
         {
             List<Imgd> imgds = new List<Imgd>();
-            foreach (ModelTexture.Texture texture in Mdlx_Service.Instance.TextureFile.Images)
+            foreach (ModelTexture.Texture texture in MdlxService.Instance.TextureFile.Images)
             {
                 imgds.Add(Imgd.Create(texture.Size,
                                       texture.PixelFormat,
@@ -142,7 +142,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
 
         private void rebuildFile(List<Imgd> imgds)
         {
-            TextureFooterData tempFooter = Mdlx_Service.Instance.TextureFile.TextureFooterData;
+            TextureFooterData tempFooter = MdlxService.Instance.TextureFile.TextureFooterData;
 
             ModelTexture modTex = new ModelTexture(imgds);
             modTex.TextureFooterData = tempFooter;
@@ -150,7 +150,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
             Stream tempStream = new MemoryStream();
             modTex.Write(tempStream);
 
-            Mdlx_Service.Instance.TextureFile = ModelTexture.Read(tempStream);
+            MdlxService.Instance.TextureFile = ModelTexture.Read(tempStream);
         }
 
         public class TextureWrapper

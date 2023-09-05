@@ -26,7 +26,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
         public TextureSelectedAnimation_VM(int index)
         {
             Animations = new ObservableCollection<ScriptWrapper>();
-            TexAnim = Mdlx_Service.Instance.TextureFile.TextureFooterData.TextureAnimationList[index];
+            TexAnim = MdlxService.Instance.TextureFile.TextureFooterData.TextureAnimationList[index];
             loadAnimations();
         }
 

@@ -3,7 +3,6 @@ using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows.Shapes;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Services
 {
@@ -11,32 +10,37 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
      * THIS IS A SERVICE ONLY USED TO TEST AND RESEARCH DATA
      * It should not be available to end users in releases (Through GUI)
      */
-    public class Testing_Service
+    public class TestingService
     {
         public string FolderPath { get; set; }
 
-        public void runCode()
+        public void RunCode()
         {
             //Apdx_Service.Instance.loadFile(Apdx_Service.Instance.ApdxPath);
 
             //Mset_Service.Instance.loadMotion(0);
 
-            Mdlx_Service.Instance.loadMdlx(Mdlx_Service.Instance.MdlxPath);
+            //Mdlx_Service.Instance.loadMdlx(Mdlx_Service.Instance.MdlxPath);
 
             // OPEN FILE
-            /*OpenFileDialog openFileDialog = new OpenFileDialog();
+            OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Multiselect = false;
             if (openFileDialog.ShowDialog() == true && openFileDialog.FileNames != null && openFileDialog.FileNames.Length > 0)
             {
+                string filePath = openFileDialog.FileNames[0];
+                DpdPData testfile;
                 //Mdlx_Service.Instance.TextureFile.TextureFooterData.TextureAnimationList.Add(ImageUtils.CreateTextureAnimation(openFileDialog.FileNames[0]));
-                using (FileStream fs = File.OpenRead(openFileDialog.FileNames[0]))
+                using (FileStream fs = File.OpenRead(filePath))
                 {
-                    Dpx testDpx = new Dpx(fs);
+                    testfile = new DpdPData(fs);
                 }
-                
-            }*/
+
+                filePath = filePath + "_OUT";
+                MemoryStream memStream = (MemoryStream)testfile.getAsStream();
+                File.WriteAllBytes(filePath, memStream.ToArray());
+            }
         }
-        public void testApdx()
+        public void TestApdx()
         {
             int invalidFiles = 0;
             Dictionary<Bar.EntryType, int> barEntryCount = new Dictionary<Bar.EntryType, int>();
@@ -72,7 +76,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             }
         }
 
-        public void testMdlx()
+        public void TestMdlx()
         {
             int invalidFiles = 0;
             Dictionary<Bar.EntryType, int> barEntryCount = new Dictionary<Bar.EntryType, int>();
@@ -108,7 +112,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             }
         }
 
-        public void testMset()
+        public void TestMset()
         {
             int invalidFiles = 0;
             Dictionary<Bar.EntryType, int> barEntryCount = new Dictionary<Bar.EntryType, int>();
@@ -145,17 +149,17 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         }
 
         // SINGLETON
-        private Testing_Service() { }
-        private static Testing_Service instance = null;
-        public static Testing_Service Instance
+        private TestingService() { }
+        private static TestingService _instance = null;
+        public static TestingService Instance
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    instance = new Testing_Service();
+                    _instance = new TestingService();
                 }
-                return instance;
+                return _instance;
             }
         }
     }

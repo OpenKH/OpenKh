@@ -32,18 +32,18 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
             if (!ObjectEditorUtils.isFilePathValid(MdlxPath, "mdlx"))
                 throw new FileNotFoundException("Mdlx does not exist: " + MdlxPath);
 
-            Mdlx_Service.Instance.loadMdlx(MdlxPath);
+            MdlxService.Instance.LoadMdlx(MdlxPath);
 
             string tempMsetPath = MdlxPath.ToLower().Replace(".mdlx", ".mset");
             if (ObjectEditorUtils.isFilePathValid(tempMsetPath, "mset"))
             {
-                Mset_Service.Instance.loadMset(tempMsetPath);
+                MsetService.Instance.LoadMset(tempMsetPath);
             }
 
             string tempApdxPath = MdlxPath.ToLower().Replace(".mdlx", ".a.us");
             if (ObjectEditorUtils.isFilePathValid(tempApdxPath, "a.us"))
             {
-                Apdx_Service.Instance.loadFile(tempApdxPath);
+                ApdxService.Instance.LoadFile(tempApdxPath);
             }
 
             triggerObjectSelected();
@@ -68,14 +68,14 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
             if(MdlxPath == null)
                 throw new FileNotFoundException("No Mdlx to apply Mset");
 
-            Mset_Service.Instance.loadMset(msetPath);
+            MsetService.Instance.LoadMset(msetPath);
             triggerObjectSelected();
         }
 
         // Load the motion through here to apply to the viewport
         public void loadMotion(int index)
         {
-            Mset_Service.Instance.loadMotion(index);
+            MsetService.Instance.LoadMotion(index);
             triggerMotionSelected();
         }
 

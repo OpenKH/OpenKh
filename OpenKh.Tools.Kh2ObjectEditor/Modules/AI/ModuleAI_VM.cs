@@ -25,9 +25,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.AI
 
         public ModuleAI_VM()
         {
-            if (Mdlx_Service.Instance.BdxFile != null)
+            if (MdlxService.Instance.BdxFile != null)
             {
-                BdxStream = Mdlx_Service.Instance.BdxFile;
+                BdxStream = MdlxService.Instance.BdxFile;
                 read();
             }
         }
@@ -69,7 +69,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.AI
 
             BdxStream = new MemoryStream(BdxStreamOut);
             BdxStream.Position = 0;
-            Mdlx_Service.Instance.BdxFile = BdxStream;
+            MdlxService.Instance.BdxFile = BdxStream;
         }
     }
 }

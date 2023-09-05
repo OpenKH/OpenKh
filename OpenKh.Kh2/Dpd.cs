@@ -13,8 +13,8 @@ namespace OpenKh.Kh2
         public List<ParticleData> ParticleDataList { get; set; }
         public List<Texture> TexturesList { get; set; }
         public List<Shape> ShapesList { get; set; }
-        public List<Model> ModelsList { get; set; }
-        public List<Vsf> VsfList { get; set; }
+        public List<DpdModel> ModelsList { get; set; }
+        public List<DpdVsf> VsfList { get; set; }
         public EtcData DpdEtcData { get; set; }
 
         public class EtcData
@@ -74,7 +74,7 @@ namespace OpenKh.Kh2
             }
 
             // MODEL
-            ModelsList = new List<Model>();
+            ModelsList = new List<DpdModel>();
             for (int i = 0; i < offsetModels.Count; i++)
             {
                 int nextOffset = i + 1 < offsetModels.Count ? i+1 : 0;
@@ -94,29 +94,17 @@ namespace OpenKh.Kh2
                 stream.Position = offsetModels[i];
                 int size = nextOffset - (int)stream.Position;
                 byte[] model = stream.ReadBytes(size);
+                MemoryStream modelStream = new MemoryStream(model);
 
-                ModelsList.Add(new Model(model));
+                ModelsList.Add(new DpdModel(modelStream));
             }
 
             // VSF
-            VsfList = new List<Vsf>();
+            VsfList = new List<DpdVsf>();
             for (int i = 0; i < offsetVsf.Count; i++)
             {
-                int nextOffset = i + 1 < offsetVsf.Count ? i + 1 : 0;
-                if (i + 1 < offsetVsf.Count)
-                {
-                    nextOffset = offsetVsf[i + 1];
-                }
-                else
-                {
-                    nextOffset = (int)stream.Length;
-                }
-
                 stream.Position = offsetVsf[i];
-                int size = nextOffset - (int)stream.Position ;
-                byte[] vsf = stream.ReadBytes(size);
-
-                VsfList.Add(new Vsf(vsf));
+                VsfList.Add(new DpdVsf(stream));
             }
 
             stream.Position = 0;
@@ -159,12 +147,12 @@ namespace OpenKh.Kh2
                 shapeStreams.Add(shape.getAsStream());
             }
             List<Stream> modelStreams = new List<Stream>();
-            foreach (Model model in ModelsList)
+            foreach (DpdModel model in ModelsList)
             {
                 modelStreams.Add(model.getAsStream());
             }
             List<Stream> vsfStreams = new List<Stream>();
-            foreach (Vsf vsf in VsfList)
+            foreach (DpdVsf vsf in VsfList)
             {
                 vsfStreams.Add(vsf.getAsStream());
             }

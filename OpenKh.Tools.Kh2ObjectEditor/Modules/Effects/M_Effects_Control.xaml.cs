@@ -15,7 +15,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 
         private void Button_ExportDpx(object sender, RoutedEventArgs e)
         {
-            if (Apdx_Service.Instance.PaxFile?.DpxPackage == null)
+            if (ApdxService.Instance.PaxFile?.DpxPackage == null)
                 return;
 
             System.Windows.Forms.SaveFileDialog sfd;
@@ -25,7 +25,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
             sfd.ShowDialog();
             if (sfd.FileName != "")
             {
-                Stream tempStream = Apdx_Service.Instance.PaxFile.DpxPackage.getAsStream();
+                Stream tempStream = ApdxService.Instance.PaxFile.DpxPackage.getAsStream();
                 MemoryStream memStream = new MemoryStream();
                 tempStream.CopyTo(memStream);
                 File.WriteAllBytes(sfd.FileName, memStream.ToArray());
@@ -33,7 +33,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
         }
         private void Button_ImportDpx(object sender, RoutedEventArgs e)
         {
-            if (Apdx_Service.Instance.PaxFile?.DpxPackage == null)
+            if (ApdxService.Instance.PaxFile?.DpxPackage == null)
                 return;
 
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
@@ -59,18 +59,18 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 
         private void importDpx(Dpx dpxFile)
         {
-            int dpdCount = Apdx_Service.Instance.PaxFile.DpxPackage.DpdList.Count;
-            int effectCount = Apdx_Service.Instance.PaxFile.DpxPackage.ParticleEffects.Count;
+            int dpdCount = ApdxService.Instance.PaxFile.DpxPackage.DpdList.Count;
+            int effectCount = ApdxService.Instance.PaxFile.DpxPackage.ParticleEffects.Count;
             foreach (Dpd dpd in dpxFile.DpdList)
             {
-                Apdx_Service.Instance.PaxFile.DpxPackage.DpdList.Add(dpd);
+                ApdxService.Instance.PaxFile.DpxPackage.DpdList.Add(dpd);
             }
 
             foreach (Dpx.DpxParticleEffect effect in dpxFile.ParticleEffects)
             {
                 effect.DpdId += dpdCount;
                 effect.EffectNumber += (uint)effectCount;
-                Apdx_Service.Instance.PaxFile.DpxPackage.ParticleEffects.Add(effect);
+                ApdxService.Instance.PaxFile.DpxPackage.ParticleEffects.Add(effect);
             }
         }
     }

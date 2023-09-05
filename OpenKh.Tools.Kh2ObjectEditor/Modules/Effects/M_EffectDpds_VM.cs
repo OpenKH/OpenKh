@@ -19,38 +19,38 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 
         public void loadDpds()
         {
-            if (Apdx_Service.Instance.PaxFile?.DpxPackage?.DpdList == null || Apdx_Service.Instance.PaxFile.DpxPackage.DpdList.Count < 0)
+            if (ApdxService.Instance.PaxFile?.DpxPackage?.DpdList == null || ApdxService.Instance.PaxFile.DpxPackage.DpdList.Count < 0)
                 return;
 
             DpdList.Clear();
-            for (int i = 0; i < Apdx_Service.Instance.PaxFile.DpxPackage.DpdList.Count; i++)
+            for (int i = 0; i < ApdxService.Instance.PaxFile.DpxPackage.DpdList.Count; i++)
             {
                 DpdWrapper wrapper = new DpdWrapper();
                 wrapper.Id = i;
                 wrapper.Name = "DPD " + i;
-                wrapper.DpdItem = Apdx_Service.Instance.PaxFile.DpxPackage.DpdList[i];
+                wrapper.DpdItem = ApdxService.Instance.PaxFile.DpxPackage.DpdList[i];
 
                 DpdList.Add(wrapper);
             }
         }
         public void Dpd_Copy(int index)
         {
-            S_Clipboard.Instance.copyDpd(Apdx_Service.Instance.PaxFile.DpxPackage.DpdList[index]);
+            ClipboardService.Instance.StoreDpd(ApdxService.Instance.PaxFile.DpxPackage.DpdList[index]);
         }
         public void Dpd_AddCopied()
         {
-            if (S_Clipboard.Instance.pasteDpd() == null)
+            if (ClipboardService.Instance.FetchDpd() == null)
                 return;
 
-            Apdx_Service.Instance.PaxFile.DpxPackage.DpdList.Add(S_Clipboard.Instance.pasteDpd());
+            ApdxService.Instance.PaxFile.DpxPackage.DpdList.Add(ClipboardService.Instance.FetchDpd());
             loadDpds();
         }
         public void Dpd_Replace(int index)
         {
-            if (S_Clipboard.Instance.pasteDpd() == null)
+            if (ClipboardService.Instance.FetchDpd() == null)
                 return;
 
-            Apdx_Service.Instance.PaxFile.DpxPackage.DpdList[index] = S_Clipboard.Instance.pasteDpd();
+            ApdxService.Instance.PaxFile.DpxPackage.DpdList[index] = ClipboardService.Instance.FetchDpd();
             loadDpds();
         }
 

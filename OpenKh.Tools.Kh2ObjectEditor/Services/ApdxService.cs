@@ -1,13 +1,13 @@
 using OpenKh.Kh2;
-using OpenKh.Kh2.Utils;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Forms;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Services
 {
-    public class Apdx_Service
+    public class ApdxService
     {
         // Apdx File
         public string ApdxPath { get; set; }
@@ -25,7 +25,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         // WrappedCollisionData (38) - 21
         // Dummy (0) - 40
 
-        public void loadFile(string filepath)
+        public void LoadFile(string filepath)
         {
             // Validations
             if (!ObjectEditorUtils.isFilePathValid(filepath, new List<string> { "apdx", "a.fm", "a.fr", "a.gr", "a.it", "a.it", "a.jp", "a.sp", "a.uk", "a.us" }))
@@ -60,7 +60,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             }
         }
 
-        public void saveToBar()
+        public void SaveToBar()
         {
             foreach (Bar.Entry barEntry in ApdxBar)
             {
@@ -81,12 +81,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             }
         }
 
-        public void saveFile()
+        public void SaveFile()
         {
-            saveToBar();
+            SaveToBar();
 
-            System.Windows.Forms.SaveFileDialog sfd;
-            sfd = new System.Windows.Forms.SaveFileDialog();
+            SaveFileDialog sfd;
+            sfd = new SaveFileDialog();
             sfd.Title = "Save file";
             string filename = Path.GetFileName(ApdxPath);
             filename = filename.Replace(".a.", ".out.a.");
@@ -96,7 +96,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             {
                 MemoryStream memStream = new MemoryStream();
                 Bar.Write(memStream, ApdxBar);
-                /*if(memStream.Length % 16 != 0) // PC pads BAR files but it may not be needed
+                /*if(memStream.Length % 16 != 0) // PC pads BAR files but it's not needed
                 {
                     int paddingSize = ReadWriteUtils.bytesRequiredToAlignToByte(memStream.Position, 16);
                     ReadWriteUtils.addBytesToStream(memStream, paddingSize, 0xCD);
@@ -105,9 +105,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             }
         }
 
-        public void overwriteFile()
+        public void OverwriteFile()
         {
-            saveToBar();
+            if (ApdxPath == null)
+                return;
+
+            SaveToBar();
 
             MemoryStream memStream = new MemoryStream();
             Bar.Write(memStream, ApdxBar);
@@ -115,22 +118,22 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         }
 
         // SINGLETON
-        private Apdx_Service() { }
-        private static Apdx_Service instance = null;
-        public static Apdx_Service Instance
+        private ApdxService() { }
+        private static ApdxService _instance = null;
+        public static ApdxService Instance
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    instance = new Apdx_Service();
+                    _instance = new ApdxService();
                 }
-                return instance;
+                return _instance;
             }
         }
-        public static void reset()
+        public static void Reset()
         {
-            instance = new Apdx_Service();
+            _instance = new ApdxService();
         }
     }
 }

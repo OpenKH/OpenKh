@@ -7,7 +7,7 @@ using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2
 {
-    public partial class Pax
+    public class Pax
     {
         private const uint MagicCode = 0x5F584150U; // PAX_
         public string Name { get; set; }

@@ -14,43 +14,51 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         private void Menu_Test(object sender, RoutedEventArgs e)
         {
             App_Context checkAppContext = App_Context.Instance;
-            Mdlx_Service checkMdlxService = Mdlx_Service.Instance;
-            Mset_Service checkMsetService = Mset_Service.Instance;
-            Apdx_Service checkApdxService = Apdx_Service.Instance;
+            MdlxService checkMdlxService = MdlxService.Instance;
+            MsetService checkMsetService = MsetService.Instance;
+            ApdxService checkApdxService = ApdxService.Instance;
             // BREAKPOINT to check app context info
         }
         private void Menu_Test_RunCode(object sender, RoutedEventArgs e)
         {
-            Testing_Service.Instance.runCode();
+            TestingService.Instance.RunCode();
         }
         private void Menu_Test_Effects(object sender, RoutedEventArgs e)
         {
-            Testing_Service.Instance.testApdx();
+            TestingService.Instance.TestApdx();
         }
         private void Menu_Test_Mdlxs(object sender, RoutedEventArgs e)
         {
-            Testing_Service.Instance.testMdlx();
+            TestingService.Instance.TestMdlx();
         }
         private void Menu_Test_Msets(object sender, RoutedEventArgs e)
         {
-            Testing_Service.Instance.testMset();
+            TestingService.Instance.TestMset();
         }
 
         private void Menu_Save_Mdlx(object sender, RoutedEventArgs e)
         {
-            Mdlx_Service.Instance.saveFile();
+            MdlxService.Instance.SaveFile();
         }
         private void Menu_Save_Mset(object sender, RoutedEventArgs e)
         {
-            Mset_Service.Instance.saveFile();
+            MsetService.Instance.SaveFile();
         }
         private void Menu_Save_Apdx(object sender, RoutedEventArgs e)
         {
-            Apdx_Service.Instance.saveFile();
+            ApdxService.Instance.SaveFile();
+        }
+        private void Menu_Overwrite_Mdlx(object sender, RoutedEventArgs e)
+        {
+            MdlxService.Instance.OverwriteFile();
+        }
+        private void Menu_Overwrite_Mset(object sender, RoutedEventArgs e)
+        {
+            MsetService.Instance.OverwriteFile();
         }
         private void Menu_Overwrite_Apdx(object sender, RoutedEventArgs e)
         {
-            Apdx_Service.Instance.overwriteFile();
+            ApdxService.Instance.OverwriteFile();
         }
 
         public Main_Window()
@@ -69,7 +77,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
                 {
                     if (MODE_DEBUG)
                     {
-                        Testing_Service.Instance.FolderPath = firstFile;
+                        TestingService.Instance.FolderPath = firstFile;
                     }
                     else
                     {
@@ -88,7 +96,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
                     }
                     else if (firstFile.Contains(".a."))
                     {
-                        Apdx_Service.Instance.loadFile(firstFile);
+                        ApdxService.Instance.LoadFile(firstFile);
                     }
                 }
             }
@@ -111,13 +119,13 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
                 {
                     if (ObjectEditorUtils.isFilePathValid(openFileDialog.FileName, "mdlx"))
                     {
-                        if(Mdlx_Service.Instance.ModelFile != null)
+                        if(MdlxService.Instance.ModelFile != null)
                         {
-                            Attachment_Service.Instance.loadAttachment(openFileDialog.FileName, 178);
+                            AttachmentService.Instance.LoadAttachment(openFileDialog.FileName, 178);
                         }
                         else
                         {
-                            Attachment_Service.Instance.loadAttachment(openFileDialog.FileName);
+                            AttachmentService.Instance.LoadAttachment(openFileDialog.FileName);
                         }
                     }
                 }

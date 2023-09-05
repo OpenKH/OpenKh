@@ -21,7 +21,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
 
         public void loadImage(int index)
         {
-            List<Bitmap> bitmaps = ImageUtils.footerToImages(Mdlx_Service.Instance.TextureFile);
+            List<Bitmap> bitmaps = ImageUtils.footerToImages(MdlxService.Instance.TextureFile);
             BitmapSource BitmapImage = ImageUtils.BitmapToImageSource(bitmaps[index]);
             ImageFrame.Source = BitmapImage;
         }

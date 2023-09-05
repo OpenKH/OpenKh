@@ -11,7 +11,7 @@ namespace OpenKh.Kh2
         public class ParticleData
         {
             public PDataHeader Header { get; set; }
-            public PDataFile ParticleDataFile { get; set; }
+            DpdPData ParticleDataFile { get; set; }
 
             public byte[] Unknown { get; set; } // Structure is unknown so the binary is stored for now
 
@@ -192,7 +192,7 @@ namespace OpenKh.Kh2
                 particleDataStream.Position = startingAddress;
 
                 fileStream.Position = 0;
-                ParticleDataFile = new PDataFile(fileStream);
+                ParticleDataFile = new DpdPData(fileStream);
             }
 
             public Stream getAsStream()

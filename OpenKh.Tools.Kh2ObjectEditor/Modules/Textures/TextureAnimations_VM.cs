@@ -16,7 +16,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
         public ObservableCollection<TexAnimWrapper> TexAnims { get; set; }
         public TextureAnimations_VM()
         {
-            TextureFooterData = Mdlx_Service.Instance.TextureFile.TextureFooterData;
+            TextureFooterData = MdlxService.Instance.TextureFile.TextureFooterData;
             TexAnims = new ObservableCollection<TexAnimWrapper>();
             loadAnims();
         }
@@ -35,7 +35,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
         }
         public void exportImage(int id)
         {
-            List<Bitmap> bitmaps = ImageUtils.footerToImages(Mdlx_Service.Instance.TextureFile);
+            List<Bitmap> bitmaps = ImageUtils.footerToImages(MdlxService.Instance.TextureFile);
             //BitmapSource bitmapImage = ImageUtils.BitmapToImageSource(bitmaps[id]);
 
             System.Windows.Forms.SaveFileDialog sfd;
@@ -52,8 +52,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
         }
         public void removeImage(int id)
         {
-            Mdlx_Service.Instance.TextureFile.TextureFooterData.TextureAnimationList.RemoveAt(id);
-            Mdlx_Service.Instance.TextureFile.TextureFooterData.UvscList.Clear();
+            MdlxService.Instance.TextureFile.TextureFooterData.TextureAnimationList.RemoveAt(id);
+            MdlxService.Instance.TextureFile.TextureFooterData.UvscList.Clear();
             loadAnims();
         }
         public void addImage()
@@ -63,8 +63,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
             if (texAnim == null)
                 return;
 
-            Mdlx_Service.Instance.TextureFile.TextureFooterData.TextureAnimationList.Add(texAnim);
-            Mdlx_Service.Instance.TextureFile.TextureFooterData.UvscList.Clear();
+            MdlxService.Instance.TextureFile.TextureFooterData.TextureAnimationList.Add(texAnim);
+            MdlxService.Instance.TextureFile.TextureFooterData.UvscList.Clear();
             loadAnims();
         }
         public void replaceImage(int id)
@@ -74,8 +74,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
             if (texAnim == null)
                 return;
 
-            Mdlx_Service.Instance.TextureFile.TextureFooterData.TextureAnimationList[id] = texAnim;
-            Mdlx_Service.Instance.TextureFile.TextureFooterData.UvscList.Clear();
+            MdlxService.Instance.TextureFile.TextureFooterData.TextureAnimationList[id] = texAnim;
+            MdlxService.Instance.TextureFile.TextureFooterData.UvscList.Clear();
             loadAnims();
         }
 

@@ -32,7 +32,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
                 {
                     App_Context.Instance.loadMotion(item.Index);
                     //Mset_Service.Instance.loadMotion(item.Index);
-                    openMotionTabs(Mset_Service.Instance.LoadedMotion);
+                    openMotionTabs(MsetService.Instance.LoadedMotion);
                 }
                 catch (System.Exception exc)
                 {

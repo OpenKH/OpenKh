@@ -84,14 +84,14 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
         {
             get
             {
-                return Mset_Service.Instance.LoadedMotion != null;
+                return MsetService.Instance.LoadedMotion != null;
             }
         }
         public bool enable_reload
         {
             get
             {
-                return Mdlx_Service.Instance.ModelFile != null;
+                return MdlxService.Instance.ModelFile != null;
             }
         }
 
@@ -124,26 +124,26 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
         public void loadModel(bool doCameraRestart)
         {
             AnimationRunning = false;
-            foreach (ModelSkeletal.SkeletalGroup group in Mdlx_Service.Instance.ModelFile.Groups)
+            foreach (ModelSkeletal.SkeletalGroup group in MdlxService.Instance.ModelFile.Groups)
             {
-                group.Mesh = ModelSkeletal.getMeshFromGroup(group, GetBoneMatrices(Mdlx_Service.Instance.ModelFile.Bones));
+                group.Mesh = ModelSkeletal.getMeshFromGroup(group, GetBoneMatrices(MdlxService.Instance.ModelFile.Bones));
             }
 
-            if (Mdlx_Service.Instance.ModelFile != null)
+            if (MdlxService.Instance.ModelFile != null)
             {
-                ThisModel = ViewportHelper.getModel(Mdlx_Service.Instance.ModelFile, Mdlx_Service.Instance.TextureFile);
+                ThisModel = ViewportHelper.getModel(MdlxService.Instance.ModelFile, MdlxService.Instance.TextureFile);
                 ViewportControl.VPModels.Clear();
                 if (ThisModel != null)
                     ViewportControl.VPModels.Add(ThisModel);
 
                 // Attachable
-                if (Attachment_Service.Instance.Attach_ModelFile != null)
+                if (AttachmentService.Instance.Attach_ModelFile != null)
                 {
-                    ViewportControl.VPModels.Add(ViewportHelper.getModel(Attachment_Service.Instance.Attach_ModelFile, Attachment_Service.Instance.Attach_TextureFile));
+                    ViewportControl.VPModels.Add(ViewportHelper.getModel(AttachmentService.Instance.Attach_ModelFile, AttachmentService.Instance.Attach_TextureFile));
                 }
 
                 // Hit Collisions
-                if (RenderHitCollisions && Mdlx_Service.Instance.CollisionFile != null)
+                if (RenderHitCollisions && MdlxService.Instance.CollisionFile != null)
                 {
                     SimpleModel model = new SimpleModel(getHitCollisions(null));
                     ViewportControl.VPModels.Add(model);
@@ -156,11 +156,11 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
         private void loadAnb()
         {
-            if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(Mset_Service.Instance.MsetPath, "mset") || Mset_Service.Instance.LoadedMotion == null)
+            if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(MsetService.Instance.MsetPath, "mset") || MsetService.Instance.LoadedMotion == null)
                 return;
 
-            Mset_Service.Instance.MsetBar[Mset_Service.Instance.LoadedMotionId].Stream.Position = 0;
-            Bar anbBarFile = Bar.Read(Mset_Service.Instance.MsetBar[Mset_Service.Instance.LoadedMotionId].Stream);
+            MsetService.Instance.MsetBar[MsetService.Instance.LoadedMotionId].Stream.Position = 0;
+            Bar anbBarFile = Bar.Read(MsetService.Instance.MsetBar[MsetService.Instance.LoadedMotionId].Stream);
 
             currentAnb = new AnbIndir(anbBarFile);
         }
@@ -170,9 +170,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
             //using var mdlxStream = File.Open(Mdlx_Service.Instance.MdlxPath, FileMode.Open);
 
             // This is a test, model should be saved in the model module
-            Mdlx_Service.Instance.saveModel();
+            MdlxService.Instance.SaveModel();
             Stream mdlxStream = new MemoryStream();
-            Bar.Write(mdlxStream, Mdlx_Service.Instance.MdlxBar);
+            Bar.Write(mdlxStream, MdlxService.Instance.MdlxBar);
             mdlxStream.Position = 0;
 
             if (!mdlxStream.CanRead || !mdlxStream.CanSeek)
@@ -187,7 +187,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
             Matrix4x4[] matrices = AnimMatricesProvider.ProvideMatrices(frame);
 
-            foreach (ModelSkeletal.SkeletalGroup group in Mdlx_Service.Instance.ModelFile.Groups)
+            foreach (ModelSkeletal.SkeletalGroup group in MdlxService.Instance.ModelFile.Groups)
             {
                 group.Mesh = ModelSkeletal.getMeshFromGroup(group, matrices);
             }
@@ -202,17 +202,17 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
             ThisCollisions = new SimpleModel(new List<SimpleMesh>(), "COLLISIONS_1", new List<string> { "COLLISION", "COLLISION_GROUP" });
 
-            if (!ObjectEditorUtils.isFilePathValid(Mdlx_Service.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(Mset_Service.Instance.MsetPath, "mset") || Mset_Service.Instance.LoadedMotion == null)
+            if (!ObjectEditorUtils.isFilePathValid(MdlxService.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(MsetService.Instance.MsetPath, "mset") || MsetService.Instance.LoadedMotion == null)
                 return;
 
-            if (Mset_Service.Instance.LoadedMotion?.MotionFile?.KeyTimes == null || Mset_Service.Instance.LoadedMotion.MotionFile.KeyTimes.IsEmpty())
+            if (MsetService.Instance.LoadedMotion?.MotionFile?.KeyTimes == null || MsetService.Instance.LoadedMotion.MotionFile.KeyTimes.IsEmpty())
             {
                 return;
             }
 
-            int realFrameStart = (int)Mset_Service.Instance.LoadedMotion.MotionFile.KeyTimes[0];
+            int realFrameStart = (int)MsetService.Instance.LoadedMotion.MotionFile.KeyTimes[0];
             if (realFrameStart < 0) realFrameStart = 0;
-            int realFrameEnd = (int)Mset_Service.Instance.LoadedMotion.MotionFile.KeyTimes[Mset_Service.Instance.LoadedMotion.MotionFile.KeyTimes.Count - 1];
+            int realFrameEnd = (int)MsetService.Instance.LoadedMotion.MotionFile.KeyTimes[MsetService.Instance.LoadedMotion.MotionFile.KeyTimes.Count - 1];
 
             if (CurrentFrame < realFrameStart)
                 CurrentFrame = realFrameEnd;
@@ -222,13 +222,13 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
             Matrix4x4[] matrices = AnimMatricesProvider.ProvideMatrices(CurrentFrame.Value);
 
-            foreach (ModelSkeletal.SkeletalGroup group in Mdlx_Service.Instance.ModelFile.Groups)
+            foreach (ModelSkeletal.SkeletalGroup group in MdlxService.Instance.ModelFile.Groups)
             {
                 group.Mesh = ModelSkeletal.getMeshFromGroup(group, matrices);
             }
 
             // Render the animated model
-            ThisModel = ViewportHelper.getModel(Mdlx_Service.Instance.ModelFile, Mdlx_Service.Instance.TextureFile);
+            ThisModel = ViewportHelper.getModel(MdlxService.Instance.ModelFile, MdlxService.Instance.TextureFile);
             ViewportControl.VPModels.Clear();
             if (ThisModel != null)
                 ViewportControl.VPModels.Add(ThisModel);
@@ -240,7 +240,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
                     ViewportControl.VPModels.Add(ThisCollisions);
             }
 
-            if (Attachment_Service.Instance.Attach_ModelFile != null)
+            if (AttachmentService.Instance.Attach_ModelFile != null)
             {
                 foreach (SimpleModel model in getAttachmentModel(matrices))
                 {
@@ -248,7 +248,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
                 }
             }
 
-            if (RenderHitCollisions && Mdlx_Service.Instance.CollisionFile != null)
+            if (RenderHitCollisions && MdlxService.Instance.CollisionFile != null)
             {
                 SimpleModel model = new SimpleModel(getHitCollisions(matrices));
                 ViewportControl.VPModels.Add(model);
@@ -263,7 +263,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
             App_Context test = App_Context.Instance;
 
             Stream temp_mdlxStream = new MemoryStream();
-            Bar.Write(temp_mdlxStream, Attachment_Service.Instance.Attach_MdlxBar);
+            Bar.Write(temp_mdlxStream, AttachmentService.Instance.Attach_MdlxBar);
 
             if (!temp_mdlxStream.CanRead || !temp_mdlxStream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");
@@ -272,29 +272,29 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
             Bar attach_AnbBarFile = new Bar();
             try // Some animations don't use the weapon
             {
-                attach_AnbBarFile = Bar.Read(Attachment_Service.Instance.Attach_MsetEntries[Mset_Service.Instance.LoadedMotionId].Entry.Stream);
+                attach_AnbBarFile = Bar.Read(AttachmentService.Instance.Attach_MsetEntries[MsetService.Instance.LoadedMotionId].Entry.Stream);
             }
             catch (Exception ex)
             {
                 return new List<SimpleModel>();
             }
 
-            Attachment_Service.Instance.Attach_MsetEntries[Mset_Service.Instance.LoadedMotionId].Entry.Stream.Position = 0;
+            AttachmentService.Instance.Attach_MsetEntries[MsetService.Instance.LoadedMotionId].Entry.Stream.Position = 0;
             AnbIndir attach_Anb = new AnbIndir(attach_AnbBarFile);
 
             IAnimMatricesProvider attach_AnimMatricesProvider = attach_Anb.GetAnimProvider(temp_mdlxStream);
 
             Matrix4x4[] matrices = attach_AnimMatricesProvider.ProvideMatrices(CurrentFrame.Value);
 
-            foreach (ModelSkeletal.SkeletalGroup group in Attachment_Service.Instance.Attach_ModelFile.Groups)
+            foreach (ModelSkeletal.SkeletalGroup group in AttachmentService.Instance.Attach_ModelFile.Groups)
             {
                 group.Mesh = ModelSkeletal.getMeshFromGroup(group, matrices);
             }
 
-            SimpleModel model = ViewportHelper.getModel(Attachment_Service.Instance.Attach_ModelFile, Attachment_Service.Instance.Attach_TextureFile);
+            SimpleModel model = ViewportHelper.getModel(AttachmentService.Instance.Attach_ModelFile, AttachmentService.Instance.Attach_TextureFile);
 
             List<SimpleModel> modelList = new List<SimpleModel>();
-            Simple3DViewport.Utils.Simple3DUtils.applyTransform(model.Meshes[0].Geometry, modelMatrices[Attachment_Service.Instance.Attach_BoneId]);
+            Simple3DViewport.Utils.Simple3DUtils.applyTransform(model.Meshes[0].Geometry, modelMatrices[AttachmentService.Instance.Attach_BoneId]);
             modelList.Add(model);
 
             return modelList;
@@ -315,16 +315,16 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
         public void loadCollisions(Matrix4x4[] matrices)
         {
-            if (Mdlx_Service.Instance.CollisionFile != null)
+            if (MdlxService.Instance.CollisionFile != null)
             {
                 List<short> collisionGroupsToLoad = new List<short>();
 
-                if (Mset_Service.Instance.LoadedMotion.MotionTriggerFile?.RangeTriggerList == null)
+                if (MsetService.Instance.LoadedMotion.MotionTriggerFile?.RangeTriggerList == null)
                 {
                     return;
                 }
 
-                foreach (MotionTrigger.RangeTrigger trigger in Mset_Service.Instance.LoadedMotion.MotionTriggerFile.RangeTriggerList)
+                foreach (MotionTrigger.RangeTrigger trigger in MsetService.Instance.LoadedMotion.MotionTriggerFile.RangeTriggerList)
                 {
                     if ((trigger.StartFrame <= CurrentFrame || trigger.StartFrame == -1) && (trigger.EndFrame >= CurrentFrame || trigger.EndFrame == -1))
                     {
@@ -358,9 +358,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
                 }
 
                 List<Collision_Wrapper> attackCollisions = new List<Collision_Wrapper>();
-                for (int i = 0; i < Mdlx_Service.Instance.CollisionFile.EntryList.Count; i++)
+                for (int i = 0; i < MdlxService.Instance.CollisionFile.EntryList.Count; i++)
                 {
-                    ObjectCollision collision = Mdlx_Service.Instance.CollisionFile.EntryList[i];
+                    ObjectCollision collision = MdlxService.Instance.CollisionFile.EntryList[i];
                     if (collisionGroupsToLoad.Contains(collision.Group))
                     {
                         attackCollisions.Add(new Collision_Wrapper("COLLISION_" + i, collision));
@@ -416,7 +416,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
                 return;
             }
 
-            if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(Mset_Service.Instance.MsetPath, "mset") || Mset_Service.Instance.LoadedMotion == null)
+            if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(MsetService.Instance.MsetPath, "mset") || MsetService.Instance.LoadedMotion == null)
                 return;
 
             int timeTicked = currentFpsMode.FrameStep;
@@ -429,19 +429,19 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
         {
             List<SimpleMesh> list_hitMeshes = new List<SimpleMesh>();
 
-            if (Mdlx_Service.Instance.CollisionFile == null)
+            if (MdlxService.Instance.CollisionFile == null)
                 return list_hitMeshes;
 
             Matrix4x4[] boneMatrices = new Matrix4x4[0];
 
             if (matrices != null)
                 boneMatrices = matrices;
-            else if (Mdlx_Service.Instance.ModelFile != null)
-                boneMatrices = ModelCommon.GetBoneMatrices(Mdlx_Service.Instance.ModelFile.Bones);
+            else if (MdlxService.Instance.ModelFile != null)
+                boneMatrices = ModelCommon.GetBoneMatrices(MdlxService.Instance.ModelFile.Bones);
 
-            for (int i = 0; i < Mdlx_Service.Instance.CollisionFile.EntryList.Count; i++)
+            for (int i = 0; i < MdlxService.Instance.CollisionFile.EntryList.Count; i++)
             {
-                ObjectCollision collision = Mdlx_Service.Instance.CollisionFile.EntryList[i];
+                ObjectCollision collision = MdlxService.Instance.CollisionFile.EntryList[i];
 
                 if (collision.Type == (byte)ObjectCollision.TypeEnum.HIT)
                 {
@@ -469,14 +469,14 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
         public void loadAttackCollisions(List<Collision_Wrapper> attackCollisions, Matrix4x4[] matrices)
         {
-            if (Mdlx_Service.Instance.CollisionFile != null)
+            if (MdlxService.Instance.CollisionFile != null)
             {
                 Matrix4x4[] boneMatrices = new Matrix4x4[0];
 
                 if (matrices != null)
                     boneMatrices = matrices;
-                else if (Mdlx_Service.Instance.ModelFile != null)
-                    boneMatrices = ModelCommon.GetBoneMatrices(Mdlx_Service.Instance.ModelFile.Bones);
+                else if (MdlxService.Instance.ModelFile != null)
+                    boneMatrices = ModelCommon.GetBoneMatrices(MdlxService.Instance.ModelFile.Bones);
 
                 List<SimpleMesh> simpleMeshes = new List<SimpleMesh>();
 

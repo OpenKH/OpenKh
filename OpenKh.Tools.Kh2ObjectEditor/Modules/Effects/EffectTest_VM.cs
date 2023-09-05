@@ -24,7 +24,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 
         public void loadTextures()
         {
-            foreach (var iDpd in Apdx_Service.Instance.PaxFile.DpxPackage.DpdList)
+            foreach (var iDpd in ApdxService.Instance.PaxFile.DpxPackage.DpdList)
             {
                 List<Texture> tempList = iDpd.TexturesList;
                 if (tempList.Count > 0)

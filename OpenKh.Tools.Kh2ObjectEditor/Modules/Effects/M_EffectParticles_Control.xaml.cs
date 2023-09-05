@@ -13,10 +13,10 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 
         public void loadEffects()
         {
-            if (Apdx_Service.Instance.PaxFile?.DpxPackage?.ParticleEffects == null)
+            if (ApdxService.Instance.PaxFile?.DpxPackage?.ParticleEffects == null)
                 return;
 
-            DataTable.ItemsSource = Apdx_Service.Instance.PaxFile.DpxPackage.ParticleEffects;
+            DataTable.ItemsSource = ApdxService.Instance.PaxFile.DpxPackage.ParticleEffects;
         }
     }
 }

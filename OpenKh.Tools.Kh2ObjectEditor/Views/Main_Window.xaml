@@ -9,7 +9,7 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top" Height="20">
-            <MenuItem Header="TEST">
+            <MenuItem Header="TEST" Visibility="Collapsed">
                 <MenuItem Header="Check App Context" Click="Menu_Test"/>
                 <MenuItem Header="Run Code" Click="Menu_Test_RunCode"/>
                 <MenuItem Header="Test Effects" Click="Menu_Test_Effects"/>
@@ -17,11 +17,17 @@
                 <MenuItem Header="Test Msets" Click="Menu_Test_Msets"/>
                 <MenuItem Header="Attach mdlx" Click="Menu_AttachMdlx"/>
             </MenuItem>
-            <MenuItem Header="Save">
-                <MenuItem Header="Save Mdlx" Click="Menu_Save_Mdlx"/>
-                <MenuItem Header="Save Mset" Click="Menu_Save_Mset"/>
-                <MenuItem Header="Save Apdx" Click="Menu_Save_Apdx"/>
-                <MenuItem Header="Overwrite Apdx" Click="Menu_Overwrite_Apdx"/>
+            <MenuItem Header="File">
+                <MenuItem Header="Save">
+                    <MenuItem Header="Save Mdlx" Click="Menu_Save_Mdlx"/>
+                    <MenuItem Header="Save Mset" Click="Menu_Save_Mset"/>
+                    <MenuItem Header="Save Apdx" Click="Menu_Save_Apdx"/>
+                </MenuItem>
+                <MenuItem Header="Overwrite">
+                    <MenuItem Header="Overwrite Mdlx" Click="Menu_Overwrite_Mdlx"/>
+                    <MenuItem Header="Overwrite Mset" Click="Menu_Overwrite_Mset"/>
+                    <MenuItem Header="Overwrite Apdx" Click="Menu_Overwrite_Apdx"/>
+                </MenuItem>
             </MenuItem>
         </Menu>
 

@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Services
 {
-    public class Mset_Service
+    public class MsetService
     {
         // Apdx File
         public string MsetPath { get; set; }
@@ -19,7 +19,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         public int LoadedMotionId { get; set; }
         public AnimationBinary LoadedMotion { get; set; }
 
-        public void loadMset(string msetPath)
+        public void LoadMset(string msetPath)
         {
             if (!ObjectEditorUtils.isFilePathValid(msetPath, "mset"))
                 throw new FileNotFoundException("Mset does not exist: " + msetPath);
@@ -33,27 +33,27 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             MsetBar = Bar.Read(streamMset);
         }
 
-        public void loadMotion(int motionIndex)
+        public void LoadMotion(int motionIndex)
         {
             LoadedMotionId = motionIndex;
-            loadCurrentMotion();
+            LoadCurrentMotion();
         }
-        public void loadCurrentMotion()
+        public void LoadCurrentMotion()
         {
             MsetBar[LoadedMotionId].Stream.Position = 0;
             LoadedMotion = new AnimationBinary(MsetBar[LoadedMotionId].Stream);
             MsetBar[LoadedMotionId].Stream.Position = 0;
         }
 
-        public void saveMotion()
+        public void SaveMotion()
         {
             MsetBar[LoadedMotionId].Stream = LoadedMotion.toStream();
         }
 
-        public void saveFile()
+        public void SaveFile()
         {
-            System.Windows.Forms.SaveFileDialog sfd;
-            sfd = new System.Windows.Forms.SaveFileDialog();
+            SaveFileDialog sfd;
+            sfd = new SaveFileDialog();
             sfd.Title = "Save file";
             sfd.FileName = Path.GetFileNameWithoutExtension(MsetPath) + ".out.mset";
             sfd.ShowDialog();
@@ -65,23 +65,33 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             }
         }
 
+        public void OverwriteFile()
+        {
+            if (MsetPath == null)
+                return;
+
+            MemoryStream memStream = new MemoryStream();
+            Bar.Write(memStream, MsetBar);
+            File.WriteAllBytes(MsetPath, memStream.ToArray());
+        }
+
         // SINGLETON
-        private Mset_Service() { }
-        private static Mset_Service instance = null;
-        public static Mset_Service Instance
+        private MsetService() { }
+        private static MsetService _instance = null;
+        public static MsetService Instance
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    instance = new Mset_Service();
+                    _instance = new MsetService();
                 }
-                return instance;
+                return _instance;
             }
         }
-        public static void reset()
+        public static void Reset()
         {
-            instance = new Mset_Service();
+            _instance = new MsetService();
         }
     }
 }

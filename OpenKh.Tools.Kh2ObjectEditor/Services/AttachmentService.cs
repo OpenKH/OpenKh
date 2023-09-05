@@ -8,7 +8,7 @@ using System.IO;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Services
 {
-    public class Attachment_Service
+    public class AttachmentService
     {
         public string Attach_MdlxPath { get; set; }
         public int Attach_BoneId { get; set; }
@@ -19,7 +19,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         public List<MotionSelector_Wrapper> Attach_MsetEntries { get; set; }
         public AnimationBinary Attach_AnimBinary { get; set; }
 
-        public void loadAttachment(string attachmentPath, int? attachToBone = null)
+        public void LoadAttachment(string attachmentPath, int? attachToBone = null)
         {
             if (!ObjectEditorUtils.isFilePathValid(attachmentPath, "mdlx"))
                 throw new FileNotFoundException("Mdlx does not exist: " + attachmentPath);
@@ -86,22 +86,22 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         }
 
         // SINGLETON
-        private Attachment_Service() { }
-        private static Attachment_Service instance = null;
-        public static Attachment_Service Instance
+        private AttachmentService() { }
+        private static AttachmentService _instance = null;
+        public static AttachmentService Instance
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    instance = new Attachment_Service();
+                    _instance = new AttachmentService();
                 }
-                return instance;
+                return _instance;
             }
         }
-        public static void reset()
+        public static void Reset()
         {
-            instance = new Attachment_Service();
+            _instance = new AttachmentService();
         }
     }
 }

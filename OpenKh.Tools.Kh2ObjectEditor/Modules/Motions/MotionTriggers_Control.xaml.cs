@@ -20,17 +20,17 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
 
         private void Button_SaveTriggers(object sender, RoutedEventArgs e)
         {
-            Mset_Service.Instance.saveMotion();
+            MsetService.Instance.SaveMotion();
         }
         private void Button_CreateTriggers(object sender, RoutedEventArgs e)
         {
-            if(Mset_Service.Instance.LoadedMotion.MotionTriggerFile != null)
+            if(MsetService.Instance.LoadedMotion.MotionTriggerFile != null)
             {
                 return;
             }
 
-            Mset_Service.Instance.LoadedMotion.MotionTriggerFile = new MotionTrigger();
-            Mset_Service.Instance.saveMotion();
+            MsetService.Instance.LoadedMotion.MotionTriggerFile = new MotionTrigger();
+            MsetService.Instance.SaveMotion();
         }
     }
 }

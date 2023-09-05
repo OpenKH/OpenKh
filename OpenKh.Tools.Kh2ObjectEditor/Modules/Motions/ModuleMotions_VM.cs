@@ -51,13 +51,13 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
         {
             Motions.Clear();
 
-            if (Mset_Service.Instance.MsetBar == null)
+            if (MsetService.Instance.MsetBar == null)
                 return;
 
             Motions = new List<MotionSelector_Wrapper>();
-            for (int i = 0; i < Mset_Service.Instance.MsetBar.Count; i++)
+            for (int i = 0; i < MsetService.Instance.MsetBar.Count; i++)
             {
-                Motions.Add(new MotionSelector_Wrapper(i, Mset_Service.Instance.MsetBar[i]));
+                Motions.Add(new MotionSelector_Wrapper(i, MsetService.Instance.MsetBar[i]));
             }
         }
 
@@ -81,7 +81,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
 
         public void Motion_Copy(int index)
         {
-            Bar.Entry item = Mset_Service.Instance.MsetBar[index];
+            Bar.Entry item = MsetService.Instance.MsetBar[index];
             copiedMotion = new Bar.Entry();
             copiedMotion.Index = item.Index;
             copiedMotion.Name = item.Name;
@@ -98,13 +98,13 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
             if (copiedMotion == null)
                 return;
 
-            Mset_Service.Instance.MsetBar[index] = copiedMotion;
+            MsetService.Instance.MsetBar[index] = copiedMotion;
             loadMotions();
             applyFilters();
         }
         public void Motion_Rename(int index)
         {
-            Bar.Entry item = Mset_Service.Instance.MsetBar[index];
+            Bar.Entry item = MsetService.Instance.MsetBar[index];
         }
     }
 }
