@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKh.AssimpUtils\OpenKh.AssimpUtils.csproj" />
+    <ProjectReference Include="..\OpenKh.Command.Bdxio\OpenKh.Command.Bdxio.csproj" />
+    <ProjectReference Include="..\OpenKh.Command.TexFooter\OpenKh.Command.TexFooter.csproj" />
+    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+    <ProjectReference Include="..\OpenKh.Research.Kh2Anim\OpenKh.Research.Kh2Anim.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.Common.Wpf\OpenKh.Tools.Common.Wpf.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.ImageViewer\OpenKh.Tools.ImageViewer.csproj" />
+    <ProjectReference Include="..\Simple3DViewport\Simple3DViewport\Simple3DViewport.csproj" />
+  </ItemGroup>
+
+</Project>

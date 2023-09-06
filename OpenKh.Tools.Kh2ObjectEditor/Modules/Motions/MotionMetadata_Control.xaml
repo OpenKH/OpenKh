@@ -1,0 +1,60 @@
+<UserControl x:Class="OpenKh.Tools.Kh2ObjectEditor.Modules.Motions.MotionMetadata_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Modules.Motions"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="Black">
+        <StackPanel DockPanel.Dock="Top" Margin="20">
+
+            <StackPanel Orientation="Horizontal">
+                <Label Foreground="White" VerticalAlignment="Center">Bone Count:</Label>
+                <TextBox MinWidth="30" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoneCount}"></TextBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Label Foreground="White" VerticalAlignment="Center">Frame count:</Label>
+                <TextBox MinWidth="30" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.FrameCount}"></TextBox>
+                <Label Foreground="White" VerticalAlignment="Center">Frame per second:</Label>
+                <TextBox MinWidth="30" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.FrameData.FramesPerSecond}"></TextBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Label Foreground="White" VerticalAlignment="Center">Frame start:</Label>
+                <TextBox MinWidth="30" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.FrameData.FrameStart}"></TextBox>
+                <Label Foreground="White" VerticalAlignment="Center">Frame end:</Label>
+                <TextBox MinWidth="30" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.FrameData.FrameEnd}"></TextBox>
+                <Label Foreground="White" VerticalAlignment="Center">Frame return:</Label>
+                <TextBox MinWidth="30" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.FrameData.FrameReturn}"></TextBox>
+            </StackPanel>
+            <Separator Height="20"/>
+            <Label Foreground="White">BOUNDING BOX</Label>
+            <StackPanel Orientation="Horizontal">
+                <Label Foreground="White" VerticalAlignment="Center">Bound MinX:</Label>
+                <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMinX}"></TextBox>
+                <Label Foreground="White" VerticalAlignment="Center">Bound MinY:</Label>
+                <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMinY}"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Foreground="White" VerticalAlignment="Center">Bound MinZ:</Label>
+                <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMinZ}"></TextBox>
+                <Label Foreground="White" VerticalAlignment="Center">Bound MinW:</Label>
+                <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMinW}"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Foreground="White" VerticalAlignment="Center">Bound MaxX:</Label>
+                <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMaxX}"></TextBox>
+                <Label Foreground="White" VerticalAlignment="Center">Bound MaxY:</Label>
+                <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMaxY}"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Foreground="White" VerticalAlignment="Center">Bound MaxZ:</Label>
+                <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMaxZ}"></TextBox>
+                <Label Foreground="White" VerticalAlignment="Center">Bound MaxW:</Label>
+                <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMaxW}"></TextBox>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,4 +1,5 @@
-﻿using System;
+using OpenKh.Common;
+using System;
 using System.Drawing;
 using System.IO;
 
@@ -8,74 +9,117 @@ namespace OpenKh.Kh2
     {
 		public class Texture
 		{
-			private short unk00;
-			private short unk02;
-			private short unk04;
-			private short format;
-			private short unk08;
-			private short unk0a;
-			private short width;
-			private short height;
-			private short unk10;
-			private short unk12;
-			private short unk14;
-			private short unk16;
-			private int unk18;
-			private int unk1c;
+			private short shTexDbp;
+            private short shCltDbp;
+            private short shDbw;
+            private short format; //shDpsm
+            private short shX;
+            private short shY;
+            private short width;
+            private short height;
+            private uint unTex0L;
+			private uint unTex0H;
+            private int unClutStart;
+            private short shTexVramSize;
+            private short shCltVramSize;
+            public byte[] Data { get; }
+            public byte[] Palette { get; }
 
-			public Texture()
+            public Texture()
 			{
 
 			}
 
-			internal Texture(BinaryReader reader)
+            internal Texture(Stream textureStream)
+            {
+                shTexDbp = textureStream.ReadInt16();
+                shCltDbp = textureStream.ReadInt16();
+                shDbw = textureStream.ReadInt16();
+                format = textureStream.ReadInt16();
+                shX = textureStream.ReadInt16();
+                shY = textureStream.ReadInt16();
+                width = textureStream.ReadInt16();
+                height = textureStream.ReadInt16();
+                unTex0L = textureStream.ReadUInt32();
+                unTex0H = textureStream.ReadUInt32();
+                unClutStart = textureStream.ReadInt32();
+                shTexVramSize = textureStream.ReadInt16();
+                shCltVramSize = textureStream.ReadInt16();
+
+                Data = textureStream.ReadBytes(width * height);
+                Palette = textureStream.ReadBytes(0x100 * sizeof(int));
+            }
+
+            internal Texture(BinaryReader reader)
 			{
 				var basePosition = reader.BaseStream.Position;
-				unk00 = reader.ReadInt16();
-				unk02 = reader.ReadInt16();
-				unk04 = reader.ReadInt16();
+				shTexDbp = reader.ReadInt16();
+				shCltDbp = reader.ReadInt16();
+				shDbw = reader.ReadInt16();
 				format = reader.ReadInt16();
-				unk08 = reader.ReadInt16();
-				unk0a = reader.ReadInt16();
+				shX = reader.ReadInt16();
+				shY = reader.ReadInt16();
 				width = reader.ReadInt16();
 				height = reader.ReadInt16();
-				unk10 = reader.ReadInt16();
-				unk12 = reader.ReadInt16();
-				unk14 = reader.ReadInt16();
-				unk16 = reader.ReadInt16();
-				unk18 = reader.ReadInt32();
-				unk1c = reader.ReadInt32();
+				unTex0L = reader.ReadUInt32();
+				unTex0H = reader.ReadUInt32();
+				unClutStart = reader.ReadInt32();
+				shTexVramSize = reader.ReadInt16();
+                shCltVramSize = reader.ReadInt16();
 
-				Data = reader.ReadBytes(width * height);
+                Data = reader.ReadBytes(width * height);
 				Palette = reader.ReadBytes(0x100 * sizeof(int));
 			}
 
 			internal void Write(BinaryWriter writer)
 			{
-				writer.Write(unk00);
-				writer.Write(unk02);
-				writer.Write(unk04);
+				writer.Write(shTexDbp);
+				writer.Write(shCltDbp);
+				writer.Write(shDbw);
 				writer.Write(format);
-				writer.Write(unk08);
-				writer.Write(unk0a);
+				writer.Write(shX);
+				writer.Write(shY);
 				writer.Write(width);
 				writer.Write(height);
-				writer.Write(unk10);
-				writer.Write(unk12);
-				writer.Write(unk14);
-				writer.Write(unk16);
-				writer.Write(unk18);
-				writer.Write(unk1c);
+				writer.Write(unTex0L);
+				writer.Write(unTex0H);
+				writer.Write(unClutStart);
+				writer.Write(shTexVramSize);
+				writer.Write(shCltVramSize);
 
 				writer.Write(Data);
 				writer.Write(Palette);
 			}
 
-			public Size Size => new Size(width, height);
+            public Stream getAsStream()
+            {
+                MemoryStream fileStream = new MemoryStream();
 
-			public byte[] Data { get; }
+                BinaryWriter writer = new BinaryWriter(fileStream, System.Text.Encoding.UTF8, true);
 
-			public byte[] Palette { get; }
+                writer.Write(shTexDbp);
+                writer.Write(shCltDbp);
+                writer.Write(shDbw);
+                writer.Write(format);
+                writer.Write(shX);
+                writer.Write(shY);
+                writer.Write(width);
+                writer.Write(height);
+                writer.Write(unTex0L);
+                writer.Write(unTex0H);
+                writer.Write(unClutStart);
+                writer.Write(shTexVramSize);
+                writer.Write(shCltVramSize);
+
+                writer.Write(Data);
+                writer.Write(Palette);
+
+                fileStream.Position = 0;
+
+                return fileStream;
+            }
+
+            public Size Size => new Size(width, height);
 
 			public byte[] GetBitmap()
 			{

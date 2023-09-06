@@ -29,6 +29,8 @@ namespace OpenKh.Command.TexFooter.Models
 
         internal TextureAnimation _source;
 
+        public TextureAnimation Source { get { return _source; } }
+
         public TextureAnimationIMEx()
         {
 
