@@ -62,22 +62,20 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
                 switch (barEntry.Type)
                 {
                     case Bar.EntryType.Model:
-                        barEntry.Stream.Position = 0;
+                        barEntry.Stream = new MemoryStream();
                         ModelFile.Write(barEntry.Stream);
                         barEntry.Stream.Position = 0;
                         break;
                     case Bar.EntryType.ModelTexture:
-                        barEntry.Stream.Position = 0;
+                        barEntry.Stream = new MemoryStream();
                         TextureFile.Write(barEntry.Stream);
                         barEntry.Stream.Position = 0;
                         break;
                     case Bar.EntryType.ModelCollision:
-                        barEntry.Stream.Position = 0;
                         barEntry.Stream = CollisionFile.toStream();
                         barEntry.Stream.Position = 0;
                         break;
                     case Bar.EntryType.Bdx:
-                        barEntry.Stream.Position = 0;
                         barEntry.Stream = new MemoryStream();
                         BdxFile.CopyTo(barEntry.Stream);
                         barEntry.Stream.Position = 0;
