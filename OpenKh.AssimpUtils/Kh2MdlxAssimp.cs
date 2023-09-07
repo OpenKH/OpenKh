@@ -224,6 +224,16 @@ namespace OpenKh.AssimpUtils
                         bone.VertexWeights.Add(new Assimp.VertexWeight(currentVertex, weight));
                     }
 
+                    // COLORS
+                    if(vertex.Color != null)
+                    {
+                        float R = vertex.Color.R / 255f;
+                        float G = vertex.Color.G / 255f;
+                        float B = vertex.Color.B / 255f;
+                        float A = vertex.Color.A / 255f;
+                        iMesh.VertexColorChannels[0].Add(new Assimp.Color4D(R, G, B, A));
+                    }
+
                     currentVertex++;
                 }
 
@@ -287,6 +297,14 @@ namespace OpenKh.AssimpUtils
                 short u = (short)(mesh.TextureCoordinateChannels[0][i].X * 4096.0f);
                 short v = (short)((1 - mesh.TextureCoordinateChannels[0][i].Y) * 4096.0f);
                 vertex.UvCoord = new VifCommon.UVCoord(u, v);
+                if (mesh.HasVertexColors(0))
+                {
+                    byte R = (byte)(mesh.VertexColorChannels[0][i].R * 255);
+                    byte G = (byte)(mesh.VertexColorChannels[0][i].G * 255);
+                    byte B = (byte)(mesh.VertexColorChannels[0][i].B * 255);
+                    byte A = (byte)(mesh.VertexColorChannels[0][i].A * 255);
+                    vertex.Color = new VifCommon.VertexColor(R, G, B, A);
+                }
 
                 verticesAssimpOrder.Add(vertex);
             }

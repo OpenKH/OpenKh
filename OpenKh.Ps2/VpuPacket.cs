@@ -52,6 +52,7 @@ namespace OpenKh.Ps2
             [Data] public int V { get; set; }
             [Data] public int Index { get; set; }
             [Data] public VertexFunction Function { get; set; }
+            public VertexColor Color { get; set; }
 
             public override string ToString() =>
                 $"{U / 4096.0f:F}, {V / 4096.0f:F}, {Index:X}, {Function}";
