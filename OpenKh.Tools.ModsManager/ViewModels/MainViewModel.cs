@@ -1,3 +1,4 @@
+using Octokit;
 using OpenKh.Common;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Models;
@@ -14,7 +15,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
-using Octokit;
 using static OpenKh.Tools.ModsManager.Helpers;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
@@ -66,6 +66,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string CurrentVersion => ApplicationVersion;
         public static Release releases = new GitHubClient(new ProductHeaderValue("LuaEngine.exe")).Repository.Release.GetLatest(owner: "TopazTK", name: "LuaEngine").Result;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
+        public ObservableCollection<string> PresetList { get; set; }
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AddModCommand { get; set; }
         public RelayCommand RemoveModCommand { get; set; }
@@ -81,8 +82,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand WizardCommand { get; set; }
         public RelayCommand OpenLinkCommand { get; set; }
         public RelayCommand CheckOpenkhUpdateCommand { get; set; }
-        public RelayCommand SavePreset { get; set; }
-        public RelayCommand LoadPreset { get; set; }
+        public RelayCommand OpenPresetMenuCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -246,6 +246,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
             ReloadModsList();
             SelectedValue = ModsList.FirstOrDefault();
+            ReloadPresetList();
 
             ExitCommand = new RelayCommand(_ => Window.Close());
             AddModCommand = new RelayCommand(_ =>
@@ -421,31 +422,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
             });
 
-            SavePreset = new RelayCommand(_ =>
+            OpenPresetMenuCommand = new RelayCommand(_ =>
             {
-                var view = new SavePreset();
-                if (view.ShowDialog() != true)
-                    return;
-                string name = string.Join("+", view.PresetName.Split(Path.GetInvalidFileNameChars()));
-                var enabledMods =  ModsList
-                .Where(x => x.Enabled)
-                .Select(x => x.Source)
-                .ToList();
-                File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name + ".txt"), enabledMods);
-            });            
-
-            LoadPreset = new RelayCommand(_ =>
-            {
-                string name = _.ToString();
-                if (File.Exists(Path.Combine(ConfigurationService.PresetPath, name + ".txt")))
-                {
-                    ConfigurationService.EnabledMods = File.ReadAllLines(Path.Combine(ConfigurationService.PresetPath, name.ToString() + ".txt"));
-                    ReloadModsList();
-                }
-                else
-                {
-                    MessageBox.Show("Cannot find preset", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                }
+                PresetsWindow view = new PresetsWindow(this);
+                view.Show();
             });
 
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
@@ -960,6 +940,57 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 var message = $"The latest version '{checkResult.CurrentVersion}' is already installed!";
 
                 MessageBox.Show(message, "OpenKh");
+            }
+        }
+
+
+        // PRESETS
+        public void SavePreset(string presetName)
+        {
+            string name = string.Join("+", presetName.Split(Path.GetInvalidFileNameChars()));
+            List<string> enabledMods = ModsList
+            .Where(x => x.Enabled)
+            .Select(x => x.Source)
+            .ToList();
+            File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name + ".txt"), enabledMods);
+
+            PresetList.Add(presetName);
+        }
+        public void RemovePreset(string presetName)
+        {
+            string filename = Path.Combine(ConfigurationService.PresetPath, presetName + ".txt");
+            if (File.Exists(filename))
+            {
+                ConfigurationService.EnabledMods = File.ReadAllLines(filename);
+                ReloadModsList();
+            }
+
+            PresetList.Remove(presetName);
+        }
+
+        public void LoadPreset(string presetName)
+        {
+            string filename = Path.Combine(ConfigurationService.PresetPath, presetName + ".txt");
+            if (File.Exists(filename))
+            {
+                ConfigurationService.EnabledMods = File.ReadAllLines(filename);
+                ReloadModsList();
+            }
+            else
+            {
+                MessageBox.Show("Cannot find preset", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+        }
+
+        public void ReloadPresetList()
+        {
+            if(PresetList == null)
+                PresetList = new ObservableCollection<string>();
+
+            PresetList.Clear();
+            foreach (string presetFilePath in Directory.GetFiles(ConfigurationService.PresetPath))
+            {
+                PresetList.Add(Path.GetFileNameWithoutExtension(presetFilePath));
             }
         }
     }
