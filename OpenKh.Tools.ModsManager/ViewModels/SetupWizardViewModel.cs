@@ -302,6 +302,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public bool PanaceaInstalled { get; set; }
         private string PanaceaSourceLocation => Path.Combine(AppContext.BaseDirectory, PanaceaDllName);
         private string PanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "DBGHELP.dll");
+        private string AlternatePanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "version.dll");
         public Visibility PanaceaNotInstalledVisibility => !IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PanaceaInstalledVisibility => IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
         public bool IsLastPanaceaVersionInstalled
@@ -322,14 +323,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     PanaceaInstalled = true;
                     return true;
                 }
-                  
-
-                if (!File.Exists(PanaceaDestinationLocation))
-                {
-                    // DBGHELP.dll is not installed
-                    PanaceaInstalled = false;
-                    return false;
-                }
 
                 byte[] CalculateChecksum(string fileName) =>
                     System.Security.Cryptography.MD5.Create().Using(md5 =>
@@ -346,9 +339,23 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     return true;
                 }
 
-                return IsEqual(
-                    CalculateChecksum(PanaceaSourceLocation),
-                    CalculateChecksum(PanaceaDestinationLocation));
+                if (File.Exists(PanaceaDestinationLocation))
+                {
+                    return IsEqual(
+                        CalculateChecksum(PanaceaSourceLocation),
+                        CalculateChecksum(PanaceaDestinationLocation));
+                }
+                else if (File.Exists(AlternatePanaceaDestinationLocation))
+                {
+                    return IsEqual(
+                        CalculateChecksum(PanaceaSourceLocation),
+                        CalculateChecksum(AlternatePanaceaDestinationLocation));
+                }
+                else
+                {
+                    PanaceaInstalled = false;
+                    return false;
+                }
             }
         }
 
@@ -415,6 +422,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             MessageBoxButton.OK,
                             MessageBoxImage.Error);
                         File.Delete(PanaceaDestinationLocation);
+                        File.Delete(AlternatePanaceaDestinationLocation);
                         File.Delete(Path.Combine(PcReleaseLocation, "avcodec-vgmstream-59.dll"));
                         File.Delete(Path.Combine(PcReleaseLocation, "avformat-vgmstream-59.dll"));
                         File.Delete(Path.Combine(PcReleaseLocation, "avutil-vgmstream-57.dll"));
@@ -439,9 +447,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             });
             RemovePanaceaCommand = new RelayCommand(_ =>
             {
-                if (File.Exists(PanaceaDestinationLocation))
+                if (File.Exists(PanaceaDestinationLocation) || File.Exists(AlternatePanaceaDestinationLocation))
                 {
                     File.Delete(PanaceaDestinationLocation);
+                    File.Delete(AlternatePanaceaDestinationLocation);
                     File.Delete(Path.Combine(PcReleaseLocation, "avcodec-vgmstream-59.dll"));
                     File.Delete(Path.Combine(PcReleaseLocation, "avformat-vgmstream-59.dll"));
                     File.Delete(Path.Combine(PcReleaseLocation, "avutil-vgmstream-57.dll"));
