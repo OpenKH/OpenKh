@@ -15,4 +15,4 @@ Sound effect; on PC, these files are pointers to an SCD in the objects remastere
 | 12     | uint16 | Sound ID Number
 | 16     | string | Filepath to SCD in objects remastered folder.
 
-On PC, Offset 12 Sound ID Number must be a unique ID. If it is not a unique ID, the SCD will not load, and will instead load the last SCD with the same ID.
+Offset 12 must be a unique ID. If it is not a unique ID, the SCD will not load and will instead load the last SCD with the same ID.
