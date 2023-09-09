@@ -247,6 +247,12 @@ Each Block corresponds to a world.
 
 On PC, trying to load into a map in a world without a corresponding Arif entry will crash the game. 
 
+Voice controls the value of the world-specific voice to load per-room. A value of 0 in Hollow Bastion will load in hb0_sora, whereas a value of 1 will load in hb1_sora. 
+
+Navimap Item determines which item ID to look the player must have in their inventory before displaying the minimap.
+
+Arif pointers follow the order of [Worlds](/docs/kh2/worlds.md)
+
 ### Arif Structure
 
 | Amount | Description |
