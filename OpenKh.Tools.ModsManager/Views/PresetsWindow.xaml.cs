@@ -54,9 +54,13 @@ namespace OpenKh.Tools.ModsManager.Views
         {
             if (List_Presets.SelectedItem == null)
                 return;
-
             string presetName = (string)List_Presets.SelectedItem;
-            MainVm.RemovePreset(presetName);
+            MessageBoxResult messageBoxResult = MessageBox.Show($"Do you want to remove {presetName} preset.", "Delete Confirmation", MessageBoxButton.YesNo);
+            if (messageBoxResult == MessageBoxResult.Yes)
+            {                
+                MainVm.RemovePreset(presetName);
+            }
+                
         }
     }
 }

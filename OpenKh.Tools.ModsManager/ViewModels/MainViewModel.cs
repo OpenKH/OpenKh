@@ -958,13 +958,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
         public void RemovePreset(string presetName)
         {
-            string filename = Path.Combine(ConfigurationService.PresetPath, presetName + ".txt");
-            if (File.Exists(filename))
-            {
-                ConfigurationService.EnabledMods = File.ReadAllLines(filename);
-                ReloadModsList();
-            }
-
+            File.Delete(Path.Combine(ConfigurationService.PresetPath, presetName + ".txt"));
             PresetList.Remove(presetName);
         }
 
