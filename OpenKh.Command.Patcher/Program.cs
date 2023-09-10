@@ -69,7 +69,7 @@ namespace OpenKh.Command.Patcher
 
                 var map = new ConcurrentDictionary<string, string>();
                 var patcher = new PatcherProcessor();
-                foreach (var mod_name in enabled)
+                foreach (var mod_name in enabled.Reverse())
                 {
                     var mod_folder = Path.Combine(ModsFolder, mod_name);
                     var metadata = File.OpenRead(Path.Combine(mod_folder, "mod.yml")).Using(Metadata.Read);
