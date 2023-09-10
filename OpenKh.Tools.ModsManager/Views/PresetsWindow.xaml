@@ -19,23 +19,10 @@
     </Window.Resources>
 
     <!-- Preset List -->
-    <StackPanel Margin="10">
-        <ScrollViewer MinHeight="200">
-            <ListView Name="List_Presets" ItemsSource="{Binding Path=MainVm.PresetList}">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Text="{Binding}"/>
-                            <Button Margin="5 0 0 0" Click="Button_ApplyPreset">Apply</Button>
-                            <Button Margin="5 0 0 0" Click="Button_RemovePreset">Remove</Button>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </ScrollViewer>
+    <DockPanel Margin="10">
 
         <!-- Add new preset -->
-        <StackPanel Grid.Row="1">
+        <StackPanel DockPanel.Dock="Bottom">
             <TextBlock Margin="0 0 0 3">Name Preset</TextBlock>
             <Grid Margin="0 0 0 5" Background="White">
                 <TextBlock Margin="5,1" MinWidth="50" Text="Enter New Preset Name" 
@@ -44,5 +31,31 @@
             </Grid>
             <Button Click="Save_Click">Save</Button>
         </StackPanel>
-    </StackPanel>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+            <ScrollViewer Grid.Column="0" MinHeight="200">
+                <ListView Name="List_Presets" ItemsSource="{Binding Path=MainVm.PresetList}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center" Text="{Binding}"/>
+                                <!--<Button Margin="5 0 0 0" Click="Button_ApplyPreset">Apply</Button>
+                                <Button Margin="5 0 0 0" Click="Button_RemovePreset">Remove</Button>-->
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </ScrollViewer>
+
+            <StackPanel Grid.Column="1" Margin="10">
+                <Button Click="Button_ApplyPreset" Margin="0 10">Apply</Button>
+                <Button Click="Button_RemovePreset">Remove</Button>
+            </StackPanel>
+        </Grid>
+        
+    </DockPanel>
 </Window>

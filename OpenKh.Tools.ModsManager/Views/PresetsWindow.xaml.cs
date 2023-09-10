@@ -42,16 +42,20 @@ namespace OpenKh.Tools.ModsManager.Views
 
         private void Button_ApplyPreset(object sender, RoutedEventArgs e)
         {
-            Button tess = (Button)sender;
-            string presetName = (string)tess.DataContext;
+            if (List_Presets.SelectedItem == null)
+                return;
+
+            string presetName = (string)List_Presets.SelectedItem;
             MainVm.LoadPreset(presetName);
             Close();
         }
 
         private void Button_RemovePreset(object sender, RoutedEventArgs e)
         {
-            Button tess = (Button)sender;
-            string presetName = (string)tess.DataContext;
+            if (List_Presets.SelectedItem == null)
+                return;
+
+            string presetName = (string)List_Presets.SelectedItem;
             MainVm.RemovePreset(presetName);
         }
     }
