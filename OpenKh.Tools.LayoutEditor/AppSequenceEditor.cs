@@ -130,6 +130,7 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 ForMenuItem("Sprite groups...", () => _isSpriteGroupEditDialogOpen = true);
                 ForMenuItem("Sprites...", () => _isSpriteEditDialogOpen = true);
+                ForMenuCheck("Enable UV Animations", () => _sequence.UVEnableFlag, x => _sequence.UVEnableFlag = x);
             });
         }
 
