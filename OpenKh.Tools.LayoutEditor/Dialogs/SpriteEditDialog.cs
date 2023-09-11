@@ -61,7 +61,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
 
             if (ImGui.Button("+"))
                 _spriteModels.Add(new SpriteModel(new Kh2.Sequence.Sprite(), _spriteDrawing, _atlasTexture, _textureBinder, _settings));
-
+            ImGui.SameLine();
             if (ImGui.Button("-"))
                 _spriteModels.RemoveAt(_selectedSpriteModel);
 
