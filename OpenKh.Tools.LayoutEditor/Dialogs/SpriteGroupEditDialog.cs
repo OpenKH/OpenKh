@@ -62,7 +62,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             var previewWidth = Math.Min(windowSize / TotalWidthMul * PreviewWidthMul, PreviewWidthMax);
             var editorWidth = Math.Min(windowSize / TotalWidthMul * EditorWidthMul, EditorWidthMax);
 
-            ForChild(nameof(SpriteGroupPreview), previewWidth, 512, true, SpriteGroupPreview);
+            ForChild(nameof(SpriteGroupPreview), previewWidth + 64, 512, true, SpriteGroupPreview);
             ImGui.SameLine();
             ForChild(nameof(SptiteGroupEditor), editorWidth, 512, false, SptiteGroupEditor);
 
