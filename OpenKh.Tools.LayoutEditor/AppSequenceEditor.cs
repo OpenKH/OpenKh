@@ -130,6 +130,7 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 ForMenuItem("Sprite groups...", () => _isSpriteGroupEditDialogOpen = true);
                 ForMenuItem("Sprites...", () => _isSpriteEditDialogOpen = true);
+                ForMenuCheck("Enable UV Animations", () => _sequence.UVEnableFlag, x => _sequence.UVEnableFlag = x);
             });
         }
 
@@ -148,6 +149,10 @@ namespace OpenKh.Tools.LayoutEditor
                 _spriteGroupEditDialog.Run();
                 ImGui.EndPopup();
             }
+
+            _sequence.Sprites = _sprites
+                .Select(x => x.Sprite)
+                .ToList();
 
             const float SpriteListWidthMul = 1f;
             const float SpriteListWidthMax = 192f;
