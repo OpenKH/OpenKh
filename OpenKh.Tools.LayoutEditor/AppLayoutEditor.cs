@@ -227,17 +227,32 @@ namespace OpenKh.Tools.LayoutEditor
         {
             const float OriginalViewportWidth = 512f;
             const float RemixViewportWidth = 684f;
+            const float ReFinedViewportWidthFirst = 970.6F;
+            const float ReFinedViewportWidthSecond = 1479F;
             const float ViewportHeight = 416f;
 
             if (_settings.ShowViewportOriginal)
                 _drawing.DrawRectangle(-1 + _renderer.PanFactorX, -1 + _renderer.PanFactorY, OriginalViewportWidth + 2, ViewportHeight + 2, backgroundColorInverse, 1);
 
             if (_settings.ShowViewportRemix)
+            {
                 _drawing.DrawRectangle(
                 -(RemixViewportWidth - OriginalViewportWidth) / 2 - 1 + _renderer.PanFactorX, -1 + _renderer.PanFactorY,
                 RemixViewportWidth + 2, ViewportHeight + 2, backgroundColorInverse, 1);
+            }
 
-            _drawing.Flush();
+            if (_settings.ShowViewportReFined)
+            {
+                _drawing.DrawRectangle(
+                -(ReFinedViewportWidthFirst - OriginalViewportWidth) / 2 - 1 + _renderer.PanFactorX, -1 + _renderer.PanFactorY,
+                ReFinedViewportWidthFirst + 2, ViewportHeight + 2, backgroundColorInverse, 1);
+
+                _drawing.DrawRectangle(
+                -(ReFinedViewportWidthSecond - OriginalViewportWidth) / 2 - 1 + _renderer.PanFactorX, -1 + _renderer.PanFactorY,
+                ReFinedViewportWidthSecond + 2, ViewportHeight + 2, backgroundColorInverse, 1);
+            }
+
+             _drawing.Flush();
         }
 
         private unsafe void Timeline()
