@@ -149,6 +149,10 @@ namespace OpenKh.Tools.LayoutEditor
                 ImGui.EndPopup();
             }
 
+            _sequence.Sprites = _sprites
+                .Select(x => x.Sprite)
+                .ToList();
+
             const float SpriteListWidthMul = 1f;
             const float SpriteListWidthMax = 192f;
             const float RightWidthMul = 1.5f;

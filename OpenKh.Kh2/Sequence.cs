@@ -243,19 +243,7 @@ namespace OpenKh.Kh2
             stream.Position = basePosition + MinimumLength;
             header.SpriteDesc.Offset = (int)(stream.Position - basePosition);
 
-            header.SpritePartDesc.Offset = stream.WriteList(Sprites.Select(x => new RawSprite
-            {
-                U0 = x.Left,
-                V0 = x.Top,
-                U1 = x.Right,
-                V1 = x.Bottom,
-                UScroll = x.UTranslation,
-                VScroll = x.VTranslation,
-                ColorLeft = x.ColorLeft,
-                ColorTop = x.ColorTop,
-                ColorRight = x.ColorRight,
-                ColorBottom = x.ColorBottom,
-            })) + header.SpriteDesc.Offset;
+            header.SpritePartDesc.Offset = stream.WriteList(Sprites.Select(x => new RawSprite { U0 = x.Left, V0 = x.Top, U1 = x.Right, V1 = x.Bottom, UScroll = x.UTranslation, VScroll = x.VTranslation, ColorLeft = x.ColorLeft, ColorTop = x.ColorTop, ColorRight = x.ColorRight, ColorBottom = x.ColorBottom })) + header.SpriteDesc.Offset;
             header.SpriteGroupDesc.Offset = stream.WriteList(SpriteGroups.SelectMany(x => x)) + header.SpritePartDesc.Offset;
 
             index = 0;
