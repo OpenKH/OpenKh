@@ -11,6 +11,7 @@ namespace OpenKh.Tools.LayoutEditor.Interfaces
         ColorF EditorBackground { get; }
         bool ShowViewportOriginal { get; }
         bool ShowViewportRemix { get; }
+        bool ShowViewportReFined { get; }
         bool IsViewportOnTop { get; }
     }
 }

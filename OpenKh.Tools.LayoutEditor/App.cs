@@ -150,6 +150,16 @@ namespace OpenKh.Tools.LayoutEditor
             }
         }
 
+        public bool ShowViewportReFined
+        {
+            get => Settings.Default.ShowViewportReFined;
+            set
+            {
+                Settings.Default.ShowViewportReFined = value;
+                Settings.Default.Save();
+            }
+        }
+
         public bool IsViewportOnTop
         {
             get => Settings.Default.IsViewportOnTop;
@@ -297,6 +307,7 @@ namespace OpenKh.Tools.LayoutEditor
 
                         ForMenuCheck("Show PS2 viewport", () => ShowViewportOriginal, x => ShowViewportOriginal = x);
                         ForMenuCheck("Show ReMIX viewport", () => ShowViewportRemix, x => ShowViewportRemix = x);
+                        ForMenuCheck("Show Re:Fined viewport", () => ShowViewportReFined, x => ShowViewportReFined = x);
                         ForMenuCheck("Viewport always on top", () => IsViewportOnTop, x => IsViewportOnTop = x);
                     });
                     ImGui.Separator();
