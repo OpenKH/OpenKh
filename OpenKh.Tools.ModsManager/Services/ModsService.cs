@@ -359,7 +359,9 @@ namespace OpenKh.Tools.ModsManager.Services
                     ConfigurationService.GameEdition,
                     fastMode,
                     packageMap,
-                    ConfigurationService.LaunchGame);
+                    ConfigurationService.LaunchGame,
+                    ConfigurationService.PcReleaseLocation,
+                    ConfigurationService.PcReleaseLanguage);
             }
 
             using var packageMapWriter = new StreamWriter(Path.Combine(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame), "patch-package-map.txt"));

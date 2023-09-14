@@ -11,6 +11,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization;
+using System.Xml.Schema;
+using System.Security.Cryptography;
+using OpenKh.Egs;
 
 namespace OpenKh.Patcher
 {
@@ -22,6 +25,11 @@ namespace OpenKh.Patcher
             public string OriginalAssetPath { get; }
             public string SourceModAssetPath { get; set; }
             public string DestinationPath { get; set; }
+            public string CurrentGame { get; set; }
+
+            public string PCReleaseLocation { get; set; }
+            public string PCReleaseLanguage { get; set; }
+
 
             public static List<string> Regions = new List<string>()
             {
@@ -56,6 +64,64 @@ namespace OpenKh.Patcher
             {
                 if (!File.Exists(dstFile))
                 {
+                    if (PCReleaseLocation != null && !fileName.Contains("remastered") && !fileName.Contains("raw"))
+                    {
+                        var _nameList = new string[]
+                        {
+                            "first",
+                            "second",
+                            "third",
+                            "fourth",
+                            "fifth",
+                            "sixth"
+                        };
+
+                        foreach (var _name in _nameList)
+                        {
+                            var _hedLocation = Path.Combine(PCReleaseLocation, "Image", PCReleaseLanguage, CurrentGame + "_" + _name + ".hed");
+                            var _pkgLocation = Path.Combine(PCReleaseLocation, "Image", PCReleaseLanguage, CurrentGame + "_" + _name + ".pkg");
+
+                            if (!File.Exists(_hedLocation))
+                                continue;
+
+                            var _streamHED = new FileStream(_hedLocation, FileMode.Open, FileAccess.Read, FileShare.Read);
+                            var _hedFile = Egs.Hed.Read(_streamHED);
+
+                            var _fileName = System.Text.Encoding.Default.GetBytes(fileName);
+                            var _nameFetch = MD5.Create().ComputeHash(_fileName);
+
+                            var _fetchFile = _hedFile.FirstOrDefault(x => OpenKh.Egs.Helpers.ToString(x.MD5) == OpenKh.Egs.Helpers.ToString(_nameFetch));
+
+                            if (_fetchFile == null)
+                            {
+                                _streamHED.Close();
+                                _streamHED.Dispose();
+                            }
+
+                            if (_fetchFile != null)
+                            {
+                                var _streamPKG = new FileStream(_pkgLocation, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                                using (var _br = new BinaryReader(_streamPKG, System.Text.Encoding.Default, true))
+                                {
+                                    _streamPKG.Position = _fetchFile.Offset;
+                                    var _hdFile = new EgsHdAsset(_streamPKG);
+
+                                    File.WriteAllBytes(dstFile, _hdFile.OriginalData);
+                                }
+
+                                _streamPKG.Close();
+                                _streamPKG.Dispose();
+
+                                _streamHED.Close();
+                                _streamHED.Dispose();
+                            }
+                        }
+                    }
+                }
+
+                else
+                {
                     var originalFile = GetOriginalAssetPath(fileName);
 
                     if (File.Exists(originalFile))
@@ -79,13 +145,17 @@ namespace OpenKh.Patcher
             "Recom",
         };
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null)
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null, string PcPath = null, string PcLang = null)
         {
             
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
             try
             {
-                
+                context.PCReleaseLocation = PcPath;
+                context.PCReleaseLanguage = PcLang;
+
+                context.CurrentGame = LaunchGame;
+
                 if (metadata.Assets == null)
                     throw new Exception("No assets found.");
                 if (metadata.Game != null && GamesList.Contains(metadata.Game.ToLower()) && metadata.Game.ToLower() != LaunchGame.ToLower())
@@ -178,11 +248,23 @@ namespace OpenKh.Patcher
                         {
                             context.CopyOriginalFile(name, dstFile);
 
-                            using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                            PatchFile(context, assetFile, _stream);
+                            if (File.Exists(dstFile))
+                            {
+                                using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                                PatchFile(context, assetFile, _stream);
 
-                            _stream.Close();
-                            _stream.Dispose();
+                                _stream.Close();
+                                _stream.Dispose();
+                            }
+
+                            else
+                            {
+                                using var _stream = new FileStream(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                                PatchFile(context, assetFile, _stream);
+
+                                _stream.Close();
+                                _stream.Dispose();
+                            }
                         }
 
                         catch (IOException) { }
@@ -451,7 +533,7 @@ namespace OpenKh.Patcher
             if (!File.Exists(srcFile))
                 throw new FileNotFoundException($"The mod does not contain the file {assetFile.Source[0].Name}", srcFile);
 
-            var spawnPoint = Helpers.YamlDeserialize<List<Kh2.Ard.SpawnPoint>>(File.ReadAllText(srcFile));
+            var spawnPoint = OpenKh.Common.Helpers.YamlDeserialize<List<Kh2.Ard.SpawnPoint>>(File.ReadAllText(srcFile));
 
             Kh2.Ard.SpawnPoint.Write(stream.SetPosition(0), spawnPoint);
         }
