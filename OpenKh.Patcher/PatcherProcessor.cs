@@ -62,9 +62,14 @@ namespace OpenKh.Patcher
             public void EnsureDirectoryExists(string fileName) => Directory.CreateDirectory(Path.GetDirectoryName(fileName));
             public void CopyOriginalFile(string fileName, string dstFile)
             {
+                var originalFile = GetOriginalAssetPath(fileName);
+
                 if (!File.Exists(dstFile))
                 {
-                    if (PCReleaseLocation != null && !fileName.Contains("remastered") && !fileName.Contains("raw"))
+                    if (File.Exists(originalFile))
+                        File.Copy(originalFile, dstFile);
+
+                    else if (PCReleaseLocation != null && !fileName.Contains("remastered") && !fileName.Contains("raw"))
                     {
                         var _nameList = new string[]
                         {
@@ -118,14 +123,6 @@ namespace OpenKh.Patcher
                             }
                         }
                     }
-                }
-
-                else
-                {
-                    var originalFile = GetOriginalAssetPath(fileName);
-
-                    if (File.Exists(originalFile))
-                        File.Copy(originalFile, dstFile);
                 }
             }
         }
