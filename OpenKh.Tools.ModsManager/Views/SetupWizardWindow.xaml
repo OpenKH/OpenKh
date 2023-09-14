@@ -128,7 +128,7 @@
             PageType="Interior"
             Title="Set Game Data Location"
             Description="It might be necessary to extract game's data."
-            CanSelectNextPage="{Binding IsGameDataFound}"
+            CanSelectNextPage="{Binding IsNotExtracting}"
             CanSelectPreviousPage="{Binding IsNotExtracting}"
             CanCancel="{Binding IsNotExtracting}"
             PreviousPage="{Binding PageStack.Back}"
