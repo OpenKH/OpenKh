@@ -27,11 +27,11 @@
 | [MSG](file/type/msg.md)         | Storing localized HUD textures for worlds
 | [MSN](file/type/msn.md)         | Mission file; defines how maps behave
 | PAX                             | Graphical effects; contains inside DPX entries
-| SEB                             | Sound effect
+| [SEB](file/type/seb.md)         | Sound effect; on PC, these files are pointers to an SCD in the objects remastered folder
 | VAG                             | Streamed music or voice (monaural audio)
 | VAS                             | Streamed music or voice (stereo audio)
 | VSB                             | A sub-type of BAR; contains VAG
-| WD                              | Instruments for BGM files
+| WD                              | Instruments for BGM files; unused in the PC release.
 | a.fm                            | A sub-type of BAR; usually used in conjunction with MDLX
 | a.fr                            | French localized a.fm
 | a.gr                            | German localized a.fm
