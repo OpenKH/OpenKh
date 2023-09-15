@@ -282,22 +282,35 @@ namespace OpenKh.Kh2.Models.VIF
             // COLORS
             if (vifPacket.Colors.Count > 0)
             {
-                using (var writer = new BinaryWriter(binStream, Encoding.UTF8, true))
+                bool hasColors = true;
+                foreach(VifCommon.VertexColor color in vifPacket.Colors)
                 {
-                    writer.Write(VifUtils.UNPACK);
-                    writer.Write((byte)packet.Header.ColorOffset);
-                    writer.Write(VifUtils.UNIT_SIZE_BYTE);
-                    writer.Write((byte)vifPacket.Colors.Count);
-                    writer.Write(VifUtils.READ_SIZE_4_2);
-                    foreach (VifCommon.VertexColor color in vifPacket.Colors)
+                    if(color == null)
                     {
-                        binStream.Write(color.R);
-                        binStream.Write(color.G);
-                        binStream.Write(color.B);
-                        binStream.Write(color.A);
+                        hasColors = false;
+                        break;
                     }
                 }
-                ModelCommon.alignStreamToByte(binStream, 4);
+
+                if(hasColors)
+                {
+                    using (var writer = new BinaryWriter(binStream, Encoding.UTF8, true))
+                    {
+                        writer.Write(VifUtils.UNPACK);
+                        writer.Write((byte)packet.Header.ColorOffset);
+                        writer.Write(VifUtils.UNIT_SIZE_BYTE);
+                        writer.Write((byte)vifPacket.Colors.Count);
+                        writer.Write(VifUtils.READ_SIZE_4_2);
+                        foreach (VifCommon.VertexColor color in vifPacket.Colors)
+                        {
+                            binStream.Write(color.R);
+                            binStream.Write(color.G);
+                            binStream.Write(color.B);
+                            binStream.Write(color.A);
+                        }
+                    }
+                    ModelCommon.alignStreamToByte(binStream, 4);
+                }
             }
 
             using (var writer = new BinaryWriter(binStream, System.Text.Encoding.UTF8, true))
