@@ -34,6 +34,7 @@ jobs:
       run: |
         msbuild OpenKh.Research.Panacea\OpenKh.Research.Panacea.vcxproj /p:Configuration=Release /p:Platform=x64
         xcopy "OpenKh.Research.Panacea\Release\*.dll" bin\
+        xcopy "OpenKh.Research.Panacea\Dependencies\*.dll" bin\
     
     - name: create openkh-release
       shell: bash
