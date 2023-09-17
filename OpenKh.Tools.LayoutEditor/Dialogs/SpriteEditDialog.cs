@@ -59,14 +59,11 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 DrawCropAtlasTexture();
             }
 
-            if (ImGui.Button("Add Sprite"))
+            if (ImGui.Button("+"))
                 _spriteModels.Add(new SpriteModel(new Kh2.Sequence.Sprite(), _spriteDrawing, _atlasTexture, _textureBinder, _settings));
             ImGui.SameLine();
-            if (ImGui.Button("Remove Sprite"))
-            {
-                _selectedSpriteModel -= 1;
-                _spriteModels.RemoveAt(_selectedSpriteModel + 1);
-            }
+            if (ImGui.Button("-"))
+                _spriteModels.RemoveAt(_selectedSpriteModel);
 
             ForChild("AtlasTexture", _atlasTexture.Width, _atlasTexture.Height, false,
                 () =>
