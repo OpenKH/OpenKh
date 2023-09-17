@@ -122,7 +122,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Utils
             PointCollection myTextureCoordinatesCollection = new PointCollection();
             foreach (ModelCommon.UVBVertex vertex in group.Mesh.Vertices)
             {
-                myTextureCoordinatesCollection.Add(new Point(vertex.U, vertex.V));
+                myTextureCoordinatesCollection.Add(new Point(vertex.U / 4096.0f, vertex.V / 4096.0f));
             }
             myMeshGeometry3D.TextureCoordinates = myTextureCoordinatesCollection;
 
@@ -159,6 +159,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Utils
             }
 
             myGeometryModel.Material = myMaterial;
+
+            // Magic vertices so that the UV mapping goes from 0 to 1 instead of scaling to maximum existing
+            myPositionCollection.Add(new Point3D(0, 0, 0));
+            myPositionCollection.Add(new Point3D(0, 0, 0));
+            myTextureCoordinatesCollection.Add(new Point(0, 0));
+            myTextureCoordinatesCollection.Add(new Point(1, 1));
 
             return myGeometryModel;
         }

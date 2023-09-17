@@ -9,10 +9,10 @@
 
     <ItemGroup>
         <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.0" />
-        <PackageReference Include="NLog" Version="5.2.3" />
+        <PackageReference Include="NLog" Version="5.2.4" />
         <PackageReference Include="YamlDotNet" Version="13.3.1" />
         <PackageReference Include="Xe.BinaryMapper" Version="1.5.2" />
-        <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.0" />
+        <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
 
         <ProjectReference Include="../OpenKh.Common/OpenKh.Common.csproj" />
     </ItemGroup>
