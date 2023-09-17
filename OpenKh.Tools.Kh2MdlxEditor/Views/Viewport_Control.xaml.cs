@@ -154,7 +154,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
             phi -= rX * 0.01;
             length *= 1.0 - 0.1 * rZ;
 
-            theta = Math.Clamp(theta, 0.0001, Math.PI - 0001);
+            theta = Math.Clamp(theta, 0.0001, Math.PI - 0.0001);
 
             vector.X = length * Math.Sin(theta) * Math.Cos(phi);
             vector.Z = -length * Math.Sin(theta) * Math.Sin(phi);

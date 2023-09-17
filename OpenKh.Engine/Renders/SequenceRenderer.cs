@@ -18,6 +18,8 @@ namespace OpenKh.Engine.Renderers
 
     public class SequenceRenderer
     {
+        public int PanFactorX;
+        public int PanFactorY;
         public class ChildContext
         {
             public float PositionX { get; set; }
@@ -30,7 +32,7 @@ namespace OpenKh.Engine.Renderers
             public float UiPadding { get; set; }
         }
 
-        private class Context
+        public class Context
         {
             public int GlobalFrameIndex { get; set; }
             public int FrameIndex { get; set; }
@@ -93,8 +95,8 @@ namespace OpenKh.Engine.Renderers
             {
                 GlobalFrameIndex = frameIndex,
                 FrameIndex = frameIndex,
-                PositionX = positionX,
-                PositionY = positionY,
+                PositionX = positionX + PanFactorX,
+                PositionY = positionY + PanFactorY,
                 Color = new ColorF(1f, 1f, 1f, alpha)
             }, Sequence.AnimationGroups[animationGroupIndex]);
 

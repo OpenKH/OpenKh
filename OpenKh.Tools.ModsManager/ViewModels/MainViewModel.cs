@@ -291,6 +291,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             ModsList.Insert(0, Map(mod));
                             SelectedValue = ModsList[0];
                         });
+                        ReloadModsList();
                     }
                     catch (Exception ex)
                     {

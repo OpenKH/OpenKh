@@ -35,6 +35,13 @@ namespace Axa
         int compressedSize;
     };
 
+    struct PCSettings
+    {
+        char unk[16];
+        short MasterVolume;
+        short MusicVolume;
+    };
+
     class PackageFile
     {
     public:
@@ -90,6 +97,14 @@ namespace Axa
     __int64 DecompressFile(void* outBuf, int* decSizePtr, void* inBuf, int compSize);
 }
 
+namespace VAG_STREAM
+{
+    void play(const char* fileName, int volume, int fadeVolume, int time);
+    void fadeOut(unsigned int time);
+    void setVolume(int volume);
+    void exit();
+}
+
 namespace Bbs
 {
     namespace File
@@ -120,6 +135,10 @@ PFN_DECLARE(int, Axa_OpenFile, (const char* Format, int OFlag));
 PFN_DECLARE(void, Axa_DebugPrint, (const char* Format, ...));
 PFN_DECLARE(void, Axa_DecryptFile, (Axa::PackageFile* pkg, void* data, int size, Axa::PkgEntry* pkgent));
 PFN_DECLARE(__int64, Axa_DecompressFile, (void* outBuf, int* decSizePtr, void* inBuf, int compSize));
+PFN_DECLARE(void, VAG_STREAM_play, (const char* fileName, int volume, int fadeVolume, int time));
+PFN_DECLARE(void, VAG_STREAM_fadeOut, (unsigned int time));
+PFN_DECLARE(void, VAG_STREAM_setVolume, (int volume));
+PFN_DECLARE(void, VAG_STREAM_exit, ());
 PFN_DECLARE(size_t, Bbs_File_load, (const char* pszPath, long long a2));
 PFN_DECLARE(void, Bbs_CRsrcData_loadCallback, (unsigned int* pMem, size_t size, unsigned int* pArg, int nOpt));
 
@@ -181,3 +200,5 @@ PVAR_DECLARE(int, PackageFileCount);
 PVAR_DECLARE(int, LastOpenedPackage);
 PARR_DECLARE(Axa::PackageFile*, PackageFiles, 16);
 PARR_DECLARE(char, BasePath, 128);
+PVAR_DECLARE(Axa::PCSettings, PCSettingsPtr);
+PARR_DECLARE(float, VolumeLevels, 11);

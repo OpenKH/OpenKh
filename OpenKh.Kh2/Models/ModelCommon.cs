@@ -1,3 +1,4 @@
+using OpenKh.Kh2.Models.VIF;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
@@ -181,14 +182,16 @@ namespace OpenKh.Kh2.Models
             public List<BPosition> BPositions { get; set; } // Positions relative to bones
             public float U { get; set; }
             public float V { get; set; }
+            public VifCommon.VertexColor Color { get; set; }
 
             public UVBVertex() { }
-            public UVBVertex(List<BPosition> BonePositions, float U = 0, float V = 0, Vector3 position = new Vector3())
+            public UVBVertex(List<BPosition> BonePositions, float U = 0, float V = 0, Vector3 position = new Vector3(), VifCommon.VertexColor color = null)
             {
                 this.BPositions = BonePositions;
                 this.U = U;
                 this.V = V;
                 Position = position;
+                Color = color;
             }
 
             public override string ToString()

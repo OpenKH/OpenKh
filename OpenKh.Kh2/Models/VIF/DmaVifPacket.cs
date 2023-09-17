@@ -40,6 +40,14 @@ namespace OpenKh.Kh2.Models.VIF
 
             currentAddress += Header.TriStripNodeOffset;
             currentAddress += Header.TriStripNodeCount;
+
+            if(vifPacket.Colors != null && vifPacket.Colors.Count > 0)
+            {
+                Header.ColorOffset = currentAddress;
+                Header.ColorCount = vifPacket.Colors.Count;
+                currentAddress += Header.ColorCount;
+            }
+
             Header.VertexCoordOffset = currentAddress;
             //Header.VertexCoordCount = vifPacket.PositionCoordsVector.Count;
             Header.VertexCoordCount = vifPacket.PositionCoords.Count;
