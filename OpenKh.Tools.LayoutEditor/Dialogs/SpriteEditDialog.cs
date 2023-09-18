@@ -64,8 +64,14 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             ImGui.SameLine();
             if (ImGui.Button("Remove Sprite"))
             {
-                _selectedSpriteModel -= 1;
-                _spriteModels.RemoveAt(_selectedSpriteModel + 1);
+                if (_selectedSpriteModel != 0)
+                {
+                    _selectedSpriteModel -= 1;
+                    _spriteModels.RemoveAt(_selectedSpriteModel + 1);
+                }
+
+                else
+                    _spriteModels.RemoveAt(_selectedSpriteModel);
             }
 
             ForChild("AtlasTexture", _atlasTexture.Width, _atlasTexture.Height, false,
