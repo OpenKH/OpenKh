@@ -124,6 +124,12 @@ namespace OpenKh.Patcher
                                 break;
                         }
 
+                        if (Path.IsPathRooted(name) && !Path.GetPathRoot(name).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
+                        {
+                            Log.Err($"File Path \"" + name + "\" cannot be copied as it is rooted and can cause instability! Aborting...");
+                            throw new PatcherException(metadata, new InvalidOperationException("Root Copy Detected!"));
+                        }
+
                         var dstFile = context.GetDestinationPath(name);
                         var packageMapLocation = "";
                         var _pcFile = name.Contains("remastered") || name.Contains("raw");
