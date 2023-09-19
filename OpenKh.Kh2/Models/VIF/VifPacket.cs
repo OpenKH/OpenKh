@@ -18,6 +18,7 @@ namespace OpenKh.Kh2.Models.VIF
         public List<int> BoneCounts;
         public List<List<List<int>>> WeightGroups; // List by weight count (Eg: 1 weight, 2 weights, 3 weights...) - list by entries (Eg: Weight group for vertex 1, WG for vertex 2...) - list of entry's weights (Eg: This weight group has coords 1, 2 & 3)
         public List<VifCommon.VertexColor> Colors;
+        public List<VifCommon.VertexNormal> Normals;
         public Dictionary<int, List<WeightGroup>> WeightGroupsByWeightCount;
 
         public VifPacket()
@@ -30,6 +31,7 @@ namespace OpenKh.Kh2.Models.VIF
             BoneCounts = new List<int>();
             WeightGroups = new List<List<List<int>>>();
             Colors = new List<VifCommon.VertexColor>();
+            Normals = new List<VifCommon.VertexNormal>();
             WeightGroupsByWeightCount = new Dictionary<int, List<WeightGroup>>();
         }
 
@@ -86,7 +88,8 @@ namespace OpenKh.Kh2.Models.VIF
                 packetLength += VifUtils.getAmountIfGroupedBy(WeightGroups[i].Count * (i + 1), 4);
             }
 
-            packetLength += Colors.Count; // 1 per vertex color; not implemented
+            packetLength += Colors.Count; // 1 per vertex color
+            packetLength += Normals.Count; // 1 per vertex normal
 
             return packetLength;
         }
