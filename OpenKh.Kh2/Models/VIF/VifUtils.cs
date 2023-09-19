@@ -53,15 +53,6 @@ namespace OpenKh.Kh2.Models.VIF
 
         public const uint SET_COLUMN = 0x31000000;
 
-        /*public const ulong END_UV = 0xCFCFCFCF20000000;
-        public const ulong END_INDICES = 0x3F3F3F3F20000000;
-        public const ulong END_VERTICES_1 = 0x3F80000031000000;
-        public const ulong END_VERTICES_2 = 0x3F8000003F800000;
-        public const ulong END_VERTICES_3 = 0x200000003F800000;
-        public const uint END_VERTICES_4 = 0x80808080;*/
-        public const ulong END_BONE_DATA = 0x0000000000000000;
-        public const uint DMA_BONE_PARAM0 = 0x01000101;
-
         // VIF CONSTANTS
         public const byte READ_SIZE_16 = 0x6C;
         public const byte READ_SIZE_12 = 0x78;
