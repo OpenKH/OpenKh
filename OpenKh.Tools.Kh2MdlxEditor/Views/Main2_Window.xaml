@@ -12,7 +12,9 @@
         <!-- Top navbar -->
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
-                <MenuItem Header="Save As..." Click="Menu_SaveFile"/>
+                <MenuItem Header="Open" Click="Menu_Open"/>
+                <MenuItem Header="Save" Click="Menu_OverwriteFile"/>
+                <MenuItem Header="Save As" Click="Menu_SaveFile"/>
                 <MenuItem Header="Export model">
                     <MenuItem Header="FBX" Click="Menu_ExportAsFbx"/>
                     <MenuItem Header="DAE (Collada)" Visibility="Collapsed" Click="Menu_ExportAsDae"/>

@@ -1,14 +1,13 @@
+using Microsoft.Win32;
 using OpenKh.AssimpUtils;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.Wpf;
-using OpenKh.Tools.Kh2MdlxEditor.Utils;
 using OpenKh.Tools.Kh2MdlxEditor.ViewModels;
 using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.Views
 {
@@ -54,9 +53,26 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
             {
             }
         }
+        private void Menu_Open(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Multiselect = false;
+            if (openFileDialog.ShowDialog() == true && openFileDialog.FileNames != null && openFileDialog.FileNames.Length > 0)
+            {
+                string filePath = openFileDialog.FileNames[0];
+                if (filePath.ToLower().EndsWith(".mdlx"))
+                {
+                    loadFile(filePath);
+                }
+            }
+        }
         private void Menu_SaveFile(object sender, EventArgs e)
         {
-            saveFile();
+            SaveFile();
+        }
+        private void Menu_OverwriteFile(object sender, EventArgs e)
+        {
+            OverwriteFile();
         }
 
         private void Menu_ExportAsFbx(object sender, EventArgs e)
@@ -123,7 +139,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         }
 
         // Saves the file
-        public void saveFile()
+        public void SaveFile()
         {
             mainVM.buildBarFile();
 
@@ -138,6 +154,13 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 Bar.Write(memStream, mainVM.BarFile);
                 File.WriteAllBytes(sfd.FileName, memStream.ToArray());
             }
+        }
+        public void OverwriteFile()
+        {
+            mainVM.buildBarFile();
+            MemoryStream memStream = new MemoryStream();
+            Bar.Write(memStream, mainVM.BarFile);
+            File.WriteAllBytes(mainVM.FilePath, memStream.ToArray());
         }
 
 

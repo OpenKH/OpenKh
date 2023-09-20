@@ -299,14 +299,14 @@ namespace OpenKh.Kh2.Models
                 OpenKh.Ps2.VpuPacket.VertexIndex index = vpuGroup.Indices[i];
                 UVBVertex vertex = vpuGroup.Vertices[index.Index];
 
-                if(index.Color != null)
-                {
-                    mesh.Vertices.Add(new UVBVertex(vertex.BPositions, index.U, index.V, ModelCommon.getAbsolutePosition(vertex.BPositions, boneMatrices), new VifCommon.VertexColor((byte)index.Color.R, (byte)index.Color.G, (byte)index.Color.B, (byte)index.Color.A)));
-                }
-                else
-                {
-                    mesh.Vertices.Add(new UVBVertex(vertex.BPositions, index.U, index.V, ModelCommon.getAbsolutePosition(vertex.BPositions, boneMatrices)));
-                }
+                UVBVertex completeVertex = new UVBVertex(vertex.BPositions, index.U, index.V, ModelCommon.getAbsolutePosition(vertex.BPositions, boneMatrices));
+
+                if (index.Color != null)
+                    completeVertex.Color = new VifCommon.VertexColor((byte)index.Color.R, (byte)index.Color.G, (byte)index.Color.B, (byte)index.Color.A);
+                if (index.Normal != null)
+                    completeVertex.Normal = new VifCommon.VertexNormal(index.Normal.X, index.Normal.Y, index.Normal.Z);
+
+                mesh.Vertices.Add(completeVertex);
 
                 // Triangles
                 if (index.Function == OpenKh.Ps2.VpuPacket.VertexFunction.DrawTriangle ||
@@ -466,6 +466,15 @@ namespace OpenKh.Kh2.Models
                     for (int j = 0; j < vpuPacket.Indices.Length; j++)
                     {
                         vpuGroup.Indices[previousIndexCount + j].Color = vpuPacket.Colors[j];
+                    }
+                }
+
+                // Normals
+                if (vpuPacket.Indices.Length == vpuPacket.Normals.Length)
+                {
+                    for (int j = 0; j < vpuPacket.Indices.Length; j++)
+                    {
+                        vpuGroup.Indices[previousIndexCount + j].Normal = vpuPacket.Normals[j];
                     }
                 }
 

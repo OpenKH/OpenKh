@@ -183,15 +183,17 @@ namespace OpenKh.Kh2.Models
             public float U { get; set; }
             public float V { get; set; }
             public VifCommon.VertexColor Color { get; set; }
+            public VifCommon.VertexNormal Normal { get; set; }
 
             public UVBVertex() { }
-            public UVBVertex(List<BPosition> BonePositions, float U = 0, float V = 0, Vector3 position = new Vector3(), VifCommon.VertexColor color = null)
+            public UVBVertex(List<BPosition> BonePositions, float U = 0, float V = 0, Vector3 position = new Vector3(), VifCommon.VertexColor color = null, VifCommon.VertexNormal normal = null)
             {
                 this.BPositions = BonePositions;
                 this.U = U;
                 this.V = V;
                 Position = position;
                 Color = color;
+                Normal = normal;
             }
 
             public override string ToString()
