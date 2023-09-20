@@ -7,6 +7,52 @@ namespace OpenKh.Kh2.Models.VIF
 {
     public class VifUtils
     {
+        // VIF CODES
+        public const uint UNPACK = 0x01000101;
+
+        // First number is the amount, second number is the size being read. M indicates using a mask
+        public const byte UNPACK_TYPE_1_32 = 0x60;
+        public const byte UNPACK_TYPE_1_16 = 0x61;
+        public const byte UNPACK_TYPE_1_8 = 0x62;
+        public const byte UNPACK_TYPE_2_32 = 0x64;
+        public const byte UNPACK_TYPE_2_16 = 0x65;
+        public const byte UNPACK_TYPE_2_8 = 0x66;
+        public const byte UNPACK_TYPE_3_32 = 0x68;
+        public const byte UNPACK_TYPE_3_16 = 0x69;
+        public const byte UNPACK_TYPE_3_8 = 0x6A;
+        public const byte UNPACK_TYPE_4_32 = 0x6C;
+        public const byte UNPACK_TYPE_4_16 = 0x6D;
+        public const byte UNPACK_TYPE_4_8 = 0x6E;
+        public const byte UNPACK_TYPE_4_5 = 0x6F; // 5+5+5+1
+        public const byte UNPACK_TYPE_M_1_32 = 0x70;
+        public const byte UNPACK_TYPE_M_1_16 = 0x71;
+        public const byte UNPACK_TYPE_M_1_8 = 0x72;
+        public const byte UNPACK_TYPE_M_2_32 = 0x74;
+        public const byte UNPACK_TYPE_M_2_16 = 0x75;
+        public const byte UNPACK_TYPE_M_2_8 = 0x76;
+        public const byte UNPACK_TYPE_M_3_32 = 0x78;
+        public const byte UNPACK_TYPE_M_3_16 = 0x79;
+        public const byte UNPACK_TYPE_M_3_8 = 0x7A;
+        public const byte UNPACK_TYPE_M_4_32 = 0x7C;
+        public const byte UNPACK_TYPE_M_4_16 = 0x7D;
+        public const byte UNPACK_TYPE_M_4_8 = 0x7E;
+        public const byte UNPACK_TYPE_M_4_5 = 0x7F; // 5+5+5+1
+
+        // Unpack options:
+        // First bit: TOPS is added to starting address (File address + unpack address)
+        // Second bit: Zero extended (If unset sign extended)
+        public const byte UNPACK_OPTIONS_SIGN = 0x80; // 1000
+        public const byte UNPACK_OPTIONS_ZERO = 0xC0; // 1100
+
+        public const uint SET_MASK = 0x20000000;
+        public const uint INDICES_MASK = 0xCFCFCFCF;
+        public const uint FLAGS_MASK = 0x3F3F3F3F;
+        public const uint NORMALS_MASK = 0xC0C0C0C0;
+        public const uint NORMALS_RESERVE_MASK = 0x3F3F3F3F;
+        public const uint COORDS_MASK = 0x80808080;
+
+        public const uint SET_COLUMN = 0x31000000;
+
         // VIF CONSTANTS
         public const byte READ_SIZE_16 = 0x6C;
         public const byte READ_SIZE_12 = 0x78;
@@ -14,19 +60,6 @@ namespace OpenKh.Kh2.Models.VIF
         public const byte READ_SIZE_4_2 = 0x6E;
         public const byte READ_SIZE_1 = 0x72;
 
-        public const byte UNIT_SIZE_INT = 0x80;
-        public const byte UNIT_SIZE_BYTE = 0xC0;
-
-        // VIF CODES
-        public const uint  UNPACK = 0x01000101;
-        public const ulong END_UV = 0xCFCFCFCF20000000;
-        public const ulong END_INDICES = 0x3F3F3F3F20000000;
-        public const ulong END_VERTICES_1 = 0x3F80000031000000;
-        public const ulong END_VERTICES_2 = 0x3F8000003F800000;
-        public const ulong END_VERTICES_3 = 0x200000003F800000;
-        public const uint  END_VERTICES_4 = 0x80808080;
-        public const ulong END_BONE_DATA = 0x0000000000000000;
-        public const uint  DMA_BONE_PARAM0 = 0x01000101;
 
         public static bool isSameVector(Vector4 vec1, Vector4 vec2)
         {

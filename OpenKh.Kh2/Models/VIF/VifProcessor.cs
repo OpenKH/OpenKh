@@ -20,6 +20,54 @@ namespace OpenKh.Kh2.Models.VIF
         public static int VERTEX_LIMIT = 0xFF; // Shouldn't need to cap, but just in case
         public static int MEMORY_LIMIT = 0xE0;
 
+        private static int currentMesh = 0;
+        private static List<MeshOptions> MeshOptionsList = new List<MeshOptions>();
+        public class MeshOptions
+        {
+            public bool HasColors = false;
+            public bool ApplyColors = false;
+            public bool HasNormals = false;
+            public bool ApplyNormals = false;
+
+            public MeshOptions(bool hasColors = false, bool applyColor = false, bool hasNormals = false, bool applyNormal = false)
+            {
+                HasColors= hasColors;
+                ApplyColors = applyColor;
+                HasNormals= hasNormals;
+                ApplyNormals = applyNormal;
+            }
+        }
+        public static bool currentApplyColor
+        {
+            get
+            {
+                if (currentMesh >= MeshOptionsList.Count)
+                    return false;
+                else
+                    return MeshOptionsList[currentMesh].ApplyColors;
+            }
+        }
+        public static bool currentApplyNormal
+        {
+            get
+            {
+                if (currentMesh >= MeshOptionsList.Count)
+                    return false;
+                else
+                    return MeshOptionsList[currentMesh].ApplyNormals;
+            }
+        }
+
+        public static void LoadOptions(List<MeshOptions> newMeshOptions)
+        {
+            currentMesh = 0;
+            MeshOptionsList = newMeshOptions;
+        }
+        public static void NextMeshOptions()
+        {
+            currentMesh++;
+        }
+
         public static List<DmaVifPacket> vifMeshToDmaVifPackets(VifMesh mesh)
         {
             List<DmaVifPacket> dmaVifChain = new List<DmaVifPacket>();
@@ -123,6 +171,9 @@ namespace OpenKh.Kh2.Models.VIF
         {
             List<VifPacket> vifPackets = new List<VifPacket>();
 
+            int tesss = currentMesh;
+            List<MeshOptions> tess = MeshOptionsList;
+
             VifPacket currentPacket = new VifPacket();
             List<VifCommon.VifVertex> verticesInCurrentPacket = new List<VifCommon.VifVertex>();
             int vifAddressPosition = 0;
@@ -178,7 +229,10 @@ namespace OpenKh.Kh2.Models.VIF
                         currentPacket.WeightGroups[vertex.RelativePositions.Count - 1].Add(weights);
                     }
 
-                    currentPacket.Colors.Add(vertex.Color);
+                    if(currentApplyColor)
+                        currentPacket.Colors.Add(vertex.Color);
+                    if(currentApplyNormal)
+                        currentPacket.Normals.Add(vertex.Normal);
                 }
 
                 currentPacket.generateBoneData();
@@ -219,7 +273,38 @@ namespace OpenKh.Kh2.Models.VIF
             if (!USE_UNCOMPRESSED && singleWeightMode)
                 vifPacket.fixIndicesForSingleWeight();
 
-            packet.calcHeader(vifPacket, singleWeightMode);
+            bool hasColors = true;
+            if (vifPacket.Colors != null && vifPacket.Colors.Count > 0)
+            {
+                foreach (VifCommon.VertexColor color in vifPacket.Colors)
+                {
+                    if (color == null)
+                    {
+                        hasColors = false;
+                        break;
+                    }
+                }
+            }
+            else
+                hasColors = false;
+
+
+            bool hasNormals = true;
+            if (vifPacket.Normals != null && vifPacket.Normals.Count > 0)
+            {
+                foreach (VifCommon.VertexNormal normal in vifPacket.Normals)
+                {
+                    if (normal == null)
+                    {
+                        hasNormals = false;
+                        break;
+                    }
+                }
+            }
+            else
+                hasNormals = false;
+
+            packet.calcHeader(vifPacket, singleWeightMode, hasColors, hasNormals);
 
             MemoryStream binStream = new MemoryStream(0);
 
@@ -228,33 +313,44 @@ namespace OpenKh.Kh2.Models.VIF
             {
                 writer.Write(VifUtils.UNPACK);
                 writer.Write((byte)0x00);
-                writer.Write(VifUtils.UNIT_SIZE_INT);
-                writer.Write((byte)0x04);
-                writer.Write(VifUtils.READ_SIZE_16);
+                writer.Write(VifUtils.UNPACK_OPTIONS_SIGN);
+                writer.Write((byte)packet.Header.TriStripNodeOffset);
+                writer.Write(VifUtils.UNPACK_TYPE_4_32);
             }
             BinaryMapping.WriteObject(binStream, packet.Header);
+            if (hasNormals)
+            {
+                using (var writer = new BinaryWriter(binStream, Encoding.UTF8, true))
+                {
+                    writer.Write(packet.Header.NormalCount);
+                    writer.Write(packet.Header.NormalOffset);
+                    writer.Write((int)0);
+                    writer.Write((int)0);
+                }
+            }
 
             using (var writer = new BinaryWriter(binStream, Encoding.UTF8, true))
             {
                 // UV COORDINATES
                 writer.Write(VifUtils.UNPACK);
-                writer.Write((byte)0x04);
-                writer.Write(VifUtils.UNIT_SIZE_INT);
+                writer.Write((byte)packet.Header.TriStripNodeOffset);
+                writer.Write(VifUtils.UNPACK_OPTIONS_SIGN);
                 writer.Write((byte)packet.Header.TriStripNodeCount);
-                writer.Write(VifUtils.READ_SIZE_4);
+                writer.Write(VifUtils.UNPACK_TYPE_2_16);
                 for (int i = 0; i < vifPacket.UvCoords.Count; i++)
                 {
                     writer.Write(vifPacket.UvCoords[i].U);
                     writer.Write(vifPacket.UvCoords[i].V);
                 }
-                writer.Write(VifUtils.END_UV);
 
                 // POSITION INDICES
+                writer.Write(VifUtils.SET_MASK);
+                writer.Write(VifUtils.INDICES_MASK);
                 writer.Write(VifUtils.UNPACK);
-                writer.Write((byte)0x04);
-                writer.Write(VifUtils.UNIT_SIZE_BYTE);
+                writer.Write((byte)packet.Header.TriStripNodeOffset);
+                writer.Write(VifUtils.UNPACK_OPTIONS_ZERO);
                 writer.Write((byte)packet.Header.TriStripNodeCount);
-                writer.Write(VifUtils.READ_SIZE_1);
+                writer.Write(VifUtils.UNPACK_TYPE_M_1_8);
                 foreach (byte positionIndex in vifPacket.PositionIds)
                 {
                     writer.Write((byte)positionIndex);
@@ -264,12 +360,12 @@ namespace OpenKh.Kh2.Models.VIF
 
             using (var writer = new BinaryWriter(binStream, Encoding.UTF8, true))
             {
-                writer.Write(VifUtils.END_INDICES);
-
                 // TRI FLAGS
+                writer.Write(VifUtils.SET_MASK);
+                writer.Write(VifUtils.FLAGS_MASK);
                 writer.Write(VifUtils.UNPACK);
-                writer.Write((byte)0x04);
-                writer.Write(VifUtils.UNIT_SIZE_BYTE);
+                writer.Write((byte)packet.Header.TriStripNodeOffset);
+                writer.Write(VifUtils.UNPACK_OPTIONS_ZERO);
                 writer.Write((byte)packet.Header.TriStripNodeCount);
                 writer.Write(VifUtils.READ_SIZE_1);
                 foreach (byte flag in vifPacket.Flags)
@@ -280,34 +376,54 @@ namespace OpenKh.Kh2.Models.VIF
             ModelCommon.alignStreamToByte(binStream, 4);
 
             // COLORS
-            if (vifPacket.Colors.Count > 0)
+            if (hasColors)
             {
-                bool hasColors = true;
-                foreach(VifCommon.VertexColor color in vifPacket.Colors)
+                using (var writer = new BinaryWriter(binStream, Encoding.UTF8, true))
                 {
-                    if(color == null)
+                    writer.Write(VifUtils.UNPACK);
+                    writer.Write((byte)packet.Header.ColorOffset);
+                    writer.Write(VifUtils.UNPACK_OPTIONS_ZERO);
+                    writer.Write((byte)vifPacket.Colors.Count);
+                    writer.Write(VifUtils.UNPACK_TYPE_4_8);
+                    foreach (VifCommon.VertexColor color in vifPacket.Colors)
                     {
-                        hasColors = false;
-                        break;
+                        binStream.Write(color.R);
+                        binStream.Write(color.G);
+                        binStream.Write(color.B);
+                        binStream.Write(color.A);
                     }
                 }
+            }
 
-                if(hasColors)
+            // NORMALS
+            if (hasNormals)
+            {
+                using (var writer = new BinaryWriter(binStream, Encoding.UTF8, true))
                 {
-                    using (var writer = new BinaryWriter(binStream, Encoding.UTF8, true))
+                    writer.Write(VifUtils.SET_MASK);
+                    writer.Write(VifUtils.NORMALS_MASK);
+                    writer.Write(VifUtils.UNPACK);
+                    writer.Write((byte)packet.Header.NormalOffset);
+                    writer.Write(VifUtils.UNPACK_OPTIONS_SIGN);
+                    writer.Write((byte)packet.Header.NormalCount);
+                    writer.Write(VifUtils.UNPACK_TYPE_M_3_32);
+                    foreach (VifCommon.VertexNormal normal in vifPacket.Normals)
                     {
-                        writer.Write(VifUtils.UNPACK);
-                        writer.Write((byte)packet.Header.ColorOffset);
-                        writer.Write(VifUtils.UNIT_SIZE_BYTE);
-                        writer.Write((byte)vifPacket.Colors.Count);
-                        writer.Write(VifUtils.READ_SIZE_4_2);
-                        foreach (VifCommon.VertexColor color in vifPacket.Colors)
-                        {
-                            binStream.Write(color.R);
-                            binStream.Write(color.G);
-                            binStream.Write(color.B);
-                            binStream.Write(color.A);
-                        }
+                        binStream.Write(normal.X);
+                        binStream.Write(normal.Y);
+                        binStream.Write(normal.Z);
+                    }
+
+                    writer.Write(VifUtils.SET_MASK);
+                    writer.Write(VifUtils.NORMALS_RESERVE_MASK);
+                    writer.Write(VifUtils.UNPACK);
+                    writer.Write((byte)packet.Header.NormalOffset);
+                    writer.Write(VifUtils.UNPACK_OPTIONS_ZERO);
+                    writer.Write((byte)packet.Header.NormalCount);
+                    writer.Write(VifUtils.UNPACK_TYPE_M_1_8);
+                    foreach (VifCommon.VertexNormal normal in vifPacket.Normals)
+                    {
+                        binStream.Write((byte)0);
                     }
                     ModelCommon.alignStreamToByte(binStream, 4);
                 }
@@ -317,21 +433,24 @@ namespace OpenKh.Kh2.Models.VIF
             {
                 if (singleWeightMode)
                 {
-                    writer.Write(VifUtils.END_VERTICES_1);
-                    writer.Write(VifUtils.END_VERTICES_2);
-                    writer.Write(VifUtils.END_VERTICES_3);
-                    writer.Write(VifUtils.END_VERTICES_4);
+                    writer.Write(VifUtils.SET_COLUMN);
+                    writer.Write((float)1);
+                    writer.Write((float)1);
+                    writer.Write((float)1);
+                    writer.Write((float)1);
+                    writer.Write(VifUtils.SET_MASK);
+                    writer.Write(VifUtils.COORDS_MASK);
                 }
 
                 // POSITIONS
                 writer.Write(VifUtils.UNPACK);
                 writer.Write((byte)packet.Header.VertexCoordOffset);
-                writer.Write(VifUtils.UNIT_SIZE_INT);
+                writer.Write(VifUtils.UNPACK_OPTIONS_SIGN);
                 writer.Write((byte)packet.Header.VertexCoordCount);
                 if (singleWeightMode)
-                    writer.Write(VifUtils.READ_SIZE_12);
+                    writer.Write(VifUtils.UNPACK_TYPE_M_3_32);
                 else
-                    writer.Write(VifUtils.READ_SIZE_16);
+                    writer.Write(VifUtils.UNPACK_TYPE_4_32);
                 foreach (VifCommon.BoneRelativePosition coordinate in vifPacket.PositionCoords)
                 {
                     writer.Write(coordinate.Coord.X);
@@ -346,7 +465,7 @@ namespace OpenKh.Kh2.Models.VIF
                 // BONE COUNTS
                 writer.Write(VifUtils.UNPACK);
                 writer.Write((byte)packet.Header.MatrixCountOffset);
-                writer.Write(VifUtils.UNIT_SIZE_INT);
+                writer.Write(VifUtils.UNPACK_OPTIONS_SIGN);
                 int boneCountsSize = VifUtils.getAmountIfGroupedBy(packet.Header.MatrixCount, 4);
 
                 if (!singleWeightMode)
@@ -368,7 +487,7 @@ namespace OpenKh.Kh2.Models.VIF
                 }
 
                 writer.Write((byte)boneCountsSize);
-                writer.Write(VifUtils.READ_SIZE_16);
+                writer.Write(VifUtils.UNPACK_TYPE_4_32);
 
                 // BONE ASSIGNS
                 for (int i = 0; i < vifPacket.BoneCounts.Count; i++)
@@ -435,7 +554,7 @@ namespace OpenKh.Kh2.Models.VIF
             for (int i = 0; i < packet.BoneList.Count; i++)
             {
                 ModelCommon.DmaPacket boneTag = new ModelCommon.DmaPacket();
-                boneTag.DmaTag.Qwc = 4;
+                boneTag.DmaTag.Qwc = (ushort)(hasNormals ? 5 : 4);
                 boneTag.DmaTag.Param = 0x3000;
                 boneTag.DmaTag.Address = packet.BoneList[i];
                 boneTag.VifCode.Cmd = 1;

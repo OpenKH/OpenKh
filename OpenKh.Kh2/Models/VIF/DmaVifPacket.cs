@@ -27,7 +27,7 @@ namespace OpenKh.Kh2.Models.VIF
             BoneList = new List<int>();
         }
 
-        public void calcHeader(VifPacket vifPacket, bool singleWeightMode = false)
+        public void calcHeader(VifPacket vifPacket, bool singleWeightMode = false, bool hasColors = false, bool hasNormals = false)
         {
             Header.Type = 1;
             Header.VertexColorPtrInc = 0;
@@ -35,17 +35,24 @@ namespace OpenKh.Kh2.Models.VIF
             Header.VertexBufferPointer = 0;
 
             int currentAddress = 0;
-            Header.TriStripNodeOffset = 4;
+            Header.TriStripNodeOffset = hasNormals ? 5 : 4;
             Header.TriStripNodeCount = vifPacket.UvCoords.Count;
 
             currentAddress += Header.TriStripNodeOffset;
             currentAddress += Header.TriStripNodeCount;
 
-            if(vifPacket.Colors != null && vifPacket.Colors.Count > 0)
+            if(hasColors)
             {
                 Header.ColorOffset = currentAddress;
                 Header.ColorCount = vifPacket.Colors.Count;
                 currentAddress += Header.ColorCount;
+            }
+
+            if (hasNormals)
+            {
+                Header.NormalOffset = currentAddress;
+                Header.NormalCount = vifPacket.Normals.Count;
+                currentAddress += Header.NormalCount;
             }
 
             Header.VertexCoordOffset = currentAddress;

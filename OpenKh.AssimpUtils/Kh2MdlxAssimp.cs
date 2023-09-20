@@ -234,6 +234,12 @@ namespace OpenKh.AssimpUtils
                         iMesh.VertexColorChannels[0].Add(new Assimp.Color4D(R, G, B, A));
                     }
 
+                    // NORMALS
+                    if (vertex.Normal != null)
+                    {
+                        iMesh.Normals.Add(new Assimp.Vector3D(vertex.Normal.X, vertex.Normal.Y, vertex.Normal.Z));
+                    }
+
                     currentVertex++;
                 }
 
@@ -304,6 +310,10 @@ namespace OpenKh.AssimpUtils
                     byte B = (byte)(mesh.VertexColorChannels[0][i].B * 255);
                     byte A = (byte)(mesh.VertexColorChannels[0][i].A * 255);
                     vertex.Color = new VifCommon.VertexColor(R, G, B, A);
+                }
+                if(mesh.HasNormals)
+                {
+                    vertex.Normal = new VifCommon.VertexNormal(mesh.Normals[i].X, mesh.Normals[i].Y, mesh.Normals[i].Z);
                 }
 
                 verticesAssimpOrder.Add(vertex);
