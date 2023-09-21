@@ -13,6 +13,7 @@
 #undef MiniDumpWriteDump
 #include <Shlwapi.h>
 #include "OpenKH.h"
+#include <filesystem>
 
 typedef BOOL(WINAPI* PFN_MiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType, PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam, PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam, PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 PFN_MiniDumpWriteDump MiniDumpWriteDumpPtr;
@@ -73,6 +74,11 @@ BOOL APIENTRY DllMain(
     DWORD ul_reason_for_call,
     LPVOID lpReserved)
 {
+
+    std::string _dllPath = std::filesystem::current_path().u8string() + "\\dependencies\\";
+    std::wstring _dllString(_dllPath.begin(), _dllPath.end());
+    SetDllDirectory(_dllString.c_str());
+
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
