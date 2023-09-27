@@ -1,4 +1,3 @@
-using Octokit;
 using OpenKh.Common;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Models;
@@ -29,7 +28,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private static Version _version = Assembly.GetEntryAssembly()?.GetName()?.Version;
         private static string ApplicationName = Utilities.GetApplicationName();
         private static string ApplicationVersion = Utilities.GetApplicationVersion();
-        private Window Window => System.Windows.Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+        private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
 
         private DebuggingWindow _debuggingWindow = new DebuggingWindow();
         private ModViewModel _selectedValue;
@@ -62,11 +61,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
         private const string REMASTERED_FILES_FOLDER_NAME = "remastered";
 
+        public static bool overwriteMod = false;
         public string Title => ApplicationName;
         public string CurrentVersion => ApplicationVersion;
-        public static Release releases = new GitHubClient(new ProductHeaderValue("LuaEngine.exe")).Repository.Release.GetLatest(owner: "TopazTK", name: "LuaEngine").Result;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
-        public ObservableCollection<string> PresetList { get; set; }
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AddModCommand { get; set; }
         public RelayCommand RemoveModCommand { get; set; }
@@ -82,7 +80,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand WizardCommand { get; set; }
         public RelayCommand OpenLinkCommand { get; set; }
         public RelayCommand CheckOpenkhUpdateCommand { get; set; }
-        public RelayCommand OpenPresetMenuCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -274,24 +271,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             progressWindow.Show();
                             return progressWindow;
                         });
-
-                        await ModsService.InstallMod(name, isZipFile, isLuaFile, progress =>
+                        if (overwriteMod)
                         {
-                            System.Windows.Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
-                        }, nProgress =>
-                        {
-                            System.Windows.Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
-                        });
-
-                        var actualName = isZipFile || isLuaFile ? Path.GetFileNameWithoutExtension(name) : name;
-                        var mod = ModsService.GetMods(new string[] { actualName }).First();
-                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            progressWindow.Close();
-                            ModsList.Insert(0, Map(mod));
-                            SelectedValue = ModsList[0];
-                        });
-                        ReloadModsList();
+                            overwriteMod = false;
+                            ReloadModsList();
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -299,7 +283,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     finally
                     {
-                        System.Windows.Application.Current.Dispatcher.Invoke(() => progressWindow?.Close());
+                        Application.Current.Dispatcher.Invoke(() => progressWindow?.Close());
                     }
                 });
             }, _ => true);
@@ -386,7 +370,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigRegionId = ConfigurationService.RegionId,
                     ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
                     ConfigIsEGSVersion = ConfigurationService.IsEGSVersion,
-                    ConfigLuaEngineLocation = ConfigurationService.LuaEngineLocation,
                 };
                 if (dialog.ShowDialog() == true)
                 {
@@ -399,7 +382,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
                     ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
                     ConfigurationService.IsEGSVersion = dialog.ConfigIsEGSVersion;
-                    ConfigurationService.LuaEngineLocation = dialog.ConfigLuaEngineLocation;
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
 
                     const int EpicGamesPC = 2;
@@ -421,12 +403,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     else
                         PC = false;
                 }
-            });
-
-            OpenPresetMenuCommand = new RelayCommand(_ =>
-            {
-                PresetsWindow view = new PresetsWindow(this);
-                view.Show();
             });
 
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
