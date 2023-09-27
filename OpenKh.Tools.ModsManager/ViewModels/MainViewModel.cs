@@ -61,6 +61,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
         private const string REMASTERED_FILES_FOLDER_NAME = "remastered";
 
+        public static bool overwriteMod = false;
         public string Title => ApplicationName;
         public string CurrentVersion => ApplicationVersion;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
@@ -285,7 +286,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             ModsList.Insert(0, Map(mod));
                             SelectedValue = ModsList[0];
                         });
-                        ReloadModsList();
+                        if (overwriteMod)
+                        {
+                            overwriteMod = false;
+                            ReloadModsList();
+                        }
                     }
                     catch (Exception ex)
                     {

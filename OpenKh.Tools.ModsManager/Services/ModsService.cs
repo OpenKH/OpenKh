@@ -3,6 +3,7 @@ using OpenKh.Common;
 using OpenKh.Patcher;
 using OpenKh.Tools.ModsManager.Exceptions;
 using OpenKh.Tools.ModsManager.Models;
+using OpenKh.Tools.ModsManager.ViewModels;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -136,6 +137,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 switch (errorMessage)
                 {
                     case MessageBoxResult.Yes:
+                        MainViewModel.overwriteMod = true;
                         Directory.Delete(modPath, true);
                         break;
                     case MessageBoxResult.No:
@@ -279,6 +281,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     case MessageBoxResult.Yes:
                         Handle(() =>
                         {
+                            MainViewModel.overwriteMod = true;
                             foreach (var filePath in Directory.GetFiles(modPath, "*", SearchOption.AllDirectories))
                             {
                                 var attributes = File.GetAttributes(filePath);
