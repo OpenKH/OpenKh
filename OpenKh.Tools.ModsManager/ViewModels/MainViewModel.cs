@@ -1,3 +1,4 @@
+using Octokit;
 using OpenKh.Common;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Models;
@@ -28,7 +29,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private static Version _version = Assembly.GetEntryAssembly()?.GetName()?.Version;
         private static string ApplicationName = Utilities.GetApplicationName();
         private static string ApplicationVersion = Utilities.GetApplicationVersion();
-        private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+        private Window Window => System.Windows.Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
 
         private DebuggingWindow _debuggingWindow = new DebuggingWindow();
         private ModViewModel _selectedValue;
@@ -64,7 +65,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public static bool overwriteMod = false;
         public string Title => ApplicationName;
         public string CurrentVersion => ApplicationVersion;
+        public static Release releases = new GitHubClient(new ProductHeaderValue("LuaEngine.exe")).Repository.Release.GetLatest(owner: "TopazTK", name: "LuaEngine").Result;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
+        public ObservableCollection<string> PresetList { get; set; }
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AddModCommand { get; set; }
         public RelayCommand RemoveModCommand { get; set; }
@@ -80,6 +83,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand WizardCommand { get; set; }
         public RelayCommand OpenLinkCommand { get; set; }
         public RelayCommand CheckOpenkhUpdateCommand { get; set; }
+        public RelayCommand OpenPresetMenuCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -283,7 +287,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     finally
                     {
-                        Application.Current.Dispatcher.Invoke(() => progressWindow?.Close());
+                        System.Windows.Application.Current.Dispatcher.Invoke(() => progressWindow?.Close());
                     }
                 });
             }, _ => true);
@@ -403,6 +407,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     else
                         PC = false;
                 }
+            });
+
+            OpenPresetMenuCommand = new RelayCommand(_ =>
+            {
+                PresetsWindow view = new PresetsWindow(this);
+                view.Show();
             });
 
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
