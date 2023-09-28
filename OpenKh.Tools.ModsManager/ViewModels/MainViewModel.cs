@@ -275,6 +275,23 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             progressWindow.Show();
                             return progressWindow;
                         });
+
+                        await ModsService.InstallMod(name, isZipFile, isLuaFile, progress =>
+                        {
+                            System.Windows.Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
+                        }, nProgress =>
+                        {
+                            System.Windows.Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
+                        });
+
+                        var actualName = isZipFile || isLuaFile ? Path.GetFileNameWithoutExtension(name) : name;
+                        var mod = ModsService.GetMods(new string[] { actualName }).First();
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            progressWindow.Close();
+                            ModsList.Insert(0, Map(mod));
+                            SelectedValue = ModsList[0];
+                        });
                         if (overwriteMod)
                         {
                             overwriteMod = false;
@@ -374,6 +391,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigRegionId = ConfigurationService.RegionId,
                     ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
                     ConfigIsEGSVersion = ConfigurationService.IsEGSVersion,
+                    ConfigLuaEngineLocation = ConfigurationService.LuaEngineLocation,
                 };
                 if (dialog.ShowDialog() == true)
                 {
@@ -387,6 +405,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
                     ConfigurationService.IsEGSVersion = dialog.ConfigIsEGSVersion;
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
+                    ConfigurationService.LuaEngineLocation = dialog.ConfigLuaEngineLocation;
 
                     const int EpicGamesPC = 2;
                     if (ConfigurationService.GameEdition == EpicGamesPC &&
