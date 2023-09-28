@@ -156,7 +156,6 @@ namespace OpenKh.Tools.ModsManager.Services
                         throw new ModAlreadyExistsExceptions(modName);
                         break;
                 }
-
             }
                
             Directory.CreateDirectory(modPath);
@@ -346,7 +345,20 @@ namespace OpenKh.Tools.ModsManager.Services
 
             string modPath = GetModPath(modName);
             if (Directory.Exists(modPath))
-                throw new ModAlreadyExistsExceptions(modName);
+            {
+                var errorMessage = MessageBox.Show($"A mod with the name '{modName}' already exists. Do you want to overwrite the mod install.", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                switch (errorMessage)
+                {
+                    case MessageBoxResult.Yes:
+                        MainViewModel.overwriteMod = true;
+                        Directory.Delete(modPath, true);
+                        break;
+                    case MessageBoxResult.No:
+                        throw new ModAlreadyExistsExceptions(modName);
+                        break;
+                }
+            }
             Directory.CreateDirectory(modPath);
             File.Copy(fileName,Path.Combine(modPath, Path.GetFileName(fileName)));
 
