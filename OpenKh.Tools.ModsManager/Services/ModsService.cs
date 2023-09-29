@@ -132,7 +132,7 @@ namespace OpenKh.Tools.ModsManager.Services
             var modPath = GetModPath(modName);
             if (Directory.Exists(modPath))
             {
-                var errorMessage = MessageBox.Show($"A mod with the name '{modName}' already exists. Do you want to overwrite the mod install.", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var errorMessage = MessageBox.Show($"A mod with the name '{modName}' already exists. Do you want to overwrite the mod install.", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
 
                 switch (errorMessage)
                 {
@@ -274,7 +274,7 @@ namespace OpenKh.Tools.ModsManager.Services
             var modPath = GetModPath(repositoryName);
             if (Directory.Exists(modPath))
             {
-                var errorMessage = MessageBox.Show($"A mod with the name '{repositoryName}' already exists. Do you want to overwrite the mod install.", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var errorMessage = MessageBox.Show($"A mod with the name '{repositoryName}' already exists. Do you want to overwrite the mod install.", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No , MessageBoxOptions.DefaultDesktopOnly);
 
                 switch (errorMessage)
                 {
