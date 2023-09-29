@@ -66,6 +66,9 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>Shlwapi.lib;Dependencies\bass.lib;Dependencies\bass_vgmstream.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy Dependencies\*.dll ..\Debug\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

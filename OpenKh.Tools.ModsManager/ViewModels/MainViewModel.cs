@@ -65,6 +65,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string Title => ApplicationName;
         public string CurrentVersion => ApplicationVersion;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
+        public ObservableCollection<string> PresetList { get; set; }
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AddModCommand { get; set; }
         public RelayCommand RemoveModCommand { get; set; }
@@ -80,6 +81,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand WizardCommand { get; set; }
         public RelayCommand OpenLinkCommand { get; set; }
         public RelayCommand CheckOpenkhUpdateCommand { get; set; }
+        public RelayCommand OpenPresetMenuCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -243,6 +245,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
             ReloadModsList();
             SelectedValue = ModsList.FirstOrDefault();
+            ReloadPresetList();
 
             ExitCommand = new RelayCommand(_ => Window.Close());
             AddModCommand = new RelayCommand(_ =>
@@ -258,6 +261,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         var name = view.RepositoryName;
                         var isZipFile = view.IsZipFile;
+                        var isLuaFile = view.IsLuaFile;
                         progressWindow = Application.Current.Dispatcher.Invoke(() =>
                         {
                             var progressWindow = new InstallModProgressWindow
@@ -269,16 +273,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             progressWindow.Show();
                             return progressWindow;
                         });
-
-                        await ModsService.InstallMod(name, isZipFile, progress =>
+                        await ModsService.InstallMod(name, isZipFile, isLuaFile, progress =>
                         {
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
                         }, nProgress =>
                         {
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
                         });
-
-                        var actualName = isZipFile ? Path.GetFileNameWithoutExtension(name) : name;
+                        var actualName = isZipFile || isLuaFile ? Path.GetFileNameWithoutExtension(name) : name;
                         var mod = ModsService.GetMods(new string[] { actualName }).First();
                         Application.Current.Dispatcher.Invoke(() =>
                         {
@@ -418,6 +420,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     else
                         PC = false;
                 }
+            });
+
+            OpenPresetMenuCommand = new RelayCommand(_ =>
+            {
+                PresetsWindow view = new PresetsWindow(this);
+                view.Show();
             });
 
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
@@ -918,6 +926,53 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 var message = $"The latest version '{checkResult.CurrentVersion}' is already installed!";
 
                 MessageBox.Show(message, "OpenKh");
+            }
+        }
+        
+        
+        // PRESETS
+        public void SavePreset(string presetName)
+        {
+            string name = string.Join("+", presetName.Split(Path.GetInvalidFileNameChars()));
+            List<string> enabledMods = ModsList
+            .Where(x => x.Enabled)
+            .Select(x => x.Source)
+            .ToList();
+            File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name + ".txt"), enabledMods);
+            if (!PresetList.Contains(presetName))
+            {
+                PresetList.Add(presetName);
+            }
+        }
+        public void RemovePreset(string presetName)
+        {
+            File.Delete(Path.Combine(ConfigurationService.PresetPath, presetName + ".txt"));
+            PresetList.Remove(presetName);
+        }
+
+        public void LoadPreset(string presetName)
+        {
+            string filename = Path.Combine(ConfigurationService.PresetPath, presetName + ".txt");
+            if (File.Exists(filename))
+            {
+                ConfigurationService.EnabledMods = File.ReadAllLines(filename);
+                ReloadModsList();
+            }
+            else
+            {
+                MessageBox.Show("Cannot find preset", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+        }
+
+        public void ReloadPresetList()
+        {
+            if (PresetList == null)
+                PresetList = new ObservableCollection<string>();
+
+            PresetList.Clear();
+            foreach (string presetFilePath in Directory.GetFiles(ConfigurationService.PresetPath))
+            {
+                PresetList.Add(Path.GetFileNameWithoutExtension(presetFilePath));
             }
         }
     }

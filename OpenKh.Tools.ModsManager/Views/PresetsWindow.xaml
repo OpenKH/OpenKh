@@ -1,0 +1,61 @@
+<Window x:Class="OpenKh.Tools.ModsManager.Views.PresetsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+        xmlns:ctrls="clr-namespace:System.Windows.Controls"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+         FocusManager.FocusedElement="{Binding ElementName=txtSourceModUrl}"
+        Title="Presets" Height="300" Width="300" SizeToContent="Height">
+    
+    <Window.InputBindings>
+        <KeyBinding Key="Esc" Command="{Binding CloseCommand}"/>
+    </Window.InputBindings>
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+
+    <!-- Preset List -->
+    <DockPanel Margin="10">
+
+        <!-- Add new preset -->
+        <StackPanel DockPanel.Dock="Bottom">
+            <TextBlock Margin="0 0 0 3">Name Preset</TextBlock>
+            <Grid Margin="0 0 0 5" Background="White">
+                <TextBlock Margin="5,1" MinWidth="50" Text="Enter New Preset Name" 
+                   Foreground="Gray" Visibility="{Binding ElementName=txtSourceModUrl, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" IsHitTestVisible="False"/>
+                <TextBox Name="txtSourceModUrl" Background="Transparent" Text="{Binding PresetName, UpdateSourceTrigger=PropertyChanged}" KeyUp="txtSourceModUrl_KeyUp" />
+            </Grid>
+            <Button Click="Save_Click">Save</Button>
+        </StackPanel>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+            <ScrollViewer Grid.Column="0" MinHeight="200">
+                <ListView Name="List_Presets" ItemsSource="{Binding Path=MainVm.PresetList}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center" Text="{Binding}"/>
+                                <!--<Button Margin="5 0 0 0" Click="Button_ApplyPreset">Apply</Button>
+                                <Button Margin="5 0 0 0" Click="Button_RemovePreset">Remove</Button>-->
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </ScrollViewer>
+
+            <StackPanel Grid.Column="1" Margin="10">
+                <Button Click="Button_ApplyPreset" Margin="0 10">Apply</Button>
+                <Button Click="Button_RemovePreset">Remove</Button>
+            </StackPanel>
+        </Grid>
+        
+    </DockPanel>
+</Window>
