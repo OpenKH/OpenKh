@@ -1,6 +1,5 @@
 using OpenKh.Tools.ModsManager.Services;
 using OpenKh.Tools.ModsManager.ViewModels;
-using SharpDX.Direct2D1;
 using System;
 using System.IO;
 using System.Linq;

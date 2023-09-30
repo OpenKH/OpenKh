@@ -948,8 +948,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 MessageBox.Show(message, "OpenKh");
             }
         }
-
-
+        
+        
         // PRESETS
         public void SavePreset(string presetName)
         {
@@ -986,7 +986,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public void ReloadPresetList()
         {
-            if(PresetList == null)
+            if (PresetList == null)
                 PresetList = new ObservableCollection<string>();
 
             PresetList.Clear();

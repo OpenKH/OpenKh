@@ -84,10 +84,9 @@ namespace OpenKh.Tools.ModsManager.Services
                 Directory.CreateDirectory(Path.Combine(modsPath, "bbs"));
             if (!Directory.Exists(Path.Combine(modsPath, "Recom")))
                 Directory.CreateDirectory(Path.Combine(modsPath, "Recom"));
-            if(!Directory.Exists(PresetPath))
+            if (!Directory.Exists(PresetPath))
                 Directory.CreateDirectory(PresetPath);
 
-           
 
             Task.Run(async () =>
             {
