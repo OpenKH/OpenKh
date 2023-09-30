@@ -1,5 +1,4 @@
 using OpenKh.Tools.ModsManager.ViewModels;
-using SharpDX.Direct2D1;
 using System;
 using System.Windows;
 
