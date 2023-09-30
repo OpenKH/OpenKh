@@ -313,8 +313,10 @@ namespace OpenKh.Tools.ModsManager.Services
                     },
                     OnTransferProgress = (progress) =>
                     {
-                        var nProgress = (progress.IndexedObjects + progress.ReceivedObjects) / (progress.TotalObjects * 2);
+                        var nProgress = ((float)progress.ReceivedObjects / (float)progress.TotalObjects);
                         progressNumber?.Invoke(nProgress);
+
+                        progressOutput?.Invoke("Received Bytes: " + (progress.ReceivedBytes / 1048576) + " MB");
                         return true;
                     }
                 };
