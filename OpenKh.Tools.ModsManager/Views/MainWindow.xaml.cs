@@ -1,11 +1,6 @@
-using OpenKh.Tools.ModsManager.Services;
 using OpenKh.Tools.ModsManager.ViewModels;
 using System;
-using System.IO;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 
 namespace OpenKh.Tools.ModsManager.Views
 {
@@ -18,7 +13,7 @@ namespace OpenKh.Tools.ModsManager.Views
         {
             InitializeComponent();
             DataContext = new MainViewModel();
-        }     
+        }
 
         protected override void OnClosed(EventArgs e)
         {
@@ -26,5 +21,5 @@ namespace OpenKh.Tools.ModsManager.Views
             WinSettings.Default.Save();
             base.OnClosed(e);
         }
-    }    
+    }
 }
