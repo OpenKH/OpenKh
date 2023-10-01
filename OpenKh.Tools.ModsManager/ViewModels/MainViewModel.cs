@@ -425,7 +425,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             OpenPresetMenuCommand = new RelayCommand(_ =>
             {
                 PresetsWindow view = new PresetsWindow(this);
-                view.Show();
+                view.ShowDialog();
             });
 
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
