@@ -317,10 +317,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             get
             {
-                if (File.Exists(Path.Combine(ConfigurationService.LuaEngineLocation, "LuaEngine.exe")))
+                if (File.Exists(Path.Combine(ConfigurationService.LuaEngineLocation, "LuaEngine-REBORN.exe")))
                 {
-                    if (FileVersionInfo.GetVersionInfo(Path.Combine(ConfigurationService.LuaEngineLocation, "LuaEngine.exe")).ProductVersion == MainViewModel.releases.TagName ||
-                        MainViewModel.releases.TagName == "v1.01" && File.Exists(Path.Combine(ConfigurationService.LuaEngineLocation, "LuaEngine.exe")))
+                    if ("v" + FileVersionInfo.GetVersionInfo(Path.Combine(ConfigurationService.LuaEngineLocation, "LuaEngine-REBORN.exe")).ProductVersion == MainViewModel.releases.TagName)
                     {
                         return ConfigurationService.LuaEngineInstalled = true;
                     }
