@@ -371,15 +371,48 @@ namespace OpenKh.Tools.ModsManager.Services
                 {
                     if (line.Contains("NAME"))
                     {
-                        modName = line.Substring(line.IndexOf("'"));
+                        if (line.Contains("\""))
+                        {
+                            modName = line.Substring(line.IndexOf("\""));
+                        }
+                        else if (line.Contains("'"))
+                        {
+                            modName = line.Substring(line.IndexOf("'"));
+                        }
+                        else
+                        {
+                            modName = line.Substring(line.IndexOf("=") + 1);
+                        }
                     }
                     else if (line.Contains("AUTH"))
                     {
-                        modAuthor = line.Substring(line.IndexOf("'"));
+                        if (line.Contains("\""))
+                        {
+                            modAuthor = line.Substring(line.IndexOf("\""));
+                        }
+                        else if (line.Contains("'"))
+                        {
+                            modAuthor = line.Substring(line.IndexOf("'"));
+                        }
+                        else
+                        {
+                            modAuthor = line.Substring(line.IndexOf("=") + 1);
+                        }
                     }
                     else if (line.Contains("DESC"))
                     {
-                        modDescription = line.Substring(line.IndexOf("'"));
+                        if (line.Contains("\""))
+                        {
+                            modDescription = line.Substring(line.IndexOf("\""));
+                        }
+                        else if (line.Contains("'"))
+                        {
+                            modDescription = line.Substring(line.IndexOf("'"));
+                        }
+                        else
+                        {
+                            modDescription = line.Substring(line.IndexOf("=") + 1);
+                        }
                     }
                     if (modName != null && modAuthor != null && modDescription != null)
                     {
