@@ -365,59 +365,31 @@ namespace OpenKh.Tools.ModsManager.Services
             StreamReader r = new StreamReader(Path.Combine(modPath, Path.GetFileName(fileName)));
             while (!r.EndOfStream)
             {
-
                 string line = r.ReadLine();
+
                 if (line.Contains("LUAGUI"))
                 {
-                    if (line.Contains("NAME"))
+                    string _lineGib = "";
+                    string _lineLead = "";
+
+                    _lineGib = line.Substring(line.IndexOf("=") + 1).Replace("\"", "").Replace("\'", "").Trim();
+                    _lineLead = string.Concat(line.Take(11));
+
+                    switch (_lineLead)
                     {
-                        if (line.Contains("\""))
-                        {
-                            modName = line.Substring(line.IndexOf("\""));
-                        }
-                        else if (line.Contains("'"))
-                        {
-                            modName = line.Substring(line.IndexOf("'"));
-                        }
-                        else
-                        {
-                            modName = line.Substring(line.IndexOf("=") + 1);
-                        }
+                        case "LUAGUI_NAME":
+                            modName = _lineGib;
+                            break;
+                        case "LUAGUI_AUTH":
+                            modAuthor = _lineGib;
+                            break;
+                        case "LUAGUI_DESC":
+                            modDescription = _lineGib;
+                            break;
                     }
-                    else if (line.Contains("AUTH"))
-                    {
-                        if (line.Contains("\""))
-                        {
-                            modAuthor = line.Substring(line.IndexOf("\""));
-                        }
-                        else if (line.Contains("'"))
-                        {
-                            modAuthor = line.Substring(line.IndexOf("'"));
-                        }
-                        else
-                        {
-                            modAuthor = line.Substring(line.IndexOf("=") + 1);
-                        }
-                    }
-                    else if (line.Contains("DESC"))
-                    {
-                        if (line.Contains("\""))
-                        {
-                            modDescription = line.Substring(line.IndexOf("\""));
-                        }
-                        else if (line.Contains("'"))
-                        {
-                            modDescription = line.Substring(line.IndexOf("'"));
-                        }
-                        else
-                        {
-                            modDescription = line.Substring(line.IndexOf("=") + 1);
-                        }
-                    }
+
                     if (modName != null && modAuthor != null && modDescription != null)
-                    {
                         break;
-                    }
                 }
             }
             r.Close();
