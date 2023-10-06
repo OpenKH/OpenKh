@@ -74,16 +74,16 @@
         </ListBox>
         <Grid Grid.Column="1">
             <StackPanel VerticalAlignment="Center">
-                <Button Grid.Row="0" Margin="0 3 0 3" Command="{Binding MoveUp}">
+                <Button Grid.Row="0" Margin="0 3 0 3" Command="{Binding MoveUp}" ToolTip="Moves selected mod up increasing its priority.">
                     <Image Source="{StaticResource AddRowToAbove_16x}"/>
                 </Button>
-                <Button Grid.Row="4" Margin="0 3 0 3" Command="{Binding MoveDown}">
+                <Button Grid.Row="4" Margin="0 3 0 3" Command="{Binding MoveDown}" ToolTip="Moves selected mod down decreasing its priority.">
                     <Image Source="{StaticResource AddRowToBelow_16x}"/>
                 </Button>
-                <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding AddModCommand}">
+                <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding AddModCommand}" ToolTip="Install a new mod.">
                     <Image Source="{StaticResource Add_16x}"/>
                 </Button>
-                <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding RemoveModCommand}">
+                <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding RemoveModCommand}" ToolTip="Delete selected mod.">
                     <Image Source="{StaticResource Remove_color_16x}"/>
                 </Button>
             </StackPanel>

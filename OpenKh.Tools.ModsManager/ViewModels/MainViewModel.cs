@@ -204,6 +204,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         break;
                 }
                 ReloadModsList();
+                if (ModsList.Count > 0)
+                    FetchUpdates();
             }
         }
 
@@ -285,14 +287,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             progressWindow.Close();
+                            if (overwriteMod)
+                            {
+                                var modRemove = ModsList.FirstOrDefault(smod => smod.Title == mod.Metadata.Title);
+                                if (modRemove != null)
+                                    ModsList.RemoveAt(ModsList.IndexOf(modRemove));
+                                overwriteMod = false;
+                            }
                             ModsList.Insert(0, Map(mod));
                             SelectedValue = ModsList[0];
                         });
-                        if (overwriteMod)
-                        {
-                            overwriteMod = false;
-                            ReloadModsList();
-                        }
                     }
                     catch (Exception ex)
                     {
@@ -319,7 +323,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }
 
                         Directory.Delete(mod.Path, true);
-                        ReloadModsList();
+                        ModsList.RemoveAt(ModsList.IndexOf(SelectedValue));
                     });
                 }
             }, _ => IsModSelected);
@@ -957,6 +961,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 ConfigurationService.EnabledMods = File.ReadAllLines(filename);
                 ReloadModsList();
+                if (ModsList.Count > 0)
+                    FetchUpdates();
             }
             else
             {
