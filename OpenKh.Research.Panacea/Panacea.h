@@ -10,8 +10,9 @@ namespace Panacea
 
     int SetReplacePath(__int64 a1, const char* a2);
     void FreeAllPackages();
-    long  __cdecl LoadFile(Axa::CFileMan* _this, const char* filename, void* addr, bool unk);
-    void*  __cdecl LoadFileWithMalloc(Axa::CFileMan* _this, const char* filename, int* sizePtr, bool unk, const char* filename2);
+    long  __cdecl LoadFile(Axa::CFileMan* _this, const char* filename, void* addr, bool useHdAsset);
+    long  __cdecl LoadFileWithSize(Axa::CFileMan* _this, const char* filename, void* addr, int size, bool useHdAsset);
+    void*  __cdecl LoadFileWithMalloc(Axa::CFileMan* _this, const char* filename, int* sizePtr, bool useHdAsset, const char* filename2);
     long  __cdecl GetFileSize(Axa::CFileMan* _this, const char* filename);
     __int64  __cdecl GetRemasteredCount();
     Axa::RemasteredEntry* __cdecl GetRemasteredEntry(Axa::CFileMan* a1, int* origOffsetPtr, int assetNum);
