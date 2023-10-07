@@ -226,6 +226,7 @@ int (*onFrameOrig)(__int64 a1);
 Hook<PFN_Axa_SetReplacePath>* Hook_Axa_SetReplacePath;
 Hook<PFN_Axa_FreeAllPackages>* Hook_Axa_FreeAllPackages;
 Hook<PFN_Axa_CFileMan_LoadFile>* Hook_Axa_CFileMan_LoadFile;
+Hook<PFN_Axa_CFileMan_LoadFileWithSize>* Hook_Axa_CFileMan_LoadFileWithSize;
 Hook<PFN_Axa_CFileMan_LoadFileWithMalloc>* Hook_Axa_CFileMan_LoadFileWithMalloc;
 Hook<PFN_Axa_CFileMan_GetFileSize>* Hook_Axa_CFileMan_GetFileSize;
 Hook<PFN_Axa_CFileMan_GetRemasteredCount>* Hook_Axa_CFileMan_GetRemasteredCount;
@@ -271,6 +272,7 @@ void Panacea::Initialize()
     Hook_Axa_SetReplacePath = NewHook(pfn_Axa_SetReplacePath, Panacea::SetReplacePath, "Axa::SetReplacePath");
     Hook_Axa_FreeAllPackages = NewHook(pfn_Axa_FreeAllPackages, Panacea::FreeAllPackages, "Axa::FreeAllPackages");
     Hook_Axa_CFileMan_LoadFile = NewHook(pfn_Axa_CFileMan_LoadFile, Panacea::LoadFile, "Axa::CFileMan::LoadFile");
+    Hook_Axa_CFileMan_LoadFileWithSize = NewHook(pfn_Axa_CFileMan_LoadFileWithSize, Panacea::LoadFileWithSize, "Axa::CFileMan::LoadFileWithSize");
     Hook_Axa_CFileMan_LoadFileWithMalloc = NewHook(pfn_Axa_CFileMan_LoadFileWithMalloc, Panacea::LoadFileWithMalloc, "Axa::CFileMan::LoadFileWithMalloc");
     Hook_Axa_CFileMan_GetFileSize = NewHook(pfn_Axa_CFileMan_GetFileSize, Panacea::GetFileSize, "Axa::CFileMan::GetFileSize");
     Hook_Axa_CFileMan_GetRemasteredCount = NewHook(pfn_Axa_CFileMan_GetRemasteredCount, Panacea::GetRemasteredCount, "Axa::CFileMan::GetRemasteredCount");
@@ -829,6 +831,113 @@ long __cdecl Panacea::LoadFile(Axa::CFileMan* _this, const char* filename, void*
     FILE* file = _wfopen(path, L"rb");
     fseek(file, 0, SEEK_END);
     auto length = ftell(file);
+
+    fseek(file, 0, SEEK_SET);
+    fread(addr, length, 1, file);
+    fclose(file);
+
+    if (!length || !useHdAsset)
+        return length;
+
+    GetRemasteredFiles(fileinfo, path, addr);
+
+    if (Axa::AxaResourceMan::SetResourceItem(filename, length, addr) != -1)
+        return length;
+    return 0;
+}
+
+long __cdecl Panacea::LoadFileWithSize(Axa::CFileMan* _this, const char* filename, void* addr, int size, bool useHdAsset)
+{
+    wchar_t path[MAX_PATH];
+    if (GetRawFile(path, sizeof(path), filename))
+    {
+        if (OpenKH::m_DebugLog)
+            fwprintf(stdout, L"LoadFileWithSize(\"%ls\", %d, %d)\n", path, size, useHdAsset);
+        auto fileinfo = Axa::PackageMan::GetFileInfo(filename, 0);
+        FILE* file = _wfopen(path, L"rb");
+        Axa::PkgEntry pkgent;
+        fread(&pkgent, sizeof(pkgent), 1, file);
+        if (useHdAsset)
+        {
+            std::vector<Axa::RemasteredEntry> entries;
+            entries.reserve(pkgent.remasteredCount);
+            int newoff = sizeof(Axa::PkgEntry) + sizeof(Axa::RemasteredEntry) * pkgent.remasteredCount;
+            if (pkgent.compressedSize <= 0)
+                newoff += (pkgent.decompressedSize + 0xF) & ~0xF;
+            else
+                newoff += pkgent.compressedSize;
+            Axa::RemasteredEntry ent;
+            for (int i = 0; i < pkgent.remasteredCount; i++)
+            {
+                fread(&ent, sizeof(Axa::RemasteredEntry), 1, file);
+                ent.offset = newoff;
+                entries.push_back(ent);
+                if (ent.compressedSize <= 0)
+                    newoff += (ent.decompressedSize + 0xF) & ~0xF;
+                else
+                    newoff += ent.compressedSize;
+            }
+            RemasteredData.insert_or_assign(fileinfo->CurrentFileName, entries);
+        }
+        else
+            fseek(file, sizeof(Axa::RemasteredEntry) * pkgent.remasteredCount, SEEK_CUR);
+
+        if (pkgent.decompressedSize > size)
+        {
+            fclose(file);
+            return -6;
+        }
+
+        if (pkgent.decompressedSize > 16)
+        {
+            if (pkgent.compressedSize <= 0)
+            {
+                fread(addr, pkgent.decompressedSize, 1, file);
+                if (pkgent.compressedSize == -1)
+                    Axa::DecryptFile(fileinfo, addr, pkgent.decompressedSize, &pkgent);
+            }
+            else
+            {
+                char* cmpbuf = new char[pkgent.compressedSize];
+                fread(cmpbuf, pkgent.compressedSize, 1, file);
+                Axa::DecryptFile(fileinfo, cmpbuf, pkgent.compressedSize, &pkgent);
+                int decSize = pkgent.decompressedSize;
+                Axa::DecompressFile(addr, &decSize, cmpbuf, pkgent.compressedSize);
+                delete[] cmpbuf;
+            }
+        }
+        else
+            fread(addr, pkgent.decompressedSize, 1, file);
+        fclose(file);
+
+        if (!pkgent.decompressedSize || !useHdAsset)
+            return pkgent.decompressedSize;
+
+        if (Axa::AxaResourceMan::SetResourceItem(filename, pkgent.decompressedSize, addr) != -1)
+            return pkgent.decompressedSize;
+        return 0;
+    }
+    else if (!TransformFilePath(path, sizeof(path), filename))
+    {
+        if (OpenKH::m_DebugLog)
+            fprintf(stdout, "LoadFile(\"%s\", %d)\n", filename, useHdAsset);
+        auto ret = Hook_Axa_CFileMan_LoadFile->Unpatch()(_this, filename, addr, useHdAsset);
+        Hook_Axa_CFileMan_LoadFile->Patch();
+        return ret;
+    }
+
+    if (OpenKH::m_DebugLog)
+        fwprintf(stdout, L"LoadFile(\"%ls\", %d)\n", path, useHdAsset);
+    auto fileinfo = Axa::PackageMan::GetFileInfo(filename, 0);
+    FILE* file = _wfopen(path, L"rb");
+    fseek(file, 0, SEEK_END);
+    auto length = ftell(file);
+
+    if (length > size)
+    {
+        fclose(file);
+        return -6;
+    }
 
     fseek(file, 0, SEEK_SET);
     fread(addr, length, 1, file);

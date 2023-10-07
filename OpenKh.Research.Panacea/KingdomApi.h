@@ -68,6 +68,7 @@ namespace Axa
     public:
         static long GetFileSize(CFileMan* _this, const char* filename);
         static long LoadFile(CFileMan* _this, const char* filename, void* addr, bool useHdAsset);
+        static long LoadFileWithSize(CFileMan* _this, const char* filename, void* addr, int size, bool useHdAsset);
         static void *LoadFileWithMalloc(CFileMan* _this, const char* filename, int* sizePtr, bool useHdAsset, const char* filename2);
         __int64 GetRemasteredCount();
         Axa::RemasteredEntry* GetRemasteredEntry(CFileMan* a1, int* origOffsetPtr, int assetNum);
@@ -120,6 +121,7 @@ namespace Bbs
 }
 
 PFN_DECLARE(long, Axa_CFileMan_LoadFile, (Axa::CFileMan* _this, const char* filename, void* addr, bool useHdAsset));
+PFN_DECLARE(long, Axa_CFileMan_LoadFileWithSize, (Axa::CFileMan* _this, const char* filename, void* addr, int size, bool useHdAsset));
 PFN_DECLARE(void*, Axa_CFileMan_LoadFileWithMalloc, (Axa::CFileMan* _this, const char* filename, int* sizePtr, bool useHdAsset, const char* filename2));
 PFN_DECLARE(long, Axa_CFileMan_GetFileSize, (Axa::CFileMan* _this, const char* filename));
 PFN_DECLARE(long, Axa_AxaResourceMan_SetResourceItem, (const char* filename, int size, void* buffer));
