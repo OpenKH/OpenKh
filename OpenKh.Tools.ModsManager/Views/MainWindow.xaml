@@ -82,8 +82,14 @@
             </MenuItem>
             <MenuItem Header="_Settings">
                 <MenuItem Header="Run _wizard" Command="{Binding WizardCommand}"  InputGestureText="Alt+W"/>
-                <MenuItem Header="Auto Update Mods" IsCheckable="True" ToolTip="When enabled Mod Manager will automatically update all mods on startup." IsChecked="{Binding AutoUpdateMods}"/>
+                <MenuItem Header="Auto Update Mods" IsCheckable="True" ToolTip="When enabled Mod Manager will automatically update all mods on startup." IsChecked="{Binding AutoUpdateMods}" StaysOpenOnClick="True"/>
                 <MenuItem Header="Check for update" Command="{Binding CheckOpenkhUpdateCommand}"/>
+                <MenuItem Header="Panacea Settings" Visibility="{Binding ModLoader}">
+                    <MenuItem Header="Enable Console" IsCheckable="True" IsChecked="{Binding PanaceaConsoleEnabled}" StaysOpenOnClick="True"/>
+                    <MenuItem Header="Enable Debug Log" IsCheckable="True" IsChecked="{Binding PanaceaDebugLogEnabled}" IsEnabled="{Binding PanaceaConsoleEnabled}" StaysOpenOnClick="True"/>
+                    <MenuItem Header="Enable Cache" IsCheckable="True" IsChecked="{Binding PanaceaCacheEnabled}" StaysOpenOnClick="True"/>
+                    <MenuItem Header="Enable Quick Menu" IsCheckable="True" IsChecked="{Binding PanaceaQuickMenuEnabled}" StaysOpenOnClick="True"/>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="_Info">
                 <MenuItem IsEnabled="False">
@@ -128,7 +134,7 @@
                         <Image Source="{StaticResource WebURL_16x}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Dev View" IsCheckable="True" IsChecked="{Binding DevView}"/>
+                <MenuItem Header="Dev View" IsCheckable="True" IsChecked="{Binding DevView}" StaysOpenOnClick="True"/>
             </MenuItem>
             <MenuItem Header="Presets" Command="{Binding OpenPresetMenuCommand}"/>
             <MenuItem Header="PC Version" Focusable="False" IsHitTestVisible="False" Visibility="{Binding isPC}"/>

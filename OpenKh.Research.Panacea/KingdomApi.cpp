@@ -5,6 +5,7 @@
 
 PFN_DEFINE(Axa_CFileMan_LoadFile);
 PFN_DEFINE(Axa_CFileMan_LoadFileWithMalloc);
+PFN_DEFINE(Axa_CFileMan_LoadFileWithSize);
 PFN_DEFINE(Axa_CFileMan_GetFileSize);
 PFN_DEFINE(Axa_AxaResourceMan_SetResourceItem);
 PFN_DEFINE(Axa_PackageMan_GetFileInfo);
@@ -26,12 +27,16 @@ PFN_DEFINE(VAG_STREAM_exit);
 PFN_DEFINE(Bbs_File_load);
 PFN_DEFINE(Bbs_CRsrcData_loadCallback);
 
-long Axa::CFileMan::LoadFile(CFileMan* _this, const char* filename, void* addr, bool unk) {
-    return pfn_Axa_CFileMan_LoadFile(_this, filename, addr, unk);
+long Axa::CFileMan::LoadFile(CFileMan* _this, const char* filename, void* addr, bool useHdAsset) {
+    return pfn_Axa_CFileMan_LoadFile(_this, filename, addr, useHdAsset);
 }
 
-void* Axa::CFileMan::LoadFileWithMalloc(CFileMan* _this, const char* filename, int* sizePtr, bool unk, const char* filename2) {
-    return pfn_Axa_CFileMan_LoadFileWithMalloc(_this, filename, sizePtr, unk, filename2);
+long Axa::CFileMan::LoadFileWithSize(CFileMan* _this, const char* filename, void* addr, int size, bool useHdAsset) {
+    return pfn_Axa_CFileMan_LoadFileWithSize(_this, filename, addr, size, useHdAsset);
+}
+
+void* Axa::CFileMan::LoadFileWithMalloc(CFileMan* _this, const char* filename, int* sizePtr, bool useHdAsset, const char* filename2) {
+    return pfn_Axa_CFileMan_LoadFileWithMalloc(_this, filename, sizePtr, useHdAsset, filename2);
 }
 
 long Axa::CFileMan::GetFileSize(CFileMan* _this, const char* filename) {
