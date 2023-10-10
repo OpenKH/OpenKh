@@ -37,6 +37,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private bool _isBuilding;
         private bool _pc;
         private bool _panaceaInstalled;
+        private bool _panaceaConsoleEnabled;
+        private bool _panaceaDebugLogEnabled;
+        private bool _panaceaCacheEnabled;
+        private bool _panaceaQuickMenuEnabled;
         private bool _devView;
         private bool _autoUpdateMods = false;
         private string _launchGame = "kh2";
@@ -110,6 +114,50 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
 
+        public bool PanaceaConsoleEnabled
+        {
+            get => _panaceaConsoleEnabled;
+            set
+            {
+                _panaceaConsoleEnabled = value;
+                ConfigurationService.ShowConsole = _panaceaConsoleEnabled;
+                if (_panaceaDebugLogEnabled)
+                    PanaceaDebugLogEnabled = false;
+                OnPropertyChanged(nameof(PanaceaConsoleEnabled));
+                UpdatePanaceaSettings();
+            }
+        }
+        public bool PanaceaDebugLogEnabled
+        {
+            get => _panaceaDebugLogEnabled;
+            set
+            {
+                _panaceaDebugLogEnabled = value;
+                ConfigurationService.DebugLog = _panaceaDebugLogEnabled;
+                OnPropertyChanged(nameof(PanaceaDebugLogEnabled));
+                UpdatePanaceaSettings();
+            }
+        }
+        public bool PanaceaCacheEnabled
+        {
+            get => _panaceaCacheEnabled;
+            set
+            {
+                _panaceaCacheEnabled = value;
+                ConfigurationService.EnableCache = _panaceaCacheEnabled;
+                UpdatePanaceaSettings();
+            }
+        }
+        public bool PanaceaQuickMenuEnabled
+        {
+            get => _panaceaQuickMenuEnabled;
+            set
+            {
+                _panaceaQuickMenuEnabled = value;
+                ConfigurationService.QuickMenu = _panaceaQuickMenuEnabled;
+                UpdatePanaceaSettings();
+            }
+        }
         public bool DevView
         {
             get => _devView;
@@ -204,6 +252,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         break;
                 }
                 ReloadModsList();
+                if (ModsList.Count > 0)
+                    FetchUpdates();
             }
         }
 
@@ -230,6 +280,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 PC = true;
                 PanaceaInstalled = ConfigurationService.PanaceaInstalled;
                 DevView = ConfigurationService.DevView;
+                _panaceaConsoleEnabled = ConfigurationService.ShowConsole;
+                _panaceaDebugLogEnabled = ConfigurationService.DebugLog;
+                _panaceaCacheEnabled = ConfigurationService.EnableCache;
+                _panaceaQuickMenuEnabled = ConfigurationService.QuickMenu;
             }
             else
                 PC = false;
@@ -285,14 +339,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             progressWindow.Close();
+                            if (overwriteMod)
+                            {
+                                var modRemove = ModsList.FirstOrDefault(smod => smod.Title == mod.Metadata.Title);
+                                if (modRemove != null)
+                                    ModsList.RemoveAt(ModsList.IndexOf(modRemove));
+                                overwriteMod = false;
+                            }
                             ModsList.Insert(0, Map(mod));
                             SelectedValue = ModsList[0];
                         });
-                        if (overwriteMod)
-                        {
-                            overwriteMod = false;
-                            ReloadModsList();
-                        }
                     }
                     catch (Exception ex)
                     {
@@ -319,7 +375,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }
 
                         Directory.Delete(mod.Path, true);
-                        ReloadModsList();
+                        ModsList.RemoveAt(ModsList.IndexOf(SelectedValue));
                     });
                 }
             }, _ => IsModSelected);
@@ -927,9 +983,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                 MessageBox.Show(message, "OpenKh");
             }
+        }        
+        
+        public void UpdatePanaceaSettings()
+        {
+            string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
+            if (panaceaSettings != null)
+            {
+                string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
+                    $"debug_log={_panaceaDebugLogEnabled}\r\nenable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
+                File.WriteAllText(panaceaSettings, textToWrite);
+            }
         }
-        
-        
+
         // PRESETS
         public void SavePreset(string presetName)
         {
@@ -957,6 +1023,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 ConfigurationService.EnabledMods = File.ReadAllLines(filename);
                 ReloadModsList();
+                if (ModsList.Count > 0)
+                    FetchUpdates();
             }
             else
             {

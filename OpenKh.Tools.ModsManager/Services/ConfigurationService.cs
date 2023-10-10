@@ -37,7 +37,11 @@ namespace OpenKh.Tools.ModsManager.Services
             public string PcReleaseLanguage { get; internal set; } = "en";
             public int RegionId { get; internal set; }
             public bool PanaceaInstalled { get; internal set; }
-            public bool DevView { get; internal set; }
+            public bool ShowConsole { get; internal set; } = false;
+            public bool DebugLog { get; internal set; } = false;
+            public bool EnableCache { get; internal set; } = true;
+            public bool QuickMenu { get; internal set; } = false;
+            public bool DevView { get; internal set; } = false;
             public bool AutoUpdateMods { get; internal set; }
             public bool isEGSVersion { get; internal set; } = true;
             public bool kh1 { get; internal set; }
@@ -264,6 +268,42 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.PanaceaInstalled = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool ShowConsole
+        {
+            get => _config.ShowConsole;
+            set
+            {
+                _config.ShowConsole = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool DebugLog
+        {
+            get => _config.DebugLog;
+            set
+            {
+                _config.DebugLog = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool EnableCache
+        {
+            get => _config.EnableCache;
+            set
+            {
+                _config.EnableCache = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool QuickMenu
+        {
+            get => _config.QuickMenu;
+            set
+            {
+                _config.QuickMenu = value;
                 _config.Save(ConfigPath);
             }
         }
