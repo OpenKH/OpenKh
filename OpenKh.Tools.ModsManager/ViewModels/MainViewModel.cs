@@ -990,9 +990,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         
         public void UpdatePanaceaSettings()
         {
-            string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
-            if (panaceaSettings != null)
+            if (PanaceaInstalled)
             {
+                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
                 string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
                     $"debug_log={_panaceaDebugLogEnabled}\r\nenable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
                 File.WriteAllText(panaceaSettings, textToWrite);
