@@ -113,6 +113,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PanaceaSettings => PC && PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
 
         public bool PanaceaConsoleEnabled
         {
@@ -185,6 +186,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _panaceaInstalled = value;
                 OnPropertyChanged(nameof(PatchVisible));
                 OnPropertyChanged(nameof(ModLoader));
+                OnPropertyChanged(nameof(PanaceaSettings));
             }
         }
 
@@ -199,6 +201,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PatchVisible));
                 OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
+                OnPropertyChanged(nameof(PanaceaSettings));
             }
         }
 
@@ -987,9 +990,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         
         public void UpdatePanaceaSettings()
         {
-            string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
-            if (panaceaSettings != null)
+            if (PanaceaInstalled)
             {
+                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
                 string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
                     $"debug_log={_panaceaDebugLogEnabled}\r\nenable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
                 File.WriteAllText(panaceaSettings, textToWrite);
