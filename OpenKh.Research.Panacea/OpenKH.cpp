@@ -109,6 +109,7 @@ void QuickBootHook()
 
 OpenKH::GameId OpenKH::m_GameID = OpenKH::GameId::Unknown;
 std::wstring OpenKH::m_ModPath = L"./mod";
+std::wstring OpenKH::m_ExtractPath = L"";
 bool OpenKH::m_ShowConsole = false;
 bool OpenKH::m_DebugLog = false;
 bool OpenKH::m_EnableCache = true;
@@ -174,6 +175,12 @@ void OpenKH::Initialize()
             memset(buf, 0, MAX_PATH);
             WideCharToMultiByte(CP_UTF8, 0, &m_ModPath.front(), m_ModPath.size(), buf, MAX_PATH, nullptr, nullptr);
             fprintf(f, "mod_path=%s\n", buf);
+            if (!m_ExtractPath.empty())
+            {
+                memset(buf, 0, MAX_PATH);
+                WideCharToMultiByte(CP_UTF8, 0, &m_ExtractPath.front(), m_ExtractPath.size(), buf, MAX_PATH, nullptr, nullptr);
+                fprintf(f, "extract_path=%s\n", buf);
+            }
             if (m_ShowConsole)
                 fputs("show_console=true\n", f);
             if (m_DebugLog)
@@ -197,6 +204,8 @@ void OpenKH::Initialize()
     }
 
     m_ModPath.append(gamefolders[(int)m_GameID]);
+    if (m_ExtractPath.size() > 0)
+        m_ExtractPath.append(gamefolders[(int)m_GameID]);
 
     Hook();
     Panacea::Initialize();
@@ -238,6 +247,11 @@ void OpenKH::ReadSettings(const char* filename)
         {
             m_ModPath.resize(MultiByteToWideChar(CP_UTF8, 0, value, strlen(value), nullptr, 0));
             MultiByteToWideChar(CP_UTF8, 0, value, strlen(value), &m_ModPath.front(), m_ModPath.size());
+        }
+        else if (!strncmp(key, "extract_path", sizeof(buf)) && strnlen(value, sizeof(buf)) > 0)
+        {
+            m_ExtractPath.resize(MultiByteToWideChar(CP_UTF8, 0, value, strlen(value), nullptr, 0));
+            MultiByteToWideChar(CP_UTF8, 0, value, strlen(value), &m_ExtractPath.front(), m_ExtractPath.size());
         }
         else if (!strncmp(key, "show_console", sizeof(buf)))
             parseBool(value, m_ShowConsole);

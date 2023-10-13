@@ -126,6 +126,8 @@ public:
     FakePackageFile()
     {
         strcpy(PkgFileName, "ModFiles");
+        if (!OpenKH::m_ExtractPath.empty())
+            ScanFolder(OpenKH::m_ExtractPath);
         ScanFolder(OpenKH::m_ModPath);
         std::wstring rawfol = OpenKH::m_ModPath + L"\\raw";
         ScanFolder(rawfol);
@@ -365,7 +367,14 @@ bool Panacea::TransformFilePath(wchar_t* strOutPath, int maxLength, const char* 
 {
     const char* actualFileName = originalPath + strlen(BasePath) + 1;
     swprintf_s(strOutPath, maxLength, L"%ls\\%hs", OpenKH::m_ModPath.c_str(), actualFileName);
-    return FileExists(strOutPath);
+    if (FileExists(strOutPath))
+        return true;
+    if (!OpenKH::m_ExtractPath.empty())
+    {
+        swprintf_s(strOutPath, maxLength, L"%ls\\%hs", OpenKH::m_ExtractPath.c_str(), actualFileName);
+        return FileExists(strOutPath);
+    }
+    return false;
 }
 
 std::unordered_map<std::string, std::vector<Axa::RemasteredEntry>> RemasteredData;
