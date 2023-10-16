@@ -9,3 +9,4 @@
 | [15jigsaw.bin](file/type/15jigsaw.md)         | Defines puzzle pieces (Final Mix) |
 | [jiminy.bar](file/type/jiminy.md)             | Jiminy's journal info             |
 | [mixdata.bar](file/type/mixdata.md)           | Moogle shop info                  |
+| [12soundinfo.bar](file/type/12soundinfo.bar)  | Defines footstep/ambient sound effects per room in a world.|
