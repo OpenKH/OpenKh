@@ -12,7 +12,6 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         private string _searchTerm;
         private readonly Ctd _ctd;
         private readonly IDrawHandler _drawHandler;
-        private FontsArc _fonts;
 
         public Ctd Ctd
         {
@@ -21,15 +20,6 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
                 _ctd.Messages.Clear();
                 _ctd.Messages.AddRange(Items.Select(x => x.Message));
                 return _ctd;
-            }
-        }
-
-        public FontsArc Fonts
-        {
-            get => _fonts;
-            set
-            {
-                _fonts = value;
             }
         }
 
@@ -62,9 +52,6 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         protected override void OnSelectedItem(MessageViewModel item)
         {
-            if (item != null)
-                item.FontContext = Fonts?.FontMes;
-
             base.OnSelectedItem(item);
         }
 

@@ -61,10 +61,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         public Ctd Ctd
         {
             get => CtdViewModel?.Ctd;
-            set => CtdViewModel = new CtdViewModel(_drawHandler, value)
-            {
-                Fonts = _fonts
-            };
+            set => CtdViewModel = new CtdViewModel(_drawHandler, value);
         }
 
         public FontsArc Fonts
@@ -73,7 +70,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             set
             {
                 _fonts = value;
-                CtdViewModel.Fonts = _fonts;
+                _drawHandler.SetFont(value.FontMes);
                 OnPropertyChanged(nameof(OpenFontEditorCommand));
             }
         }

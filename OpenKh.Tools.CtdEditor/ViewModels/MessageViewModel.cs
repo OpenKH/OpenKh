@@ -25,11 +25,8 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
             DrawHandler = new RelayCommand(_ =>
             {
-                if (FontContext == null)
-                    return;
-
                 var layout = _ctd.Layouts[Message.LayoutIndex];
-                _drawHandler.DrawHandler(CtdEncoders.International, FontContext, Message, layout);
+                _drawHandler.DrawHandler(CtdEncoders.International, Message, layout);
                 _drawHandler.DrawingContext.Flush();
             });
         }
@@ -64,7 +61,6 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         public ISpriteDrawing DrawingContext => _drawHandler.DrawingContext;
         public RelayCommand DrawHandler { get; }
-        public FontsArc.Font FontContext { get; set; }
 
         public override string ToString() => Title;
     }

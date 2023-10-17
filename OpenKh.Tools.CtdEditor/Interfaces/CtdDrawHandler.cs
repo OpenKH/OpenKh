@@ -12,20 +12,46 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
     {
         private const int PspScreenWidth = 480;
         private const int PspScreenHeight = 272;
+        private ISpriteDrawing _drawingContext;
 
         public CtdDrawHandler()
         {
-            DrawingContext = new SpriteDrawingDirect3D();
+            _drawingContext = new SpriteDrawingDirect3D();
         }
 
-        public ISpriteDrawing DrawingContext { get; }
+        public ISpriteDrawing DrawingContext => _drawingContext;
+        private FontsArc.Font _currentFont;
+        private ISpriteTexture _fontTex1;
+        private ISpriteTexture _fontTex2;
+
+        public void Create()
+        {
+            
+        }
+
+        public void SetFont(FontsArc.Font font)
+        {
+            if (_currentFont != null)
+            {
+                _fontTex1.Dispose();
+                _fontTex1 = null;
+                _fontTex2.Dispose();
+                _fontTex2 = null;
+                _currentFont = null;
+            }
+            _currentFont = font;
+            _fontTex1 = _drawingContext.CreateSpriteTexture(font.Image1);
+            _fontTex2 = _drawingContext.CreateSpriteTexture(font.Image2);
+        }
 
         public void DrawHandler(
             ICtdMessageEncoder encoder,
-            FontsArc.Font fontContext,
             Ctd.Message message,
             Ctd.Layout layout)
         {
+            if (_currentFont == null)
+                return;
+
             DrawPspScreen();
             DrawDialog(layout);
 
@@ -33,35 +59,34 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
             int BeginY = layout.DialogY + layout.TextY;
             var x = BeginX;
             var y = BeginY;
-            var texture1 = DrawingContext.CreateSpriteTexture(fontContext.Image1);
-            var texture2 = DrawingContext.CreateSpriteTexture(fontContext.Image2);
             foreach (var ch in encoder.ToUcs(message.Data))
             {
                 if (ch >= 0x20)
                 {
-                    var chInfo = fontContext.CharactersInfo.FirstOrDefault(info => info.Id == ch);
+                    var chInfo = _currentFont.CharactersInfo.FirstOrDefault(info => info.Id == ch);
                     if (chInfo == null)
                     {
-                        if (ch == 0x20)
-                            x += fontContext.Info.CharacterWidth / 2;
+                        if (ch == 0x20) // space
+                            x += _currentFont.Info.CharacterWidth / 2;
                         continue;
                     }
                     if (chInfo.Palette >= 2)
                         continue;
 
-                    var texture = chInfo.Palette == 0 ? texture1 : texture2;
+                    var texture = chInfo.Palette == 0 ? _fontTex1 : _fontTex2;
                     var source = new Rectangle
                     {
                         X = chInfo.PositionX,
                         Y = chInfo.PositionY,
                         Width = chInfo.Width,
-                        Height = fontContext.Info.CharacterHeight
+                        Height = _currentFont.Info.CharacterHeight
                     };
                     DrawingContext.AppendSprite(new SpriteDrawingContext()
                         .SpriteTexture(texture)
-                        .Source(chInfo.PositionX, chInfo.PositionY, chInfo.Width, fontContext.Info.CharacterHeight)
+                        .Source(chInfo.PositionX, chInfo.PositionY, chInfo.Width, _currentFont.Info.CharacterHeight)
                         .MatchSourceSize()
-                        .Position(x, y));
+                        .Position(x, y)
+                        .ColorDefault());
 
                     x += source.Width + layout.HorizontalSpace;
                 }
@@ -76,6 +101,14 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
                     }
                 }
             }
+        }
+
+        public void Destroy()
+        {
+            if (_currentFont != null)
+                SetFont(null);
+
+            DrawingContext.Dispose();
         }
 
         private void DrawPspScreen() =>

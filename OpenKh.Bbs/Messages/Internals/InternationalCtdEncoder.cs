@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -41,6 +41,15 @@ namespace OpenKh.Bbs.Messages.Internals
             [0xc3] = "button-dpad",
             [0xc4] = "button-dpad-h",
             [0xc5] = "button-dpad-v",
+        };
+        private static readonly Dictionary<byte, string> _mappingF2 = new Dictionary<byte, string>
+        {
+            [0xF6] = "unk"
+        };
+        private static readonly Dictionary<byte, string> _mappingF5 = new Dictionary<byte, string>
+        {
+            [0x67] = "unk",
+            [0x76] = "button-dpad-and-analog"
         };
         private static readonly Dictionary<byte, string> _mappingF9 = new Dictionary<byte, string>
         {
@@ -125,6 +134,14 @@ namespace OpenKh.Bbs.Messages.Internals
                 case 0xf1:
                     name = "icon";
                     value = _mappingF1[param];
+                    break;
+                case 0xf2:
+                    name = "icon";
+                    value = _mappingF2[param];
+                    break;
+                case 0xf5:
+                    name = "icon";
+                    value = _mappingF5[param];
                     break;
                 case 0xf9:
                     name = "color";
