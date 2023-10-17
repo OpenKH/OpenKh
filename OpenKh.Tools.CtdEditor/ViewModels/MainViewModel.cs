@@ -113,7 +113,10 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
             AboutCommand = new RelayCommand(x =>
             {
-                new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
+                var about = new AboutDialog(Assembly.GetExecutingAssembly());
+                about.Author = "Open KH Team";
+                about.AuthorWebsite = "https://www.openkh.dev";
+                about.ShowDialog();
             }, x => true);
 
             CtdViewModel = new CtdViewModel(_drawHandler);
