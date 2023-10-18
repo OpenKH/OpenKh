@@ -234,6 +234,21 @@ namespace OpenKh.Tools.Kh2MsetEditor.ViewModels
                     //fromAnb.MotionFile.BoneFCurves.RemoveAt(i);
                 }
             }
+            
+            // EXPRESSION NODES - Related to IK Data. Must be updated, or else IK-bones will behave weirdly.
+            for (int i = fromAnb.MotionFile.ExpressionNodes.Count - 1; i >= 0; i--)
+            {
+                Motion.ExpressionNode expressionnodes = fromAnb.MotionFile.ExpressionNodes[i];
+
+                if (boneTransfers[expressionnodes.ExpressionId] != 65535) //"NULL" in this context is "FF FF".
+                {
+                    expressionnodes.ExpressionId = (short)boneTransfers[expressionnodes.ExpressionId];
+                }
+                else
+                {
+                    //fromAnb.MotionFile.BoneFCurves.RemoveAt(i);
+                }
+            }
 
             // IK HELPERS
             for (int i = fromAnb.MotionFile.IKHelpers.Count - 1; i >= 0; i--)
