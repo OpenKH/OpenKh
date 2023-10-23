@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <AssemblyTitle>KH2 mset motion editor</AssemblyTitle>
+        <Product>KH2 mset motion editor - OpenKh</Product>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ApplicationIcon />
+        <StartupObject />
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <MonoGameContentReference Include="**\*.mgcb" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="Content\bin\**" />
+        <EmbeddedResource Remove="Content\bin\**" />
+        <MonoGameContentReference Remove="Content\bin\**" />
+        <None Remove="Content\bin\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
+        <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
+        <PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.7" />
+        <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
+        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+        <PackageReference Include="NPOI" Version="2.6.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\OpenKh.Engine.MonoGame\OpenKh.Engine.MonoGame.csproj" />
+        <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
+        <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+        <ProjectReference Include="..\OpenKh.Tools.Common.CustomImGui\OpenKh.Tools.Common.CustomImGui.csproj" />
+        <ProjectReference Include="..\OpenKh.Tools.Common.WPF\OpenKh.Tools.Common.Wpf.csproj" />
+        <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
+        <ProjectReference Include="..\OpenKh.Kh2AnimEmu\OpenKh.Kh2AnimEmu.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Settings.Designer.cs">
+            <DesignTimeSharedInput>True</DesignTimeSharedInput>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Settings.settings</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="Content\SpriteIcons.png">
+          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </None>
+        <None Update="Settings.settings">
+            <Generator>PublicSettingsSingleFileGenerator</Generator>
+            <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+        </None>
+    </ItemGroup>
+
+</Project>
