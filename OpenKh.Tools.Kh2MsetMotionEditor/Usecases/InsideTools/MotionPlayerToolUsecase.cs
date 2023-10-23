@@ -3,6 +3,7 @@ using OpenKh.Tools.Kh2MsetMotionEditor.Helpers;
 using OpenKh.Tools.Kh2MsetMotionEditor.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.InsideTools
@@ -79,6 +80,54 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.InsideTools
                     ForEdit("FrameEnd", () => _loadedModel.FrameEnd, it => { });
 
                 });
+
+                if (_loadedModel.MotionData?.RootPosition is Kh2.Motion.RootPosition rootPosition)
+                {
+                    ForHeader("Root position", () =>
+                    {
+                        ForEdit3("Scaling",
+                            () => new Vector3(rootPosition.ScaleX, rootPosition.ScaleY, rootPosition.ScaleZ),
+                            it =>
+                            {
+                                rootPosition.ScaleX = it.X;
+                                rootPosition.ScaleY = it.Y;
+                                rootPosition.ScaleZ = it.Z;
+                            }
+                        );
+                        ForEdit3("Rotation",
+                            () => new Vector3(rootPosition.RotateX, rootPosition.RotateY, rootPosition.RotateZ),
+                            it =>
+                            {
+                                rootPosition.RotateX = it.X;
+                                rootPosition.RotateY = it.Y;
+                                rootPosition.RotateZ = it.Z;
+                            }
+                        );
+                        ForEdit3("Translation",
+                            () => new Vector3(rootPosition.TranslateX, rootPosition.TranslateY, rootPosition.TranslateZ),
+                            it =>
+                            {
+                                rootPosition.TranslateX = it.X;
+                                rootPosition.TranslateY = it.Y;
+                                rootPosition.TranslateZ = it.Z;
+                            }
+                        );
+
+                        ImGui.Text("FCurves --");
+                        {
+                            var array = rootPosition.FCurveId;
+
+                            for (int y = 0; y < 3; y++)
+                            {
+                                ImGui.Text(array[3 * y + 0].ToString());
+                                ImGui.SameLine();
+                                ImGui.Text(array[3 * y + 1].ToString());
+                                ImGui.SameLine();
+                                ImGui.Text(array[3 * y + 2].ToString());
+                            }
+                        }
+                    });
+                }
 
                 _loadedModel.FrameTime = frame;
             };
