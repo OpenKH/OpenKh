@@ -49,7 +49,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
                         );
                     };
                 }
-                else
+                else if (_loadedModel.MsetEntries != null)
                 {
                     // source is mset file
                     barEntries = Bar.Read(
@@ -74,6 +74,10 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
                         subBarStream.FromBegin();
                     };
                 }
+                else
+                {
+                    return;
+                }
 
                 var motionEntry = barEntries.Single(it => it.Type == Bar.EntryType.Motion);
                 _loadedModel.MotionData = GetCacheOrLoad(motionEntry);
@@ -93,7 +97,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
 
                 _loadedModel.GetActiveIkBoneViews = () => _filterBoneViewUsecase
                     .Filter(
-                        _loadedModel.MotionList[index].BoneViewMatcher
+                        _loadedModel.MotionList.Skip(index).FirstOrDefault()?.BoneViewMatcher ?? new string[0]
                     );
 
                 {

@@ -227,6 +227,11 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
                         _settings.ViewFCurvesInverse = it;
                         _settings.Save();
                     });
+                    ForMenuCheck("FCurves grid", () => _settings.ViewFCurvesGrid, it =>
+                    {
+                        _settings.ViewFCurvesGrid = it;
+                        _settings.Save();
+                    });
                     ForMenuCheck("FCurveKey", () => _settings.ViewFCurveKey, it =>
                     {
                         _settings.ViewFCurveKey = it;

@@ -281,6 +281,13 @@ namespace OpenKh.Tools.Common.CustomImGui
                 setter(value);
         }
 
+        public static void ForEdit4(string name, Func<Vector4> getter, Action<Vector4> setter, float speed = 1f)
+        {
+            var value = getter();
+            if (ImGui.DragFloat4(name, ref value, speed))
+                setter(value);
+        }
+
         public static void ForMenuCheck(string name, Func<bool> getter, Action<bool> setter)
         {
             var value = getter();

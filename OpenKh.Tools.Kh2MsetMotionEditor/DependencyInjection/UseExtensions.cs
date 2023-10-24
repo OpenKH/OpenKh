@@ -72,6 +72,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.DependencyInjection
             self.AddSingleton<LogCrashStatusUsecase>();
             self.AddSingleton<GlobalInfo>();
             self.AddSingleton<OpenWindowUsecase>();
+            self.AddSingleton<EditMotionDataUsecase>();
 
             // next
 
@@ -117,6 +118,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.DependencyInjection
             self.AddSingleton<IWindowRunnableProvider, FCurvesForwardManagerWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, FCurvesInverseManagerWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, FCurveKeyManagerWindowUsecase>();
+            self.AddSingleton<IWindowRunnableProvider, FCurvesGridManagerWindow>();
             
 
 

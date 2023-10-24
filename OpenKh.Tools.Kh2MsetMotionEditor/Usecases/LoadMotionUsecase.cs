@@ -69,6 +69,8 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
         public void Close()
         {
             _loadedModel.MotionList.Clear();
+            _loadedModel.GetActiveFkBoneViews = null;
+            _loadedModel.GetActiveIkBoneViews = null;
             _loadedModel.SelectedMotionIndex = -1;
             _loadedModel.MotionData = null;
             _loadedModel.FrameTime = 0;
