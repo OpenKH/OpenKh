@@ -74,5 +74,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Helpers
         public string? MsetFile { get; set; }
         public string? AnbFile { get; set; }
         public int SelectFCurveKey { get; set; } = -1;
+        public int SelectFCurvesFoward { get; set; } = -1;
+        public int SelectFCurvesInverse { get; set; } = -1;
     }
 }

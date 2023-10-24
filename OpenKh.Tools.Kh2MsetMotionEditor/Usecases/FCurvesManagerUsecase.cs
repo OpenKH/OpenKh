@@ -49,6 +49,29 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
 
             return () =>
             {
+                if (forward)
+                {
+                    if (0 <= _loadedModel.SelectFCurvesFoward)
+                    {
+                        selectedIndex = _loadedModel.SelectFCurvesFoward;
+
+                        _settings.ViewFCurvesForward = true;
+
+                        _loadedModel.SelectFCurvesFoward = -1;
+                    }
+                }
+                else
+                {
+                    if (0 <= _loadedModel.SelectFCurvesInverse)
+                    {
+                        selectedIndex = _loadedModel.SelectFCurvesInverse;
+
+                        _settings.ViewFCurvesInverse = true;
+
+                        _loadedModel.SelectFCurvesInverse = -1;
+                    }
+                }
+
                 if (forward ? _settings.ViewFCurvesForward : _settings.ViewFCurvesInverse)
                 {
                     var windowClosed = !ForWindow(forward ? "FCurvesForward manager" : "FCurvesInverse manager", () =>

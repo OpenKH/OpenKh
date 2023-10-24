@@ -1,4 +1,5 @@
 using ImGuiNET;
+using MathNet.Numerics.LinearAlgebra.Factorization;
 using OpenKh.Tools.Kh2MsetMotionEditor.Helpers;
 using OpenKh.Tools.Kh2MsetMotionEditor.Interfaces;
 using System;
@@ -10,6 +11,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.InsideTools
 {
     public class MotionPlayerToolUsecase : IToolRunnableProvider
     {
+        private readonly Settings _settings;
         private readonly LoadedModel _loadedModel;
         private readonly IEnumerable<(string Label, float Speed)> _displayAndSpeed = new (string, float)[]
         {
@@ -22,9 +24,11 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.InsideTools
         };
 
         public MotionPlayerToolUsecase(
-            LoadedModel loadedModel
+            LoadedModel loadedModel,
+            Settings settings
         )
         {
+            _settings = settings;
             _loadedModel = loadedModel;
         }
 
@@ -48,6 +52,8 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.InsideTools
                 {
                     ImGui.SetNextItemOpen(true);
                 }
+
+                var saved = false;
 
                 ForHeader("MotionPlayer", () =>
                 {
@@ -74,59 +80,41 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.InsideTools
                         }
                     }
 
+                    void TryToEditFrameData(Action<Kh2.Motion.FrameData> editor)
+                    {
+                        if (_loadedModel.MotionData?.InterpolatedMotionHeader?.FrameData is Kh2.Motion.FrameData frameData)
+                        {
+                            editor(frameData);
+                            saved = true;
+                        }
+                    }
+
                     ImGui.Text("Anb --");
-                    ForEdit("FrameLoop", () => _loadedModel.FrameLoop, it => { });
-                    ForEdit("FramePerSecond", () => _loadedModel.FramePerSecond, it => { });
-                    ForEdit("FrameEnd", () => _loadedModel.FrameEnd, it => { });
+                    ForEdit("FrameLoop",
+                        () => _loadedModel.FrameLoop,
+                        it => TryToEditFrameData(frameData => frameData.FrameReturn = it)
+                    );
+                    ForEdit("FramePerSecond",
+                        () => _loadedModel.FramePerSecond,
+                        it => TryToEditFrameData(frameData => frameData.FramesPerSecond = it)
+                    );
+                    ForEdit("FrameEnd",
+                        () => _loadedModel.FrameEnd,
+                        it => TryToEditFrameData(frameData => frameData.FrameEnd = it)
+                    );
 
                 });
 
-                if (_loadedModel.MotionData?.RootPosition is Kh2.Motion.RootPosition rootPosition)
+                ImGui.Text("Open");
+                ImGui.SameLine();
+                if (ImGui.Button("RootPosition"))
                 {
-                    ForHeader("Root position", () =>
-                    {
-                        ForEdit3("Scaling",
-                            () => new Vector3(rootPosition.ScaleX, rootPosition.ScaleY, rootPosition.ScaleZ),
-                            it =>
-                            {
-                                rootPosition.ScaleX = it.X;
-                                rootPosition.ScaleY = it.Y;
-                                rootPosition.ScaleZ = it.Z;
-                            }
-                        );
-                        ForEdit3("Rotation",
-                            () => new Vector3(rootPosition.RotateX, rootPosition.RotateY, rootPosition.RotateZ),
-                            it =>
-                            {
-                                rootPosition.RotateX = it.X;
-                                rootPosition.RotateY = it.Y;
-                                rootPosition.RotateZ = it.Z;
-                            }
-                        );
-                        ForEdit3("Translation",
-                            () => new Vector3(rootPosition.TranslateX, rootPosition.TranslateY, rootPosition.TranslateZ),
-                            it =>
-                            {
-                                rootPosition.TranslateX = it.X;
-                                rootPosition.TranslateY = it.Y;
-                                rootPosition.TranslateZ = it.Z;
-                            }
-                        );
+                    _settings.ViewRootPosition = true;
+                }
 
-                        ImGui.Text("FCurves --");
-                        {
-                            var array = rootPosition.FCurveId;
-
-                            for (int y = 0; y < 3; y++)
-                            {
-                                ImGui.Text(array[3 * y + 0].ToString());
-                                ImGui.SameLine();
-                                ImGui.Text(array[3 * y + 1].ToString());
-                                ImGui.SameLine();
-                                ImGui.Text(array[3 * y + 2].ToString());
-                            }
-                        }
-                    });
+                if (saved)
+                {
+                    _loadedModel.SendBackMotionData.TurnOn();
                 }
 
                 _loadedModel.FrameTime = frame;

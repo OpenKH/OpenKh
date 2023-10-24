@@ -322,5 +322,17 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor {
                 this["ViewIkBones"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewRootPosition {
+            get {
+                return ((bool)(this["ViewRootPosition"]));
+            }
+            set {
+                this["ViewRootPosition"] = value;
+            }
+        }
     }
 }
