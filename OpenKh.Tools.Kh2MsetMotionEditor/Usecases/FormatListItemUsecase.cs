@@ -56,6 +56,11 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
             return $"{it}";
         }
 
+        public string FormatValue(float it)
+        {
+            return $"{it}";
+        }
+
         public string FormatTangent(float it)
         {
             return $"{it}";

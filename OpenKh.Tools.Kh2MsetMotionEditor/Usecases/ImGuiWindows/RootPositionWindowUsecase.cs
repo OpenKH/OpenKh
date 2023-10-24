@@ -117,6 +117,14 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.ImGuiWindows
                                     _openWindowUsecase.OpenFCurves(rootPosition.FCurveId[selectedIndex]);
                                 }
                             }
+                            else
+                            {
+                                ImGui.Text("(Editor will appear after selection)");
+                            }
+                        }
+                        else
+                        {
+                            ImGui.Text("(Editor will appear after selection)");
                         }
 
                         if (saved)

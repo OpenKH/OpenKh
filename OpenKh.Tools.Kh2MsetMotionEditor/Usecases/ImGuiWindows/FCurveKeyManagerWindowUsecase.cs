@@ -43,8 +43,10 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.ImGuiWindows
             var selectedIndex = -1;
             var nextTimeRefresh = new OneTimeOn(false);
             var timeNames = new List<string>();
+            var valueNames = new List<string>();
             var tangentNames = new List<string>();
             var timeSelectedIndex = -1;
+            var valueSelectedIndex = -1;
             int tangentSelectedIndex = -1;
 
             return () =>
@@ -62,6 +64,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.ImGuiWindows
                     {
                         var sourceList = _loadedModel.MotionData?.FCurveKeys;
                         var timeList = _loadedModel.MotionData?.KeyTimes;
+                        var valueList = _loadedModel.MotionData?.KeyValues;
                         var tangentList = _loadedModel.MotionData?.KeyTangents;
 
                         var saved = false;
@@ -99,6 +102,12 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.ImGuiWindows
                                 timeNames.AddRangeIfNotNull(
                                     timeList?
                                         .Select(_formatListItemUsecase.FormatTime)
+                                );
+
+                                valueNames.Clear();
+                                valueNames.AddRangeIfNotNull(
+                                    valueList?
+                                        .Select(_formatListItemUsecase.FormatValue)
                                 );
 
                                 tangentNames.Clear();
@@ -150,6 +159,11 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.ImGuiWindows
                                         timeSelectedIndex = key.Time;
                                     }
                                     ImGui.SameLine();
+                                    if (ImGui.Button("Value##gotoValue"))
+                                    {
+                                        valueSelectedIndex = key.Time;
+                                    }
+                                    ImGui.SameLine();
                                     if (ImGui.Button("LeftTangent##gotoLeftTangent"))
                                     {
                                         tangentSelectedIndex = key.LeftTangentId;
@@ -171,6 +185,17 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.ImGuiWindows
                                         }
                                     }
 
+                                    void AllocValue(Action<int> onAdd)
+                                    {
+                                        if (valueList != null)
+                                        {
+                                            var index = valueList.Count;
+                                            valueList.Add(default);
+                                            onAdd(index);
+                                            saved = true;
+                                        }
+                                    }
+
                                     void AllocTangent(Action<int> onAdd)
                                     {
                                         if (tangentList != null)
@@ -184,20 +209,25 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.ImGuiWindows
 
                                     ImGui.Separator();
 
-                                    ImGui.Text("Manipulator:");
+                                    ImGui.Text("Manipulator alloc:");
 
                                     ImGui.SameLine();
-                                    if (ImGui.Button("Alloc Time"))
+                                    if (ImGui.Button("Time"))
                                     {
                                         AllocTime(it => timeSelectedIndex = key.Time = (short)it);
                                     }
                                     ImGui.SameLine();
-                                    if (ImGui.Button("Alloc LeftTangent"))
+                                    if (ImGui.Button("Value"))
+                                    {
+                                        AllocValue(it => valueSelectedIndex = key.ValueId = (short)it);
+                                    }
+                                    ImGui.SameLine();
+                                    if (ImGui.Button("LeftTangent"))
                                     {
                                         AllocTangent(it => tangentSelectedIndex = key.LeftTangentId = (short)it);
                                     }
                                     ImGui.SameLine();
-                                    if (ImGui.Button("Alloc RightTangent"))
+                                    if (ImGui.Button("RightTangent"))
                                     {
                                         AllocTangent(it => tangentSelectedIndex = key.RightTangentId = (short)it);
                                     }
@@ -240,6 +270,44 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.ImGuiWindows
                                 if (timeList?.GetAtOrNull(timeSelectedIndex) is float value)
                                 {
                                     ForEdit("Value##timeValue", () => value, it => { timeList[timeSelectedIndex] = it; saved = true; });
+                                }
+                                else
+                                {
+                                    ImGui.Text("(Editor will appear after selection)");
+                                }
+                            }
+                            else
+                            {
+                                ImGui.Text("(Collection is empty)");
+                            }
+                        },
+                            openByDefault: true
+                        );
+
+                        ForHeader("Value##valueTab", () =>
+                        {
+                            if (valueNames.Any())
+                            {
+                                if (ImGui.DragInt("index (slider)##valueIndex", ref valueSelectedIndex, 0.2f, 0, valueNames.Count - 1))
+                                {
+
+                                }
+
+                                if (ImGui.BeginCombo($"Value", valueNames.GetAtOrNull(valueSelectedIndex) ?? "..."))
+                                {
+                                    foreach (var (item, index) in valueNames.SelectWithIndex())
+                                    {
+                                        if (ImGui.Selectable(valueNames[index], index == valueSelectedIndex))
+                                        {
+                                            valueSelectedIndex = index;
+                                        }
+                                    }
+                                    ImGui.EndCombo();
+                                }
+
+                                if (valueList?.GetAtOrNull(valueSelectedIndex) is float value)
+                                {
+                                    ForEdit("Value##valueValue", () => value, it => { valueList[valueSelectedIndex] = it; saved = true; });
                                 }
                                 else
                                 {
