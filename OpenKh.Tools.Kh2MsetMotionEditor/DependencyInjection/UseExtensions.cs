@@ -73,6 +73,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.DependencyInjection
             self.AddSingleton<GlobalInfo>();
             self.AddSingleton<OpenWindowUsecase>();
             self.AddSingleton<EditMotionDataUsecase>();
+            self.AddSingleton<NormalMessages>();
 
             // next
 
@@ -118,8 +119,9 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.DependencyInjection
             self.AddSingleton<IWindowRunnableProvider, FCurvesForwardManagerWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, FCurvesInverseManagerWindowUsecase>();
             self.AddSingleton<IWindowRunnableProvider, FCurveKeyManagerWindowUsecase>();
-            self.AddSingleton<IWindowRunnableProvider, FCurvesGridManagerWindow>();
-            
+            self.AddSingleton<IWindowRunnableProvider, FCurvesFkIkGridManagerWindow>();
+            self.AddSingleton<IWindowRunnableProvider, NormalMessagesWindowUsecase>();
+
 
 
 

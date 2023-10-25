@@ -76,5 +76,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Helpers
         public int SelectFCurveKey { get; set; } = -1;
         public int SelectFCurvesFoward { get; set; } = -1;
         public int SelectFCurvesInverse { get; set; } = -1;
+
+        public AgeManager StopAnimPlayer { get; set; } = new AgeManager();
     }
 }

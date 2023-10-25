@@ -12,13 +12,13 @@ using System.Numerics;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.ImGuiWindows
 {
-    public class FCurvesGridManagerWindow : IWindowRunnableProvider
+    public class FCurvesFkIkGridManagerWindow : IWindowRunnableProvider
     {
         private readonly EditMotionDataUsecase _editMotionDataUsecase;
         private readonly LoadedModel _loadedModel;
         private readonly Settings _settings;
 
-        public FCurvesGridManagerWindow(
+        public FCurvesFkIkGridManagerWindow(
             Settings settings,
             LoadedModel loadedModel,
             EditMotionDataUsecase editMotionDataUsecase
@@ -37,7 +37,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.ImGuiWindows
             {
                 if (_settings.ViewFCurvesGrid)
                 {
-                    var windowClosed = !ForWindow("FCurves grid manager", () =>
+                    var windowClosed = !ForWindow("FCurvesFkIk grid manager", () =>
                     {
                         if (true
                             && _loadedModel.MotionData is InterpolatedMotion motionData

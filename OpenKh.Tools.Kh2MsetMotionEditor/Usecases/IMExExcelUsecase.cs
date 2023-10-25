@@ -33,14 +33,14 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
             exchanger.ExportTo(stream, onProgress);
         }
 
-        public IMExErrors ImportFrom(string loadFrom, Action<IMExProgress>? onProgress = null)
+        public ImportResult ImportFrom(string loadFrom, Action<IMExProgress>? onProgress = null)
         {
             var root = _loadedModel.MotionData ?? throw new Exception("motion data not yet loaded");
             var exchanger = new DataExchange();
             DoDataExchange(root, exchanger);
             using var stream = File.OpenRead(loadFrom);
-            var result = new IMExErrors();
-            exchanger.ImportFrom(stream, onProgress, result.Errors.Add);
+            var result = new ImportResult();
+            exchanger.ImportFrom(stream, onProgress, result.Errors.Add, result.Results.Add);
             return result;
         }
 
@@ -293,14 +293,15 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
                 book.Write(stream);
             }
 
-            public void ImportFrom(Stream stream, Action<IMExProgress>? onProgress, Action<Exception>? onError)
+            public void ImportFrom(Stream stream, Action<IMExProgress>? onProgress, Action<Exception>? onError, Action<ImportSheetResult>? onResult)
             {
                 var book = new XSSFWorkbook(stream);
 
                 foreach (var (sheetDef, index) in _sheetDefs.SelectWithIndex())
                 {
                     onProgress?.Invoke(new IMExProgress(index, _sheetDefs.Count(), sheetDef.SheetName));
-                    sheetDef.ImportFrom(book, onError);
+                    var result = sheetDef.ImportFrom(book, onError);
+                    onResult?.Invoke(result);
                 }
             }
 
@@ -340,7 +341,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
         private interface ISheetDef
         {
             void ExportTo(XSSFWorkbook book);
-            void ImportFrom(XSSFWorkbook book, Action<Exception>? onError);
+            ImportSheetResult ImportFrom(XSSFWorkbook book, Action<Exception>? onError);
 
             string SheetName { get; }
         }
@@ -436,12 +437,12 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
                 xlsxSheet.CreateFreezePane(1, 1);
             }
 
-            public void ImportFrom(XSSFWorkbook book, Action<Exception>? onError)
+            public ImportSheetResult ImportFrom(XSSFWorkbook book, Action<Exception>? onError)
             {
                 var xlsxSheet = book.GetSheet(SheetName);
                 if (xlsxSheet == null)
                 {
-                    return;
+                    return new ImportSheetResult($"The sheet \"{SheetName}\" is not found. Skipped.", IsWarning: true);
                 }
 
                 var headerNames = new List<string>();
@@ -452,14 +453,14 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
                     var xlsxHeader = xlsxSheet.GetRow(0);
                     if (xlsxHeader == null)
                     {
-                        return;
+                        return new ImportSheetResult($"The sheet \"{SheetName}\" has no header line. Skipped.", IsWarning: true);
                     }
 
                     {
                         var xlsxCell = xlsxHeader.GetCell(0);
                         if (xlsxCell == null || xlsxCell.StringCellValue != "#")
                         {
-                            return;
+                            return new ImportSheetResult($"The sheet \"{SheetName}\" has no first header column: \"#\". Skipped.", IsWarning: true);
                         }
                     }
 
@@ -477,7 +478,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
 
                 if (!headerNames.Any())
                 {
-                    return;
+                    return new ImportSheetResult($"The sheet \"{SheetName}\" has no header columns to be imported. Skipped.", IsWarning: true);
                 }
 
                 int y = 0;
@@ -506,7 +507,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
                         if (SingleRow)
                         {
                             addError(new Exception($"{SheetName} sheet is a single row table. The row cannot be increased."));
-                            return;
+                            return new ImportSheetResult($"The sheet \"{SheetName}\" has critical error. Skipped.", IsWarning: true);
                         }
 
                         List.Add(new RowType());
@@ -552,11 +553,13 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
                     if (SingleRow)
                     {
                         addError(new Exception($"{SheetName} sheet is a single row table. The row cannot be decreased."));
-                        return;
+                        return new ImportSheetResult($"The sheet \"{SheetName}\" has critical error. Skipped.", IsWarning: true);
                     }
 
                     List.RemoveAt(List.Count - 1);
                 }
+
+                return new ImportSheetResult($"The sheet \"{SheetName}\" supplied {List.Count} items.");
             }
         }
     }

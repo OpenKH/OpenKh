@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.Helpers
 {
-    public class IMExErrors
+    public record ImportSheetResult(string Message, bool IsWarning = false)
     {
-        public List<Exception> Errors { get; set; } = new List<Exception>();
     }
 }

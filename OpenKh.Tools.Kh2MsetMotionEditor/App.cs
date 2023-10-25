@@ -39,6 +39,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
             .AddAllFiles();
 
         private readonly Vector4 BgUiColor = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
+        private readonly NormalMessages _normalMessages;
         private readonly GlobalInfo _globalInfo;
         private readonly Engine.Camera _camera;
         private readonly LoadedModel _loadedModel;
@@ -85,9 +86,11 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
             AskOpenFileNowUsecase askOpenFileNowUsecase,
             LoadedModel loadedModel,
             Camera camera,
-            GlobalInfo globalInfo
+            GlobalInfo globalInfo,
+            NormalMessages normalMessages
         )
         {
+            _normalMessages = normalMessages;
             _globalInfo = globalInfo;
             _camera = camera;
             _loadedModel = loadedModel;
@@ -227,7 +230,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
                         _settings.ViewFCurvesInverse = it;
                         _settings.Save();
                     });
-                    ForMenuCheck("FCurves grid", () => _settings.ViewFCurvesGrid, it =>
+                    ForMenuCheck("FCurvesFkIk grid", () => _settings.ViewFCurvesGrid, it =>
                     {
                         _settings.ViewFCurvesGrid = it;
                         _settings.Save();
@@ -293,6 +296,15 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
                         }
                         else
                         {
+                            var writer = new StringWriter();
+                            writer.WriteLine("Import succeeded. The following lines are messages noted by importer.");
+                            writer.WriteLine();
+
+                            result.Results
+                                .ForEach(it => writer.WriteLine(it.Message));
+
+                            _normalMessages.Add(writer.ToString());
+
                             _loadedModel.SendBackMotionData.TurnOn();
                         }
                     }
