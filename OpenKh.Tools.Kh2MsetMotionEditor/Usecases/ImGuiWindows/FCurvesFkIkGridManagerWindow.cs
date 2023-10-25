@@ -43,49 +43,93 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.ImGuiWindows
                             && _loadedModel.MotionData is InterpolatedMotion motionData
                             )
                         {
-                            var fcurvesBoth = motionData.FCurvesForward.Concat(motionData.FCurvesInverse).ToArray();
+                            var numFk = motionData.FCurvesForward.Count;
+                            var numIk = motionData.FCurvesInverse.Count;
+                            var numFkIk = numFk + numIk;
 
-                            if (ImGui.DragInt("index (slider)", ref selectedIndex, 0.2f, 0, fcurvesBoth.Count() - 1))
+
+                            if (ImGui.DragInt("index (slider)", ref selectedIndex, 0.2f, 0, numFkIk - 1))
                             {
 
                             }
 
-                            if (fcurvesBoth.GetAtOrNull(selectedIndex) is FCurve fcurve)
+                            FCurve? fcurve;
+                            string which = "";
+
+                            if (selectedIndex < 0)
                             {
-                                ImGui.Text("Insert Delete | Time | Value | LeftTangent | RightTangent");
+                                fcurve = null;
+                            }
+                            else if (selectedIndex < numFk)
+                            {
+                                fcurve = motionData.FCurvesForward[selectedIndex];
+                                which = $"Current: FCurvesForward #{selectedIndex}";
+                            }
+                            else if (selectedIndex < numFk + numIk)
+                            {
+                                fcurve = motionData.FCurvesInverse[selectedIndex - numFk];
+                                which = $"Current: FCurvesInverse #{selectedIndex - numFk}";
+                            }
+                            else
+                            {
+                                fcurve = null;
+                            }
 
-                                var saved = false;
+                            if (fcurve != null)
+                            {
+                                ImGui.Text(which);
 
-                                for (int y = 0; y < fcurve.KeyCount; y++)
+                                if (ImGui.BeginChild("FCurvesGridArea"))
                                 {
-                                    if (motionData.FCurveKeys.GetAtOrNull(fcurve.KeyStartId + y) is Key key)
+                                    if (ImGui.BeginTable($"Grid", 5, ImGuiTableFlags.Resizable | ImGuiTableFlags.ScrollY))
                                     {
-                                        ImGui.Button($"I##I{y}");
+                                        ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.IsVisible);
+                                        ImGui.TableSetupColumn("Time", ImGuiTableColumnFlags.IsVisible);
+                                        ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.IsVisible);
+                                        ImGui.TableSetupColumn("LeftTangent", ImGuiTableColumnFlags.IsVisible);
+                                        ImGui.TableSetupColumn("RightTangent", ImGuiTableColumnFlags.IsVisible);
+                                        ImGui.TableSetupScrollFreeze(0, 1);
+                                        ImGui.TableHeadersRow();
 
-                                        ImGui.SameLine();
-                                        ImGui.Button($"x##D{y}");
-
-                                        ImGui.SameLine();
-                                        ForEdit4($"#{y}",
-                                            () => new Vector4(
-                                                motionData.KeyTimes.GetAtOrNull(key.Time),
-                                                motionData.KeyValues.GetAtOrNull(key.ValueId),
-                                                motionData.KeyTangents.GetAtOrNull(key.LeftTangentId),
-                                                motionData.KeyTangents.GetAtOrNull(key.RightTangentId)
-                                            ),
-                                            it =>
+                                        for (int y = 0; y < fcurve.KeyCount; y++)
+                                        {
+                                            if (motionData.FCurveKeys.GetAtOrNull(fcurve.KeyStartId + y) is Key key)
                                             {
-                                                key.Time = _editMotionDataUsecase.AssignTimeId(key.Time, it.X);
-                                                key.ValueId = _editMotionDataUsecase.AssignValueId(key.ValueId, it.Y);
-                                                key.LeftTangentId = _editMotionDataUsecase.AssignTangentId(key.LeftTangentId, it.Z);
-                                                key.RightTangentId = _editMotionDataUsecase.AssignTangentId(key.RightTangentId, it.W);
-                                                saved = true;
+                                                ImGui.TableNextRow();
+
+                                                if (ImGui.TableNextColumn())
+                                                {
+                                                    ImGui.Text(key.Type.ToString());
+                                                }
+
+                                                if (ImGui.TableNextColumn())
+                                                {
+                                                    ImGui.Text(motionData.KeyTimes.GetAtOrNull(key.Time).ToString());
+                                                }
+
+                                                if (ImGui.TableNextColumn())
+                                                {
+                                                    ImGui.Text(motionData.KeyValues.GetAtOrNull(key.ValueId).ToString());
+                                                }
+
+                                                if (ImGui.TableNextColumn())
+                                                {
+                                                    ImGui.Text(motionData.KeyTangents.GetAtOrNull(key.LeftTangentId).ToString());
+                                                }
+
+                                                if (ImGui.TableNextColumn())
+                                                {
+                                                    ImGui.Text(motionData.KeyTangents.GetAtOrNull(key.RightTangentId).ToString());
+                                                }
                                             }
-                                        );
+                                        }
+                                        ImGui.EndTable();
                                     }
+
+                                    ImGui.EndChild();
                                 }
 
-                                ImGui.Button($"Append");
+                                var saved = false;
 
                                 if (saved)
                                 {
