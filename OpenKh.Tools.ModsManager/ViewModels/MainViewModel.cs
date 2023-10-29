@@ -1008,9 +1008,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             .Select(x => x.Source)
             .ToList();
             File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name + ".txt"), enabledMods);
-            if (!PresetList.Contains(presetName))
+            if (!PresetList.Contains(name))
             {
-                PresetList.Add(presetName);
+                PresetList.Add(name);
             }
         }
         public void RemovePreset(string presetName)

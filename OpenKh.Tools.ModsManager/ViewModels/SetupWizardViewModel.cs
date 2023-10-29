@@ -302,6 +302,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public bool PanaceaInstalled { get; set; }
         private string PanaceaSourceLocation => Path.Combine(AppContext.BaseDirectory, PanaceaDllName);
         private string PanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "DBGHELP.dll");
+        private string PanaceaAlternateLocation => Path.Combine(PcReleaseLocation, "version.dll");
         private string PanaceaDependenciesLocation => Path.Combine(PcReleaseLocation, "dependencies");
         public Visibility PanaceaNotInstalledVisibility => !IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PanaceaInstalledVisibility => IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
@@ -322,15 +323,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     // DLL into the right place. So don't bother.
                     PanaceaInstalled = true;
                     return true;
-                }
-                  
-
-                if (!File.Exists(PanaceaDestinationLocation))
-                {
-                    // DBGHELP.dll is not installed
-                    PanaceaInstalled = false;
-                    return false;
-                }
+                }                  
 
                 byte[] CalculateChecksum(string fileName) =>
                     System.Security.Cryptography.MD5.Create().Using(md5 =>
@@ -347,9 +340,30 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     return true;
                 }
 
-                return IsEqual(
-                    CalculateChecksum(PanaceaSourceLocation),
-                    CalculateChecksum(PanaceaDestinationLocation));
+                if (File.Exists(PanaceaDestinationLocation) && !File.Exists(PanaceaAlternateLocation))
+                {
+                    return IsEqual(
+                        CalculateChecksum(PanaceaSourceLocation),
+                        CalculateChecksum(PanaceaDestinationLocation));
+                }
+                else if (File.Exists(PanaceaAlternateLocation) && !File.Exists(PanaceaDestinationLocation))
+                {
+                    return IsEqual(
+                        CalculateChecksum(PanaceaSourceLocation),
+                        CalculateChecksum(PanaceaAlternateLocation));
+                }
+                else if (File.Exists(PanaceaDestinationLocation) && File.Exists(PanaceaAlternateLocation))
+                {
+                    return IsEqual(CalculateChecksum(PanaceaSourceLocation),
+                        CalculateChecksum(PanaceaDestinationLocation)) || 
+                        IsEqual(CalculateChecksum(PanaceaSourceLocation),
+                        CalculateChecksum(PanaceaAlternateLocation));
+                }
+                else
+                {
+                    PanaceaInstalled = false;
+                    return false;
+                }
             }
         }
 
@@ -386,67 +400,78 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                 }
             });
-            InstallPanaceaCommand = new RelayCommand(_ =>
+            InstallPanaceaCommand = new RelayCommand(AlternateName =>
             {
-            if (File.Exists(PanaceaSourceLocation))
-            {
-                // Again, do not bother in debug mode
-                File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation, true);
-                if (!Directory.Exists(PanaceaDependenciesLocation))
+                if (File.Exists(PanaceaSourceLocation))
                 {
-                    Directory.CreateDirectory(PanaceaDependenciesLocation);
+                    // Again, do not bother in debug mode
+                    if (!Directory.Exists(PanaceaDependenciesLocation))
+                    {
+                        Directory.CreateDirectory(PanaceaDependenciesLocation);
+                    }
+                    if (!Convert.ToBoolean(AlternateName))
+                    {
+                        File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation, true);
+                        File.Delete(PanaceaAlternateLocation);
+                    }
+                    else
+                    {
+                        File.Copy(PanaceaSourceLocation, PanaceaAlternateLocation, true);
+                        File.Delete(PanaceaDestinationLocation);
+                    }
+                    try
+                    {
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "avcodec-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "avformat-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "avutil-vgmstream-57.dll"), Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "bass.dll"), Path.Combine(PanaceaDependenciesLocation, "bass.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "bass_vgmstream.dll"), Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libatrac9.dll"), Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0061.dll"), Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0110.dll"), Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libg719_decode.dll"), Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libmpg123-0.dll"), Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libspeex-1.dll"), Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libvorbis.dll"), Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "swresample-vgmstream-4.dll"), Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"), true);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(
+                            $"Missing panacea dependencies. Unable to fully install panacea.",
+                            "Extraction error",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                        File.Delete(PanaceaDestinationLocation);
+                        File.Delete(PanaceaAlternateLocation);
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
+                        PanaceaInstalled = false;
+                        return;
+                    }
                 }
-                try
-                {   
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "avcodec-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"), true);
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "avformat-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"), true);
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "avutil-vgmstream-57.dll"), Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"), true);
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "bass.dll"), Path.Combine(PanaceaDependenciesLocation, "bass.dll"), true);
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "bass_vgmstream.dll"), Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"), true);
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "libatrac9.dll"), Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"), true);
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0061.dll"), Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"), true);
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0110.dll"), Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"), true);
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "libg719_decode.dll"), Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"), true);
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "libmpg123-0.dll"), Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"), true);
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "libspeex-1.dll"), Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"), true);
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "libvorbis.dll"), Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"), true);
-                    File.Copy(Path.Combine(AppContext.BaseDirectory, "swresample-vgmstream-4.dll"), Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"), true);
-                }
-                catch (Exception e) 
-                {
-                    MessageBox.Show(
-                        $"Missing panacea dependencies. Unable to fully install panacea.",
-                        "Extraction error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-                    File.Delete(PanaceaDestinationLocation);
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
-                    PanaceaInstalled = false;
-                    return;
-                }
-            }
-            OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
-            OnPropertyChanged(nameof(PanaceaInstalledVisibility));
-            OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
-            PanaceaInstalled = true;
+                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
+                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
+                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
+                PanaceaInstalled = true;
             });
             RemovePanaceaCommand = new RelayCommand(_ =>
             {
-                if (File.Exists(PanaceaDestinationLocation))
+                if (File.Exists(PanaceaDestinationLocation) || File.Exists(PanaceaAlternateLocation))
                 {
                     File.Delete(PanaceaDestinationLocation);
+                    File.Delete(PanaceaAlternateLocation);
                     File.Delete(Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"));
                     File.Delete(Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"));
                     File.Delete(Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"));

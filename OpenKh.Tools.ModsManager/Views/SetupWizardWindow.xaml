@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="{Binding Title}" d:Title="OpenKH Mods Manager set-up"
-        Height="400" Width="400">
+        Height="425" Width="400" ResizeMode="NoResize">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
@@ -217,25 +217,34 @@
             NextPage="{Binding ElementName=PCLaunchOption}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        OpenKH Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
+                        Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
                         modifying the game files.
-                        If installed, this file is named 'DBGHELP.dll' and it can be found in your game's data folder.
-                        If installed, Panacea will run every time you start the game and attempt to load mods. To
-                        remove Panacea, run this wizard again, or delete the `DBGHELP.dll`.
+                        The file is named 'DBGHELP.dll' for Windows and 'version.dll' for Linux and it can be found in your game's install folder.
+                        Panacea will run every time you start the game and attempt to load built mods. To uninstall Panacea, click Remove Panacea button.
                 </TextBlock>
                 <StackPanel Visibility="{Binding PanaceaNotInstalledVisibility}">
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        It seems you do not have OpenKH Panacea installed or you are running a different version than the one
-                        compatible with the Mods Manager. We need your permission to install it into the game's folder.
+                        It seems you do not have Panacea installed or you are running a different version than the one
+                        compatible with this version of Mods Manager. We need your permission to install it into the game's folder.
                         If you choose not to install, you may need to use one of the Build and Patch options to apply mods
                         to your game.
                     </TextBlock>
                     <Button
                         Margin="0 0 0 6"
-                        Content="Install OpenKH Panacea"
+                        Content="Install Panacea for Windows"
                         HorizontalAlignment="Left"
-                        Width="160"
-                        Command="{Binding InstallPanaceaCommand}"/>
+                        Width="205"
+                        Command="{Binding InstallPanaceaCommand}" CommandParameter="false"/>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                        <Run Foreground="Red">WARNING</Run>
+                        linux support is still a WIP. While it does currently work it is a lot of extra setup.
+                    </TextBlock>
+                    <Button
+                        Margin="0 0 0 6"
+                        Content="Install Panacea for Linux"
+                        HorizontalAlignment="Left"
+                        Width="205"
+                        Command="{Binding InstallPanaceaCommand}" CommandParameter="true"/>
                 </StackPanel>
                 <StackPanel Visibility="{Binding PanaceaInstalledVisibility}">
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
@@ -243,7 +252,7 @@
                     </TextBlock>
                     <Button
                         Margin="0 0 0 6"
-                        Content="Remove OpenKH Panacea"
+                        Content="Remove Panacea"
                         HorizontalAlignment="Left"
                         Width="160"
                         Command="{Binding RemovePanaceaCommand}"/>
