@@ -11,11 +11,13 @@ using OpenKh.Tools.LayoutEditor.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Windows;
 using Xe.Tools.Wpf.Dialogs;
+
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
 namespace OpenKh.Tools.LayoutEditor
@@ -56,9 +58,20 @@ namespace OpenKh.Tools.LayoutEditor
 
         private const string LinkToPcsx2ActionName = "Open file and link it to PCSX2";
         private const string ResourceSelectionDialogTitle = "Resource selection";
+        private const string PreviewTitle = "In-Game Preview Target";
+        private const string TargetSelectTitle = "In-Game Target Selection";
+
         private bool _isResourceSelectionDialogOpening;
         private bool _isResourceSelectingLayout;
+
+        private bool _isPrevDialogOpening;
+        private bool _isTargetDialogOpening;
+
+        private PreviewTargetDialog _prevDialog;
+        private TargetSelectionDialog _targetDialog;
         private ResourceSelectionDialog _resourceSelectionDialog;
+
+
         private Dictionary<Keys, Action> _keyMapping = new Dictionary<Keys, Action>();
 
         public event IEditorSettings.ChangeBackground OnChangeBackground;
@@ -137,6 +150,16 @@ namespace OpenKh.Tools.LayoutEditor
             }
         }
 
+        public bool ShowViewportReFined
+        {
+            get => Settings.Default.ShowViewportReFined;
+            set
+            {
+                Settings.Default.ShowViewportReFined = value;
+                Settings.Default.Save();
+            }
+        }
+
         public bool IsViewportOnTop
         {
             get => Settings.Default.IsViewportOnTop;
@@ -178,6 +201,36 @@ namespace OpenKh.Tools.LayoutEditor
                 }
             }
 
+            if (ImGui.BeginPopupModal(PreviewTitle, ref dummy,
+                ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                _prevDialog.Run();
+                ImGui.EndPopup();
+            }
+
+            if (ImGui.BeginPopupModal(TargetSelectTitle, ref dummy,
+            ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                _targetDialog.Run();
+                ImGui.EndPopup();
+
+                if (_targetDialog.HasTargetBeenSelected)
+                {
+                    var _fetchFile = CurrentEditor.SaveAnimation("comw");
+                    var _memStream = new MemoryStream((int)_fetchFile.Stream.Length);
+
+                    ulong _offset = _fetchFile.Type == Bar.EntryType.Seqd ? (ulong)0x00 : (ulong)0x20;
+
+                    _fetchFile.Stream.Position = 0;
+                    _fetchFile.Stream.CopyTo(_memStream);
+
+                    Hypervisor.WriteArray(_prevDialog.FetchedPointer + (ulong)_targetDialog.SelectedAnimation.Offset + _offset, _memStream.ToArray(), true);
+
+                    _prevDialog = null;
+                    _targetDialog = null;
+                }
+            }
+
             ImGuiEx.MainWindow(() =>
             {
                 MainMenu();
@@ -188,6 +241,25 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 ImGui.OpenPopup(ResourceSelectionDialogTitle);
                 _isResourceSelectionDialogOpening = false;
+            }
+
+            if (_isPrevDialogOpening)
+            {
+                ImGui.OpenPopup(PreviewTitle);
+                _isPrevDialogOpening = false;
+            }
+
+            if (_prevDialog != null && _prevDialog.FetchedFile != null && _targetDialog == null)
+            {
+                var _barFile = _prevDialog.FetchedFile;
+
+                var sequenceEntry = _barFile.FirstOrDefault(x => x.Type == Bar.EntryType.Seqd);
+                var layoutEntry = _barFile.FirstOrDefault(x => x.Type == Bar.EntryType.Layout);
+
+                _targetDialog = new TargetSelectionDialog(_barFile, sequenceEntry == null ? Bar.EntryType.Layout : Bar.EntryType.Seqd);
+
+                ImGui.OpenPopup(TargetSelectTitle);
+                _isTargetDialogOpening = true;
             }
 
             return _exitFlag;
@@ -220,16 +292,10 @@ namespace OpenKh.Tools.LayoutEditor
                     ForMenuItem($"{LinkToPcsx2ActionName}...", "CTRL+L", MenuFileOpenPcsx2);
                     ForMenuItem("Save", "CTRL+S", MenuFileSave, CurrentEditor != null);
                     ForMenuItem("Save as...", MenuFileSaveAs, CurrentEditor != null);
+                    ForMenuItem("Preview In-Game...", MenuFilePreview, CurrentEditor != null);
                     ImGui.Separator();
                     ForMenu("Preferences", () =>
                     {
-                        //var checkerboardBackground = CheckerboardBackground;
-                        //if (ImGui.Checkbox("Checkerboard background", ref checkerboardBackground))
-                        //{
-                        //    CheckerboardBackground = false;
-                        //    OnChangeBackground?.Invoke(this, this);
-                        //}
-
                         var editorBackground = new Vector3(EditorBackground.R,
                             EditorBackground.G, EditorBackground.B);
                         if (ImGui.ColorEdit3("Background color", ref editorBackground))
@@ -241,6 +307,7 @@ namespace OpenKh.Tools.LayoutEditor
 
                         ForMenuCheck("Show PS2 viewport", () => ShowViewportOriginal, x => ShowViewportOriginal = x);
                         ForMenuCheck("Show ReMIX viewport", () => ShowViewportRemix, x => ShowViewportRemix = x);
+                        ForMenuCheck("Show Re:Fined viewport", () => ShowViewportReFined, x => ShowViewportReFined = x);
                         ForMenuCheck("Viewport always on top", () => IsViewportOnTop, x => IsViewportOnTop = x);
                     });
                     ImGui.Separator();
@@ -260,6 +327,11 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 OpenFile(fileName);
             }, Filters);
+        }
+
+        private void MenuFilePreview()
+        {
+            OpenPreviewDialog(); 
         }
 
         private void MenuFileOpenWithoutPcsx2()
@@ -465,6 +537,12 @@ namespace OpenKh.Tools.LayoutEditor
                 entries, animationType, textureType);
             _isResourceSelectionDialogOpening = true;
             _isResourceSelectingLayout = animationType == Bar.EntryType.Layout;
+        }
+
+        public void OpenPreviewDialog()
+        {
+            _prevDialog = new PreviewTargetDialog();
+            _isPrevDialogOpening = true;
         }
 
         private void OpenSequenceEditor(Bar.Entry sequenceEntry, Bar.Entry textureEntry)

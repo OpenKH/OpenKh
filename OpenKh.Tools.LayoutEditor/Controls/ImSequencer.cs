@@ -630,7 +630,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                 // moving
                 if (/*backgroundRect.Contains(io.MousePos) && */movingEntry >= 0)
                 {
-                    ImGui.CaptureMouseFromApp();
+                    ImGui.SetNextFrameWantCaptureMouse(true);
                     int diffFrame = (int)((cx - movingPos) / framePixelWidth);
                     if (Math.Abs(diffFrame) > 0)
                     {

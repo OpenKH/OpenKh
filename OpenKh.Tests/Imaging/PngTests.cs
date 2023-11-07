@@ -18,5 +18,12 @@ namespace OpenKh.Tests.Imaging
         {
             File.OpenRead($"Imaging/res/png/{prefix}.png").Using(PngImage.Read);
         }
+
+        [Theory]
+        [InlineData("icon0_e")]
+        public void RarelyEncounteredCaseTests(string prefix)
+        {
+            File.OpenRead($"Imaging/res/png/{prefix}.png").Using(PngImage.Read);
+        }
     }
 }

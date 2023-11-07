@@ -136,5 +136,20 @@ namespace OpenKh.Imaging
             for (var i = 0; i < data.Length; i++)
                 data[i] = (byte)(((data[i] & 0x0F) << 4) | (data[i] >> 4));
         }
+
+        public static byte[] FromRgb888ToBgra32(byte[] source)
+        {
+            var destination = new byte[source.Length / 3 * 4];
+            int dstIdx = 0;
+            for (int srcIdx = 0; srcIdx < source.Length;)
+            {
+                destination[dstIdx++] = source[srcIdx + 2];
+                destination[dstIdx++] = source[srcIdx + 1];
+                destination[dstIdx++] = source[srcIdx + 0];
+                destination[dstIdx++] = 255;
+                srcIdx += 3;
+            }
+            return destination;
+        }
     }
 }

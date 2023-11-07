@@ -7,6 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel Grid.Row="2" Background="#1d1d1d">
+        <FrameworkElement Visibility="Collapsed" Name="_viewBagging" />
         <StackPanel Orientation="Horizontal" Margin="10">
             <Label Content="Group:" Foreground="White"/>
             <TextBox Width="30" Text="{Binding Path=Group, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
@@ -17,9 +18,19 @@
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="10">
             <Label Content="Type:" Foreground="White"/>
-            <TextBox Width="30" Text="{Binding Path=Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+            <ComboBox Width="100"
+                      DisplayMemberPath="Value"
+                      SelectedValuePath="Key"
+                      SelectedValue="{Binding Path=Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      ItemsSource="{Binding Path=DataContext.TypeItems, ElementName=_viewBagging}"
+                      />
             <Label Content="Shape:" Foreground="White"/>
-            <TextBox Width="30" Text="{Binding Path=Shape, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+            <ComboBox Width="100"
+                      DisplayMemberPath="Value"
+                      SelectedValuePath="Key"
+                      SelectedValue="{Binding Path=Shape, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      ItemsSource="{Binding Path=DataContext.ShapeItems, ElementName=_viewBagging}"
+                      />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="10">
             <Label Content="Bone:" Foreground="White"/>
@@ -40,5 +51,5 @@
             <TextBox Width="30" Text="{Binding Path=Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
         </StackPanel>
     </StackPanel>
-    
+
 </UserControl>

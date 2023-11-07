@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 using System.IO;
 using System.Linq;
@@ -19,22 +19,34 @@ namespace OpenKh.Ps2
         public class VpuHeader
         {
             [Data] public int Type { get; set; }
-            [Data] public int Unknown04 { get; set; }
-            [Data] public int Unknown08 { get; set; }
-            [Data] public int Unknown0c { get; set; }
-            [Data] public int IndexCount { get; set; }
-            [Data] public int IndexLocation { get; set; }
-            [Data] public int UnkBoxLocation { get; set; }
-            [Data] public int Unknown1cLocation { get; set; }
+            [Data] public int VertexColorPtrInc { get; set; }
+            [Data] public int MagicNumber { get; set; }
+            [Data] public int VertexBufferPointer { get; set; }
+            [Data] public int TriStripNodeCount { get; set; }
+            [Data] public int TriStripNodeOffset { get; set; }
+            [Data] public int MatrixCountOffset { get; set; }
+            [Data] public int MatrixOffset { get; set; }
             [Data] public int ColorCount { get; set; }
-            [Data] public int ColorLocation { get; set; }
-            [Data] public int VertexMixerCount { get; set; }
-            [Data] public int VertexMixerOffset { get; set; }
-            [Data] public int VertexCount { get; set; }
-            [Data] public int VertexLocation { get; set; }
-            [Data] public int Unknown38 { get; set; }
-            [Data] public int UnkBoxCount { get; set; }
+            [Data] public int ColorOffset { get; set; }
+            [Data] public int WeightGroupCount { get; set; }
+            [Data] public int WeightGroupCountOffset { get; set; }
+            [Data] public int VertexCoordCount { get; set; }
+            [Data] public int VertexCoordOffset { get; set; }
+            [Data] public int VertexIndexOffset { get; set; }
+            [Data] public int MatrixCount { get; set; }
+            public int NormalCount { get; set; }
+            public int NormalOffset { get; set; }
         }
+
+        /*
+         * SKELETAL REFERENCE
+         * Header[1]
+         * StripNodes[] - U; V; VertexIndex; Function (1 int each) | TriStripNodeOffset (Always 0x04)
+         * VertexCoords[] - X; Y; Z; W; (1 int each, W is weight asignment) | VertexCoordOffset ! W = 0 for single bones
+         * MatrixCounts[] - Amount of vertices assigned to the bone in this position (1 int each) | MatrixCountOffset
+         * VertexIndices[] - Weight groups (1 int per weight) | WeightGroupCountOffset + VertexIndexOffset ! Only for multiple bones
+         * Matrices[] - Transform matrices of the bones | MatrixOffset
+         */
 
         public class VertexIndex
         {
@@ -42,6 +54,8 @@ namespace OpenKh.Ps2
             [Data] public int V { get; set; }
             [Data] public int Index { get; set; }
             [Data] public VertexFunction Function { get; set; }
+            public VertexColor Color { get; set; }
+            public VertexNormal Normal { get; set; }
 
             public override string ToString() =>
                 $"{U / 4096.0f:F}, {V / 4096.0f:F}, {Index:X}, {Function}";
@@ -68,10 +82,22 @@ namespace OpenKh.Ps2
             public override string ToString() =>
                 $"{X:F}, {Y:F}, {Z:F}, {W:F}";
         }
-        
+
+        public class VertexNormal
+        {
+            [Data] public float X { get; set; }
+            [Data] public float Y { get; set; }
+            [Data] public float Z { get; set; }
+            [Data] public float Padding { get; set; }
+
+            public override string ToString() =>
+                $"{X:F}, {Y:F}, {Z:F}, {Padding:F}";
+        }
+
         public VertexIndex[] Indices { get; }
         public VertexColor[] Colors { get; }
         public VertexCoord[] Vertices { get; }
+        public VertexNormal[] Normals { get; }
         public int[] VertexRange { get; }
         public int VertexWeightedCount { get; }
         public int[][][] VertexWeightedIndices { get; }
@@ -80,14 +106,25 @@ namespace OpenKh.Ps2
         {
             var vpu = BinaryMapping.ReadObject<VpuHeader>(stream);
 
-            VertexRange = Read(stream, vpu.UnkBoxLocation, vpu.UnkBoxCount, ReadInt32);
-            Indices = Read(stream, vpu.IndexLocation, vpu.IndexCount, ReadIndex);
-            Colors = Read(stream, vpu.ColorLocation, vpu.ColorCount, ReadColor);
-            Vertices = Read(stream, vpu.VertexLocation, vpu.VertexCount, ReadVertex);
-
-            if (vpu.VertexMixerCount > 0)
+            bool hasNormals = (vpu.VertexCoordOffset != vpu.TriStripNodeOffset + vpu.TriStripNodeCount + vpu.ColorCount);
+            if(hasNormals)
             {
-                var countPerAmount = Read(stream, vpu.VertexMixerOffset, vpu.VertexMixerCount, ReadInt32);
+                vpu.NormalCount = stream.ReadInt32();
+                vpu.NormalOffset = stream.ReadInt32();
+            }
+
+            VertexRange = Read(stream, vpu.MatrixCountOffset, vpu.MatrixCount, ReadInt32);
+            Indices = Read(stream, vpu.TriStripNodeOffset, vpu.TriStripNodeCount, ReadIndex);
+            Colors = Read(stream, vpu.ColorOffset, vpu.ColorCount, ReadColor);
+            Vertices = Read(stream, vpu.VertexCoordOffset, vpu.VertexCoordCount, ReadVertex);
+            if(vpu.NormalCount > 0)
+                Normals = Read(stream, vpu.NormalOffset, vpu.NormalCount, ReadNormal);
+            else
+                Normals = new VertexNormal[0];
+
+            if (vpu.WeightGroupCount > 0)
+            {
+                var countPerAmount = Read(stream, vpu.WeightGroupCountOffset, vpu.WeightGroupCount, ReadInt32);
                 VertexWeightedCount = countPerAmount.Sum();
 
                 VertexWeightedIndices = countPerAmount
@@ -130,6 +167,14 @@ namespace OpenKh.Ps2
             Y = stream.ReadSingle(),
             Z = stream.ReadSingle(),
             W = stream.ReadSingle(),
+        };
+
+        private static VertexNormal ReadNormal(Stream stream) => new VertexNormal
+        {
+            X = stream.ReadSingle(),
+            Y = stream.ReadSingle(),
+            Z = stream.ReadSingle(),
+            Padding = stream.ReadSingle(),
         };
 
         private static T[] Read<T>(Stream stream, int offset, int count, Func<Stream, T> func)

@@ -1,6 +1,7 @@
 using ImGuiNET;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
+using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 using OpenKh.Tools.LayoutEditor.Interfaces;
 using OpenKh.Tools.LayoutEditor.Models;
 using System;
@@ -58,7 +59,27 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 DrawCropAtlasTexture();
             }
 
-            ImGui.Image(_cropAtlasTextureId, new Vector2(_atlasTexture.Width, _atlasTexture.Height));
+            if (ImGui.Button("Add Sprite"))
+                _spriteModels.Add(new SpriteModel(new Kh2.Sequence.Sprite(), _spriteDrawing, _atlasTexture, _textureBinder, _settings));
+            ImGui.SameLine();
+            if (ImGui.Button("Remove Sprite"))
+            {
+                if (_selectedSpriteModel != 0)
+                {
+                    _selectedSpriteModel -= 1;
+                    _spriteModels.RemoveAt(_selectedSpriteModel + 1);
+                }
+
+                else
+                    _spriteModels.RemoveAt(_selectedSpriteModel);
+            }
+
+            ForChild("AtlasTexture", _atlasTexture.Width, _atlasTexture.Height, false,
+                () =>
+                {
+                    ImGui.Image(_cropAtlasTextureId, new Vector2(_atlasTexture.Width, _atlasTexture.Height));
+                }
+            );
 
             var source = new int[]
             {
@@ -109,7 +130,13 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             }
 
             SpriteModel.Draw(0, 0);
-            ImGui.Image(SpriteModel.TextureId, SuggestSpriteSize());
+            var spriteSize = SuggestSpriteSize();
+            ForChild("Sprite", spriteSize.X, spriteSize.Y, false,
+                () =>
+                {
+                    ImGui.Image(SpriteModel.TextureId, spriteSize);
+                }
+            );
         }
 
         private void DrawCropAtlasTexture()

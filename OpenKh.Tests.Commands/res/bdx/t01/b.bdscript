@@ -4,23 +4,27 @@ StackSize: 64
 TempSize: 64
 Triggers:
 - Key: 0
-  Addr: TR0
+  Addr: OBJ_INIT
 Name: aaa
 
 ---
 ; codeLabels: 
 ; codeRevealer: 
  section .text
-TR0:
+OBJ_INIT:
+ pushImm 123456789
+ drop 
+ pushImmf 123.45
+ drop 
  pushFromPWp W0
  drop 
  pushFromPWp W12
  drop 
  pushFromPWp W24
  drop 
- gosub 2, L26
+ gosub 2, L34
  ret 
-L26:
+L34:
  ret 
 
  section .bss

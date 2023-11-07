@@ -1,0 +1,91 @@
+<UserControl x:Class="OpenKh.Tools.Kh2ObjectEditor.Modules.Textures.TextureSelectedAnimation_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Modules.Textures"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="100" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="300" />
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer Grid.Column="0">
+            <Canvas>
+                <Canvas.Background>
+                    <DrawingBrush TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
+                        <DrawingBrush.Drawing>
+                            <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#80000000"/>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Canvas.Background>
+                <Image Name="ImageFrame"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Stretch="Uniform"/>
+            </Canvas>
+        </ScrollViewer>
+
+        <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
+
+        <Grid Grid.Column="2" Background="White">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="150" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            
+            <!-- Animation Properties -->
+            <StackPanel Grid.Row="0"  Orientation="Vertical" Margin="4">
+                <StackPanel Orientation="Horizontal" Margin="3">
+                    <Label>Texture:</Label>
+                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.TextureIndex}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="3">
+                    <Label>Offset Y:</Label>
+                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.VOffsetInBaseImage}"></TextBox>
+                    <Label>Offset X:</Label>
+                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.UOffsetInBaseImage}"></TextBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="3">
+                    <Label>Height:</Label>
+                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.SpriteHeight}"></TextBox>
+                    <Label>Width:</Label>
+                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.SpriteWidth}"></TextBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="3">
+                    <Label>Number of sprites:</Label>
+                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.NumSpritesInImageData}"></TextBox>
+                    <Label>Default sprite:</Label>
+                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.DefaultAnimationIndex}"></TextBox>
+                </StackPanel>
+            </StackPanel>
+
+            <GridSplitter Grid.Row="1" Background="LightGray" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="True" Height="5"/>
+
+            <ListView Grid.Row="2" Name="ScriptList" ItemsSource="{Binding Animations}" SelectedItem="{Binding SelectedAnimation}">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Export as JSON" Click="Script_Export"/>
+                        <MenuItem Header="Import" Click="Script_Import"/>
+                        <MenuItem Header="Replace" Click="Script_Replace"/>
+                        <MenuItem Header="Remove" Click="Script_Remove"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{Binding Path=Name}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+        </Grid>
+    </Grid>
+</UserControl>

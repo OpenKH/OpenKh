@@ -1,16 +1,17 @@
 using OpenKh.Kh2;
 using OpenKh.Kh2.Models;
-using OpenKh.Tools.Kh2MdlxEditor.Utils;
 using OpenKh.Tools.Kh2MdlxEditor.ViewModels;
+using Simple3DViewport.Controls;
+using Simple3DViewport.Objects;
 using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Media3D;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.Views
 {
     public partial class CollisionV_Control : UserControl
     {
+        Simple3DViewport_Control thisViewport { get; set; }
         CollisionV_VM CollisionVM { get; set; }
         public CollisionV_Control()
         {
@@ -22,7 +23,20 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
             CollisionVM = new CollisionV_VM(collisionFile, modelFile, textureFile);
             DataContext = CollisionVM;
 
-            drawSelectedGroups();
+            if(CollisionVM.ThisModel != null)
+            {
+                thisViewport = new Simple3DViewport_Control(new List<SimpleModel> { CollisionVM.ThisModel });
+            }
+            else
+            {
+                thisViewport = new Simple3DViewport_Control();
+            }
+            
+            thisViewport.setOpacityById(0.7, "MODEL_1");
+            thisViewport.VPModels.Add(CollisionVM.ThisCollisions);
+            thisViewport.setVisibilityByLabel(false, "COLLISION_SINGLE");
+
+            viewportFrame.Content = thisViewport;
         }
         public void CollisionList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -34,35 +48,8 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
             CollisionWrapper collision = ((ListViewItem)sender).Content as CollisionWrapper;
             collisionPropertiesFrame.Content = new CollisionProperties_Control(collision.Collision);
             collision.Selected_VM = !collision.Selected_VM;
-            drawSelectedGroups();
-        }
-
-        public void drawSelectedGroups()
-        {
-            List<GeometryModel3D> geometry = new List<GeometryModel3D>();
-
-            // Model
-            if (CollisionVM.ModelFile != null) {
-                geometry.AddRange(Viewport3DUtils.getGeometryFromModel(CollisionVM.ModelFile, CollisionVM.TextureFile));
-            }
-
-            // Collisions
-            foreach (CollisionWrapper collision in CollisionVM.Collisions)
-            {
-                if (collision.Selected_VM) {
-                    geometry.Add(CollisionVM.getCollisionBox(collision.Collision));
-                }
-            }
-
-            if(viewportFrame.Content == null)
-            {
-                viewportFrame.Content = new Viewport_Control(geometry);
-            }
-            else
-            {
-                viewportFrame.Content = new Viewport_Control(geometry, ((Viewport_Control)viewportFrame.Content).VPCamera);
-            }
-            
+            thisViewport.setVisibilityById(collision.Selected_VM, collision.Name);
+            thisViewport.render();
         }
     }
 }

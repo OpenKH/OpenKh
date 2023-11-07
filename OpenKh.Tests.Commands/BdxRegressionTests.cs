@@ -4,6 +4,7 @@ using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -22,7 +23,21 @@ namespace OpenKh.Tests.Commands
         [MemberData(nameof(GetSource))]
         public void TestSamples(string sourceDir)
         {
+            TestSamplesWith(sourceDir, CultureInfo.InvariantCulture);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetSource))]
+        public void TestSamplesFrench(string sourceDir)
+        {
+            TestSamplesWith(sourceDir, CultureInfo.GetCultureInfo("fr-FR"));
+        }
+
+        private void TestSamplesWith(string sourceDir, CultureInfo cultureInfo)
+        {
             Console.WriteLine(sourceDir);
+
+            CultureInfo.CurrentCulture = cultureInfo;
 
             var InputFile = Path.Combine(sourceDir, "a.bdscript");
             var outFile = Path.Combine(sourceDir, "a.bdx");

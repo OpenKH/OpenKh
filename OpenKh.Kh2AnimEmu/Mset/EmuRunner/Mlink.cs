@@ -11,6 +11,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections;
 using System.Xml;
 using System.IO.Compression;
+using OpenKh.Kh2AnimEmu;
 
 namespace OpenKh.Kh2Anim.Mset.EmuRunner
 {
@@ -21,32 +22,6 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
 
         int cntPass = 0;
         uint offMdlx04 = uint.MaxValue;
-
-        class CnfUt
-        {
-            public static string findeeram
-            {
-                get
-                {
-                    var file = "rawData/ee.mset.ram.bin.gz";
-                    {
-                        string path = Path.Combine(Environment.CurrentDirectory, file);
-                        if (File.Exists(path))
-                        {
-                            return path;
-                        }
-                    }
-                    {
-                        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, file);
-                        if (File.Exists(path))
-                        {
-                            return path;
-                        }
-                    }
-                    throw new FileNotFoundException($"Please deploy '{file}' for MSET emulation!");
-                }
-            }
-        }
 
         public void Permit(Stream fsMdlx, int cnt1, Stream fsMset, int cnt2, uint offMsetRxxx, float tick, MemoryStream os)
         {
@@ -60,7 +35,7 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
 #if UsePressed_eeram
                 Szexp.Decode(Resources.eeramx, ee.ram, ee.ram.Length);
 #else
-                using (FileStream fsi = File.OpenRead(CnfUt.findeeram))
+                using (var fsi = new MemoryStream(BinaryResources.ee_mset_ram_bin))
                 using (GZipStream gz = new GZipStream(fsi, CompressionMode.Decompress))
                 {
                     gz.Read(ee.ram, 0, 32 * 1024 * 1024);
@@ -291,6 +266,7 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
             }
 
             os.Write(ee.ram, (int)tmp4, 0x40 * cnt1);
+            os.Write(ee.ram, (int)tmpa, 0x40 * cnt2);
 
             cntPass++;
 
@@ -308,7 +284,7 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
 #if UsePressed_eeram
                 Szexp.Decode(Resources.eeramx, ee.ram, ee.ram.Length);
 #else
-                using (FileStream fsi = File.OpenRead(CnfUt.findeeram))
+                using (var fsi = new MemoryStream(BinaryResources.ee_mset_ram_bin))
                 using (GZipStream gz = new GZipStream(fsi, CompressionMode.Decompress))
                 {
                     gz.Read(ee.ram, 0, 32 * 1024 * 1024);
@@ -565,31 +541,6 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
         internal SortedDictionary<uint, MobUt.Tx8> pfns { get { return dicti2a; } }
         internal void Init0() { initfns(); }
         internal void Init1(CustEE ee) { this.ee = ee; }
-    }
-
-    class Uteeram
-    {
-        class CnfUt
-        {
-            public static string findeeram
-            {
-                get
-                {
-                    string[] al = new string[] {
-                        @"H:\Proj\khkh_xldM\MEMO\expSim\rc1\eeram.bin",
-                        Path.Combine(Environment.CurrentDirectory, "eeram.bin"),
-                    };
-                    foreach (string s in al)
-                    {
-                        if (File.Exists(s))
-                            return s;
-                    }
-                    return al[1];
-                }
-            }
-        }
-
-        public static byte[] eeram = File.ReadAllBytes(CnfUt.findeeram);
     }
 
     class MobRecUt

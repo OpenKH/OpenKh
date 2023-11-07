@@ -1,0 +1,67 @@
+<UserControl x:Class="OpenKh.Tools.Kh2ObjectEditor.Views.ModuleMotions_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="600">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
+
+        <TabControl Grid.Column="0">
+            <TabItem>
+                <TabItem.Header>
+                    <Label>Metadata</Label>
+                </TabItem.Header>
+                <ContentControl Name="Frame_Metadata"/>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <Label>Triggers</Label>
+                </TabItem.Header>
+                <ContentControl Name="Frame_Triggers"/>
+                <!--<local:DataViewer_Control Grid.Row="1"/>-->
+            </TabItem>
+        </TabControl>
+
+        <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
+
+        <!-- MOTION LIST -->
+        <DockPanel Background="White" Grid.Column="2">
+            <!-- Filters -->
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10">
+                <Label FontWeight="Bold">Filters</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Name:</Label>
+                    <TextBox Text="{Binding FilterName}" Width="100" VerticalContentAlignment="Center"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Hide Dummies:</Label>
+                    <CheckBox IsChecked="{Binding FilterHideDummies}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <Button Width="100" HorizontalAlignment="Right" Click="Button_ApplyFilters">Apply filters</Button>
+            </StackPanel>
+
+            <!-- Motion list -->
+            <ListView Name="MotionList" ItemsSource="{Binding MotionsView}" SelectedItem="{Binding SelectedMotion}"  MouseDoubleClick="list_doubleCLick">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Copy motion" Click="Motion_Copy"/>
+                        <MenuItem Header="Replace with copied motion" Click="Motion_Replace"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Grid.Column="0" Text="{Binding Path=Name}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+        </DockPanel>
+    </Grid>
+</UserControl>

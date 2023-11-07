@@ -237,10 +237,13 @@ namespace OpenKh.Imaging
             }
             else if (filter == 2)
             {
-                var endPtr = ptr + stride;
-                for (; ptr < endPtr; ptr++)
+                if (ptr != 0)
                 {
-                    data[ptr] += data[ptr - stride];
+                    var endPtr = ptr + stride;
+                    for (; ptr < endPtr; ptr++)
+                    {
+                        data[ptr] += data[ptr - stride];
+                    }
                 }
             }
             else if (filter == 3)
@@ -310,7 +313,8 @@ namespace OpenKh.Imaging
                     clut[4 * y + 1] = PLTE[3 * y + 1];
                     clut[4 * y + 2] = PLTE[3 * y + 2];
                 }
-                if (y + 1 <= tRNS.Length)
+                clut[4 * y + 3] = 255;
+                if (y + 1 <= tRNS?.Length)
                 {
                     clut[4 * y + 3] = tRNS[y];
                 }

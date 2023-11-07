@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.Renders;
+using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using System;
@@ -14,6 +14,9 @@ namespace OpenKh.Engine.Renderers
         private readonly ISpriteTexture[] surfaces;
         private int selectedSequenceGroupIndex;
         private IDebugLayoutRenderer _debugLayoutRenderer;
+
+        public int PanFactorX;
+        public int PanFactorY;
 
         public int SelectedSequenceGroupIndex
         {
@@ -68,7 +71,7 @@ namespace OpenKh.Engine.Renderers
             var sequence = layout.SequenceItems[l1.SequenceIndex];
             var surface = surfaces[l1.TextureIndex];
             var sequenceRenderer = new SequenceRenderer(sequence, drawing, surface);
-            sequenceRenderer.Draw(l1.AnimationGroup, currentFrameIndex, l1.PositionX, l1.PositionY);
+            sequenceRenderer.Draw(l1.AnimationGroup, currentFrameIndex, l1.PositionX + PanFactorX, l1.PositionY + PanFactorY);
         }
     }
 }

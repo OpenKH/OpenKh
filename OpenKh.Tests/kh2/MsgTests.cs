@@ -179,11 +179,8 @@ namespace OpenKh.Tests.kh2
             var actualId = stream.ReadInt32();
             var actualOffset = stream.ReadInt32();
 
-            if (expectedId != actualId)
-                throw new EqualException(expectedId, actualId);
-
-            if (expectedPosition != actualOffset)
-                throw new EqualException(expectedPosition, actualOffset);
+            Assert.Equal(expectedId, actualId);
+            Assert.Equal(expectedPosition, actualOffset);
         }
     }
 }

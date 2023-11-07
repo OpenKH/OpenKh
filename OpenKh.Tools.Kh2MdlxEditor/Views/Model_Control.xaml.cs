@@ -20,11 +20,15 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         public Model_Control(ModelSkeletal modelFile, ModelTexture textureFile, ModelCollision? collisionFile = null)
         {
             InitializeComponent();
+
+            // Recalc meshes
+            modelFile.recalculateMeshes();
+
             modelControlModel = new Model_VM(modelFile, textureFile, collisionFile);
             DataContext = modelControlModel;
             List<GeometryModel3D> geometry = new List<GeometryModel3D>();
             geometry.AddRange(Viewport3DUtils.getGeometryFromModel(modelControlModel.ModelFile, modelControlModel.TextureFile));
-            if(modelControlModel.CollisionFile != null)
+            //if(modelControlModel.CollisionFile != null)
             //geometry.AddRange(modelControlModel.getCollisionBoxes());
             //geometry.AddRange(modelControlModel.getBoneBoxes());
             viewportFrame.Content = new Viewport_Control(geometry);

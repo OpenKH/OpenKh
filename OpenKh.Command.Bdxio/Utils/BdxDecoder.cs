@@ -3,6 +3,7 @@ using OpenKh.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -240,9 +241,27 @@ namespace OpenKh.Command.Bdxio.Utils
                 }
             }
 
+            var knownItems = BdxTrigger.GetKnownItems()
+                .ToDictionary(
+                    one => one.Key,
+                    one => one.Label
+                );
+
+            string GetTriggerLabelFor(int key)
+            {
+                if (knownItems.TryGetValue(key, out string? label) && label != null)
+                {
+                    return label;
+                }
+                else
+                {
+                    return $"TR{key}";
+                }
+            }
+
             foreach (var trigger in triggers)
             {
-                AddAddr(trigger.Addr, $"TR{trigger.Key}");
+                AddAddr(trigger.Addr, GetTriggerLabelFor(trigger.Key));
                 Walk(trigger.Addr);
             }
 
@@ -736,7 +755,7 @@ namespace OpenKh.Command.Bdxio.Utils
                 }
                 else if (arg.PreferFloat32)
                 {
-                    return BitConverter.ToSingle(BitConverter.GetBytes(arg.Value)).ToString("R");
+                    return BitConverter.ToSingle(BitConverter.GetBytes(arg.Value)).ToString("R", invariantNumberFormat);
                 }
                 else
                 {
@@ -785,5 +804,7 @@ namespace OpenKh.Command.Bdxio.Utils
                 return string.Join(",", tokens);
             }
         }
+
+        private static readonly IFormatProvider invariantNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
     }
 }

@@ -15,15 +15,15 @@ namespace OpenKh.Kh2
     {
         private class Header
         {
-            [Data] public int MagicCode { get; set; }
-            [Data] public int ColorCount { get; set; }
-            [Data] public int TextureInfoCount { get; set; }
-            [Data] public int GsInfoCount { get; set; }
-            [Data] public int Offset1 { get; set; }
-            [Data] public int Texinf1off { get; set; }
-            [Data] public int Texinf2off { get; set; }
-            [Data] public int PictureOffset { get; set; }
-            [Data] public int PaletteOffset { get; set; }
+            [Data] public int MagicCode { get; set; } // shorts type + flag
+            [Data] public int ColorCount { get; set; } // clutDataNum (Color LookUp Table) / Color Palettes
+            [Data] public int TextureInfoCount { get; set; } // pixelDataNum
+            [Data] public int GsInfoCount { get; set; } // textureEnvNum
+            [Data] public int Offset1 { get; set; } // pixelNoOffset
+            [Data] public int Texinf1off { get; set; } // sendPacketOffset
+            [Data] public int Texinf2off { get; set; } // textureEnvPacketOffset
+            [Data] public int PictureOffset { get; set; } // pixelDataOffset
+            [Data] public int PaletteOffset { get; set; } // clutDataOffset
         }
 
         public class Texture : IImageRead
@@ -107,7 +107,7 @@ namespace OpenKh.Kh2
 
         private class _DataTransfer
         {
-            [Data] public int Data00 { get; set; }
+            [Data] public int Data00 { get; set; } // giftag0 > Should be 128 bits (16 bytes)
             [Data] public int Data04 { get; set; }
             [Data] public int Data08 { get; set; }
             [Data] public int Data0c { get; set; }
@@ -116,14 +116,14 @@ namespace OpenKh.Kh2
             [Data] public int Data18 { get; set; }
             [Data] public int Data1c { get; set; }
             [Data] public BITBLTBUF BitBltBuf { get; set; }
-            [Data] public long GSReg50 { get; set; }
+            [Data] public long GSReg50 { get; set; } // bitbltbuf_addr
             [Data] public TRXPOS TrxPos { get; set; }
-            [Data] public long GSReg51 { get; set; }
+            [Data] public long GSReg51 { get; set; } // trxpos_addr
             [Data] public TRXREG TrxReg { get; set; }
-            [Data] public long GSReg52 { get; set; }
+            [Data] public long GSReg52 { get; set; } // trxreg_addr
             [Data] public TRXDIR TrxDir { get; set; }
-            [Data] public long GSReg53 { get; set; }
-            [Data] public int Data60 { get; set; }
+            [Data] public long GSReg53 { get; set; } // trxdir_addr
+            [Data] public int Data60 { get; set; } // giftag1 > Should be 128 bits (16 bytes)
             [Data] public int Data64 { get; set; }
             [Data] public int Data68 { get; set; }
             [Data] public int Data6c { get; set; }
@@ -408,7 +408,7 @@ namespace OpenKh.Kh2
         private byte[] PictureData { get; }
         private byte[] PaletteData { get; }
         
-        public TextureFooterData TextureFooterData { get; }
+        public TextureFooterData TextureFooterData { get; set; }
 
         private const int ClutBasePtr = 0x2C00;
         private const int TexBasePtr = 0x3000;

@@ -36,10 +36,18 @@
             <!-- Texture list -->
             <DockPanel Grid.Row="0" LastChildFill="True">
                 <Label DockPanel.Dock="Top" Foreground="White" HorizontalAlignment="Center">Textures</Label>
-                <ListView ItemsSource="{Binding textureData.Images}" DisplayMemberPath="Size">
+                <ListView Name="LV_Textures" ItemsSource="{Binding textureData.Images}" DisplayMemberPath="Size">
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Export as PNG" Click="Texture_Export"/>
+                            <MenuItem Header="Remove texture" Click="Texture_Remove" Visibility="Collapsed"/>
+                            <MenuItem Header="Add texture" Click="Texture_Add" Visibility="Collapsed"/>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
                             <EventSetter Event="MouseLeftButtonUp" Handler="ListViewItem_OpenTexture"/>
+                            <EventSetter Event="MouseRightButtonUp" Handler="ListViewItem_OpenTexture"/>
                         </Style>
                     </ListView.ItemContainerStyle>
                 </ListView>
@@ -48,7 +56,12 @@
             <!-- Texture animation list -->
             <DockPanel Grid.Row="1" LastChildFill="True">
                 <Label DockPanel.Dock="Top" Foreground="White" HorizontalAlignment="Center">Texture animations</Label>
-                <ListView Grid.Row="1" ItemsSource="{Binding textureData.TextureFooterData.TextureAnimationList}" DisplayMemberPath="TextureIndex">
+                <ListView Grid.Row="1" Name="LV_Animations" ItemsSource="{Binding textureData.TextureFooterData.TextureAnimationList}" DisplayMemberPath="TextureIndex">
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Export as PNG" Click="Animation_Export"/>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
                             <EventSetter Event="MouseLeftButtonUp" Handler="ListViewItem_OpenTexAnim"/>

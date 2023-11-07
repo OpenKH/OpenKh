@@ -4,3 +4,6 @@
 [submodule "nQuant"]
 	path = nQuant
 	url = https://github.com/OpenKH/nQuant.git
+[submodule "Simple3DViewport"]
+	path = Simple3DViewport
+	url = https://github.com/osdanova/Simple3DViewport.git
