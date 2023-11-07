@@ -6,12 +6,37 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="ee.mset.ram.bin.gz" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
         <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="ee.mset.ram.bin.gz">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </Resource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="BinaryResources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>BinaryResources.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="BinaryResources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>BinaryResources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>
