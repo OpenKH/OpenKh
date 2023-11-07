@@ -66,6 +66,7 @@ void GetArrPtr(ArrayPtr<T,N>& vp, void* offset)
 void Hook()
 {
     Hook(pfn_Axa_CFileMan_LoadFile, "\x48\x89\x5C\x24\x00\x48\x89\x6C\x24\x00\x48\x89\x74\x24\x00\x48\x89\x7C\x24\x00\x41\x56\x48\x83\xEC\x20\x4C\x8B\xF2\x41\x8B\xE9\x49\x8B\xCE\x33\xD2\x49\x8B\xF0\xBB\x00\x00\x00\x00\xE8", "xxxx?xxxx?xxxx?xxxx?xxxxxxxxxxxxxxxxxxxxx????x");
+    Hook(pfn_Axa_CFileMan_LoadFileWithSize, "\x48\x89\x5C\x24\x00\x48\x89\x6C\x24\x00\x48\x89\x74\x24\x00\x48\x89\x7C\x24\x00\x41\x56\x48\x83\xEC\x20\x4C\x8B\xF2\x41\x8B\xE9\x49\x8B\xCE\x33\xD2\x49\x8B\xF0\x33", "xxxx?xxxx?xxxx?xxxx?xxxxxxxxxxxxxxxxxxxxx");
     Hook(pfn_Axa_CFileMan_LoadFileWithMalloc, "\x48\x89\x5C\x24\x00\x48\x89\x6C\x24\x00\x48\x89\x74\x24\x00\x48\x89\x7C\x24\x00\x41\x56\x48\x83\xEC\x20\x48\x8B\xEA\x45", "xxxx?xxxx?xxxx?xxxx?xxxxxxxxxx");
     Hook(pfn_Axa_CFileMan_GetFileSize, "\x40\x53\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x48\x8B\xDA\x33\xD2\x48\x8B\xCB\xE8", "xxxxx????xxx????xxxxxxx????xxxxxxxxx");
     Hook(pfn_Axa_AxaResourceMan_SetResourceItem, "\x48\x89\x5C\x24\x00\x55\x56\x57\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x49\x8B\xF0\x8B\xFA\x48\x8B", "xxxx?xxxxxx????xxx????xxxxxxx????xxxxxxx");
@@ -81,11 +82,21 @@ void Hook()
     Hook(pfn_Axa_DebugPrint, "\x48\x89\x54\x24\x00\x4C\x89\x44\x24\x00\x4C\x89\x4C\x24\x00\xC3", "xxxx?xxxx?xxxx?x");
     Hook(pfn_Axa_DecryptFile, "\x40\x55\x56\x57\x48\x83\xEC\x50\x48\xC7\x44\x24\x00\x00\x00\x00\x00\x48\x89\x5C\x24\x00\x48\x8B\x05", "xxxxxxxxxxxx?????xxxx?xxx");
     Hook(pfn_Axa_DecompressFile, "\x40\x57\x48\x81\xEC\x00\x00\x00\x00\x8B\x02\x48\x8B\xFA\x89\x44\x24\x38\x48\x8D\x15", "xxxxx????xxxxxxxxxxxx");
+    Hook(pfn_VAG_STREAM_play, "\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x48\x83\x3D\x00\x00\x00\x00\x00\x75\x35", "xxx????xxx????xxxxxxx????xxx?????xx");
+    Hook(pfn_VAG_STREAM_fadeOut, "\x44\x8B\xC1\x48\x8B\x0D\x00\x00\x00\x00\x48\x85\xC9\x74\x08", "xxxxxx????xxxxx");
+    Hook(pfn_VAG_STREAM_setVolume, "\x48\x8B\x05\x00\x00\x00\x00\x48\x85\xC0\x74\x1E\x0F", "xxx????xxxxxx");
+    Hook(pfn_VAG_STREAM_exit, "\x48\x83\xEC\x28\x48\x8B\x0D\x00\x00\x00\x00\x0F", "xxxxxxx????x");
+    char* settingsfunc;
+    Hook(settingsfunc, "\x40\x53\x48\x83\xEC\x20\x8B\xD9\x33\xD2\x48\x8D\x0D", "xxxxxxxxxxxxx");
+    char* volumefunc;
+    Hook(volumefunc, "\x40\x53\x48\x83\xEC\x50\x48\xC7\x44\x24\x00\x00\x00\x00\x00\x48\x63\xD9\x8D\x43\xFF\x83\xF8\x09\x77", "xxxxxxxxxx?????xxxxxxxxxx");
     FindAllFuncs();
     GetVarPtr(PackageFileCount, (char*)pfn_Axa_PackageMan_GetFileInfo + 0x1A);
     GetVarPtr(LastOpenedPackage, (char*)pfn_Axa_CFileMan_GetRemasteredCount + 3);
     GetArrPtr(PackageFiles, (char*)pfn_Axa_PackageMan_GetFileInfo + 0xB1);
     GetArrPtr(BasePath, (char*)pfn_Axa_AxaResourceMan_SetResourceItem + 0x3E);
+    GetVarPtr(PCSettingsPtr, settingsfunc + 0x2B);
+    GetArrPtr(VolumeLevels, volumefunc + 0x2D);
 }
 
 int QuickLaunch = 0;
@@ -98,6 +109,7 @@ void QuickBootHook()
 
 OpenKH::GameId OpenKH::m_GameID = OpenKH::GameId::Unknown;
 std::wstring OpenKH::m_ModPath = L"./mod";
+std::wstring OpenKH::m_ExtractPath = L"";
 bool OpenKH::m_ShowConsole = false;
 bool OpenKH::m_DebugLog = false;
 bool OpenKH::m_EnableCache = true;
@@ -163,6 +175,12 @@ void OpenKH::Initialize()
             memset(buf, 0, MAX_PATH);
             WideCharToMultiByte(CP_UTF8, 0, &m_ModPath.front(), m_ModPath.size(), buf, MAX_PATH, nullptr, nullptr);
             fprintf(f, "mod_path=%s\n", buf);
+            if (!m_ExtractPath.empty())
+            {
+                memset(buf, 0, MAX_PATH);
+                WideCharToMultiByte(CP_UTF8, 0, &m_ExtractPath.front(), m_ExtractPath.size(), buf, MAX_PATH, nullptr, nullptr);
+                fprintf(f, "extract_path=%s\n", buf);
+            }
             if (m_ShowConsole)
                 fputs("show_console=true\n", f);
             if (m_DebugLog)
@@ -186,6 +204,8 @@ void OpenKH::Initialize()
     }
 
     m_ModPath.append(gamefolders[(int)m_GameID]);
+    if (m_ExtractPath.size() > 0)
+        m_ExtractPath.append(gamefolders[(int)m_GameID]);
 
     Hook();
     Panacea::Initialize();
@@ -227,6 +247,11 @@ void OpenKH::ReadSettings(const char* filename)
         {
             m_ModPath.resize(MultiByteToWideChar(CP_UTF8, 0, value, strlen(value), nullptr, 0));
             MultiByteToWideChar(CP_UTF8, 0, value, strlen(value), &m_ModPath.front(), m_ModPath.size());
+        }
+        else if (!strncmp(key, "extract_path", sizeof(buf)) && strnlen(value, sizeof(buf)) > 0)
+        {
+            m_ExtractPath.resize(MultiByteToWideChar(CP_UTF8, 0, value, strlen(value), nullptr, 0));
+            MultiByteToWideChar(CP_UTF8, 0, value, strlen(value), &m_ExtractPath.front(), m_ExtractPath.size());
         }
         else if (!strncmp(key, "show_console", sizeof(buf)))
             parseBool(value, m_ShowConsole);

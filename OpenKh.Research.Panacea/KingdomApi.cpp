@@ -5,6 +5,7 @@
 
 PFN_DEFINE(Axa_CFileMan_LoadFile);
 PFN_DEFINE(Axa_CFileMan_LoadFileWithMalloc);
+PFN_DEFINE(Axa_CFileMan_LoadFileWithSize);
 PFN_DEFINE(Axa_CFileMan_GetFileSize);
 PFN_DEFINE(Axa_AxaResourceMan_SetResourceItem);
 PFN_DEFINE(Axa_PackageMan_GetFileInfo);
@@ -19,15 +20,23 @@ PFN_DEFINE(Axa_OpenFile);
 PFN_DEFINE(Axa_DebugPrint);
 PFN_DEFINE(Axa_DecryptFile);
 PFN_DEFINE(Axa_DecompressFile);
+PFN_DEFINE(VAG_STREAM_play);
+PFN_DEFINE(VAG_STREAM_fadeOut);
+PFN_DEFINE(VAG_STREAM_setVolume);
+PFN_DEFINE(VAG_STREAM_exit);
 PFN_DEFINE(Bbs_File_load);
 PFN_DEFINE(Bbs_CRsrcData_loadCallback);
 
-long Axa::CFileMan::LoadFile(CFileMan* _this, const char* filename, void* addr, bool unk) {
-    return pfn_Axa_CFileMan_LoadFile(_this, filename, addr, unk);
+long Axa::CFileMan::LoadFile(CFileMan* _this, const char* filename, void* addr, bool useHdAsset) {
+    return pfn_Axa_CFileMan_LoadFile(_this, filename, addr, useHdAsset);
 }
 
-void* Axa::CFileMan::LoadFileWithMalloc(CFileMan* _this, const char* filename, int* sizePtr, bool unk, const char* filename2) {
-    return pfn_Axa_CFileMan_LoadFileWithMalloc(_this, filename, sizePtr, unk, filename2);
+long Axa::CFileMan::LoadFileWithSize(CFileMan* _this, const char* filename, void* addr, int size, bool useHdAsset) {
+    return pfn_Axa_CFileMan_LoadFileWithSize(_this, filename, addr, size, useHdAsset);
+}
+
+void* Axa::CFileMan::LoadFileWithMalloc(CFileMan* _this, const char* filename, int* sizePtr, bool useHdAsset, const char* filename2) {
+    return pfn_Axa_CFileMan_LoadFileWithMalloc(_this, filename, sizePtr, useHdAsset, filename2);
 }
 
 long Axa::CFileMan::GetFileSize(CFileMan* _this, const char* filename) {
@@ -92,6 +101,26 @@ __int64 Axa::DecompressFile(void* outBuf, int* decSizePtr, void* inBuf, int comp
     return pfn_Axa_DecompressFile(outBuf, decSizePtr, inBuf, compSize);
 }
 
+void VAG_STREAM::play(const char* fileName, int volume, int fadeVolume, int time)
+{
+    pfn_VAG_STREAM_play(fileName, volume, fadeVolume, time);
+}
+
+void VAG_STREAM::fadeOut(unsigned int time)
+{
+    pfn_VAG_STREAM_fadeOut(time);
+}
+
+void VAG_STREAM::setVolume(int volume)
+{
+    pfn_VAG_STREAM_setVolume(volume);
+}
+
+void VAG_STREAM::exit()
+{
+    pfn_VAG_STREAM_exit();
+}
+
 size_t Bbs::File::load(const char* filename, long long a2) {
     return pfn_Bbs_File_load(filename, a2);
 }
@@ -107,3 +136,5 @@ PVAR_DEFINE(int, PackageFileCount);
 PVAR_DEFINE(int, LastOpenedPackage);
 PARR_DEFINE(Axa::PackageFile*, PackageFiles, 16);
 PARR_DEFINE(char, BasePath, 128);
+PVAR_DEFINE(Axa::PCSettings, PCSettingsPtr);
+PARR_DEFINE(float, VolumeLevels, 11);

@@ -14,27 +14,72 @@ namespace OpenKh.Kh2
             public short EndFrame { get; set; }
             public byte Trigger { get; set; }
             public byte ParamSize { get; set; }
-            public List<short> Param { get; set; }
+            public short Param1 { get; set; }
+            public short Param2 { get; set; }
+            public short Param3 { get; set; }
+            public short Param4 { get; set; }
 
-            public short? Param1
+
+            public RangeTrigger()
             {
-                get { return (ParamSize > 0) ? Param[0] : null; }
-                set { if (ParamSize > 0) Param[0] = (short)value; }
             }
-            public short? Param2
+
+            public enum RangeEnum
             {
-                get { return (ParamSize > 1) ? Param[1] : null; }
-                set { if (ParamSize > 1) Param[1] = (short)value; }
-            }
-            public short? Param3
-            {
-                get { return (ParamSize > 2) ? Param[2] : null; }
-                set { if (ParamSize > 2) Param[2] = (short)value; }
-            }
-            public short? Param4
-            {
-                get { return (ParamSize > 3) ? Param[3] : null; }
-                set { if (ParamSize > 3) Param[3] = (short)value; }
+                u0 = 0,
+                u1 = 1,
+                u2 = 2,
+                u3 = 3,
+                u4 = 4,
+                u5 = 5,
+                u6 = 6,
+                u7 = 7,
+                u8 = 8,
+                u9 = 9,
+                u10 = 10,
+                u11 = 11,
+                u12 = 12,
+                u13 = 13,
+                u14 = 14,
+                u15 = 15,
+                u16 = 16,
+                u17 = 17,
+                u18 = 18,
+                u19 = 19,
+                u20 = 20,
+                u21 = 21,
+                u22 = 22,
+                u23 = 23,
+                u24 = 24,
+                u25 = 25,
+                u26 = 26,
+                u27 = 27,
+                u28 = 28,
+                u29 = 29,
+                u30 = 30,
+                u31 = 31,
+                u32 = 32,
+                u33 = 33,
+                u34 = 34,
+                u35 = 35,
+                u36 = 36,
+                u37 = 37,
+                u38 = 38,
+                u39 = 39,
+                u40 = 40,
+                u41 = 41,
+                u42 = 42,
+                u43 = 43,
+                u44 = 44,
+                u45 = 45,
+                u46 = 46,
+                u47 = 47,
+                u48 = 48,
+                u49 = 49,
+                u50 = 50,
+                u51 = 51,
+                u52 = 52,
+                u53 = 53
             }
         }
 
@@ -43,7 +88,7 @@ namespace OpenKh.Kh2
             public short Frame { get; set; }
             public byte Trigger { get; set; }
             public byte ParamSize { get; set; }
-            public List<short> Param { get; set; }
+            /*public List<short> Param { get; set; }
 
             public short? Param1
             {
@@ -64,6 +109,54 @@ namespace OpenKh.Kh2
             {
                 get { return (ParamSize > 3) ? Param[3] : null; }
                 set { if (ParamSize > 3) Param[3] = (short)value; }
+            }*/
+            public short Param1 { get; set; }
+            public short Param2 { get; set; }
+            public short Param3 { get; set; }
+            public short Param4 { get; set; }
+
+            public FrameTrigger()
+            {
+            }
+
+            public enum FrameEnum
+            {
+                u0 = 0,
+                u1 = 1,
+                u2 = 2,
+                u3 = 3,
+                u4 = 4,
+                u5 = 5,
+                u6 = 6,
+                u7 = 7,
+                u8 = 8,
+                u9 = 9,
+                u10 = 10,
+                u11 = 11,
+                u12 = 12,
+                u13 = 13,
+                u14 = 14,
+                u15 = 15,
+                u16 = 16,
+                u17 = 17,
+                u18 = 18,
+                u19 = 19,
+                u20 = 20,
+                u21 = 21,
+                u22 = 22,
+                u23 = 23,
+                u24 = 24,
+                u25 = 25,
+                u26 = 26,
+                u27 = 27,
+                u28 = 28,
+                u29 = 29,
+                u30 = 30,
+                u31 = 31,
+                u32 = 32,
+                u33 = 33,
+                u34 = 34,
+                u35 = 35
             }
         }
 
@@ -76,6 +169,12 @@ namespace OpenKh.Kh2
         {
             Dummy = 0,
             Binary = 1
+        }
+
+        public MotionTrigger()
+        {
+            RangeTriggerList = new List<RangeTrigger>();
+            FrameTriggerList = new List<FrameTrigger>();
         }
 
         public MotionTrigger(Stream stream)
@@ -97,11 +196,20 @@ namespace OpenKh.Kh2
                 rangeTrigger.EndFrame = reader.ReadInt16();
                 rangeTrigger.Trigger = reader.ReadByte();
                 rangeTrigger.ParamSize = reader.ReadByte();
-                rangeTrigger.Param = new List<short>();
+                /*rangeTrigger.Param = new List<short>();
                 for (int j = 0; j < rangeTrigger.ParamSize; j++)
                 {
                     rangeTrigger.Param.Add(reader.ReadInt16());
-                }
+                }*/
+                if(rangeTrigger.ParamSize > 0)
+                    rangeTrigger.Param1 = reader.ReadInt16();
+                if (rangeTrigger.ParamSize > 1)
+                    rangeTrigger.Param2 = reader.ReadInt16();
+                if (rangeTrigger.ParamSize > 2)
+                    rangeTrigger.Param3 = reader.ReadInt16();
+                if (rangeTrigger.ParamSize > 3)
+                    rangeTrigger.Param4 = reader.ReadInt16();
+
                 RangeTriggerList.Add(rangeTrigger);
             }
 
@@ -112,11 +220,21 @@ namespace OpenKh.Kh2
                 frameTrigger.Frame = reader.ReadInt16();
                 frameTrigger.Trigger = reader.ReadByte();
                 frameTrigger.ParamSize = reader.ReadByte();
-                frameTrigger.Param = new List<short>();
+                /*frameTrigger.Param = new List<short>();
                 for (int j = 0; j < frameTrigger.ParamSize; j++)
                 {
                     frameTrigger.Param.Add(reader.ReadInt16());
-                }
+                }*/
+
+                if (frameTrigger.ParamSize > 0)
+                    frameTrigger.Param1 = reader.ReadInt16();
+                if (frameTrigger.ParamSize > 1)
+                    frameTrigger.Param2 = reader.ReadInt16();
+                if (frameTrigger.ParamSize > 2)
+                    frameTrigger.Param3 = reader.ReadInt16();
+                if (frameTrigger.ParamSize > 3)
+                    frameTrigger.Param4 = reader.ReadInt16();
+
                 FrameTriggerList.Add(frameTrigger);
             }
         }
@@ -144,10 +262,18 @@ namespace OpenKh.Kh2
                 writer.Write(rangeTrigger.EndFrame);
                 writer.Write(rangeTrigger.Trigger);
                 writer.Write(rangeTrigger.ParamSize);
-                foreach (short par in rangeTrigger.Param)
+                /*foreach (short par in rangeTrigger.Param)
                 {
                     writer.Write(par);
-                }
+                }*/
+                if (rangeTrigger.ParamSize > 0)
+                    writer.Write(rangeTrigger.Param1);
+                if (rangeTrigger.ParamSize > 1)
+                    writer.Write(rangeTrigger.Param2);
+                if (rangeTrigger.ParamSize > 2)
+                    writer.Write(rangeTrigger.Param3);
+                if (rangeTrigger.ParamSize > 3)
+                    writer.Write(rangeTrigger.Param4);
             }
 
             foreach (FrameTrigger frameTrigger in FrameTriggerList)
@@ -155,10 +281,18 @@ namespace OpenKh.Kh2
                 writer.Write(frameTrigger.Frame);
                 writer.Write(frameTrigger.Trigger);
                 writer.Write(frameTrigger.ParamSize);
-                foreach (short par in frameTrigger.Param)
+                /*foreach (short par in frameTrigger.Param)
                 {
                     writer.Write(par);
-                }
+                }*/
+                if (frameTrigger.ParamSize > 0)
+                    writer.Write(frameTrigger.Param1);
+                if (frameTrigger.ParamSize > 1)
+                    writer.Write(frameTrigger.Param2);
+                if (frameTrigger.ParamSize > 2)
+                    writer.Write(frameTrigger.Param3);
+                if (frameTrigger.ParamSize > 3)
+                    writer.Write(frameTrigger.Param4);
             }
 
             stream.Position = 0;

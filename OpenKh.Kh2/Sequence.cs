@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -48,6 +49,8 @@ namespace OpenKh.Kh2
             [Data] public Section SpriteGroupDesc { get; set; }
             [Data] public Section AnimationDesc { get; set; }
             [Data] public Section AnimationGroupDesc { get; set; }
+
+            [Data] public int UVEnableFlag { get; set; }
         }
 
         public class RawSprite
@@ -165,6 +168,7 @@ namespace OpenKh.Kh2
         }
 
         public int Unknown04 { get; set; }
+        public bool UVEnableFlag { get; set; }
         public List<Sprite> Sprites { get; set; }
         public List<List<SpritePart>> SpriteGroups { get; set; }
         public List<AnimationGroup> AnimationGroups { get; set; }
@@ -186,6 +190,7 @@ namespace OpenKh.Kh2
                 throw new InvalidDataException("Invalid header");
 
             Unknown04 = header.Unknown04;
+            UVEnableFlag = Convert.ToBoolean(header.UVEnableFlag);
             Sprites = stream.ReadList<RawSprite>(header.SpriteDesc.Offset, header.SpriteDesc.Count)
                 .Select(x => new Sprite
                 {
@@ -235,6 +240,7 @@ namespace OpenKh.Kh2
                 SpriteGroupDesc = new Section() { Count = SpriteGroups.Count },
                 AnimationDesc = new Section() { Count = AnimationGroups.Sum(x => x.Animations.Count) },
                 AnimationGroupDesc = new Section() { Count = AnimationGroups.Count },
+                UVEnableFlag = Convert.ToInt32(UVEnableFlag)
             };
 
             var index = 0;
@@ -243,19 +249,7 @@ namespace OpenKh.Kh2
             stream.Position = basePosition + MinimumLength;
             header.SpriteDesc.Offset = (int)(stream.Position - basePosition);
 
-            header.SpritePartDesc.Offset = stream.WriteList(Sprites.Select(x => new RawSprite
-            {
-                U0 = x.Left,
-                V0 = x.Top,
-                U1 = x.Right,
-                V1 = x.Bottom,
-                UScroll = x.UTranslation,
-                VScroll = x.VTranslation,
-                ColorLeft = x.ColorLeft,
-                ColorTop = x.ColorTop,
-                ColorRight = x.ColorRight,
-                ColorBottom = x.ColorBottom,
-            })) + header.SpriteDesc.Offset;
+            header.SpritePartDesc.Offset = stream.WriteList(Sprites.Select(x => new RawSprite { U0 = x.Left, V0 = x.Top, U1 = x.Right, V1 = x.Bottom, UScroll = x.UTranslation, VScroll = x.VTranslation, ColorLeft = x.ColorLeft, ColorTop = x.ColorTop, ColorRight = x.ColorRight, ColorBottom = x.ColorBottom })) + header.SpriteDesc.Offset;
             header.SpriteGroupDesc.Offset = stream.WriteList(SpriteGroups.SelectMany(x => x)) + header.SpritePartDesc.Offset;
 
             index = 0;

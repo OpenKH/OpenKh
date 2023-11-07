@@ -91,7 +91,7 @@ namespace OpenKh.Tools.DpdViewer.ViewModels
             set
             {
                 dpd = value;
-                Textures = new TexturesViewModel(dpd.Textures);
+                Textures = new TexturesViewModel(dpd.TexturesList);
                 OnPropertyChanged(nameof(Textures));
             }
         }

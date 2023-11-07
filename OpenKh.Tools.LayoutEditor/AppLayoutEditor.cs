@@ -8,6 +8,7 @@ using OpenKh.Tools.Common.CustomImGui;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
@@ -32,6 +33,16 @@ namespace OpenKh.Tools.LayoutEditor
         private readonly DefaultDebugLayoutRenderer _debugRender;
         private readonly List<ISpriteTexture> _spriteTextures;
         private readonly LayoutRenderer _renderer;
+
+        private float ZoomFactor = 1;
+
+        private float PanFactorX = 0;
+        private float PanFactorY = 0;
+
+        private int PastScrollValue = 0;
+
+        private float PastMouseX = 0;
+        private float PastMouseY = 0;
 
         private int _selectedLayoutIndex;
         private int _animationFrameCurrent;
@@ -68,7 +79,7 @@ namespace OpenKh.Tools.LayoutEditor
             _graphics = bootstrap.GraphicsDevice;
             _shader = new KingdomShader(bootstrap.Content);
             _drawing = new MonoSpriteDrawing(_graphics, _shader);
-            _destinationTexture = _drawing.CreateSpriteTexture(1024, 1024);
+            _destinationTexture = _drawing.CreateSpriteTexture(2048, 2048);
             _destinationTextureId = this.BindTexture(_destinationTexture);
 
             _debugRender = new DefaultDebugLayoutRenderer();
@@ -154,10 +165,10 @@ namespace OpenKh.Tools.LayoutEditor
 
             ForChild("Preview", 0, 0, false, () =>
             {
-                const float PositionX = 128f;
-                const float PositionY = 32f;
-                const float ViewportWidth = 1024f;
-                const float ViewportHeight = 1024f;
+                 float PositionX = 128f;
+                 float PositionY = 32f;
+                const float ViewportWidth = 2048;
+                const float ViewportHeight = 2048;
                 var width = ImGui.GetWindowContentRegionMax().X;
                 var height = ImGui.GetWindowHeight();
                 var backgroundColorInverse = new ColorF(
@@ -168,9 +179,31 @@ namespace OpenKh.Tools.LayoutEditor
 
                 _drawing.DestinationTexture = _destinationTexture;
                 _drawing.Clear(_settings.EditorBackground);
+                
+                if (Mouse.GetState().ScrollWheelValue - PastScrollValue > 0)
+                    ZoomFactor -= 0.05F;
+
+                if (Mouse.GetState().ScrollWheelValue - PastScrollValue < 0)
+                    ZoomFactor += 0.05F;
+
+                PastScrollValue = Mouse.GetState().ScrollWheelValue;
+
+                if (Keyboard.GetState().IsKeyDown(Keys.Right))
+                    _renderer.PanFactorX += 5;
+
+                if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                    _renderer.PanFactorX -= 5;
+
+                if (Keyboard.GetState().IsKeyDown(Keys.Up))
+                    _renderer.PanFactorY -= 5;
+
+                if (Keyboard.GetState().IsKeyDown(Keys.Down))
+                    _renderer.PanFactorY += 5;
+
+
                 _drawing.SetViewport(-PositionX, ViewportWidth - PositionX, -PositionY, ViewportHeight - PositionY);
-
-
+                _drawing.SetProjection(ViewportWidth - PositionX, ViewportHeight - PositionY, (ViewportWidth - PositionX) * ZoomFactor, (ViewportHeight - PositionY) * ZoomFactor, 1);
+            
                 _renderer.FrameIndex = _animationFrameCurrent;
                 _renderer.SelectedSequenceGroupIndex = SelectedLayoutIndex;
 
@@ -194,17 +227,32 @@ namespace OpenKh.Tools.LayoutEditor
         {
             const float OriginalViewportWidth = 512f;
             const float RemixViewportWidth = 684f;
+            const float ReFinedViewportWidthFirst = 970.6F;
+            const float ReFinedViewportWidthSecond = 1479F;
             const float ViewportHeight = 416f;
 
             if (_settings.ShowViewportOriginal)
-                _drawing.DrawRectangle(-1, -1, OriginalViewportWidth + 2, ViewportHeight + 2, backgroundColorInverse);
+                _drawing.DrawRectangle(-1 + _renderer.PanFactorX, -1 + _renderer.PanFactorY, OriginalViewportWidth + 2, ViewportHeight + 2, backgroundColorInverse, 1);
 
             if (_settings.ShowViewportRemix)
+            {
                 _drawing.DrawRectangle(
-                -(RemixViewportWidth - OriginalViewportWidth) / 2 - 1, -1,
-                RemixViewportWidth + 2, ViewportHeight + 2, backgroundColorInverse);
+                -(RemixViewportWidth - OriginalViewportWidth) / 2 - 1 + _renderer.PanFactorX, -1 + _renderer.PanFactorY,
+                RemixViewportWidth + 2, ViewportHeight + 2, backgroundColorInverse, 1);
+            }
 
-            _drawing.Flush();
+            if (_settings.ShowViewportReFined)
+            {
+                _drawing.DrawRectangle(
+                -(ReFinedViewportWidthFirst - OriginalViewportWidth) / 2 - 1 + _renderer.PanFactorX, -1 + _renderer.PanFactorY,
+                ReFinedViewportWidthFirst + 2, ViewportHeight + 2, backgroundColorInverse, 1);
+
+                _drawing.DrawRectangle(
+                -(ReFinedViewportWidthSecond - OriginalViewportWidth) / 2 - 1 + _renderer.PanFactorX, -1 + _renderer.PanFactorY,
+                ReFinedViewportWidthSecond + 2, ViewportHeight + 2, backgroundColorInverse, 1);
+            }
+
+             _drawing.Flush();
         }
 
         private unsafe void Timeline()

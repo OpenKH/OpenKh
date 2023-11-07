@@ -1,11 +1,21 @@
 using OpenKh.Imaging;
-using System;
 using System.Drawing;
 
 namespace OpenKh.Kh2
 {
     public partial class Imgd
     {
+        /// <param name="data">
+        /// Accept pixel order in the following styles:
+        /// - `Indexed4`: The first pixel is high byte. The second pixel is low byte.
+        /// - `Indexed8`: No conversion, one byte is one pixel.
+        /// - `Rgba8888`: `RR GG BB AA`
+        /// </param>
+        /// <param name="clut">
+        /// - Place color look at table in this order: `RR GG BB AA`, for `Indexed4` or `Indexed8` images.
+        /// - `AA` ranges from 0 to 255. This will map to Ps2 alpha range (0 to 128).
+        /// </param>
+        /// <param name="isSwizzled"></param>
         public Imgd(
             Size size,
             PixelFormat pixelFormat,
@@ -14,17 +24,17 @@ namespace OpenKh.Kh2
             bool isSwizzled)
         {
             Size = size;
-            format = GetFormat(pixelFormat);
-            swizzled = isSwizzled ? 7 : 3;
+            _format = GetFormat(pixelFormat);
+            _flags = 3 | (isSwizzled ? SwizzledFlag : 0);
 
             if (isSwizzled)
             {
-                switch (format)
+                switch (_format)
                 {
-                    case Format4bpp:
+                    case Tm2.GsPSM.GS_PSMT4:
                         Data = Swizzle4bpp(size, data);
                         break;
-                    case Format8bpp:
+                    case Tm2.GsPSM.GS_PSMT8:
                         Data = Swizzle8bpp(size, data);
                         break;
                     default:
@@ -37,17 +47,27 @@ namespace OpenKh.Kh2
                 Data = data;
             }
 
-            switch (format)
+            switch (_format)
             {
-                case Format4bpp:
+                case Tm2.GsPSM.GS_PSMT4:
                     Clut = GetKh2Clut4(clut);
                     break;
-                case Format8bpp:
+                case Tm2.GsPSM.GS_PSMT8:
                     Clut = GetKh2Clut8(clut);
                     break;
             }
         }
 
+        /// <param name="data">
+        /// Accept pixel order in the following styles:
+        /// - `Indexed4`: The first pixel is high byte. The second pixel is low byte.
+        /// - `Indexed8`: No conversion, one byte is one pixel.
+        /// - `Rgba8888`: `BB GG RR AA` (same as Format32bppArgb)
+        /// </param>
+        /// <param name="clut">
+        /// - Place color look at table in this order: `RR GG BB AA`, for `Indexed4` or `Indexed8` images.
+        /// - `AA` ranges from 0 to 255. This will map to Ps2 alpha range (0 to 128).
+        /// </param>
         public static Imgd Create(
             Size size,
             PixelFormat pixelFormat,

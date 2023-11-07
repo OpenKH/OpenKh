@@ -35,6 +35,8 @@ namespace OpenKh.Tools.Kh2MapStudio
             .AddExtensions("OBJ file (Wavefront)  (might lose some information)", "obj")
             .AddAllFiles();
 
+        private const string SelectArdFilesCaption = "Select ard files";
+
         private readonly Vector4 BgUiColor = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
         private readonly MonoGameImGuiBootstrap _bootstrap;
         private bool _exitFlag = false;
@@ -47,10 +49,35 @@ namespace OpenKh.Tools.Kh2MapStudio
         private string _ardPath;
         private string _mapPath;
         private string _objPath;
-        private List<string> _mapList = new List<string>();
+        private List<MapArdsBefore> _mapArdsList = new List<MapArdsBefore>();
         private ObjEntryController _objEntryController;
 
         private xna.Point _previousMousePosition;
+        private MapArdsBefore _before;
+        private MapArdsAfter _after;
+        private SelectArdFilesState _selectArdFilesState = new SelectArdFilesState();
+
+        private record MapArdsBefore(string MapName, string MapFile, IEnumerable<string> ArdFilesRelative)
+        {
+
+        }
+
+        private record MapArdsAfter(string MapName, string MapFile, string ArdFileRelativeInput, IEnumerable<string> ArdFilesRelativeOutput)
+        {
+
+        }
+
+        private class SelectArdFilesState
+        {
+            public string InputArd { get; set; }
+            public List<string> OutputArds { get; set; } = new List<string>();
+
+            public void Reset()
+            {
+                InputArd = null;
+                OutputArds.Clear();
+            }
+        }
 
         public string Title
         {
@@ -90,11 +117,17 @@ namespace OpenKh.Tools.Kh2MapStudio
             {
                 _mapName = value;
                 UpdateTitle();
-
-                _mapRenderer.Close();
-                _mapRenderer.OpenMap(Path.Combine(_mapPath, $"{_mapName}.map"));
-                _mapRenderer.OpenArd(Path.Combine(_ardPath, $"{_mapName}.ard"));
             }
+        }
+
+        private void LoadMapArd(MapArdsAfter after)
+        {
+            MapName = after.MapName;
+
+            _mapRenderer.Close();
+            _mapRenderer.OpenMap(after.MapFile);
+            _mapRenderer.OpenArd(Path.Combine(_ardPath, after.ArdFileRelativeInput));
+            _after = after;
         }
 
         private bool IsGameOpen => !string.IsNullOrEmpty(_gamePath);
@@ -174,6 +207,8 @@ namespace OpenKh.Tools.Kh2MapStudio
                 }
             });
 
+            SelectArdFilesPopup();
+
             ImGui.PopStyleColor();
 
             return _exitFlag;
@@ -182,6 +217,65 @@ namespace OpenKh.Tools.Kh2MapStudio
         public void Dispose()
         {
             _objEntryController?.Dispose();
+        }
+
+        private void SelectArdFilesPopup()
+        {
+            var dummy = true;
+            if (ImGui.BeginPopupModal(SelectArdFilesCaption, ref dummy,
+                ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                ImGui.Text("Select one ard file:");
+                ImGui.Separator();
+                ImGui.Text("Load from ard:");
+                ForChild("loadFromArds", 120, 120, true, () =>
+                {
+                    foreach (var ard in _before.ArdFilesRelative)
+                    {
+                        if (ImGui.Selectable(ard, _selectArdFilesState.InputArd == ard, ImGuiSelectableFlags.DontClosePopups))
+                        {
+                            _selectArdFilesState.InputArd = ard;
+                        }
+                    }
+                });
+                ImGui.Separator();
+                ImGui.Text("Save to ards:");
+                ForChild("saveToArds", 120, 120, true, () =>
+                {
+                    foreach (var ard in _before.ArdFilesRelative)
+                    {
+                        if (ImGui.Selectable($"{ard}##save", _selectArdFilesState.OutputArds.Contains(ard), ImGuiSelectableFlags.DontClosePopups))
+                        {
+                            if (!_selectArdFilesState.OutputArds.Remove(ard))
+                            {
+                                _selectArdFilesState.OutputArds.Add(ard);
+                            }
+                        }
+                    }
+                });
+                if (ImGui.Button("Select all"))
+                {
+                    _selectArdFilesState.OutputArds.Clear();
+                    _selectArdFilesState.OutputArds.AddRange(_before.ArdFilesRelative);
+                }
+                ImGui.Separator();
+                ImGui.BeginDisabled(_selectArdFilesState.InputArd == null || !_selectArdFilesState.OutputArds.Any());
+                if (ImGui.Button("Proceed"))
+                {
+                    LoadMapArd(
+                        new MapArdsAfter(
+                            _before.MapName,
+                            _before.MapFile,
+                            _selectArdFilesState.InputArd,
+                            _selectArdFilesState.OutputArds
+                        )
+                    );
+
+                    ImGui.CloseCurrentPopup();
+                }
+                ImGui.EndDisabled();
+                ImGui.EndPopup();
+            }
         }
 
         private void MainWindow()
@@ -202,16 +296,34 @@ namespace OpenKh.Tools.Kh2MapStudio
                 ImGui.SetWindowPos(nextPos);
                 ImGui.SetWindowSize(new Vector2(64, 0));
                 return ret;
-            }, () => { }, () =>
+            }, () => { }, (Action)(() =>
             {
-                foreach (var map in _mapList)
+                foreach (var mapArds in _mapArdsList)
                 {
-                    if (ImGui.Selectable(map, MapName == map))
+                    if (ImGui.Selectable(mapArds.MapName, MapName == mapArds.MapName))
                     {
-                        MapName = map;
+                        if (mapArds.ArdFilesRelative.Count() == 1)
+                        {
+                            LoadMapArd(
+                                new MapArdsAfter(
+                                    mapArds.MapName,
+                                    mapArds.MapFile,
+                                    mapArds.ArdFilesRelative.Single(),
+                                    mapArds.ArdFilesRelative
+                                )
+                            );
+                        }
+                        else
+                        {
+                            _before = mapArds;
+
+                            _selectArdFilesState.Reset();
+
+                            ImGui.OpenPopup(SelectArdFilesCaption);
+                        }
                     }
                 }
-            });
+            }));
             ImGui.SameLine();
 
             if (!IsMapOpen)
@@ -278,8 +390,12 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         private void MenuFileSave()
         {
-            _mapRenderer.SaveMap(Path.Combine(_mapPath, MapName + ".map"));
-            _mapRenderer.SaveArd(Path.Combine(_ardPath, MapName + ".ard"));
+            _mapRenderer.SaveMap(_after.MapFile);
+
+            foreach (var ard in _after.ArdFilesRelativeOutput)
+            {
+                _mapRenderer.SaveArd(Path.Combine(_ardPath, ard));
+            }
         }
 
         private void MenuFileSaveMapAs()
@@ -352,8 +468,19 @@ namespace OpenKh.Tools.Kh2MapStudio
                 }
             }
 
-            _mapList.Clear();
-            _mapList.AddRange(mapFiles.Select(Path.GetFileNameWithoutExtension));
+            _mapArdsList.Clear();
+
+            foreach (var mapFile in mapFiles)
+            {
+                var mapName = Path.GetFileNameWithoutExtension(mapFile);
+
+                var ardFiles = Constants.Regions
+                    .Select(region => Path.Combine(region, $"{mapName}.ard"))
+                    .Where(it => File.Exists(Path.Combine(_ardPath, it)))
+                    .ToArray();
+
+                _mapArdsList.Add(new MapArdsBefore(mapName, mapFile, ardFiles));
+            }
         }
 
         private void AddKeyMapping(Keys key, Action action)
