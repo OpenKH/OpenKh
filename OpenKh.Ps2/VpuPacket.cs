@@ -34,6 +34,8 @@ namespace OpenKh.Ps2
             [Data] public int VertexCoordOffset { get; set; }
             [Data] public int VertexIndexOffset { get; set; }
             [Data] public int MatrixCount { get; set; }
+            public int NormalCount { get; set; }
+            public int NormalOffset { get; set; }
         }
 
         /*
@@ -52,6 +54,8 @@ namespace OpenKh.Ps2
             [Data] public int V { get; set; }
             [Data] public int Index { get; set; }
             [Data] public VertexFunction Function { get; set; }
+            public VertexColor Color { get; set; }
+            public VertexNormal Normal { get; set; }
 
             public override string ToString() =>
                 $"{U / 4096.0f:F}, {V / 4096.0f:F}, {Index:X}, {Function}";
@@ -78,10 +82,22 @@ namespace OpenKh.Ps2
             public override string ToString() =>
                 $"{X:F}, {Y:F}, {Z:F}, {W:F}";
         }
-        
+
+        public class VertexNormal
+        {
+            [Data] public float X { get; set; }
+            [Data] public float Y { get; set; }
+            [Data] public float Z { get; set; }
+            [Data] public float Padding { get; set; }
+
+            public override string ToString() =>
+                $"{X:F}, {Y:F}, {Z:F}, {Padding:F}";
+        }
+
         public VertexIndex[] Indices { get; }
         public VertexColor[] Colors { get; }
         public VertexCoord[] Vertices { get; }
+        public VertexNormal[] Normals { get; }
         public int[] VertexRange { get; }
         public int VertexWeightedCount { get; }
         public int[][][] VertexWeightedIndices { get; }
@@ -90,10 +106,21 @@ namespace OpenKh.Ps2
         {
             var vpu = BinaryMapping.ReadObject<VpuHeader>(stream);
 
+            bool hasNormals = (vpu.VertexCoordOffset != vpu.TriStripNodeOffset + vpu.TriStripNodeCount + vpu.ColorCount);
+            if(hasNormals)
+            {
+                vpu.NormalCount = stream.ReadInt32();
+                vpu.NormalOffset = stream.ReadInt32();
+            }
+
             VertexRange = Read(stream, vpu.MatrixCountOffset, vpu.MatrixCount, ReadInt32);
             Indices = Read(stream, vpu.TriStripNodeOffset, vpu.TriStripNodeCount, ReadIndex);
             Colors = Read(stream, vpu.ColorOffset, vpu.ColorCount, ReadColor);
             Vertices = Read(stream, vpu.VertexCoordOffset, vpu.VertexCoordCount, ReadVertex);
+            if(vpu.NormalCount > 0)
+                Normals = Read(stream, vpu.NormalOffset, vpu.NormalCount, ReadNormal);
+            else
+                Normals = new VertexNormal[0];
 
             if (vpu.WeightGroupCount > 0)
             {
@@ -140,6 +167,14 @@ namespace OpenKh.Ps2
             Y = stream.ReadSingle(),
             Z = stream.ReadSingle(),
             W = stream.ReadSingle(),
+        };
+
+        private static VertexNormal ReadNormal(Stream stream) => new VertexNormal
+        {
+            X = stream.ReadSingle(),
+            Y = stream.ReadSingle(),
+            Z = stream.ReadSingle(),
+            Padding = stream.ReadSingle(),
         };
 
         private static T[] Read<T>(Stream stream, int offset, int count, Func<Stream, T> func)

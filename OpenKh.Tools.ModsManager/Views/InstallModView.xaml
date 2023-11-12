@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
          FocusManager.FocusedElement="{Binding ElementName=txtSourceModUrl}"
-        Title="Install a new mod..." Height="160" Width="300" SizeToContent="Height">
+        Title="Install a new mod or Lua Script..." Height="160" Width="300" SizeToContent="Height">
     <Window.InputBindings>
         <KeyBinding Key="Esc" Command="{Binding CloseCommand}"/>
     </Window.InputBindings>
@@ -30,8 +30,8 @@
                 <TextBox Name="txtSourceModUrl" Background="Transparent" Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" KeyUp="txtSourceModUrl_KeyUp" />
             </Grid>
 
-            <TextBlock Margin="0 0 0 3">Or install it from a Mod Archive</TextBlock>
-            <Button Margin="0 0 0 5" Click="InstallZip_Click">Select and install Mod Archive</Button>
+            <TextBlock Margin="0 0 0 3">Install a Mod Archive or Lua Script</TextBlock>
+            <Button Margin="0 0 0 5" Click="InstallLocalFile_Click">Select and install Mod Archive or Lua Script</Button>
         </StackPanel>
 
         <Grid Grid.Row="2">

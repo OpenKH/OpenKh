@@ -10,9 +10,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Xe.Tools;
@@ -40,7 +37,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private bool _isBuilding;
         private bool _pc;
         private bool _panaceaInstalled;
+        private bool _panaceaConsoleEnabled;
+        private bool _panaceaDebugLogEnabled;
+        private bool _panaceaCacheEnabled;
+        private bool _panaceaQuickMenuEnabled;
         private bool _devView;
+        private bool _autoUpdateMods = false;
         private string _launchGame = "kh2";
         private List<string> _supportedGames = new List<string>()
         {
@@ -63,9 +65,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
         private const string REMASTERED_FILES_FOLDER_NAME = "remastered";
 
+        public static bool overwriteMod = false;
         public string Title => ApplicationName;
         public string CurrentVersion => ApplicationVersion;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
+        public ObservableCollection<string> PresetList { get; set; }
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AddModCommand { get; set; }
         public RelayCommand RemoveModCommand { get; set; }
@@ -81,6 +85,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand WizardCommand { get; set; }
         public RelayCommand OpenLinkCommand { get; set; }
         public RelayCommand CheckOpenkhUpdateCommand { get; set; }
+        public RelayCommand OpenPresetMenuCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -108,7 +113,52 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PanaceaSettings => PC && PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
 
+        public bool PanaceaConsoleEnabled
+        {
+            get => _panaceaConsoleEnabled;
+            set
+            {
+                _panaceaConsoleEnabled = value;
+                ConfigurationService.ShowConsole = _panaceaConsoleEnabled;
+                if (_panaceaDebugLogEnabled)
+                    PanaceaDebugLogEnabled = false;
+                OnPropertyChanged(nameof(PanaceaConsoleEnabled));
+                UpdatePanaceaSettings();
+            }
+        }
+        public bool PanaceaDebugLogEnabled
+        {
+            get => _panaceaDebugLogEnabled;
+            set
+            {
+                _panaceaDebugLogEnabled = value;
+                ConfigurationService.DebugLog = _panaceaDebugLogEnabled;
+                OnPropertyChanged(nameof(PanaceaDebugLogEnabled));
+                UpdatePanaceaSettings();
+            }
+        }
+        public bool PanaceaCacheEnabled
+        {
+            get => _panaceaCacheEnabled;
+            set
+            {
+                _panaceaCacheEnabled = value;
+                ConfigurationService.EnableCache = _panaceaCacheEnabled;
+                UpdatePanaceaSettings();
+            }
+        }
+        public bool PanaceaQuickMenuEnabled
+        {
+            get => _panaceaQuickMenuEnabled;
+            set
+            {
+                _panaceaQuickMenuEnabled = value;
+                ConfigurationService.QuickMenu = _panaceaQuickMenuEnabled;
+                UpdatePanaceaSettings();
+            }
+        }
         public bool DevView
         {
             get => _devView;
@@ -119,6 +169,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PatchVisible));
             }
         }
+        public bool AutoUpdateMods
+        {
+            get => _autoUpdateMods;
+            set
+            {
+                _autoUpdateMods = value;
+                ConfigurationService.AutoUpdateMods = _autoUpdateMods;
+            }
+        }
         public bool PanaceaInstalled
         {
             get => _panaceaInstalled;
@@ -127,6 +186,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _panaceaInstalled = value;
                 OnPropertyChanged(nameof(PatchVisible));
                 OnPropertyChanged(nameof(ModLoader));
+                OnPropertyChanged(nameof(PanaceaSettings));
             }
         }
 
@@ -141,6 +201,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PatchVisible));
                 OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
+                OnPropertyChanged(nameof(PanaceaSettings));
             }
         }
 
@@ -194,6 +255,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         break;
                 }
                 ReloadModsList();
+                if (ModsList.Count > 0)
+                    FetchUpdates();
             }
         }
 
@@ -220,6 +283,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 PC = true;
                 PanaceaInstalled = ConfigurationService.PanaceaInstalled;
                 DevView = ConfigurationService.DevView;
+                _panaceaConsoleEnabled = ConfigurationService.ShowConsole;
+                _panaceaDebugLogEnabled = ConfigurationService.DebugLog;
+                _panaceaCacheEnabled = ConfigurationService.EnableCache;
+                _panaceaQuickMenuEnabled = ConfigurationService.QuickMenu;
             }
             else
                 PC = false;
@@ -228,11 +295,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             else
                 ConfigurationService.LaunchGame = _launchGame;
 
+            AutoUpdateMods = ConfigurationService.AutoUpdateMods;
+
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
 
             ReloadModsList();
             SelectedValue = ModsList.FirstOrDefault();
+            ReloadPresetList();
 
             ExitCommand = new RelayCommand(_ => Window.Close());
             AddModCommand = new RelayCommand(_ =>
@@ -248,6 +318,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         var name = view.RepositoryName;
                         var isZipFile = view.IsZipFile;
+                        var isLuaFile = view.IsLuaFile;
                         progressWindow = Application.Current.Dispatcher.Invoke(() =>
                         {
                             var progressWindow = new InstallModProgressWindow
@@ -259,20 +330,25 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             progressWindow.Show();
                             return progressWindow;
                         });
-
-                        await ModsService.InstallMod(name, isZipFile, progress =>
+                        await ModsService.InstallMod(name, isZipFile, isLuaFile, progress =>
                         {
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
                         }, nProgress =>
                         {
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
                         });
-
-                        var actualName = isZipFile ? Path.GetFileNameWithoutExtension(name) : name;
+                        var actualName = isZipFile || isLuaFile ? Path.GetFileNameWithoutExtension(name) : name;
                         var mod = ModsService.GetMods(new string[] { actualName }).First();
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             progressWindow.Close();
+                            if (overwriteMod)
+                            {
+                                var modRemove = ModsList.FirstOrDefault(smod => smod.Title == mod.Metadata.Title);
+                                if (modRemove != null)
+                                    ModsList.RemoveAt(ModsList.IndexOf(modRemove));
+                                overwriteMod = false;
+                            }
                             ModsList.Insert(0, Map(mod));
                             SelectedValue = ModsList[0];
                         });
@@ -302,7 +378,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }
 
                         Directory.Delete(mod.Path, true);
-                        ReloadModsList();
+                        ModsList.RemoveAt(ModsList.IndexOf(SelectedValue));
                     });
                 }
             }, _ => IsModSelected);
@@ -403,6 +479,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     else
                         PC = false;
                 }
+            });
+
+            OpenPresetMenuCommand = new RelayCommand(_ =>
+            {
+                PresetsWindow view = new PresetsWindow(this);
+                view.ShowDialog();
             });
 
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
@@ -849,6 +931,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 Application.Current.Dispatcher.Invoke(() =>
                     mod.UpdateCount = modUpdate.UpdateCount);
             }
+            if (AutoUpdateMods)
+            {
+                foreach (var mod in ModsList)
+                {
+                    if (mod.UpdateCount > 0)
+                        await ModsService.Update(mod.Source);                    
+                }
+                ReloadModsList();
+            }
         }
 
         private async Task UpdateOpenkhAsync()
@@ -894,6 +985,65 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 var message = $"The latest version '{checkResult.CurrentVersion}' is already installed!";
 
                 MessageBox.Show(message, "OpenKh");
+            }
+        }        
+        
+        public void UpdatePanaceaSettings()
+        {
+            if (PanaceaInstalled)
+            {
+                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
+                string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
+                    $"debug_log={_panaceaDebugLogEnabled}\r\nenable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
+                File.WriteAllText(panaceaSettings, textToWrite);
+            }
+        }
+
+        // PRESETS
+        public void SavePreset(string presetName)
+        {
+            string name = string.Join("+", presetName.Split(Path.GetInvalidFileNameChars()));
+            List<string> enabledMods = ModsList
+            .Where(x => x.Enabled)
+            .Select(x => x.Source)
+            .ToList();
+            File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name + ".txt"), enabledMods);
+            if (!PresetList.Contains(presetName))
+            {
+                PresetList.Add(presetName);
+            }
+        }
+        public void RemovePreset(string presetName)
+        {
+            File.Delete(Path.Combine(ConfigurationService.PresetPath, presetName + ".txt"));
+            PresetList.Remove(presetName);
+        }
+
+        public void LoadPreset(string presetName)
+        {
+            string filename = Path.Combine(ConfigurationService.PresetPath, presetName + ".txt");
+            if (File.Exists(filename))
+            {
+                ConfigurationService.EnabledMods = File.ReadAllLines(filename);
+                ReloadModsList();
+                if (ModsList.Count > 0)
+                    FetchUpdates();
+            }
+            else
+            {
+                MessageBox.Show("Cannot find preset", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+        }
+
+        public void ReloadPresetList()
+        {
+            if (PresetList == null)
+                PresetList = new ObservableCollection<string>();
+
+            PresetList.Clear();
+            foreach (string presetFilePath in Directory.GetFiles(ConfigurationService.PresetPath))
+            {
+                PresetList.Add(Path.GetFileNameWithoutExtension(presetFilePath));
             }
         }
     }

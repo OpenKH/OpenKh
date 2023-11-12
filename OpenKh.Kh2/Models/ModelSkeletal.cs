@@ -1,5 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Common.Utils;
+using OpenKh.Kh2.Models.VIF;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
@@ -236,11 +237,11 @@ namespace OpenKh.Kh2.Models
                 using (var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, true))
                 {
                     writer.Write(group.BoneMatrix.Count);
-                    foreach (int boneIndex in group.BoneMatrix)
-                    {
+                foreach (int boneIndex in group.BoneMatrix)
+                {
                         writer.Write(boneIndex);
-                    }
                 }
+            }
             }
 
             ModelCommon.alignStreamToByte(stream, 16);
@@ -297,7 +298,15 @@ namespace OpenKh.Kh2.Models
                 // Vertices
                 OpenKh.Ps2.VpuPacket.VertexIndex index = vpuGroup.Indices[i];
                 UVBVertex vertex = vpuGroup.Vertices[index.Index];
-                mesh.Vertices.Add(new UVBVertex(vertex.BPositions, index.U, index.V, ModelCommon.getAbsolutePosition(vertex.BPositions, boneMatrices)));
+
+                UVBVertex completeVertex = new UVBVertex(vertex.BPositions, index.U, index.V, ModelCommon.getAbsolutePosition(vertex.BPositions, boneMatrices));
+
+                if (index.Color != null)
+                    completeVertex.Color = new VifCommon.VertexColor((byte)index.Color.R, (byte)index.Color.G, (byte)index.Color.B, (byte)index.Color.A);
+                if (index.Normal != null)
+                    completeVertex.Normal = new VifCommon.VertexNormal(index.Normal.X, index.Normal.Y, index.Normal.Z);
+
+                mesh.Vertices.Add(completeVertex);
 
                 // Triangles
                 if (index.Function == OpenKh.Ps2.VpuPacket.VertexFunction.DrawTriangle ||
@@ -440,6 +449,7 @@ namespace OpenKh.Kh2.Models
                 }
 
                 // VPU INDICES (Vertices with spacial position + UV)
+                int previousIndexCount = vpuGroup.Indices.Count;
                 foreach (OpenKh.Ps2.VpuPacket.VertexIndex vertexIndex in vpuPacket.Indices)
                 {
                     OpenKh.Ps2.VpuPacket.VertexIndex newVertexIndex = new OpenKh.Ps2.VpuPacket.VertexIndex();
@@ -448,6 +458,24 @@ namespace OpenKh.Kh2.Models
                     newVertexIndex.U = vertexIndex.U;
                     newVertexIndex.V = vertexIndex.V;
                     vpuGroup.Indices.Add(newVertexIndex);
+                }
+
+                // Colors
+                if(vpuPacket.Indices.Length == vpuPacket.Colors.Length)
+                {
+                    for (int j = 0; j < vpuPacket.Indices.Length; j++)
+                    {
+                        vpuGroup.Indices[previousIndexCount + j].Color = vpuPacket.Colors[j];
+                    }
+                }
+
+                // Normals
+                if (vpuPacket.Indices.Length == vpuPacket.Normals.Length)
+                {
+                    for (int j = 0; j < vpuPacket.Indices.Length; j++)
+                    {
+                        vpuGroup.Indices[previousIndexCount + j].Normal = vpuPacket.Normals[j];
+                    }
                 }
 
                 indexCount = vpuGroup.Vertices.Count;

@@ -5,9 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.Kh2MdlxEditor.Views"
         mc:Ignorable="d"
-        Title="Import and Replace Mesh" Height="320" Width="460">
-    <StackPanel Margin="10">
+        Title="Import and Replace Mesh" Height="500" Width="500">
+
+    <StackPanel Margin="10" AllowDrop="True" Drop="Drop_LoadModel">
+
+        <StackPanel.Resources>
+            <BooleanToVisibilityConverter x:Key="converter"/>
+        </StackPanel.Resources>
+
+        <!-- Loader -->
+        <Button Margin="10" Click="Button_LoadModel" Width="200">Select model to load</Button>
+
+        <!-- Shadow -->
         <CheckBox Margin="5" IsChecked="{Binding Path=KeepShadow, Mode=TwoWay}">Keep shadow</CheckBox>
+
+        <!-- Limits -->
         <StackPanel Margin="10" Orientation="Horizontal">
             <TextBox Text="{Binding Path=VertexLimitPerPacket}" Width="50"></TextBox>
             <Label>Vertex limit per packet (255 Max)</Label>
@@ -19,7 +31,42 @@
         <Label>The higher the limits the lower the output file's size</Label>
         <Label>If the model is too heavy to process (Eg: Multiweight) lower the memory limit</Label>
         <Label>If the model doesn't load properly ingame (Eg: PS2) lower the vertex limit</Label>
-        <Button Margin="10" Click="Button_Import" Width="200">Select file and Import Mesh</Button>
+
+        <StackPanel Visibility="{Binding Path=ModelLoaded, Converter={StaticResource converter}}">
+
+            <!-- Mesh options -->
+            <DataGrid ItemsSource="{Binding MeshOptionsList}" 
+                      AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False"
+                      HorizontalAlignment="Center" VerticalAlignment="Center">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Mesh" IsReadOnly="True" Binding="{Binding Id}" />
+                    <DataGridTextColumn Header="Poly count" IsReadOnly="True" Binding="{Binding PolyCount}" />
+                    <DataGridTextColumn Header="Texture" IsReadOnly="True" Binding="{Binding Texture}" />
+
+                    <DataGridTemplateColumn Header="Vertex colors">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsEnabled="{Binding HasColors}" IsChecked="{Binding Path=ApplyColors, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Vertex normals">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsEnabled="{Binding HasNormals}" IsChecked="{Binding ApplyNormals, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Import -->
+            <Button Margin="0 30 0 10" Height="30" Width="70" Click="Button_Import">Import</Button>
+        </StackPanel>
+        
         <Label Name="ErrorMessage"/>
+        
     </StackPanel>
 </Window>

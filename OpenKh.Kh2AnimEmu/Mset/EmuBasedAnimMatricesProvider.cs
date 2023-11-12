@@ -47,6 +47,11 @@ namespace OpenKh.Kh2Anim.Mset
 
         int IAnimMatricesProvider.MatrixCount => animReader.cntb2;
 
+        public void ResetGameTimeDelta()
+        {
+            absTime = 0;
+        }
+
         Matrix4x4[] IAnimMatricesProvider.ProvideMatrices(double delta)
         {
             absTime += delta;
@@ -67,5 +72,36 @@ namespace OpenKh.Kh2Anim.Mset
 
             return matrixOut;
         }
+
+        public (Matrix4x4[] Fk, Matrix4x4[] Ik) ProvideMatrices2(double gameTimeDelta)
+        {
+            absTime += gameTimeDelta;
+
+            var matrixOutStream = new MemoryStream();
+
+            emuRunner.Permit(
+                null, animReader.cntb1,
+                null, animReader.cntb2,
+                0, (float)absTime, matrixOutStream
+            );
+
+            matrixOutStream.Position = 0;
+
+            var fk = new Matrix4x4[animReader.cntb1];
+            for (int t = 0; t < animReader.cntb1; t++)
+            {
+                fk[t] = matrixOutStream.ReadMatrix4x4();
+            }
+
+            var numIk = animReader.cntb2 - animReader.cntb1;
+            var ik = new Matrix4x4[numIk];
+            for (int t = 0; t < numIk; t++)
+            {
+                ik[t] = matrixOutStream.ReadMatrix4x4();
+            }
+
+            return (fk, ik);
+        }
+
     }
 }

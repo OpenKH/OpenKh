@@ -49,7 +49,7 @@ namespace OpenKh.Game
             }
             catch (Exception ex)
             {
-                Log.Err("A fatal error has occurred. Please attach this log to https://github.com/xeeynamo/openkh/issues");
+                Log.Err("A fatal error has occurred. Please attach this log to https://github.com/openkh/openkh/issues");
                 Catch(ex);
                 Log.Close();
 

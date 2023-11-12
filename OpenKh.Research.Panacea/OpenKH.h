@@ -18,6 +18,7 @@ namespace OpenKH
 
     extern GameId m_GameID;
     extern std::wstring m_ModPath;
+    extern std::wstring m_ExtractPath;
     extern bool m_ShowConsole;
     extern bool m_DebugLog;
     extern bool m_EnableCache;

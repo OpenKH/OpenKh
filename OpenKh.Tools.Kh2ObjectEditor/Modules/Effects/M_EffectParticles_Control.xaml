@@ -1,0 +1,20 @@
+<UserControl x:Class="OpenKh.Tools.Kh2ObjectEditor.Modules.Effects.M_EffectParticles_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Modules.Effects"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <DataGrid Name="DataTable"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Path=EffectNumber}" Header="Number" />
+                <DataGridTextColumn Binding="{Binding Path=DpdId}" Header="DPD Id" />
+                <DataGridTextColumn Binding="{Binding Path=ParticleDataId}" Header="Particle Data Id" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

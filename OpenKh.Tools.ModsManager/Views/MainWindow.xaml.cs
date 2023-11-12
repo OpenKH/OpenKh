@@ -18,6 +18,7 @@ namespace OpenKh.Tools.ModsManager.Views
         protected override void OnClosed(EventArgs e)
         {
             (DataContext as MainViewModel)?.CloseAllWindows();
+            WinSettings.Default.Save();
             base.OnClosed(e);
         }
     }

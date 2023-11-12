@@ -103,6 +103,10 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
                 model.Groups.Add(group);
 
                 baseAddress += VifProcessor.getGroupSize(group);
+
+                if (VifProcessor.currentApplyNormal)
+                    group.Header.Specular = true;
+                VifProcessor.NextMeshOptions();
             }
 
             foreach (ModelSkeletal.SkeletalGroup group in model.Groups)

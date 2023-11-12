@@ -25,6 +25,7 @@ namespace OpenKh.Kh2.Models.VIF
             public UVCoord UvCoord;
             public byte TriFlag;
             public VertexColor Color;
+            public VertexNormal Normal;
             public Vector3 AbsolutePosition;
             public List<BoneRelativePosition> RelativePositions; // WeightGroup
 
@@ -48,6 +49,7 @@ namespace OpenKh.Kh2.Models.VIF
                 vpuSize += (4 * RelativePositions.Count); // Bone matrices
 
                 if(Color != null) vpuSize += 1; // Color
+                if(Normal != null) vpuSize += 1; // Normal
 
                 return vpuSize;
             }
@@ -168,6 +170,20 @@ namespace OpenKh.Kh2.Models.VIF
                 this.G = G;
                 this.B = B;
                 this.A = A;
+            }
+        }
+
+        public class VertexNormal
+        {
+            public float X;
+            public float Y;
+            public float Z;
+
+            public VertexNormal(float x, float y, float z)
+            {
+                this.X = x;
+                this.Y = y;
+                this.Z = z;
             }
         }
 

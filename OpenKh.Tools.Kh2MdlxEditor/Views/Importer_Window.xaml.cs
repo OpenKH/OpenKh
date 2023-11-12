@@ -1,7 +1,6 @@
-using OpenKh.Kh2.Models.VIF;
-using OpenKh.Tools.Kh2MdlxEditor.Utils;
 using OpenKh.Tools.Kh2MdlxEditor.ViewModels;
 using System;
+using System.Linq;
 using System.Windows;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.Views
@@ -23,7 +22,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
             this.mainWindow = mainWindow;
         }
 
-        private void Button_Import(object sender, EventArgs e)
+        private void Button_LoadModel(object sender, EventArgs e)
         {
             System.Windows.Forms.OpenFileDialog sfd;
             sfd = new System.Windows.Forms.OpenFileDialog();
@@ -35,25 +34,60 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 {
                     try
                     {
-                        ErrorMessage.Content = "Loading...";
-                        MdlxEditorImporter.KEEP_ORIGINAL_SHADOW = importerVM.KeepShadow;
-                        VifProcessor.VERTEX_LIMIT = importerVM.VertexLimitPerPacket;
-                        VifProcessor.MEMORY_LIMIT = importerVM.MemoryLimitPerPacket;
-                        importerVM.MainVM.replaceModel(sfd.FileName);
-                        ErrorMessage.Content = "Finished";
-                        if(mainWindow != null)
-                        {
-                            mainWindow.reloadModelControl();
-                        }
-                        this.Close();
+                        loadModel(sfd.FileName);
                     }
                     catch (Exception exception)
                     {
                         ErrorMessage.Content = "Error: " + exception.Message;
                     }
                 }
-                    
+
             }
+        }
+
+        private void Drop_LoadModel(object sender, DragEventArgs e)
+        {
+            try
+            {
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                    string firstFile = files?.FirstOrDefault();
+
+                    if (firstFile.ToLower().EndsWith(".fbx") || firstFile.ToLower().EndsWith(".dae"))
+                    {
+                        loadModel(firstFile);
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                ErrorMessage.Content = "Error opening file: " + exception.Message;
+            }
+        }
+
+        private void Button_Import(object sender, EventArgs e)
+        {
+            try
+            {
+                ErrorMessage.Content = "Loading...";
+                importerVM.ImportModel();
+                ErrorMessage.Content = "Finished";
+                if (mainWindow != null)
+                {
+                    mainWindow.reloadModelControl();
+                }
+                this.Close();
+            }
+            catch (Exception exception)
+            {
+                ErrorMessage.Content = "Error: " + exception.Message;
+            }
+        }
+
+        private void loadModel(string filepath)
+        {
+            importerVM.loadModel(filepath);
         }
     }
 }
