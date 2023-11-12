@@ -1,9 +1,11 @@
-﻿using System;
+using System;
+using System.Runtime.Versioning;
 
 namespace OpenKh.Imaging
 {
     public static class PixelFormatExtensions
     {
+        [SupportedOSPlatform("windows")]
         internal static System.Drawing.Imaging.PixelFormat GetDrawingPixelFormat(this PixelFormat pixelFormat)
         {
             switch (pixelFormat)
@@ -26,6 +28,7 @@ namespace OpenKh.Imaging
             }
         }
 
+        [SupportedOSPlatform("windows")]
         internal static PixelFormat GetPixelFormat(this System.Drawing.Imaging.PixelFormat pixelFormat)
         {
             switch (pixelFormat)
