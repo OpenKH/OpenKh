@@ -12,11 +12,16 @@ namespace OpenKh.Tools.Kh2FontImageEditor.DependencyInjection
 {
     internal static class UseExtension
     {
-        public static void UseKh2FontImageEditor(this ServiceCollection container)
+        public static IServiceCollection UseKh2FontImageEditor(this IServiceCollection services)
         {
-            container.AddSingleton<MainWindow>();
-            container.AddSingleton<MainWindowVM>();
-            container.AddSingleton<ShowErrorMessageUsecase>();
+            services.AddSingleton<MainWindow>();
+            services.AddSingleton<MainWindowVM>();
+            services.AddSingleton<ShowErrorMessageUsecase>();
+            services.AddSingleton<ExitAppUsecase>();
+            services.AddSingleton<Func<MainWindow>>(sp => () => sp.GetRequiredService<MainWindow>());
+            services.AddSingleton<ReplacePaletteAlphaUsecase>();
+
+            return services;
         }
     }
 }

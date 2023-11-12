@@ -8,6 +8,7 @@ using OpenKh.Tools.Kh2FontImageEditor.Usecases;
 using OpenKh.Tools.Kh2FontImageEditor.UserControls;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,18 +25,30 @@ namespace OpenKh.Tools.Kh2FontImageEditor.ViewModels
     public class MainWindowVM : BaseNotifyPropertyChanged
     {
         public MainWindowVM(
-            ShowErrorMessageUsecase showErrorMessageUsecase
+            ShowErrorMessageUsecase showErrorMessageUsecase,
+            ExitAppUsecase exitAppUsecase,
+            ReplacePaletteAlphaUsecase replacePaletteAlphaUsecase
         )
         {
+            _replacePaletteAlphaUsecase = replacePaletteAlphaUsecase;
+
             OpenCommand = new RelayCommand(
                 _ =>
                 {
                     try
                     {
-                        FileDialog.OnOpen(fileName =>
+                        FileDialog.OnOpen(fontImageFile =>
                         {
-                            LoadFontImage(fileName);
-                            _lastOpenedFile = fileName;
+                            LoadFontImage(fontImageFile);
+                            _lastOpenedFontImage = fontImageFile;
+                            _lastOpenedFontInfo = null;
+
+                            FileDialog.OnOpen(fontInfoFile =>
+                            {
+                                LoadFontInfo(fontInfoFile);
+                                _lastOpenedFontInfo = fontInfoFile;
+                            }, OpenFontInfoFilters);
+
                         }, OpenFontImageFilters);
                     }
                     catch (Exception ex)
@@ -52,8 +65,8 @@ namespace OpenKh.Tools.Kh2FontImageEditor.ViewModels
                         FileDialog.OnSave(fileName =>
                         {
                             SaveFontImage(fileName);
-                            _lastOpenedFile = fileName;
-                        }, OpenFontImageFilters, defaultFileName: _lastOpenedFile);
+                            _lastOpenedFontImage = fileName;
+                        }, OpenFontImageFilters, defaultFileName: _lastOpenedFontImage);
                     }
                     catch (Exception ex)
                     {
@@ -69,8 +82,8 @@ namespace OpenKh.Tools.Kh2FontImageEditor.ViewModels
                         FileDialog.OnSave(fileName =>
                         {
                             SaveFontImage(fileName);
-                            _lastOpenedFile = fileName;
-                        }, OpenFontImageFilters, defaultFileName: _lastOpenedFile);
+                            _lastOpenedFontImage = fileName;
+                        }, OpenFontImageFilters, defaultFileName: _lastOpenedFontImage);
                     }
                     catch (Exception ex)
                     {
@@ -78,12 +91,20 @@ namespace OpenKh.Tools.Kh2FontImageEditor.ViewModels
                     }
                 }
             );
+            ExitCommand = new RelayCommand(
+                _ =>
+                {
+                    exitAppUsecase.ExitApp();
+                }
+            );
 
-            System1 = new ImagerModel("System1", it => it.ImageSystem, (it, one) => it.ImageSystem = one);
-            System2 = new ImagerModel("System2", it => it.ImageSystem2, (it, one) => it.ImageSystem2 = one);
-            Event1 = new ImagerModel("Event1", it => it.ImageEvent, (it, one) => it.ImageEvent = one);
-            Event2 = new ImagerModel("Event2", it => it.ImageEvent2, (it, one) => it.ImageEvent2 = one);
-            Icon = new ImagerModel("Icon", it => it.ImageIcon, (it, one) => it.ImageIcon = one);
+            // us icon 24x24 event 24x32 sys 18x24
+            // ja icon 24x24 event 24x24 sys 18x18
+            System1 = new ImagerModel("System1", true, it => it.ImageSystem, (it, one) => it.ImageSystem = one);
+            System2 = new ImagerModel("System2", true, it => it.ImageSystem2, (it, one) => it.ImageSystem2 = one);
+            Event1 = new ImagerModel("Event1", true, it => it.ImageEvent, (it, one) => it.ImageEvent = one);
+            Event2 = new ImagerModel("Event2", true, it => it.ImageEvent2, (it, one) => it.ImageEvent2 = one);
+            Icon = new ImagerModel("Icon", false, it => it.ImageIcon, (it, one) => it.ImageIcon = one);
 
             ImagerImportCommand = new RelayCommand(
                 imager =>
@@ -141,7 +162,13 @@ namespace OpenKh.Tools.Kh2FontImageEditor.ViewModels
             FileDialog.OnSave(fileName =>
             {
                 var temp = new MemoryStream();
-                Png.Write(temp, imager.GetImage(_fontContext!)); //TODO use PngImage
+                var image = imager.GetImage(_fontContext!);
+                Png.Write(
+                    temp,
+                    imager.IsFontImage
+                        ? _replacePaletteAlphaUsecase.ReplacePaletteAlphaWith(image, 255)
+                        : image
+                );
                 File.WriteAllBytes(fileName, temp.ToArray());
             }, OpenPngFilters, defaultFileName: $"{imager.Caption}.png");
         }
@@ -165,6 +192,11 @@ namespace OpenKh.Tools.Kh2FontImageEditor.ViewModels
             imager.SetImage(_fontContext!, pngImage);
         }
 
+        private void LoadFontInfo(string fileName)
+        {
+            _fontContext!.Read(File.OpenRead(fileName).Using(stream => Bar.Read(stream)));
+        }
+
         private void LoadFontImage(string fileName)
         {
             _fontContext = new FontContext();
@@ -178,12 +210,16 @@ namespace OpenKh.Tools.Kh2FontImageEditor.ViewModels
         }
 
         private FontContext? _fontContext = new FontContext();
-        private string? _lastOpenedFile = null;
+        private string? _lastOpenedFontImage = null;
+        private string? _lastOpenedFontInfo = null;
 
         public ICommand OpenCommand { get; }
         public ICommand SaveCommand { get; }
         public ICommand SaveAsCommand { get; }
+        public ICommand ExitCommand { get; }
         public ICommand AboutCommand { get; }
+
+        private readonly ReplacePaletteAlphaUsecase _replacePaletteAlphaUsecase;
 
         public ICommand ImagerImportCommand { get; }
         public ICommand ImagerExportCommand { get; }
@@ -196,18 +232,25 @@ namespace OpenKh.Tools.Kh2FontImageEditor.ViewModels
 
         public class ImagerModel : BaseNotifyPropertyChanged
         {
-            public ImagerModel(string caption, Func<FontContext, IImageRead> getImage, Action<FontContext, IImageRead> setImage)
+            public ImagerModel(
+                string caption,
+                bool isFontImage,
+                Func<FontContext, IImageRead> getImage,
+                Action<FontContext, IImageRead> setImage
+            )
             {
                 Caption = caption;
+                IsFontImage = isFontImage;
                 GetImage = getImage;
                 SetImage = setImage;
             }
 
             public string Caption { get; }
-            internal Func<FontContext, IImageRead> GetImage { get; }
-            internal Action<FontContext, IImageRead> SetImage { get; }
+            public bool IsFontImage { get; }
+            public Func<FontContext, IImageRead> GetImage { get; }
+            public Action<FontContext, IImageRead> SetImage { get; }
 
-            #region Image
+            #region Image property
             private ImageSource? _image;
             public ImageSource? Image
             {
@@ -228,6 +271,12 @@ namespace OpenKh.Tools.Kh2FontImageEditor.ViewModels
         private static readonly List<FileDialogFilter> OpenFontImageFilters = FileDialogFilterComposer
             .Compose()
             .AddPatterns("fontimage.bar", new string[] { "fontimage.bar" }.AsEnumerable())
+            .ToList()
+            .AddAllFiles();
+
+        private static readonly List<FileDialogFilter> OpenFontInfoFilters = FileDialogFilterComposer
+            .Compose()
+            .AddPatterns("fontinfo.bar", new string[] { "fontinfo.bar" }.AsEnumerable())
             .ToList()
             .AddAllFiles();
 

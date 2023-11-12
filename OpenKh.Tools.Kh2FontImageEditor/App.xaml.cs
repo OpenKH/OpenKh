@@ -29,9 +29,9 @@ namespace OpenKh.Tools.Kh2FontImageEditor
         {
             base.OnStartup(e);
 
-            var builder = new ServiceCollection();
-            builder.UseKh2FontImageEditor();
-            _container = builder.BuildServiceProvider();
+            _container = new ServiceCollection()
+                .UseKh2FontImageEditor()
+                .BuildServiceProvider();
             ShutdownMode = ShutdownMode.OnMainWindowClose;
             MainWindow = _container.GetRequiredService<MainWindow>();
             MainWindow.Show();

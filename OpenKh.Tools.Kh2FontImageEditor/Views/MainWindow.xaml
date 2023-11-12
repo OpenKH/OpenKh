@@ -17,9 +17,8 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open" Command="{Binding OpenCommand}"/>
-                <MenuItem Header="_Save" Command="{Binding SaveCommand}"/>
-                <MenuItem Header="Save _as..." Command="{Binding SaveAsCommand}"/>
+                <MenuItem Header="_Load 2 files: msg/*/fontimage.bar and msg/*/fontinfo.bar" Command="{Binding OpenCommand}"/>
+                <MenuItem Header="Save fontimage.bar _as..." Command="{Binding SaveAsCommand}"/>
                 <Separator/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
             </MenuItem>
@@ -39,11 +38,40 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <UserControls:ImagerTablet Grid.Column="0" Caption="{Binding System1.Caption}" Image="{Binding System1.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding System1}" ExportCommandParameter="{Binding System1}" />
-            <UserControls:ImagerTablet Grid.Column="1" Caption="{Binding System2.Caption}" Image="{Binding System2.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding System2}" ExportCommandParameter="{Binding System2}" />
-            <UserControls:ImagerTablet Grid.Column="2" Caption="{Binding Event1.Caption}" Image="{Binding Event1.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding Event1}" ExportCommandParameter="{Binding Event1}" />
-            <UserControls:ImagerTablet Grid.Column="3" Caption="{Binding Event2.Caption}" Image="{Binding Event2.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding Event2}" ExportCommandParameter="{Binding Event2}" />
-            <UserControls:ImagerTablet Grid.Column="4" Caption="{Binding Icon.Caption}" Image="{Binding Icon.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding Icon}" ExportCommandParameter="{Binding Icon}" />
+            <DockPanel Grid.Column="0" LastChildFill="True">
+                <StatusBar DockPanel.Dock="Bottom">
+                    <StatusBarItem>2bpp gray image</StatusBarItem>
+                </StatusBar>
+                <UserControls:ImagerTablet Caption="{Binding System1.Caption}" Image="{Binding System1.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding System1}" ExportCommandParameter="{Binding System1}" />
+            </DockPanel>
+
+            <DockPanel Grid.Column="1" LastChildFill="True">
+                <StatusBar DockPanel.Dock="Bottom">
+                    <StatusBarItem>2bpp gray image</StatusBarItem>
+                </StatusBar>
+                <UserControls:ImagerTablet Caption="{Binding System2.Caption}" Image="{Binding System2.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding System2}" ExportCommandParameter="{Binding System2}" />
+            </DockPanel>
+
+            <DockPanel Grid.Column="2" LastChildFill="True">
+                <StatusBar DockPanel.Dock="Bottom">
+                    <StatusBarItem>2bpp gray image</StatusBarItem>
+                </StatusBar>
+                <UserControls:ImagerTablet Caption="{Binding Event1.Caption}" Image="{Binding Event1.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding Event1}" ExportCommandParameter="{Binding Event1}" />
+            </DockPanel>
+
+            <DockPanel Grid.Column="3" LastChildFill="True">
+                <StatusBar DockPanel.Dock="Bottom">
+                    <StatusBarItem>2bpp gray image</StatusBarItem>
+                </StatusBar>
+                <UserControls:ImagerTablet Caption="{Binding Event2.Caption}" Image="{Binding Event2.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding Event2}" ExportCommandParameter="{Binding Event2}" />
+            </DockPanel>
+
+            <DockPanel Grid.Column="4" LastChildFill="True">
+                <StatusBar DockPanel.Dock="Bottom">
+                    <StatusBarItem>8bpp image + palette</StatusBarItem>
+                </StatusBar>
+                <UserControls:ImagerTablet Caption="{Binding Icon.Caption}" Image="{Binding Icon.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding Icon}" ExportCommandParameter="{Binding Icon}" />
+            </DockPanel>
 
         </Grid>
     </Grid>

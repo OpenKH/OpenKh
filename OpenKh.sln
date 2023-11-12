@@ -212,7 +212,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Command.Txa", "OpenK
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simple3DViewport", "Simple3DViewport\Simple3DViewport\Simple3DViewport.csproj", "{CA7DCF50-324E-4C36-B476-49940EBA393A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tools.Kh2FontImageEditor", "OpenKh.Tools.Kh2FontImageEditor\OpenKh.Tools.Kh2FontImageEditor.csproj", "{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Kh2FontImageEditor", "OpenKh.Tools.Kh2FontImageEditor\OpenKh.Tools.Kh2FontImageEditor.csproj", "{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Kh2MsetMotionEditor", "OpenKh.Tools.Kh2MsetMotionEditor\OpenKh.Tools.Kh2MsetMotionEditor.csproj", "{4A16893C-3E9B-4547-AE22-FDF7FD216137}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Kh2ObjectEditor", "OpenKh.Tools.Kh2ObjectEditor\OpenKh.Tools.Kh2ObjectEditor.csproj", "{CF6D785D-602A-46E0-9DCB-5F703E3544F0}"
@@ -1487,12 +1488,20 @@ Global
 		{CA7DCF50-324E-4C36-B476-49940EBA393A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CA7DCF50-324E-4C36-B476-49940EBA393A}.Release|x64.ActiveCfg = Release|Any CPU
 		{CA7DCF50-324E-4C36-B476-49940EBA393A}.Release|x64.Build.0 = Release|Any CPU
+		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}..NET Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}..NET Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}..NET Debug|x64.ActiveCfg = Debug|Any CPU
 		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}..NET Debug|x64.Build.0 = Debug|Any CPU
+		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}..NET Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}..NET Release|Any CPU.Build.0 = Release|Any CPU
 		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}..NET Release|x64.ActiveCfg = Release|Any CPU
 		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}..NET Release|x64.Build.0 = Release|Any CPU
+		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}.Debug|x64.Build.0 = Debug|Any CPU
+		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}.Release|x64.ActiveCfg = Release|Any CPU
 		{97E01F25-D6FB-45F0-9FD7-7A88F95F88D0}.Release|x64.Build.0 = Release|Any CPU
 		{4A16893C-3E9B-4547-AE22-FDF7FD216137}..NET Debug|Any CPU.ActiveCfg = Debug|Any CPU
