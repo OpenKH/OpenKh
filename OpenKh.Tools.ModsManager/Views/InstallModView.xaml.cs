@@ -13,11 +13,12 @@ namespace OpenKh.Tools.ModsManager.Views
     {
         private static readonly IEnumerable<FileDialogFilter> _zipFilter = FileDialogFilterComposer
             .Compose()
-            .AddExtensions("Mod archive", "zip", "kh2pcpatch", "kh1pcpatch", "compcpatch", "bbspcpatch");
+            .AddExtensions("Mod archive", "zip", "kh2pcpatch", "kh1pcpatch", "compcpatch", "bbspcpatch", "lua");
 
         public RelayCommand CloseCommand { get; }
         public string RepositoryName { get; set; }
         public bool IsZipFile { get; private set; }
+        public bool IsLuaFile { get; private set; } = false;
 
         public InstallModView()
         {
@@ -53,14 +54,25 @@ namespace OpenKh.Tools.ModsManager.Views
             Close();
         }
 
-        private void InstallZip_Click(object sender, RoutedEventArgs e)
+        private void InstallLocalFile_Click(object sender, RoutedEventArgs e)
         {
             FileDialog.OnOpen(fileName =>
             {
-                IsZipFile = true;
-                RepositoryName = fileName;
-                DialogResult = true;
-                Close();
+                if (!fileName.Contains(".lua"))
+                {
+                    IsZipFile = true;
+                    RepositoryName = fileName;
+                    DialogResult = true;
+                    Close();
+                }
+                else
+                {
+                    IsZipFile = false;
+                    IsLuaFile = true;
+                    RepositoryName = fileName;
+                    DialogResult = true;
+                    Close();
+                }
             }, _zipFilter);
         }
 

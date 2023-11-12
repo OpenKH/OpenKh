@@ -333,6 +333,7 @@ namespace OpenKh.Imaging
                     clut[4 * y + 1] = PLTE[3 * y + 1];
                     clut[4 * y + 2] = PLTE[3 * y + 2];
                 }
+                clut[4 * y + 3] = 255;
                 if (y + 1 <= tRNS?.Length)
                 {
                     clut[4 * y + 3] = tRNS[y];

@@ -1,0 +1,73 @@
+<UserControl x:Class="OpenKh.Tools.Kh2ObjectEditor.Views.MotionTriggers_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <Grid>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        
+        <!-- DISPLAY -->
+        <Grid Background="Black" Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <DockPanel Grid.Column="0">
+                <Label DockPanel.Dock="Top" HorizontalAlignment="Center" Foreground="White">Range Triggers</Label>
+                <DataGrid
+                  AutoGenerateColumns="False"
+                  ItemsSource="{Binding AnimBinary.MotionTriggerFile.RangeTriggerList}"
+                  CanUserAddRows="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding Path=Trigger}" Header="Trigger" />
+                        <DataGridTextColumn Binding="{Binding Path=StartFrame}" Header="Start Frame" />
+                        <DataGridTextColumn Binding="{Binding Path=EndFrame}" Header="End Frame" />
+                        <DataGridTextColumn Binding="{Binding Path=ParamSize}" Header="Param Size"/>
+                        <DataGridTextColumn Binding="{Binding Path=Param1}" Header="Param 1" />
+                        <DataGridTextColumn Binding="{Binding Path=Param2}" Header="Param 2" />
+                        <DataGridTextColumn Binding="{Binding Path=Param3}" Header="Param 3" />
+                        <DataGridTextColumn Binding="{Binding Path=Param4}" Header="Param 4" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+
+            <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
+
+            <DockPanel Grid.Column="2">
+                <Label DockPanel.Dock="Top" HorizontalAlignment="Center" Foreground="White">Frame Triggers</Label>
+                <DataGrid
+                  AutoGenerateColumns="False"
+                  ItemsSource="{Binding AnimBinary.MotionTriggerFile.FrameTriggerList}"
+                  CanUserAddRows="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding Path=Trigger}" Header="Trigger" />
+                        <DataGridTextColumn Binding="{Binding Path=Frame}" Header="Frame" />
+                        <DataGridTextColumn Binding="{Binding Path=ParamSize}" Header="ParamSize"/>
+                        <DataGridTextColumn Binding="{Binding Path=Param1}" Header="Param 1" />
+                        <DataGridTextColumn Binding="{Binding Path=Param2}" Header="Param 2" />
+                        <DataGridTextColumn Binding="{Binding Path=Param3}" Header="Param 3" />
+                        <DataGridTextColumn Binding="{Binding Path=Param4}" Header="Param 4" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+
+        </Grid>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+            <Button Margin="10,0,10,0" Padding="5,0,5,0" Click="Button_CreateTriggers" IsEnabled="{Binding HasNoTriggers}">Create Triggers</Button>
+            <Button Margin="10,0,10,0" Padding="5,0,5,0" Click="Button_SaveTriggers">Save Triggers</Button>
+        </StackPanel>
+        
+    </Grid>
+    
+</UserControl>

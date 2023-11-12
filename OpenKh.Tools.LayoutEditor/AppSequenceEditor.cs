@@ -4,6 +4,7 @@ using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.LayoutEditor.Interfaces;
 using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.MonoGame;
@@ -46,6 +47,17 @@ namespace OpenKh.Tools.LayoutEditor
         private MySequencer _sequencer;
         int _sequencerSelectedAnimation = 0;
         int _sequencerFirstFrame = 0;
+
+
+        private float ZoomFactor = 1;
+
+        private float PanFactorX = 0;
+        private float PanFactorY = 0;
+
+        private int PastScrollValue = 0;
+
+        private float PastMouseX = 0;
+        private float PastMouseY = 0;
 
         private bool _isSpriteEditDialogOpen;
         private SpriteEditDialog _spriteEditDialog;
@@ -118,6 +130,7 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 ForMenuItem("Sprite groups...", () => _isSpriteGroupEditDialogOpen = true);
                 ForMenuItem("Sprites...", () => _isSpriteEditDialogOpen = true);
+                ForMenuCheck("Enable UV Animations", () => _sequence.UVEnableFlag, x => _sequence.UVEnableFlag = x);
             });
         }
 
@@ -136,6 +149,10 @@ namespace OpenKh.Tools.LayoutEditor
                 _spriteGroupEditDialog.Run();
                 ImGui.EndPopup();
             }
+
+            _sequence.Sprites = _sprites
+                .Select(x => x.Sprite)
+                .ToList();
 
             const float SpriteListWidthMul = 1f;
             const float SpriteListWidthMax = 192f;
@@ -252,8 +269,8 @@ namespace OpenKh.Tools.LayoutEditor
 
             ForChild("Preview", 0, 0, false, () =>
             {
-                const float ViewportWidth = 1024f;
-                const float ViewportHeight = 1024f;
+                const float ViewportWidth = 2048;
+                const float ViewportHeight = 2048;
                 const float Infinite = 65536f;
                 var width = ImGui.GetWindowContentRegionMax().X;
                 var height = ImGui.GetWindowHeight();
@@ -270,11 +287,35 @@ namespace OpenKh.Tools.LayoutEditor
                 _drawing.SetViewport(0, ViewportWidth, 0, ViewportHeight);
 
                 // This draws the origin
-                _drawing.FillRectangle(originX - 1, 0, 1, Infinite, backgroundColorInverse);
-                _drawing.FillRectangle(0, originY - 1, Infinite, 1, backgroundColorInverse);
+                _drawing.FillRectangle(originX - 1 + _renderer.PanFactorX, -2048 + _renderer.PanFactorX, 1, Infinite, backgroundColorInverse);
+                _drawing.FillRectangle(0 + _renderer.PanFactorX - 2048, originY - 1 + _renderer.PanFactorY, Infinite, 1, backgroundColorInverse);
+
+                if (Mouse.GetState().ScrollWheelValue - PastScrollValue > 0)
+                    ZoomFactor -= 0.05F;
+
+                if (Mouse.GetState().ScrollWheelValue - PastScrollValue < 0)
+                    ZoomFactor += 0.05F;
+
+                PastScrollValue = Mouse.GetState().ScrollWheelValue;
+
+                if (Keyboard.GetState().IsKeyDown(Keys.Right))
+                    _renderer.PanFactorX += 5;
+
+                if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                    _renderer.PanFactorX -= 5;
+
+                if (Keyboard.GetState().IsKeyDown(Keys.Up))
+                    _renderer.PanFactorY -= 5;
+
+                if (Keyboard.GetState().IsKeyDown(Keys.Down))
+                    _renderer.PanFactorY += 5;
+
+                _drawing.SetProjection(ViewportWidth, ViewportHeight, 1024 * ZoomFactor, 1024 * ZoomFactor, 1);
+
                 _drawing.Flush();
 
                 _renderer.Draw(_selectedAnimGroup, _animationFrameCurrent, originX, originY);
+
                 _drawing.Flush();
                 _drawing.DestinationTexture = null;
 

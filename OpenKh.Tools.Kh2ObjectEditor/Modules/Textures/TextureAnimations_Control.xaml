@@ -1,0 +1,62 @@
+<UserControl x:Class="OpenKh.Tools.Kh2ObjectEditor.Modules.Textures.TextureAnimations_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Modules.Textures"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
+
+        <ContentControl Grid.Column="0" Name="SelectedAnimationFrame"></ContentControl>
+
+        <!-- <Canvas Grid.Column="0">
+            <Canvas.Background>
+                <DrawingBrush TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
+                    <DrawingBrush.Drawing>
+                        <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#80000000"/>
+                    </DrawingBrush.Drawing>
+                </DrawingBrush>
+            </Canvas.Background>
+            <Image Name="ImageFrame"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Stretch="Uniform"/>
+        </Canvas> -->
+
+        <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
+
+        <DockPanel Grid.Column="2">
+            <!-- Filters -->
+            <!-- <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
+                <Button Width="100" Click="Button_MoveTextureUp">^</Button>
+                <Button Width="100" Click="Button_MoveTextureDown">V</Button>
+            </StackPanel> -->
+
+            <ListView x:Name="List_Textures" ItemsSource="{Binding TexAnims}" SelectedItem="{Binding SelectedAnim}" MouseDoubleClick="list_doubleCLick">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Export as PNG" Click="Texture_Export"/>
+                        <MenuItem Header="Replace texture" Click="Texture_Replace"/>
+                        <MenuItem Header="Remove texture" Click="Texture_Remove"/>
+                        <MenuItem Header="Add texture" Click="Texture_Add"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{Binding Path=Name}"/>
+                            <TextBlock Text="{Binding Path=Group.Header.PolygonCount}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+        </DockPanel>
+    </Grid>
+</UserControl>

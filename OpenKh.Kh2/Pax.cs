@@ -1,43 +1,60 @@
-﻿using System;
+using OpenKh.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2
 {
-    public partial class Pax
-	{
-		public class Entry
-		{
-			public int Effect { get; set; }
-			public int Caster { get; set; }
-			public int Unk04 { get; set; }
-			public int Unk06 { get; set; }
-			public int Unk08 { get; set; }
-			public int Unk0C { get; set; }
-			public int Unk10 { get; set; }
-			public int Unk14 { get; set; }
-			public int SoundEffect { get; set; }
-			public float PosX { get; set; }
-			public float PosZ { get; set; }
-			public float PosY { get; set; }
-			public float RotX { get; set; }
-			public float RotZ { get; set; }
-			public float RotY { get; set; }
-			public float ScaleX { get; set; }
-			public float ScaleZ { get; set; }
-			public float ScaleY { get; set; }
-			public int Unk40 { get; set; }
-			public int Unk44 { get; set; }
-			public int Unk48 { get; set; }
-			public int Unk4C { get; set; }
+    public class Pax
+    {
+        private const uint MagicCode = 0x5F584150U; // PAX_
+        public string Name { get; set; }
+        public PaxHeader Header { get; set; }
+        public byte[] DebugInfo { get; set; }  // Always 8 x 16 bytes
+        public List<Element> Elements { get; set; }
+        public Dpx DpxPackage { get; set; }
 
-			internal static Entry Read(BinaryReader reader)
+        public class PaxHeader
+        {
+            [Data] public uint Signature { get; set; } // PAX_
+            [Data] public int DebugInfoOffset { get; set; }
+            [Data] public int ElementCount { get; set; }
+            [Data] public int DpxOffset { get; set; }
+        }
+
+		public class Element
+		{
+            [Data] public ushort EffectNumber { get; set; }
+            [Data] public ushort Id { get; set; }
+			[Data] public byte Group { get; set; }
+            [Data] public byte FadeoutFrame { get; set; }
+            [Data] public short BoneId { get; set; }
+			[Data] public ulong Category { get; set; }
+			[Data] public uint Flag { get; set; }
+			[Data] public float StartWait { get; set; }
+			[Data] public int SoundEffectNumber { get; set; }
+			[Data] public float TranslationX { get; set; }
+			[Data] public float TranslationZ { get; set; }
+			[Data] public float TranslationY { get; set; }
+			[Data] public float RotationX { get; set; }
+			[Data] public float RotationZ { get; set; }
+			[Data] public float RotationY { get; set; }
+			[Data] public float ScaleX { get; set; }
+			[Data] public float ScaleZ { get; set; }
+			[Data] public float ScaleY { get; set; }
+			[Data] public int Unk40 { get; set; } // Reserve/Padding? Always 0
+			[Data] public int Unk44 { get; set; } // Reserve/Padding? Always 0
+            [Data] public int Unk48 { get; set; } // Reserve/Padding? Always 0
+            [Data] public int Unk4C { get; set; } // Reserve/Padding? Always 0
+
+            /*internal static Element Read(BinaryReader reader)
 			{
-				return new Entry()
+				return new Element()
 				{
-					Effect = reader.ReadInt16(),
-					Caster = reader.ReadInt16(),
+                    Number = reader.ReadHalf(),
+                    Id = reader.ReadInt16(),
 					Unk04 = reader.ReadInt16(),
 					Unk06 = reader.ReadInt16(),
 					Unk08 = reader.ReadInt32(),
@@ -59,25 +76,25 @@ namespace OpenKh.Kh2
 					Unk48 = reader.ReadInt32(),
 					Unk4C = reader.ReadInt32(),
 				};
-			}
+			}*/
 
 			internal void Save(BinaryWriter writer)
 			{
-				writer.Write((short)Effect);
-				writer.Write((short)Caster);
-				writer.Write((short)Unk04);
-				writer.Write((short)Unk06);
-				writer.Write(Unk08);
-				writer.Write(Unk0C);
-				writer.Write(Unk10);
-				writer.Write(Unk14);
-				writer.Write(SoundEffect);
-				writer.Write(PosX);
-				writer.Write(PosZ);
-				writer.Write(PosY);
-				writer.Write(RotX);
-				writer.Write(RotZ);
-				writer.Write(RotY);
+				writer.Write((ushort)EffectNumber);
+				writer.Write((ushort)Id);
+				writer.Write((byte)Group);
+                writer.Write((byte)FadeoutFrame);
+                writer.Write((short)BoneId);
+				writer.Write(Category);
+				writer.Write(Flag);
+				writer.Write(StartWait);
+				writer.Write(SoundEffectNumber);
+				writer.Write(TranslationX);
+				writer.Write(TranslationZ);
+				writer.Write(TranslationY);
+				writer.Write(RotationX);
+				writer.Write(RotationZ);
+				writer.Write(RotationY);
 				writer.Write(ScaleX);
 				writer.Write(ScaleZ);
 				writer.Write(ScaleY);
@@ -85,47 +102,67 @@ namespace OpenKh.Kh2
 				writer.Write(Unk44);
 				writer.Write(Unk48);
 				writer.Write(Unk4C);
-			}
-		}
+            }
 
-		private const uint MagicCode = 0x5F584150U;
+            public override string ToString()
+            {
+                return "No: "+ EffectNumber + " | Id: " + Id + " | Gr: " + Group + " | Bone: " + BoneId + " | SEno: " + SoundEffectNumber;
+            }
+        }
 
-		public Pax(Stream stream)
+        public Pax(Stream stream)
 		{
 			if (!stream.CanRead || !stream.CanSeek)
 				throw new InvalidDataException($"Read or seek must be supported.");
 
-			var reader = new BinaryReader(stream);
-			var offsetBase = reader.BaseStream.Position;
+            Header = BinaryMapping.ReadObject<PaxHeader>(stream);
 
-			if (stream.Length < 16L || reader.ReadUInt32() != MagicCode)
-				throw new InvalidDataException("Invalid header");
+            Elements = new List<Element>();
+            for(int i = 0; i < Header.ElementCount; i++)
+            {
+                Elements.Add(BinaryMapping.ReadObject<Element>(stream));
+            }
 
-			var offsetName = reader.ReadInt32();
-			var entriesCount = reader.ReadInt32();
-			var offsetDpx = reader.ReadInt32();
+            DebugInfo = new byte[0x80];
+            for (int i = 0; i < 0x80; i++)
+            {
+                DebugInfo[i] = (byte) stream.ReadByte();
+            }
 
-			Entries = new List<Entry>(entriesCount);
-			for (int i = 0; i < entriesCount; i++)
-			{
-				Entries.Add(Entry.Read(reader));
-			}
+            stream.Position = Header.DpxOffset;
 
-			reader.BaseStream.Position = offsetBase + offsetName;
-			ReadName(reader);
+            // Load remaining data to a stream
+            byte[] data = stream.ReadBytes((int)(stream.Length - stream.Position));
+            MemoryStream dpxStream = new MemoryStream();
+            dpxStream.Write(data, 0, data.Length);
+            dpxStream.Position = 0;
 
-			reader.BaseStream.Position = offsetBase + offsetDpx;
-			//Dpx = new Dpx(reader);
-		}
+            DpxPackage = new Dpx(dpxStream);
+        }
 
-		public string Name { get; set; }
+        public Stream getAsStream()
+        {
+            Stream fileStream = new MemoryStream();
 
-		public List<Entry> Entries { get; set; }
+            Header.DebugInfoOffset = 16 + 80 * Elements.Count;
+            Header.DpxOffset = Header.DebugInfoOffset + 128;
 
-		public Dpx Dpx { get; set; }
+            BinaryMapping.WriteObject(fileStream, Header);
+            foreach(Element elem in Elements)
+            {
+                BinaryMapping.WriteObject(fileStream, elem);
+            }
 
+            BinaryWriter writer = new BinaryWriter(fileStream);
+            writer.Write(DebugInfo);
 
-		private void ReadName(BinaryReader reader)
+            writer.Write(((MemoryStream)DpxPackage.getAsStream()).ToArray());
+
+            fileStream.Position = 0;
+            return fileStream;
+        }
+
+        private void ReadName(BinaryReader reader)
 		{
 			byte[] data = new byte[0x80];
 			reader.Read(data, 0, data.Length);
@@ -152,18 +189,17 @@ namespace OpenKh.Kh2
 			SaveName(writer);
 
 			int offsetDpx = (int)(writer.BaseStream.Position - offsetBase);
-			//Dpx.SaveChanges(writer);
 
 			writer.BaseStream.Position = offsetBase;
 			writer.Write(MagicCode);
 			writer.Write(offsetName);
-			writer.Write(Entries.Count);
+			writer.Write(Elements.Count);
 			writer.Write(offsetDpx);
 		}
 
 		public void SaveEntries(BinaryWriter writer)
 		{
-			foreach (var entry in Entries)
+			foreach (var entry in Elements)
 			{
 				entry.Save(writer);
 			}
@@ -176,5 +212,5 @@ namespace OpenKh.Kh2
 			Array.Copy(strData, data, Math.Min(data.Length, strData.Length));
 			writer.Write(data);
 		}
-	}
+    }
 }

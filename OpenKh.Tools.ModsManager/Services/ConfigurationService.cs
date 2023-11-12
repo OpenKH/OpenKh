@@ -34,11 +34,15 @@ namespace OpenKh.Tools.ModsManager.Services
             public string OpenKhGameEngineLocation { get; internal set; }
             public string Pcsx2Location { get; internal set; }
             public string PcReleaseLocation { get; internal set; }
-            public string PcShortcutLocation { get; internal set; }
             public string PcReleaseLanguage { get; internal set; } = "en";
             public int RegionId { get; internal set; }
             public bool PanaceaInstalled { get; internal set; }
-            public bool DevView { get; internal set; }
+            public bool ShowConsole { get; internal set; } = false;
+            public bool DebugLog { get; internal set; } = false;
+            public bool EnableCache { get; internal set; } = true;
+            public bool QuickMenu { get; internal set; } = false;
+            public bool DevView { get; internal set; } = false;
+            public bool AutoUpdateMods { get; internal set; }
             public bool isEGSVersion { get; internal set; } = true;
             public bool kh1 { get; internal set; }
             public bool kh2 { get; internal set; } = true;
@@ -69,6 +73,7 @@ namespace OpenKh.Tools.ModsManager.Services
         private static string EnabledModsPathBBS = Path.Combine(StoragePath, "mods-BBS.txt");
         private static string EnabledModsPathRECOM = Path.Combine(StoragePath, "mods-ReCoM.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
+        public static string PresetPath = Path.Combine(StoragePath, "presets");
 
         static ConfigurationService()
         {
@@ -81,7 +86,9 @@ namespace OpenKh.Tools.ModsManager.Services
                 Directory.CreateDirectory(Path.Combine(modsPath, "bbs"));
             if (!Directory.Exists(Path.Combine(modsPath, "Recom")))
                 Directory.CreateDirectory(Path.Combine(modsPath, "Recom"));
-           
+            if (!Directory.Exists(PresetPath))
+                Directory.CreateDirectory(PresetPath);
+
 
             Task.Run(async () =>
             {
@@ -234,15 +241,6 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
-        public static string PcShortcutLocation
-        {
-            get => _config.PcShortcutLocation;
-            set
-            {
-                _config.PcShortcutLocation = value;
-                _config.Save(ConfigPath);
-            }
-        }
 
         public static string PcReleaseLanguage
         {
@@ -273,12 +271,57 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
+        public static bool ShowConsole
+        {
+            get => _config.ShowConsole;
+            set
+            {
+                _config.ShowConsole = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool DebugLog
+        {
+            get => _config.DebugLog;
+            set
+            {
+                _config.DebugLog = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool EnableCache
+        {
+            get => _config.EnableCache;
+            set
+            {
+                _config.EnableCache = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool QuickMenu
+        {
+            get => _config.QuickMenu;
+            set
+            {
+                _config.QuickMenu = value;
+                _config.Save(ConfigPath);
+            }
+        }
         public static bool DevView
         {
             get => _config.DevView;
             set
             {
                 _config.DevView = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool AutoUpdateMods
+        {
+            get => _config.AutoUpdateMods;
+            set
+            {
+                _config.AutoUpdateMods = value;
                 _config.Save(ConfigPath);
             }
         }

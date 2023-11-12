@@ -14,7 +14,7 @@ namespace OpenKh.Engine.MonoGame
             var texture = new Texture2D(graphicsDevice, size.Width, size.Height);
             if(image.PixelFormat != PixelFormat.Rgba1555)
             {
-                texture.SetData(image.AsBgra8888());
+                texture.SetData(image.AsRgba8888());
             }
             else
             {

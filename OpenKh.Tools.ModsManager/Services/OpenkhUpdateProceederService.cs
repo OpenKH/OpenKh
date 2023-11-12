@@ -40,6 +40,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 zip.ExtractToDirectory(tempZipDir);
             }
 
+            File.Delete(tempZipFile);
             var tempBatFile = Path.Combine(Path.GetTempPath(), $"openkh-{tempId}.bat");
 
             var copyTo = AppDomain.CurrentDomain.BaseDirectory;
@@ -84,8 +85,11 @@ namespace OpenKh.Tools.ModsManager.Services
         private async Task CreateBatchFileAsync(string tempBatFile, string copyFrom, string copyTo, string execAfter)
         {
             var bat = new StringWriter();
+            bat.WriteLine($"taskkill /im OpenKh.Tools.ModsManager.exe");
             bat.WriteLine($"xcopy /d /e \"{copyFrom}\" \"{copyTo}\" || pause");
             bat.WriteLine($"{execAfter}");
+            bat.WriteLine($"rd /s /q \"{copyFrom}\"");
+            bat.WriteLine($"del %0");
             await File.WriteAllTextAsync(tempBatFile, bat.ToString(), Encoding.Default);
         }
     }

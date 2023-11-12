@@ -7,7 +7,7 @@ namespace OpenKh.Tools.ModsManager.Exceptions
         public string ModName { get; }
 
         public ModAlreadyExistsExceptions(string modName) :
-            base($"A mod with the name '{modName}' already exists. The installation will now stop.")
+            base($"The previous install of '{modName}' will not be overwritten. The installation will now stop.")
         {
             ModName = modName;
         }

@@ -1,0 +1,44 @@
+<UserControl x:Class="OpenKh.Tools.Kh2ObjectEditor.Views.ObjectSelector_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <DockPanel Background="White">
+
+        <!-- FILTERS AND OTHER CONTROLS -->
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10">
+            <Label FontWeight="Bold">Filters</Label>
+            <StackPanel Orientation="Horizontal">
+                <Label>Name:</Label>
+                <TextBox Text="{Binding FilterName}" Width="200" VerticalContentAlignment="Center"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Has Moveset:</Label>
+                <CheckBox IsChecked="{Binding FilterHasMset}" VerticalAlignment="Center"/>
+            </StackPanel>
+            <Button Width="100" HorizontalAlignment="Right" Click="Button_ApplyFilters">Apply filters</Button>
+        </StackPanel>
+
+        <!-- OBJECT LIST -->
+        <ListView ItemsSource="{Binding ObjectsView}" SelectedItem="{Binding SelectedObject}"  MouseDoubleClick="list_doubleCLick">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Grid.Column="0" Text="{Binding Path=FileName}"/>
+                        <CheckBox Grid.Column="1" Focusable="False" IsHitTestVisible="False"  IsChecked="{Binding Path=HasMset}" BorderThickness="0" VerticalAlignment="Center" >
+                            <CheckBox.Background>
+                                <SolidColorBrush Opacity="0"/>
+                            </CheckBox.Background>
+                        </CheckBox>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        
+    </DockPanel>
+    
+</UserControl>

@@ -1,0 +1,37 @@
+<UserControl x:Class="OpenKh.Tools.Kh2ObjectEditor.Views.ModuleLoader_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <Grid Background="Black">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="50" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Content loader -->
+        <ContentControl x:Name="contentFrame" Grid.Column="0" Background="#2d2d2d"/>
+        <!-- <local:ModuleMotions_Control/> -->
+
+        <!-- Side menu -->
+        <StackPanel Grid.Column="1" Background="White">
+            <Label Visibility="Visible" x:Name="TabModel" MouseLeftButtonUp="TabClick_Model">Model</Label>
+            <Label Visibility="Visible" x:Name="TabTextures" MouseLeftButtonUp="TabClick_Textures">Textures</Label>
+            <Label Visibility="Visible" x:Name="TabCollisions" MouseLeftButtonUp="TabClick_Collisions">Collisions</Label>
+            <Label Visibility="Visible" x:Name="TabMotions" MouseLeftButtonUp="TabClick_Motions">Motions</Label>
+            <Label Visibility="Visible" x:Name="TabParticles" MouseLeftButtonUp="TabClick_Particles">Particles</Label>
+            <Label Visibility="Visible" x:Name="TabAI" MouseLeftButtonUp="TabClick_AI">AI</Label>
+            <!-- 
+            <Image x:Name="sideModel" Visibility="Collapsed" Height="50" Source="../Assets/IconModelW.png" MouseLeftButtonUp="Side_Model"></Image>
+            <Image x:Name="sideTexture" Visibility="Collapsed" Height="50" Source="../Assets/IconTextureW.png" MouseLeftButtonUp="Side_Texture"></Image>
+            <Image x:Name="sideCollision" Visibility="Collapsed" Height="50" Source="../Assets/IconCollisionW.png" MouseLeftButtonUp="Side_Collision" MouseRightButtonUp="Side_CollisionTable"></Image>
+            -->
+        </StackPanel>
+
+    </Grid>
+    
+</UserControl>
