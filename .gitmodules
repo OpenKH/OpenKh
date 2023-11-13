@@ -7,3 +7,6 @@
 [submodule "Simple3DViewport"]
 	path = Simple3DViewport
 	url = https://github.com/osdanova/Simple3DViewport.git
+[submodule "ModelingToolkit"]
+	path = ModelingToolkit
+	url = https://github.com/osdanova/ModelingToolkit.git
