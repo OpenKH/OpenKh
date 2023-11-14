@@ -63,7 +63,7 @@ namespace OpenKh.Tools.KhModels.KIH2
                             {
                                 MtVertex vertex = new MtVertex();
                                 vertex.AbsolutePosition = new Vector3(mapVertex.X, mapVertex.Y, mapVertex.Z);
-                                vertex.TextureCoordinates = new Vector3(mapVertex.Tu, mapVertex.Tv, 0);
+                                vertex.TextureCoordinates = new Vector3(mapVertex.Tu, 1 - mapVertex.Tv, 0);
                                 vertex.Color = new Vector4(mapVertex.R, mapVertex.G, mapVertex.B, mapVertex.A);
                                 mesh.Vertices.Add(vertex);
                             }
