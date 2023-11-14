@@ -1,0 +1,40 @@
+<Window x:Class="OpenKh.Tools.KhModels.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.KhModels"
+        xmlns:h="http://helix-toolkit.org/wpf"
+        mc:Ignorable="d"
+        Title="KH Models" Height="1000" Width="1000">
+    
+    <DockPanel>
+        <!-- Top navbar -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="DEBUG" Visibility="Collapsed">
+                <MenuItem Header="Reload" Click="Menu_DebugReload"/>
+                <MenuItem Header="Export MDLS" Click="Menu_DebugExportMdls"/>
+            </MenuItem>
+            <MenuItem Header="Export">
+                <MenuItem Header="FBX" Click="Menu_ExportAsFbx"/>
+            </MenuItem>
+        </Menu>
+        <Grid AllowDrop="True" Drop="Grid_Drop">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            <h:HelixViewport3D Grid.Row="0" Name="viewport"/>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Click="Button_ShowMesh">Mesh</Button>
+                <Button Grid.Column="1" Click="Button_ShowWireframe">Wireframe</Button>
+                <Button Grid.Column="2" Click="Button_ShowSkeleton">Skeleton</Button>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>

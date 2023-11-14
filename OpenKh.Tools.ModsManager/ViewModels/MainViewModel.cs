@@ -88,6 +88,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand OpenLinkCommand { get; set; }
         public RelayCommand CheckOpenkhUpdateCommand { get; set; }
         public RelayCommand OpenPresetMenuCommand { get; set; }
+        public RelayCommand CheckForModUpdatesCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -489,6 +490,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 PresetsWindow view = new PresetsWindow(this);
                 view.ShowDialog();
+            });
+
+            CheckForModUpdatesCommand = new RelayCommand(_ =>
+            {
+                FetchUpdates();
             });
 
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
@@ -1026,9 +1032,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             .Select(x => x.Source)
             .ToList();
             File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name + ".txt"), enabledMods);
-            if (!PresetList.Contains(presetName))
+            if (!PresetList.Contains(name))
             {
-                PresetList.Add(presetName);
+                PresetList.Add(name);
             }
         }
         public void RemovePreset(string presetName)

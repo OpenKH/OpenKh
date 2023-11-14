@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HelixToolkit.Wpf" Version="2.24.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ModelingToolkit\ModelingToolkit\ModelingToolkit.csproj" />
+    <ProjectReference Include="..\OpenKh.AssimpUtils\OpenKh.AssimpUtils.csproj" />
+    <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
+    <ProjectReference Include="..\OpenKh.Ddd\OpenKh.Ddd.csproj" />
+    <ProjectReference Include="..\OpenKh.Imaging\OpenKh.Imaging.csproj" />
+    <ProjectReference Include="..\OpenKh.Kh1\OpenKh.Kh1.csproj" />
+    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+  </ItemGroup>
+
+</Project>
