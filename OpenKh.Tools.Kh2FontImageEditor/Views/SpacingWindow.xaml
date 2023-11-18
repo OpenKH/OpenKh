@@ -13,7 +13,7 @@
                 <AccessText>_Save and close</AccessText>
             </Button>
         </StackPanel>
-        <Label DockPanel.Dock="Top" HorizontalAlignment="Left" VerticalAlignment="Top">Spacing mapping. Left click the glyph to narrow. Right click the glypto widen.</Label>
+        <Label DockPanel.Dock="Top" HorizontalAlignment="Left" VerticalAlignment="Top">Spacing mapping. Left click the glyph to narrow. Right click the glyph to widen.</Label>
         <Viewbox>
             <Image Source="{Binding State.Image}" Width="{Binding State.Width}" Height="{Binding State.Height}"
                    IsHitTestVisible="True"
