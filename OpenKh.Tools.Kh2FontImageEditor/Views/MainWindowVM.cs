@@ -183,7 +183,7 @@ namespace OpenKh.Tools.Kh2FontImageEditor.Views
                             {
                                 case MessageBoxResult.Yes:
                                     ApplyFontMetrics(
-                                        512, 512,
+                                        512, 256,
                                         512, 512,
                                         Constants.FontEuropeanSystemWidth,
                                         Constants.FontEuropeanSystemHeight,
@@ -462,7 +462,7 @@ namespace OpenKh.Tools.Kh2FontImageEditor.Views
 
                                     ImageSource CreateImage()
                                     {
-                                        if (imager.IsFontImage)
+                                        if (imager.IsFontImage && image.PixelFormat == Imaging.PixelFormat.Indexed4)
                                         {
                                             return _applySpacingToImageReadUsecase.ApplyToIndexed4(
                                                 image,
