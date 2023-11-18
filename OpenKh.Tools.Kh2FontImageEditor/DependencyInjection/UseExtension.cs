@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using OpenKh.Tools.Kh2FontImageEditor.Usecases;
-using OpenKh.Tools.Kh2FontImageEditor.ViewModels;
 using OpenKh.Tools.Kh2FontImageEditor.Views;
 using System;
 using System.Collections.Generic;
@@ -20,6 +19,16 @@ namespace OpenKh.Tools.Kh2FontImageEditor.DependencyInjection
             services.AddSingleton<ExitAppUsecase>();
             services.AddSingleton<Func<MainWindow>>(sp => () => sp.GetRequiredService<MainWindow>());
             services.AddSingleton<ReplacePaletteAlphaUsecase>();
+            services.AddSingleton<ConvertFontImageUsecase>();
+            services.AddSingleton<CombineBarUsecase>();
+            services.AddSingleton<ConvertFontDataUsecase>();
+            services.AddSingleton<CopyArrayUsecase>();
+            services.AddSingleton<ApplySpacingToImageReadUsecase>();
+            services.AddSingleton<CreateGlyphCellsUsecase>();
+
+            services.AddTransient<SpacingWindow>();
+            services.AddSingleton<Func<SpacingWindow>>(sp => () => sp.GetRequiredService<SpacingWindow>());
+            services.AddTransient<SpacingWindowVM>();
 
             return services;
         }

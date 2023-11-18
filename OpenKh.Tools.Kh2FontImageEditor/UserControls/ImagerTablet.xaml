@@ -13,6 +13,8 @@
             <Separator />
             <Button Content="Import" Command="{Binding ImportCommand,ElementName=self}" CommandParameter="{Binding ImportCommandParameter,ElementName=self}" />
             <Button Content="Export" Command="{Binding ExportCommand,ElementName=self}" CommandParameter="{Binding ExportCommandParameter,ElementName=self}" />
+            <Separator />
+            <Button Content="EditSpacing" Command="{Binding EditSpacingCommand,ElementName=self}" CommandParameter="{Binding EditSpacingCommandParameter,ElementName=self}" />
         </ToolBar>
         <Border Background="Black">
             <Image Source="{Binding Image,ElementName=self}" />

@@ -1,4 +1,3 @@
-using OpenKh.Tools.Kh2FontImageEditor.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -81,6 +81,20 @@ namespace OpenKh.Tools.Kh2FontImageEditor.UserControls
         }
         #endregion
 
+        #region EditSpacingCommand
+        public static readonly DependencyProperty EditSpacingCommandProperty = DependencyProperty.Register(
+            "EditSpacingCommand",
+            typeof(ICommand),
+            typeof(ImagerTablet)
+        );
+
+        public ICommand? EditSpacingCommand
+        {
+            get => (ICommand?)GetValue(EditSpacingCommandProperty);
+            set => SetValue(EditSpacingCommandProperty, value);
+        }
+        #endregion
+
         #region ImportCommandParameter
         public static readonly DependencyProperty ImportCommandParameterProperty = DependencyProperty.Register(
             "ImportCommandParameter",
@@ -106,6 +120,20 @@ namespace OpenKh.Tools.Kh2FontImageEditor.UserControls
         {
             get => (object?)GetValue(ExportCommandParameterProperty);
             set => SetValue(ExportCommandParameterProperty, value);
+        }
+        #endregion   
+
+        #region EditSpacingCommandParameter
+        public static readonly DependencyProperty EditSpacingCommandParameterProperty = DependencyProperty.Register(
+            "EditSpacingCommandParameter",
+            typeof(object),
+            typeof(ImagerTablet)
+        );
+
+        public object? EditSpacingCommandParameter
+        {
+            get => (object?)GetValue(EditSpacingCommandParameterProperty);
+            set => SetValue(EditSpacingCommandParameterProperty, value);
         }
         #endregion   
     }

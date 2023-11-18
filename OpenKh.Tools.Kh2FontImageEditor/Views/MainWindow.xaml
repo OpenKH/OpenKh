@@ -17,7 +17,8 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
-                <MenuItem Header="_Load 2 files: msg/*/fontimage.bar and msg/*/fontinfo.bar" Command="{Binding OpenCommand}"/>
+                <MenuItem Header="_Load msg/*/fontimage.bar" Command="{Binding OpenFontImageCommand}"/>
+                <MenuItem Header="Load msg/*/fontinfo.bar" Command="{Binding OpenFontInfoCommand}"/>
                 <MenuItem Header="Save fontimage.bar _as..." Command="{Binding SaveAsCommand}"/>
                 <Separator/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
@@ -42,35 +43,80 @@
                 <StatusBar DockPanel.Dock="Bottom">
                     <StatusBarItem>2bpp gray image</StatusBarItem>
                 </StatusBar>
-                <UserControls:ImagerTablet Caption="{Binding System1.Caption}" Image="{Binding System1.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding System1}" ExportCommandParameter="{Binding System1}" />
+                <UserControls:ImagerTablet 
+                    Caption="{Binding System1.Caption}" 
+                    Image="{Binding System1.State.Image}" 
+                    ImportCommand="{Binding ImagerImportCommand}" 
+                    ExportCommand="{Binding ImagerExportCommand}" 
+                    EditSpacingCommand="{Binding ImagerEditSpacingCommand}" 
+                    ImportCommandParameter="{Binding System1}" 
+                    ExportCommandParameter="{Binding System1}" 
+                    EditSpacingCommandParameter="{Binding System1}" 
+                />
             </DockPanel>
 
             <DockPanel Grid.Column="1" LastChildFill="True">
                 <StatusBar DockPanel.Dock="Bottom">
                     <StatusBarItem>2bpp gray image</StatusBarItem>
                 </StatusBar>
-                <UserControls:ImagerTablet Caption="{Binding System2.Caption}" Image="{Binding System2.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding System2}" ExportCommandParameter="{Binding System2}" />
+                <UserControls:ImagerTablet 
+                    Caption="{Binding System2.Caption}" 
+                    Image="{Binding System2.State.Image}" 
+                    ImportCommand="{Binding ImagerImportCommand}" 
+                    ExportCommand="{Binding ImagerExportCommand}" 
+                    EditSpacingCommand="{Binding ImagerEditSpacingCommand}" 
+                    ImportCommandParameter="{Binding System2}" 
+                    ExportCommandParameter="{Binding System2}" 
+                    EditSpacingCommandParameter="{Binding System2}" 
+                />
             </DockPanel>
 
             <DockPanel Grid.Column="2" LastChildFill="True">
                 <StatusBar DockPanel.Dock="Bottom">
                     <StatusBarItem>2bpp gray image</StatusBarItem>
                 </StatusBar>
-                <UserControls:ImagerTablet Caption="{Binding Event1.Caption}" Image="{Binding Event1.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding Event1}" ExportCommandParameter="{Binding Event1}" />
+                <UserControls:ImagerTablet 
+                    Caption="{Binding Event1.Caption}" 
+                    Image="{Binding Event1.State.Image}" 
+                    ImportCommand="{Binding ImagerImportCommand}" 
+                    ExportCommand="{Binding ImagerExportCommand}" 
+                    EditSpacingCommand="{Binding ImagerEditSpacingCommand}" 
+                    ImportCommandParameter="{Binding Event1}" 
+                    ExportCommandParameter="{Binding Event1}" 
+                    EditSpacingCommandParameter="{Binding Event1}" 
+                />
             </DockPanel>
 
             <DockPanel Grid.Column="3" LastChildFill="True">
                 <StatusBar DockPanel.Dock="Bottom">
                     <StatusBarItem>2bpp gray image</StatusBarItem>
                 </StatusBar>
-                <UserControls:ImagerTablet Caption="{Binding Event2.Caption}" Image="{Binding Event2.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding Event2}" ExportCommandParameter="{Binding Event2}" />
+                <UserControls:ImagerTablet 
+                    Caption="{Binding Event2.Caption}" 
+                    Image="{Binding Event2.State.Image}" 
+                    ImportCommand="{Binding ImagerImportCommand}" 
+                    ExportCommand="{Binding ImagerExportCommand}" 
+                    EditSpacingCommand="{Binding ImagerEditSpacingCommand}" 
+                    ImportCommandParameter="{Binding Event2}" 
+                    ExportCommandParameter="{Binding Event2}" 
+                    EditSpacingCommandParameter="{Binding Event2}" 
+                />
             </DockPanel>
 
             <DockPanel Grid.Column="4" LastChildFill="True">
                 <StatusBar DockPanel.Dock="Bottom">
                     <StatusBarItem>8bpp image + palette</StatusBarItem>
                 </StatusBar>
-                <UserControls:ImagerTablet Caption="{Binding Icon.Caption}" Image="{Binding Icon.Image}" ImportCommand="{Binding ImagerImportCommand}" ExportCommand="{Binding ImagerExportCommand}" ImportCommandParameter="{Binding Icon}" ExportCommandParameter="{Binding Icon}" />
+                <UserControls:ImagerTablet 
+                    Caption="{Binding Icon1.Caption}" 
+                    Image="{Binding Icon1.State.Image}" 
+                    ImportCommand="{Binding ImagerImportCommand}" 
+                    ExportCommand="{Binding ImagerExportCommand}" 
+                    EditSpacingCommand="{Binding ImagerEditSpacingCommand}" 
+                    ImportCommandParameter="{Binding Icon1}" 
+                    ExportCommandParameter="{Binding Icon1}" 
+                    EditSpacingCommandParameter="{Binding Icon1}" 
+                />
             </DockPanel>
 
         </Grid>
