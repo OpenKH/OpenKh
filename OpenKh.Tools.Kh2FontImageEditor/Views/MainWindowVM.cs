@@ -174,7 +174,7 @@ namespace OpenKh.Tools.Kh2FontImageEditor.Views
 
                             _lastOpenedFontImage = fontImageFile;
 
-                            switch (MessageBox.Show("FontEuropean?", "", MessageBoxButton.YesNoCancel))
+                            switch (MessageBox.Show("FontEuropean?\n\n- Answer yes to use FontEuropean\n- Answer no to use FontJapanese", "", MessageBoxButton.YesNoCancel))
                             {
                                 case MessageBoxResult.Yes:
                                     ApplyFontMetrics(
@@ -196,7 +196,6 @@ namespace OpenKh.Tools.Kh2FontImageEditor.Views
                                         Constants.FontJapaneseEventWidth,
                                         Constants.FontJapaneseEventHeight
                                     );
-
                                     break;
                             }
                         }, OpenFontImageFilters);

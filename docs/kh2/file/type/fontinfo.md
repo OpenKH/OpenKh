@@ -10,8 +10,14 @@ Tag   | Type      | Purpose
 
 The entire of spacing data is array of `byte`.
 
-Each character unit size is 24x24 or such (size is square).
+Each character unit size is fixed.
 
-The spacing declares each character size in pixel unit spreading from bottom left origin point to top right end.
+The spacing declares each character width in pixel unit spreading from left to right.
 
 ![](images/spacing.png)
+
+The ordering of spacing data is a little bit difficult.
+Basically it advances left to right, and then top to bottom.
+However if there is a 2 blocks in vertical direction,
+at first, the index advances from front plane to back plane,
+and then advance to front plane of next block.
