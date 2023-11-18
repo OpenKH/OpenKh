@@ -7,7 +7,7 @@
         xmlns:UserControls="clr-namespace:OpenKh.Tools.Kh2FontImageEditor.UserControls"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="Kh2FontImageEditor" Height="388" Width="885">
+        Title="Kh2FontImageEditor" Height="499" Width="1011">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -19,7 +19,9 @@
             <MenuItem Header="_File">
                 <MenuItem Header="_Load msg/*/fontimage.bar" Command="{Binding OpenFontImageCommand}"/>
                 <MenuItem Header="Load msg/*/fontinfo.bar" Command="{Binding OpenFontInfoCommand}"/>
-                <MenuItem Header="Save fontimage.bar _as..." Command="{Binding SaveAsCommand}"/>
+                <Separator/>
+                <MenuItem Header="Save fontimage.bar _as..." Command="{Binding SaveFontImageCommand}"/>
+                <MenuItem Header="Save fontinfo.bar _as..." Command="{Binding SaveFontInfoCommand}"/>
                 <Separator/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
             </MenuItem>

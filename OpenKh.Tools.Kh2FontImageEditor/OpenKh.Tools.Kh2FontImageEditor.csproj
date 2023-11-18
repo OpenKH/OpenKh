@@ -11,6 +11,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+        <PackageReference Include="System.Reactive" Version="6.0.0" />
         
         <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
         <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />

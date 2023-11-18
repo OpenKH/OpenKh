@@ -8,9 +8,10 @@
              x:Name="self"
              d:DesignHeight="450" d:DesignWidth="450">
     <DockPanel>
+        <Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="Gray" Margin="3">
+            <Label Background="White" Foreground="Black" Content="{Binding Caption,ElementName=self}" />
+        </Border>
         <ToolBar DockPanel.Dock="Top">
-            <Label Content="{Binding Caption,ElementName=self}" />
-            <Separator />
             <Button Content="Import" Command="{Binding ImportCommand,ElementName=self}" CommandParameter="{Binding ImportCommandParameter,ElementName=self}" />
             <Button Content="Export" Command="{Binding ExportCommand,ElementName=self}" CommandParameter="{Binding ExportCommandParameter,ElementName=self}" />
             <Separator />

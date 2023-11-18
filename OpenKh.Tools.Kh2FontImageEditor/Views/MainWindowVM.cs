@@ -12,6 +12,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -155,6 +158,8 @@ namespace OpenKh.Tools.Kh2FontImageEditor.Views
                 }
             }
 
+            var fontImageLoaded = new BehaviorSubject<bool>(false);
+
             OpenFontImageCommand = new RelayCommand(
                 _ =>
                 {
@@ -198,6 +203,9 @@ namespace OpenKh.Tools.Kh2FontImageEditor.Views
                                     );
                                     break;
                             }
+
+                            fontImageLoaded.OnNext(true);
+
                         }, OpenFontImageFilters);
                     }
                     catch (Exception ex)
@@ -206,60 +214,102 @@ namespace OpenKh.Tools.Kh2FontImageEditor.Views
                     }
                 }
             );
-            OpenFontInfoCommand = new RelayCommand(
-                _ =>
-                {
-                    try
-                    {
-                        FileDialog.OnOpen(fontInfoFile =>
-                        {
-                            _fontInfoBar = File.OpenRead(fontInfoFile).Using(stream => Bar.Read(stream));
 
-                            _fontInfoData = _convertFontDataUsecase.Decode(_fontInfoBar);
+            var fontInfoLoaded = new BehaviorSubject<bool>(false);
 
-                            _lastOpenedFontInfo = fontInfoFile;
-                        }, OpenFontInfoFilters);
-                    }
-                    catch (Exception ex)
+            {
+                CommandWithCanExecute command;
+
+                OpenFontInfoCommand = command = new CommandWithCanExecute(
+                    _ =>
                     {
-                        showErrorMessageUsecase.Show(ex);
-                    }
-                }
-            );
-            SaveCommand = new RelayCommand(
-                _ =>
-                {
-                    try
-                    {
-                        FileDialog.OnSave(fileName =>
+                        try
                         {
-                            SaveFontImage(fileName);
-                            _lastOpenedFontImage = fileName;
-                        }, OpenFontImageFilters, defaultFileName: _lastOpenedFontImage);
-                    }
-                    catch (Exception ex)
-                    {
-                        showErrorMessageUsecase.Show(ex);
-                    }
-                }
-            );
-            SaveAsCommand = new RelayCommand(
-                _ =>
-                {
-                    try
-                    {
-                        FileDialog.OnSave(fileName =>
+                            FileDialog.OnOpen(fontInfoFile =>
+                            {
+                                _fontInfoBar = File.OpenRead(fontInfoFile).Using(stream => Bar.Read(stream));
+
+                                _fontInfoData = _convertFontDataUsecase.Decode(_fontInfoBar);
+
+                                _lastOpenedFontInfo = fontInfoFile;
+
+                                fontInfoLoaded.OnNext(true);
+                            }, OpenFontInfoFilters);
+                        }
+                        catch (Exception ex)
                         {
-                            SaveFontImage(fileName);
-                            _lastOpenedFontImage = fileName;
-                        }, OpenFontImageFilters, defaultFileName: _lastOpenedFontImage);
+                            showErrorMessageUsecase.Show(ex);
+                        }
                     }
-                    catch (Exception ex)
+                );
+
+                fontImageLoaded
+                    .ObserveOn(Scheduler.Immediate)
+                    .Subscribe(value => command.IsExecutable = value);
+
+            }
+
+            {
+                CommandWithCanExecute command;
+
+                SaveFontImageCommand = command = new CommandWithCanExecute(
+                    _ =>
                     {
-                        showErrorMessageUsecase.Show(ex);
+                        try
+                        {
+                            FileDialog.OnSave(fileName =>
+                            {
+                                SaveFontImage(fileName);
+                                _lastOpenedFontImage = fileName;
+                            }, OpenFontImageFilters, defaultFileName: _lastOpenedFontImage);
+                        }
+                        catch (Exception ex)
+                        {
+                            showErrorMessageUsecase.Show(ex);
+                        }
                     }
-                }
-            );
+                );
+
+                fontImageLoaded
+                    .ObserveOn(Scheduler.Immediate)
+                    .Subscribe(value => command.IsExecutable = value);
+            }
+
+            {
+                CommandWithCanExecute command;
+
+                SaveFontInfoCommand = command = new CommandWithCanExecute(
+                    _ =>
+                    {
+                        try
+                        {
+                            FileDialog.OnSave(fileName =>
+                            {
+                                var work = new MemoryStream();
+                                Bar.Write(
+                                    work,
+                                    _combineBarUsecase.Combine(
+                                        _fontInfoBar,
+                                        _convertFontDataUsecase.Encode(_fontInfoData)
+                                    )
+                                );
+                                File.WriteAllBytes(fileName, work.ToArray());
+
+                            }, OpenFontInfoFilters, defaultFileName: _lastOpenedFontInfo);
+                        }
+                        catch (Exception ex)
+                        {
+                            showErrorMessageUsecase.Show(ex);
+                        }
+                    }
+                );
+
+                fontInfoLoaded
+                    .ObserveOn(Scheduler.Immediate)
+                    .Subscribe(value => command.IsExecutable = value);
+
+            }
+
             ExitCommand = new RelayCommand(
                 _ =>
                 {
@@ -313,152 +363,179 @@ namespace OpenKh.Tools.Kh2FontImageEditor.Views
                 state: new ImagerState()
             );
 
-            ImagerImportCommand = new RelayCommand(
-                any =>
-                {
-                    try
-                    {
-                        var imager = any as ImagerModel ?? throw new NullReferenceException();
+            {
+                CommandWithCanExecute command;
 
-                        FileDialog.OnOpen(
-                            fileName =>
-                            {
-                                var pngImage = File.OpenRead(fileName).Using(it => PngImage.Read(it));
-                                imager.State = imager.State with { Image = pngImage.GetBimapSource() };
-                                _fontImageData = imager.SetImage(_fontImageData, pngImage);
-                            },
-                            OpenPngFilters,
-                            defaultFileName: $"{imager.Caption}.png"
-                        );
-                    }
-                    catch (Exception ex)
+                ImagerImportCommand = command = new CommandWithCanExecute(
+                    any =>
                     {
-                        showErrorMessageUsecase.Show(ex);
-                    }
-                }
-            );
-            ImagerExportCommand = new RelayCommand(
-                any =>
-                {
-                    try
-                    {
-                        var imager = any as ImagerModel ?? throw new NullReferenceException();
-
-                        var image = imager.GetImage(_fontImageData);
-                        if (image != null)
+                        try
                         {
-                            FileDialog.OnSave(
+                            var imager = any as ImagerModel ?? throw new NullReferenceException();
+
+                            FileDialog.OnOpen(
                                 fileName =>
                                 {
-                                    var temp = new MemoryStream();
-                                    Png.Write(
-                                        temp,
-                                        imager.IsFontImage
-                                            ? _replacePaletteAlphaUsecase.ReplacePaletteAlphaWith(image, 255)
-                                            : image
-                                    );
-                                    File.WriteAllBytes(fileName, temp.ToArray());
+                                    var pngImage = File.OpenRead(fileName).Using(it => PngImage.Read(it));
+                                    imager.State = imager.State with { Image = pngImage.GetBimapSource() };
+                                    _fontImageData = imager.SetImage(_fontImageData, pngImage);
                                 },
                                 OpenPngFilters,
                                 defaultFileName: $"{imager.Caption}.png"
                             );
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        showErrorMessageUsecase.Show(ex);
-                    }
-                }
-            );
-            ImagerEditSpacingCommand = new RelayCommand(
-                any =>
-                {
-                    try
-                    {
-                        var imager = any as ImagerModel ?? throw new NullReferenceException();
-
-                        var image = imager.GetImage(_fontImageData);
-                        if (true
-                            && image != null
-                            && imager.State.GlyphSize is System.Drawing.Size glyphSize
-                            && imager.State.GlyphCells is GlyphCell[] glyphCells
-                        )
+                        catch (Exception ex)
                         {
-                            var spacingSource = imager.GetSpacing(_fontInfoData);
-                            if (spacingSource != null)
-                            {
-                                var spacing = _copyArrayUsecase.Copy(spacingSource);
-
-                                ImageSource CreateImage()
-                                {
-                                    if (imager.IsFontImage)
-                                    {
-                                        return _applySpacingToImageReadUsecase.ApplyToIndexed4(
-                                            image,
-                                            index => (index < spacing.Length) ? spacing[index] : (byte)0,
-                                            glyphCells
-                                        )
-                                            .GetBimapSource();
-                                    }
-                                    else
-                                    {
-                                        return _applySpacingToImageReadUsecase.ApplyToFullColored(
-                                            image,
-                                            index => (index < spacing.Length) ? spacing[index] : (byte)0,
-                                            glyphCells
-                                        )
-                                            .GetBimapSource();
-                                    }
-                                }
-
-                                Action refreshImage = () => { };
-
-                                var window = newSpacingWindow();
-                                window.Show();
-                                var vm = window.DataContext as SpacingWindowVM ?? throw new NullReferenceException();
-                                var state = new SpacingWindowVM.StateModel(
-                                    CreateImage(),
-                                    image.Size.Width,
-                                    image.Size.Height,
-                                    new RelayCommand(
-                                        _ =>
-                                        {
-                                            _fontInfoData = imager.SetSpacing(_fontInfoData, spacing);
-                                            window.Close();
-                                        }
-                                    ),
-                                    (x, y, delta) =>
-                                    {
-                                        var hit = glyphCells.FirstOrDefault(it => it.Cell.Contains(x, y));
-                                        if (hit != null && hit.SpacingIndex < spacing.Length)
-                                        {
-                                            spacing[hit.SpacingIndex] =
-                                                (byte)Math.Max(
-                                                    0,
-                                                    Math.Min(
-                                                        glyphSize.Width,
-                                                        spacing[hit.SpacingIndex] + delta
-                                                    )
-                                                );
-                                            refreshImage();
-                                        }
-                                    }
-                                );
-                                vm.State = state;
-
-                                refreshImage = () =>
-                                {
-                                    vm.State = state with { Image = CreateImage() };
-                                };
-                            }
+                            showErrorMessageUsecase.Show(ex);
                         }
                     }
-                    catch (Exception ex)
+                );
+
+                fontImageLoaded
+                    .ObserveOn(Scheduler.Immediate)
+                    .Subscribe(value => command.IsExecutable = value);
+            }
+
+            {
+                CommandWithCanExecute command;
+
+                ImagerExportCommand = command = new CommandWithCanExecute(
+                    any =>
                     {
-                        showErrorMessageUsecase.Show(ex);
+                        try
+                        {
+                            var imager = any as ImagerModel ?? throw new NullReferenceException();
+
+                            var image = imager.GetImage(_fontImageData);
+                            if (image != null)
+                            {
+                                FileDialog.OnSave(
+                                    fileName =>
+                                    {
+                                        var temp = new MemoryStream();
+                                        Png.Write(
+                                            temp,
+                                            imager.IsFontImage
+                                                ? _replacePaletteAlphaUsecase.ReplacePaletteAlphaWith(image, 255)
+                                                : image
+                                        );
+                                        File.WriteAllBytes(fileName, temp.ToArray());
+                                    },
+                                    OpenPngFilters,
+                                    defaultFileName: $"{imager.Caption}.png"
+                                );
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            showErrorMessageUsecase.Show(ex);
+                        }
                     }
-                }
-            );
+                );
+
+                fontImageLoaded
+                    .ObserveOn(Scheduler.Immediate)
+                    .Subscribe(value => command.IsExecutable = value);
+            }
+
+            {
+                CommandWithCanExecute command;
+
+                ImagerEditSpacingCommand = command = new CommandWithCanExecute(
+                    any =>
+                    {
+                        try
+                        {
+                            var imager = any as ImagerModel ?? throw new NullReferenceException();
+
+                            var image = imager.GetImage(_fontImageData);
+                            if (true
+                                && image != null
+                                && imager.State.GlyphSize is System.Drawing.Size glyphSize
+                                && imager.State.GlyphCells is GlyphCell[] glyphCells
+                            )
+                            {
+                                var spacingSource = imager.GetSpacing(_fontInfoData);
+                                if (spacingSource != null)
+                                {
+                                    var spacing = _copyArrayUsecase.Copy(spacingSource);
+
+                                    ImageSource CreateImage()
+                                    {
+                                        if (imager.IsFontImage)
+                                        {
+                                            return _applySpacingToImageReadUsecase.ApplyToIndexed4(
+                                                image,
+                                                index => (index < spacing.Length) ? spacing[index] : (byte)0,
+                                                glyphCells
+                                            )
+                                                .GetBimapSource();
+                                        }
+                                        else
+                                        {
+                                            return _applySpacingToImageReadUsecase.ApplyToFullColored(
+                                                image,
+                                                index => (index < spacing.Length) ? spacing[index] : (byte)0,
+                                                glyphCells
+                                            )
+                                                .GetBimapSource();
+                                        }
+                                    }
+
+                                    Action refreshImage = () => { };
+
+                                    var window = newSpacingWindow();
+                                    window.Show();
+                                    var vm = window.DataContext as SpacingWindowVM ?? throw new NullReferenceException();
+                                    var state = new SpacingWindowVM.StateModel(
+                                        CreateImage(),
+                                        image.Size.Width,
+                                        image.Size.Height,
+                                        new RelayCommand(
+                                            _ =>
+                                            {
+                                                _fontInfoData = imager.SetSpacing(_fontInfoData, spacing);
+                                                window.Close();
+                                            }
+                                        ),
+                                        (x, y, delta) =>
+                                        {
+                                            var hit = glyphCells.FirstOrDefault(it => it.Cell.Contains(x, y));
+                                            if (hit != null && hit.SpacingIndex < spacing.Length)
+                                            {
+                                                spacing[hit.SpacingIndex] =
+                                                    (byte)Math.Max(
+                                                        0,
+                                                        Math.Min(
+                                                            glyphSize.Width,
+                                                            spacing[hit.SpacingIndex] + delta
+                                                        )
+                                                    );
+                                                refreshImage();
+                                            }
+                                        }
+                                    );
+                                    vm.State = state;
+
+                                    refreshImage = () =>
+                                    {
+                                        vm.State = state with { Image = CreateImage() };
+                                    };
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            showErrorMessageUsecase.Show(ex);
+                        }
+                    }
+                );
+
+                fontInfoLoaded
+                    .ObserveOn(Scheduler.Immediate)
+                    .Subscribe(value => command.IsExecutable = value);
+            }
+
             AboutCommand = new RelayCommand(
                 _ =>
                 {
@@ -489,8 +566,8 @@ namespace OpenKh.Tools.Kh2FontImageEditor.Views
 
         public ICommand OpenFontImageCommand { get; }
         public ICommand OpenFontInfoCommand { get; }
-        public ICommand SaveCommand { get; }
-        public ICommand SaveAsCommand { get; }
+        public ICommand SaveFontImageCommand { get; }
+        public ICommand SaveFontInfoCommand { get; }
         public ICommand ExitCommand { get; }
         public ICommand AboutCommand { get; }
 
