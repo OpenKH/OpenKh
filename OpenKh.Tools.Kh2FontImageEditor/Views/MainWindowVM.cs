@@ -392,12 +392,24 @@ namespace OpenKh.Tools.Kh2FontImageEditor.Views
 
                                 ImageSource CreateImage()
                                 {
-                                    return _applySpacingToImageReadUsecase.Apply(
-                                        image,
-                                        index => (index < spacing.Length) ? spacing[index] : (byte)0,
-                                        glyphCells
-                                    )
-                                        .GetBimapSource();
+                                    if (imager.IsFontImage)
+                                    {
+                                        return _applySpacingToImageReadUsecase.ApplyToIndexed4(
+                                            image,
+                                            index => (index < spacing.Length) ? spacing[index] : (byte)0,
+                                            glyphCells
+                                        )
+                                            .GetBimapSource();
+                                    }
+                                    else
+                                    {
+                                        return _applySpacingToImageReadUsecase.ApplyToFullColored(
+                                            image,
+                                            index => (index < spacing.Length) ? spacing[index] : (byte)0,
+                                            glyphCells
+                                        )
+                                            .GetBimapSource();
+                                    }
                                 }
 
                                 Action refreshImage = () => { };
