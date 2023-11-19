@@ -41,6 +41,10 @@ namespace OpenKh.Tools.KhModels.View
         {
             thisVM.ExportModel();
         }
+        private void Menu_ExportAsBasicDae(object sender, RoutedEventArgs e)
+        {
+            thisVM.ExportModelBasicDae();
+        }
         // Assimp's DAE export doesn't work
         private void Menu_ExportAsDae(object sender, EventArgs e)
         {
@@ -66,5 +70,6 @@ namespace OpenKh.Tools.KhModels.View
             thisVM.SetOptions();
             thisVM.VpService.Render();
         }
+
     }
 }

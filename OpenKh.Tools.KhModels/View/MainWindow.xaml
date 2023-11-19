@@ -16,7 +16,8 @@
                 <MenuItem Header="Export MDLS" Click="Menu_DebugExportMdls"/>
             </MenuItem>
             <MenuItem Header="Export">
-                <MenuItem Header="FBX" Click="Menu_ExportAsFbx"/>
+                <MenuItem Header="FBX (AssimpNet)" Click="Menu_ExportAsFbx"/>
+                <MenuItem Header="DAE" Click="Menu_ExportAsBasicDae"/>
             </MenuItem>
         </Menu>
         <Grid AllowDrop="True" Drop="Grid_Drop">

@@ -1,3 +1,4 @@
+using Assimp;
 using HelixToolkit.Wpf;
 using ModelingToolkit.AssimpModule;
 using ModelingToolkit.HelixModule;
@@ -12,6 +13,7 @@ using OpenKh.Tools.KhModels.BBS;
 using OpenKh.Tools.KhModels.DDD;
 using OpenKh.Tools.KhModels.KH1;
 using OpenKh.Tools.KhModels.KIH2;
+using OpenKh.Tools.KhModels.Usecases;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -290,5 +292,24 @@ namespace OpenKh.Tools.KhModels.View
                 }
             }
         }
+
+        public void ExportModelBasicDae()
+        {
+            System.Windows.Forms.SaveFileDialog sfd;
+            sfd = new System.Windows.Forms.SaveFileDialog();
+            sfd.Title = "Export model";
+            sfd.FileName = (VpService.Models.Count == 1)
+                ? VpService.Models[0].Name + ".dae"
+                : "Map.dae";
+            sfd.ShowDialog();
+            if (sfd.FileName != "")
+            {
+                string dirPath = Path.GetDirectoryName(sfd.FileName);
+
+                var prefix = Path.Combine(Path.GetDirectoryName(sfd.FileName)!, Path.GetFileNameWithoutExtension(sfd.FileName));
+                new ExportToBasicDaeUsecase().Export(VpService.Models, modelName => $"{prefix}_{modelName}");
+            }
+        }
+
     }
 }
