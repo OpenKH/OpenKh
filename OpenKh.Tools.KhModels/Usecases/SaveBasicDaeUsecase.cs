@@ -680,6 +680,69 @@ namespace OpenKh.Tools.KhModels.Usecases
                                                         )
                                                 );
                                             }
+
+                                            foreach (var instanceControllers in model.InstanceControllers)
+                                            {
+                                                var mesh = instanceControllers.Mesh;
+
+                                                visual_Scene.Node.Add(
+                                                    new Node
+                                                    {
+                                                        Id = mesh.Name,
+                                                        Name = mesh.Name,
+                                                        Type = NodeType.NODE,
+                                                    }
+                                                        .Also(
+                                                            geoNode =>
+                                                            {
+                                                                geoNode.Scale.Add(new TargetableFloat3 { Sid = "scale", Value = $"{geometryScaling} {geometryScaling} {geometryScaling}", });
+                                                                geoNode.Rotate.Add(new Rotate { Sid = "rotationZ", Value = "0 0 1 0", });
+                                                                geoNode.Rotate.Add(new Rotate { Sid = "rotationY", Value = "0 1 0 0", });
+                                                                geoNode.Rotate.Add(new Rotate { Sid = "rotationX", Value = "1 0 0 0", });
+                                                                geoNode.Translate.Add(new TargetableFloat3 { Sid = "location", Value = "0 0 0", });
+                                                                geoNode.Instance_Controller.Add(
+                                                                    new Instance_Controller
+                                                                    {
+                                                                        Url = $"#{ToSidForm(mesh.Name)}-skin",
+                                                                    }
+                                                                        .Also(
+                                                                            instance_Controller =>
+                                                                            {
+                                                                                instance_Controller.Skeleton.Add(
+                                                                                    instanceControllers.Skeleton.Name
+                                                                                );
+
+                                                                                if (mesh.Material != null)
+                                                                                {
+                                                                                    instance_Controller.Bind_Material = new Bind_Material();
+                                                                                    instance_Controller.Bind_Material.Technique_Common.Add(
+                                                                                        new Instance_Material
+                                                                                        {
+                                                                                            Symbol = ToMaterialReference(mesh.Material),
+                                                                                            Target = $"#{ToMaterialReference(mesh.Material)}",
+                                                                                        }
+                                                                                            .Also(
+                                                                                                instance_Material =>
+                                                                                                {
+                                                                                                    instance_Material.Bind_Vertex_Input.Add(
+                                                                                                        new Instance_MaterialBind_Vertex_Input
+                                                                                                        {
+                                                                                                            Semantic = "UVMap",
+                                                                                                            Input_Semantic = "TEXCOORD",
+                                                                                                            Input_Set = 0,
+                                                                                                        }
+                                                                                                    );
+                                                                                                }
+                                                                                            )
+                                                                                    );
+                                                                                }
+                                                                            }
+                                                                        )
+                                                                );
+                                                            }
+                                                        )
+                                                );
+                                            }
                                         }
                                     )
                             );

@@ -17,10 +17,12 @@ namespace OpenKh.Tools.KhModels.Utils
             IReadOnlyList<DaeMesh> Meshes,
             IReadOnlyList<DaeSkinController> SkinControllers,
             IReadOnlyList<DaeMesh> InstanceGeometries,
+            IReadOnlyList<DaeInstanceController> InstanceControllers,
             float GeometryScaling);
 
-        public record DaeInstanceGeometry(
-            );
+        public record DaeInstanceController(
+            DaeMesh Mesh,
+            DaeBone Skeleton);
 
         public record DaeSkinController(
             DaeMesh Mesh,

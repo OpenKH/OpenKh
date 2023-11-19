@@ -94,6 +94,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                 .ToImmutableArray();
 
             var instanceGeometries = new List<DaeMesh>();
+            var instanceControllers = new List<DaeInstanceController>();
 
             var skinControllers = new List<DaeSkinController>();
 
@@ -193,16 +194,22 @@ namespace OpenKh.Tools.KhModels.Usecases
 
                 if (enableSkinning)
                 {
-                    skinControllers.Add(
-                        new DaeSkinController(
+                    var controller = new DaeSkinController(
+                        Mesh: mesh,
+                        Bones: assocBones
+                            .Select(boneIndex => bones[boneIndex])
+                            .ToImmutableArray(),
+                        InvBindMatrices: invertedMatrices
+                            .ToImmutableArray(),
+                        SkinWeights: skinWeights.ToImmutableArray(),
+                        VertexWeightSets: vertexWeightSets.ToImmutableArray()
+                    );
+
+                    skinControllers.Add(controller);
+                    instanceControllers.Add(
+                        new DaeInstanceController(
                             Mesh: mesh,
-                            Bones: assocBones
-                                .Select(boneIndex => bones[boneIndex])
-                                .ToImmutableArray(),
-                            InvBindMatrices: invertedMatrices
-                                .ToImmutableArray(),
-                            SkinWeights: skinWeights.ToImmutableArray(),
-                            VertexWeightSets: vertexWeightSets.ToImmutableArray()
+                            Skeleton: bones.First()
                         )
                     );
                 }
@@ -220,6 +227,8 @@ namespace OpenKh.Tools.KhModels.Usecases
                 SkinControllers: skinControllers
                     .ToImmutableArray(),
                 InstanceGeometries: instanceGeometries
+                    .ToImmutableArray(),
+                InstanceControllers: instanceControllers
                     .ToImmutableArray()
             );
         }
