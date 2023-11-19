@@ -42,6 +42,7 @@ namespace OpenKh.Tools.KhModels.Usecases
             collada.Library_Images.Add(new Library_Images());
             collada.Library_Materials.Add(new Library_Materials());
             collada.Library_Effects.Add(new Library_Effects());
+            collada.Library_Controllers.Add(new Library_Controllers());
             collada.Library_Geometries.Add(new Library_Geometries());
 
             Node? rootBone = null;
@@ -217,7 +218,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                                 " ",
                                                 mesh.TriangleSets
                                                     .Select(
-                                                        triangleSet => 
+                                                        triangleSet =>
                                                             string.Join(
                                                                 " ",
                                                                 triangleSet
@@ -309,6 +310,195 @@ namespace OpenKh.Tools.KhModels.Usecases
                 else
                 {
                     rootBone = boneNode;
+                }
+            }
+
+            if (model.SkinControllers.Any())
+            {
+                foreach (var skinController in model.SkinControllers)
+                {
+                    var mesh = skinController.Mesh;
+
+                    collada.Library_Controllers.Single().Controller.Add(
+                        new Controller
+                        {
+                            Id = $"Armature-{ToSidForm(mesh.Name)}-skin",
+                            Name = "Armature",
+                            Skin = new Skin
+                            {
+                                Source1 = $"#{ToSidForm(mesh.Name)}-mesh",
+                            }
+                                .Also(
+                                    skin =>
+                                    {
+                                        skin.Bind_Shape_Matrix.Add("1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1");
+
+                                        skin.Source.Add(
+                                            new Source
+                                            {
+                                                Id = $"Armature-{ToSidForm(mesh.Name)}-joints",
+                                                Technique_Common = new SourceTechnique_Common
+                                                {
+                                                    Accessor = new Accessor
+                                                    {
+                                                        Source = $"Armature-{ToSidForm(mesh.Name)}-skin-joints-array",
+                                                        Count = Convert.ToUInt64(skinController.Bones.Count()),
+                                                        Stride = 1,
+                                                    }
+                                                        .Also(
+                                                            accessor =>
+                                                            {
+                                                                accessor.Param.Add(new Param { Name = "JOINT", Type = "name", });
+                                                            }
+                                                        ),
+                                                },
+                                            }
+                                                .Also(
+                                                    source =>
+                                                    {
+                                                        source.Name_Array.Add(
+                                                            new Name_Array
+                                                            {
+                                                                Id = $"Armature-{ToSidForm(mesh.Name)}-skin-joints-array",
+                                                                Count = Convert.ToUInt64(skinController.Bones.Count()),
+                                                                Value = string.Join(
+                                                                    " ",
+                                                                    skinController.Bones
+                                                                        .Select(bone => ToSidForm(bone.Name))
+                                                                ),
+                                                            }
+                                                        );
+                                                    }
+                                                )
+                                        );
+
+                                        skin.Source.Add(
+                                            new Source
+                                            {
+                                                Id = $"Armature-{ToSidForm(mesh.Name)}-skin-bind_poses",
+                                                Technique_Common = new SourceTechnique_Common
+                                                {
+                                                    Accessor = new Accessor
+                                                    {
+                                                        Source = $"#Armature-{ToSidForm(mesh.Name)}-skin-bind_poses-array",
+                                                        Count = Convert.ToUInt64(16 * skinController.InvBindMatrices.Count()),
+                                                        Stride = 16,
+                                                    }
+                                                        .Also(
+                                                            accessor =>
+                                                            {
+                                                                accessor.Param.Add(
+                                                                    new Param
+                                                                    {
+                                                                        Name = "TRANSFORM",
+                                                                        Type = "float4x4",
+                                                                    }
+                                                                );
+                                                            }
+                                                        ),
+                                                },
+                                            }
+                                                .Also(
+                                                    source =>
+                                                    {
+                                                        source.Float_Array.Add(
+                                                            new Float_Array
+                                                            {
+                                                                Value = string.Join(" ", skinController.InvBindMatrices.Select(MatrixToText)),
+                                                            }
+                                                        );
+                                                    }
+                                                )
+                                        );
+
+                                        skin.Source.Add(
+                                            new Source
+                                            {
+                                                Id = $"Armature-{ToSidForm(mesh.Name)}-skin-weights",
+                                                Technique_Common = new SourceTechnique_Common
+                                                {
+                                                    Accessor = new Accessor
+                                                    {
+                                                        Source = $"#Armature-{ToSidForm(mesh.Name)}-skin-weights-array",
+                                                        Count = Convert.ToUInt64(skinController.SkinWeights.Count()),
+                                                        Stride = 1,
+                                                    }
+                                                        .Also(
+                                                            accessor =>
+                                                            {
+                                                                accessor.Param.Add(new Param { Name = "WEIGHT", Type = "float", });
+                                                            }
+                                                        ),
+                                                },
+                                            }
+                                                .Also(
+                                                    source =>
+                                                    {
+                                                        source.Float_Array.Add(
+                                                            new Float_Array
+                                                            {
+                                                                Value = string.Join(" ", skinController.SkinWeights.Select(it => it.ToString())),
+                                                            }
+                                                        );
+                                                    }
+                                                )
+                                        );
+
+                                        skin.Joints = new SkinJoints();
+                                        skin.Joints.Input.Add(
+                                            new InputLocal
+                                            {
+                                                Semantic = "JOINT",
+                                                Source = $"#Armature-{ToSidForm(mesh.Name)}-skin-joints",
+                                            }
+                                        );
+                                        skin.Joints.Input.Add(
+                                            new InputLocal
+                                            {
+                                                Semantic = "INV_BIND_MATRIX",
+                                                Source = $"#Armature-{ToSidForm(mesh.Name)}-skin-bind_poses",
+                                            }
+                                        );
+
+                                        skin.Vertex_Weights = new SkinVertex_Weights
+                                        {
+                                            Count = Convert.ToUInt64(skinController.VertexWeightSets.Count()),
+                                        };
+                                        skin.Vertex_Weights.Input.Add(
+                                            new InputLocalOffset
+                                            {
+                                                Semantic = "JOINT",
+                                                Source = $"#Armature-{ToSidForm(mesh.Name)}-skin-joints",
+                                                Offset = 0,
+                                            }
+                                        );
+                                        skin.Vertex_Weights.Input.Add(
+                                            new InputLocalOffset
+                                            {
+                                                Semantic = "WEIGHT",
+                                                Source = $"#Armature-{ToSidForm(mesh.Name)}-skin-weights",
+                                                Offset = 1,
+                                            }
+                                        );
+                                        skin.Vertex_Weights.Vcount.Add(
+                                            string.Join(
+                                                " ",
+                                                skinController.VertexWeightSets
+                                                    .Select(vertexWeightSet => $"{vertexWeightSet.Count()}")
+                                            )
+                                        );
+                                        skin.Vertex_Weights.V.Add(
+                                            string.Join(
+                                                " ",
+                                                skinController.VertexWeightSets
+                                                    .SelectMany(vertexWeightSet => vertexWeightSet)
+                                                    .Select(vertexWeight => $"{vertexWeight.JointIndex} {vertexWeight.WeightIndex}")
+                                            )
+                                        );
+                                    }
+                                ),
+                        }
+                    );
                 }
             }
 
@@ -520,6 +710,11 @@ namespace OpenKh.Tools.KhModels.Usecases
             };
 
             new XmlSerializer(typeof(COLLADA)).Serialize(stream, collada);
+        }
+
+        private string MatrixToText(Matrix4x4 m)
+        {
+            return $"{m.M11} {m.M12} {m.M13} {m.M14} {m.M21} {m.M22} {m.M23} {m.M24} {m.M31} {m.M32} {m.M33} {m.M34} {m.M41} {m.M42} {m.M43} {m.M44}";
         }
 
         private record DaeInstanceGeometry(string Url, string Name, IEnumerable<string> Instance_material);

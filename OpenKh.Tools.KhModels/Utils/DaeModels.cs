@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static OpenKh.Ddd.PmoV4_2.Vertex;
 
 namespace OpenKh.Tools.KhModels.Utils
 {
@@ -13,7 +14,19 @@ namespace OpenKh.Tools.KhModels.Utils
             IReadOnlyList<DaeBone> Bones,
             IReadOnlyList<DaeMaterial> Materials,
             IReadOnlyList<DaeMesh> Meshes,
+            IReadOnlyList<DaeSkinController> SkinControllers,
             float GeometryScaling);
+
+        public record DaeSkinController(
+            DaeMesh Mesh,
+            IReadOnlyList<DaeBone> Bones,
+            IReadOnlyList<Matrix4x4> InvBindMatrices,
+            IReadOnlyList<float> SkinWeights,
+            IReadOnlyList<IReadOnlyList<DaeVertexWeight>> VertexWeightSets);
+
+        public record DaeVertexWeight(
+            int JointIndex,
+            int WeightIndex);
 
         /// <param name="TriangleStripSets">
         /// From blender 3.2.0:
