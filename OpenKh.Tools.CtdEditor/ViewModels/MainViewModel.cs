@@ -33,7 +33,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         public string Title => $"{Path.GetFileName(FileName) ?? "untitled"} | {ApplicationName}";
 
-        private string FileName
+        public string FileName
         {
             get => _fileName;
             set
@@ -42,6 +42,8 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
                 OnPropertyChanged(nameof(Title));
             }
         }
+
+        public string FontName { get; set; }
 
         public RelayCommand OpenCommand { get; }
         public RelayCommand SaveCommand { get; }
@@ -66,7 +68,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             {
                 CtdViewModel = new CtdViewModel(_drawHandler, value);
                 OnPropertyChanged(nameof(OpenLayoutEditorCommand));
-        }
+            }
         }
 
         public FontsArc Fonts
@@ -133,6 +135,23 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             }, x => true);
 
             CtdViewModel = new CtdViewModel(_drawHandler);
+
+            string[] args = Environment.GetCommandLineArgs();
+            for (int a = 0; a < args.Length; a++)
+            {
+                if (string.Equals(args[a], "--font", StringComparison.InvariantCultureIgnoreCase)
+                    || string.Equals(args[a], "-f", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    a++;
+                    OpenFontFile(args[a]);
+                }
+                else if (string.Equals(args[a], "--message", StringComparison.InvariantCultureIgnoreCase)
+                    || string.Equals(args[a], "-m", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    a++;
+                    OpenFile(args[a]);                       
+                }
+            }
         }
 
         private bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
@@ -156,15 +175,14 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             });
         }
 
-        private void OpenFontFile(string fileName)
+        private void OpenFontFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
-            Fonts = File.OpenRead(fileName).Using(stream =>
-            {
-                if (!Arc.IsValid(stream))
-                    throw new Exception("Not a valid ARC file");
+            if (!Arc.IsValid(stream))
+                throw new Exception("Not a valid ARC file");
 
-                return FontsArc.Read(stream);
-            });
-        }
+            Fonts = FontsArc.Read(stream);
+            FontName = fileName;
+        });
+
     }
 }
