@@ -36,6 +36,9 @@ namespace OpenKh.Tools.KhModels.View
         public bool ShowBoundingBox { get; set; }
         public bool ShowOrigin { get; set; }
 
+        private readonly SaveBasicDaeUsecase _saveBasicDaeUsecase = new();
+        private readonly ConvertToBasicDaeUsecase _convertToBasicDaeUsecase = new();
+
         public MainWindowVM(HelixViewport3D viewport)
         {
             VpService = new ViewportService(viewport);
@@ -70,7 +73,7 @@ namespace OpenKh.Tools.KhModels.View
 
         public void LoadFile()
         {
-            if(Filepath == null)
+            if (Filepath == null)
                 throw new Exception("File not set");
 
             string fileName = Path.GetFileNameWithoutExtension(Filepath);
@@ -202,9 +205,9 @@ namespace OpenKh.Tools.KhModels.View
                         MtModel model = PmoV4Processor.GetMtModel(pmoModel);
                         model.Name = "Model" + i.ToString("D4");
                         System.Numerics.Matrix4x4 modelTransformation = pmpModel.objectInfo[i].GetTransformationMatrix();
-                        foreach(MtMesh mesh in model.Meshes)
+                        foreach (MtMesh mesh in model.Meshes)
                         {
-                            foreach(MtVertex vertex in mesh.Vertices)
+                            foreach (MtVertex vertex in mesh.Vertices)
                             {
                                 vertex.AbsolutePosition = Vector3.Transform(vertex.AbsolutePosition.Value, modelTransformation);
                             }
@@ -246,7 +249,7 @@ namespace OpenKh.Tools.KhModels.View
                 string dirPath = Path.GetDirectoryName(sfd.FileName);
 
                 AssimpGeneric.ExportScene(scene, fileFormat, sfd.FileName);
-                foreach(MtModel model in VpService.Models)
+                foreach (MtModel model in VpService.Models)
                 {
                     foreach (MtMaterial material in model.Materials)
                     {
@@ -306,8 +309,20 @@ namespace OpenKh.Tools.KhModels.View
             {
                 string dirPath = Path.GetDirectoryName(sfd.FileName);
 
-                var prefix = Path.Combine(Path.GetDirectoryName(sfd.FileName)!, Path.GetFileNameWithoutExtension(sfd.FileName));
-                new ExportToBasicDaeUsecase().Export(VpService.Models, modelName => $"{prefix}_{modelName}");
+                var daeOutputPrefix = Path.Combine(Path.GetDirectoryName(sfd.FileName)!, Path.GetFileNameWithoutExtension(sfd.FileName));
+
+                foreach (var sourceModel in VpService.Models)
+                {
+                    using var daeStream = File.Create($"{daeOutputPrefix}_{sourceModel.Name}.dae");
+
+                    _saveBasicDaeUsecase.Save(
+                        model: _convertToBasicDaeUsecase.Convert(
+                            sourceModel: sourceModel,
+                            filePrefix: $"{daeOutputPrefix}_{sourceModel.Name}"
+                        ),
+                        stream: daeStream
+                    );
+                }
             }
         }
 

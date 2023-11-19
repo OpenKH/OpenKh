@@ -15,7 +15,10 @@ namespace OpenKh.Tests.Tools.Tdd
 {
     public class ExportToBasicDaeUsecaseTest
     {
-        [Theory(Skip = "TDD")]
+        private readonly SaveBasicDaeUsecase _saveBasicDaeUsecase = new();
+        private readonly ConvertToBasicDaeUsecase _convertToBasicDaeUsecase = new();
+
+        [Theory]
         [InlineData(@"%KH2FM_EXTRACTION_DIR%\obj\P_EX100.mdlx", "P_EX100")]
         [InlineData(@"%KH2FM_EXTRACTION_DIR%\map\jp\tt00.map", "tt00")]
         [InlineData(@"%KH2FM_EXTRACTION_DIR%\map\jp\tt01.map", "tt01")]
@@ -44,11 +47,18 @@ namespace OpenKh.Tests.Tools.Tdd
                     var vm = new MainWindowVM(vp);
                     vm.LoadFilepath(mdlxInput);
 
-                    var exportToBasicDaeUsecase = new ExportToBasicDaeUsecase();
-                    exportToBasicDaeUsecase.Export(
-                        vm.VpService.Models,
-                        modelName => $"{daeOutputPrefix}_{modelName}"
-                    );
+                    foreach (var sourceModel in vm.VpService.Models)
+                    {
+                        using var daeStream = File.Create($"{daeOutputPrefix}_{sourceModel.Name}.dae");
+
+                        _saveBasicDaeUsecase.Save(
+                            model: _convertToBasicDaeUsecase.Convert(
+                                sourceModel: sourceModel,
+                                filePrefix: $"{daeOutputPrefix}_{sourceModel.Name}"
+                            ),
+                            stream: daeStream
+                        );
+                    }
                 }
             );
         }
