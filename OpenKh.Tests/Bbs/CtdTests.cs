@@ -50,10 +50,10 @@ namespace OpenKh.Tests.Bbs
         });
 
         [Theory]
-        [InlineData(0, "Command Deck")]
-        [InlineData(1, "Action Commands")]
+        [InlineData(878968832, "Command Deck")]
+        [InlineData(878968833, "Action Commands")]
         [InlineData(12345678, null)]
-        public void ReadStringCorrectly(int id, string expected) => File.OpenRead(FileName).Using(stream =>
+        public void ReadStringCorrectly(uint id, string expected) => File.OpenRead(FileName).Using(stream =>
         {
             var ctd = Ctd.Read(stream);
             var str = ctd.GetString(id);

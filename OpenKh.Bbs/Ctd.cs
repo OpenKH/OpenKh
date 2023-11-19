@@ -134,7 +134,7 @@ namespace OpenKh.Bbs
         public List<Message> Messages { get; set; }
         public List<Layout> Layouts { get; set; }
 
-        public string GetString(int id)
+        public string GetString(uint id)
         {
             var entry = Messages.FirstOrDefault(x => x.Id == id);
             if (entry == null)
