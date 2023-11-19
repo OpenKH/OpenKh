@@ -24,7 +24,7 @@ namespace OpenKh.Tools.KhModels.Usecases
             {
                 Created = DateTime.Now,
                 Modified = DateTime.Now,
-                Up_Axis = UpAxisType.Z_UP,
+                Up_Axis = UpAxisType.Y_UP,
                 Unit = new AssetUnit
                 {
                     Meter = 1,

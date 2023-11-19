@@ -5,7 +5,6 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using static OpenKh.Ddd.PmoV4_2.Vertex;
 
 namespace OpenKh.Tools.KhModels.Utils
 {
