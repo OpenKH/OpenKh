@@ -33,7 +33,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         public Ctd.Message Message { get; }
 
-        public short Id
+        public uint Id
         {
             get => Message.Id;
             set
@@ -51,6 +51,15 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
                 Message.Text = value;
                 OnPropertyChanged(nameof(Title));
                 OnPropertyChanged(nameof(TextDump));
+            }
+        }
+
+        public ushort LayoutID
+        {
+            get => Message.LayoutIndex;
+            set
+            {
+                Message.LayoutIndex = value;
             }
         }
 

@@ -33,6 +33,12 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             }
         }
 
+        public uint CtdID
+        {
+            get => _ctd.FileID;
+            set => _ctd.FileID = value;
+        }
+
         public CtdViewModel(IDrawHandler drawHandler) :
             this(drawHandler, new Ctd())
         {
@@ -58,10 +64,10 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         protected override MessageViewModel OnNewItem() =>
             new MessageViewModel(_drawHandler, _ctd, new Ctd.Message
             {
-                Id = (short)(Items.Max(x => x.Message.Id) + 1),
+                Id = (Items.Max(x => x.Message.Id) + 1),
                 Data = new byte[0],
                 LayoutIndex = 0,
-                Unknown02 = _ctd.Unknown
+                WaitFrames = 0
             });
 
         private void PerformFiltering()
@@ -75,6 +81,6 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         private bool FilterNone(MessageViewModel arg) => true;
 
         private bool FilterTextAndId(MessageViewModel arg) =>
-            $"{arg.Id.ToString()} {arg.Text}".ToLower().Contains(SearchTerm.ToLower());
+            $"{arg.Id} {arg.Text}".ToLower().Contains(SearchTerm.ToLower());
     }
 }

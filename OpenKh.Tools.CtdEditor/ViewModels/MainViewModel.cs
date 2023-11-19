@@ -51,6 +51,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         public RelayCommand OpenFontCommand { get; }
         public RelayCommand OpenFontEditorCommand { get; }
+        public RelayCommand OpenLayoutEditorCommand { get; }
 
         public CtdViewModel CtdViewModel
         {
@@ -61,7 +62,11 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         public Ctd Ctd
         {
             get => CtdViewModel?.Ctd;
-            set => CtdViewModel = new CtdViewModel(_drawHandler, value);
+            set
+            {
+                CtdViewModel = new CtdViewModel(_drawHandler, value);
+                OnPropertyChanged(nameof(OpenLayoutEditorCommand));
+        }
         }
 
         public FontsArc Fonts
@@ -110,6 +115,14 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
                     DataContext = new FontEditorViewModel(Fonts)
                 }.ShowDialog(),
                 x => Fonts != null);
+
+            OpenLayoutEditorCommand = new RelayCommand(x =>
+                new LayoutWindow()
+                {
+                    DataContext = new LayoutEditorViewModel(Ctd)
+                }.ShowDialog(),
+                x => Ctd != null
+            );
 
             AboutCommand = new RelayCommand(x =>
             {

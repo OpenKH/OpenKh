@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using OpenKh.Common;
 using System.IO;
 using Xunit;
@@ -81,7 +81,7 @@ namespace OpenKh.Tests.Bbs
             Assert.NotNull(ctd.Layouts);
             Assert.Empty(ctd.Messages);
             Assert.Empty(ctd.Layouts);
-            Assert.Equal(0, ctd.Unknown);
+            Assert.Equal(0u, ctd.FileID);
         }
     }
 }
