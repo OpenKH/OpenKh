@@ -17,15 +17,21 @@ namespace OpenKh.Tools.KhModels.Usecases
         {
             string ExportTexture(MtMaterial material)
             {
-                if (string.IsNullOrEmpty(material.DiffuseTextureFileName))
-                {
-                    return "";
-                }
-                else
+                if (!string.IsNullOrEmpty(material.DiffuseTextureFileName))
                 {
                     var pngFilePath = $"{filePrefix}_{material.DiffuseTextureFileName}.png";
                     material.ExportAsPng(pngFilePath);
                     return pngFilePath;
+                }
+                else if (material.DiffuseTextureBitmap != null)
+                {
+                    var pngFilePath = $"{filePrefix}_{material.Name}.png";
+                    material.DiffuseTextureBitmap.Save(pngFilePath, System.Drawing.Imaging.ImageFormat.Png);
+                    return pngFilePath;
+                }
+                else
+                {
+                    return "noImage.png";
                 }
             }
 
@@ -206,6 +212,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                     );
 
                     skinControllers.Add(controller);
+
                     instanceControllers.Add(
                         new DaeInstanceController(
                             Mesh: mesh,

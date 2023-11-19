@@ -50,20 +50,38 @@ namespace OpenKh.Tools.KhModels.Usecases
             string ToSidForm(string name) => name.Replace(".", "_");
             double ToAngle(float rad) => rad / Math.PI * 180;
 
-            var daeTextureList = model.Materials;
+            string ToMaterialId(DaeMaterial material) => $"{ToSidForm(material.Name)}-material";
+            string ToMeshMeshId(DaeMesh mesh) => $"{ToSidForm(mesh.Name)}-mesh";
+            string ToMeshMeshPositionsId(DaeMesh mesh) => $"{ToSidForm(mesh.Name)}-mesh-positions";
+            string ToMeshMeshPositionsArrayId(DaeMesh mesh) => $"{ToSidForm(mesh.Name)}-mesh-positions-array";
+            string ToMeshMeshVerticesId(DaeMesh mesh) => $"{ToSidForm(mesh.Name)}-mesh-vertices";
+            string ToMeshMeshMap0Id(DaeMesh mesh) => $"{ToSidForm(mesh.Name)}-mesh-map-0";
+            string ToMeshMeshMap0ArrayId(DaeMesh mesh) => $"{ToSidForm(mesh.Name)}-mesh-map-0-array";
+            string ToArmatureBoneId(DaeBone bone) => $"Armature_{ToSidForm(bone.Name)}";
+            string ToArmatureMeshSkinId(DaeMesh mesh) => $"Armature-{ToSidForm(mesh.Name)}-skin";
+            string ToArmatureMeshSkinJointsArrayId(DaeMesh mesh) => $"Armature-{ToSidForm(mesh.Name)}-skin-joints-array";
+            string ToArmatureMeshSkinBindPosesId(DaeMesh mesh) => $"Armature-{ToSidForm(mesh.Name)}-skin-bind_poses";
+            string ToArmatureMeshSkinBindPosesArrayId(DaeMesh mesh) => $"Armature-{ToSidForm(mesh.Name)}-skin-bind_poses-array";
+            string ToArmatureMeshSkinWeightsId(DaeMesh mesh) => $"Armature-{ToSidForm(mesh.Name)}-skin-weights";
+            string ToArmatureMeshSkinWeightsArrayId(DaeMesh mesh) => $"Armature-{ToSidForm(mesh.Name)}-skin-weights-array";
+            string ToArmatureMeshSkinJointsId(DaeMesh mesh) => $"Armature-{ToSidForm(mesh.Name)}-skin-joints";
+            string ToMaterialPngId(DaeMaterial material) => $"{ToSidForm(material.Name)}-png";
+            string ToMaterialEffectId(DaeMaterial material) => $"{ToSidForm(material.Name)}-effect";
+            string ToMaterialSurfaceId(DaeMaterial material) => $"{ToSidForm(material.Name)}-surface";
+            string ToMaterialSamplerId(DaeMaterial material) => $"{ToSidForm(material.Name)}-sampler";
+            string ToMaterialMaterialId(DaeMaterial material) => $"{ToSidForm(material.Name)}-material";
 
             var geometryScaling = model.GeometryScaling;
 
             string ToMaterialReference(DaeMaterial? material) => (material != null)
-                ? $"{ToSidForm(material.Name)}-material"
+                ? ToMaterialId(material)
                 : "";
 
             foreach (var mesh in model.Meshes)
             {
-                var meshName = mesh.Name;
                 var geometry = new Geometry
                 {
-                    Id = $"{ToSidForm(meshName)}-mesh",
+                    Id = ToMeshMeshId(mesh),
                     Name = mesh.Name,
                 };
 
@@ -74,12 +92,12 @@ namespace OpenKh.Tools.KhModels.Usecases
                     geometry.Mesh.Source.Add(
                         new Source
                         {
-                            Id = $"{ToSidForm(meshName)}-mesh-positions",
+                            Id = ToMeshMeshPositionsId(mesh),
                             Technique_Common = new SourceTechnique_Common
                             {
                                 Accessor = new Accessor
                                 {
-                                    Source = $"#{ToSidForm(meshName)}-mesh-positions-array",
+                                    Source = $"#{ToMeshMeshPositionsArrayId(mesh)}",
                                     Count = Convert.ToUInt64(3 * mesh.Vertices.Count),
                                     Stride = 3,
                                 }
@@ -99,7 +117,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                     source.Float_Array.Add(
                                         new Float_Array
                                         {
-                                            Id = $"{ToSidForm(meshName)}-mesh-positions-array",
+                                            Id = $"{ToMeshMeshPositionsArrayId(mesh)}",
                                             Count = Convert.ToUInt64(3 * mesh.Vertices.Count),
                                             Value = string.Join(
                                                 " ",
@@ -115,14 +133,14 @@ namespace OpenKh.Tools.KhModels.Usecases
                     // x y z
                     geometry.Mesh.Vertices = new Vertices
                     {
-                        Id = $"{ToSidForm(meshName)}-mesh-vertices",
+                        Id = ToMeshMeshVerticesId(mesh),
                     };
 
                     geometry.Mesh.Vertices.Input.Add(
                         new InputLocal
                         {
                             Semantic = "POSITION",
-                            Source = $"#{ToSidForm(meshName)}-mesh-positions",
+                            Source = $"#{ToMeshMeshPositionsId(mesh)}",
                         }
                     );
                 }
@@ -132,12 +150,12 @@ namespace OpenKh.Tools.KhModels.Usecases
                     geometry.Mesh.Source.Add(
                         new Source
                         {
-                            Id = $"{ToSidForm(meshName)}-mesh-map-0",
+                            Id = ToMeshMeshMap0Id(mesh),
                             Technique_Common = new SourceTechnique_Common
                             {
                                 Accessor = new Accessor
                                 {
-                                    Source = $"#{ToSidForm(meshName)}-mesh-map-0-array",
+                                    Source = $"#{ToMeshMeshMap0ArrayId(mesh)}",
                                     Count = Convert.ToUInt64(2 * mesh.Vertices.Count),
                                     Stride = 2,
                                 }
@@ -156,7 +174,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                     source.Float_Array.Add(
                                         new Float_Array
                                         {
-                                            Id = $"{ToSidForm(meshName)}-mesh-map-0-array",
+                                            Id = ToMeshMeshMap0ArrayId(mesh),
                                             Count = Convert.ToUInt64(2 * mesh.TextureCoordinates.Count),
                                             Value = string.Join(
                                                 " ",
@@ -188,7 +206,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                             new InputLocalOffset
                                             {
                                                 Semantic = "VERTEX",
-                                                Source = $"#{ToSidForm(meshName)}-mesh-vertices",
+                                                Source = $"#{ToMeshMeshVerticesId(mesh)}",
                                                 Offset = 0,
                                             }
                                         );
@@ -196,7 +214,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                             new InputLocalOffset
                                             {
                                                 Semantic = "TEXCOORD",
-                                                Source = $"#{ToSidForm(meshName)}-mesh-map-0",
+                                                Source = $"#{ToMeshMeshMap0Id(mesh)}",
                                                 Offset = 1,
                                                 Set = 0,
                                             }
@@ -238,7 +256,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                             new InputLocalOffset
                                             {
                                                 Semantic = "VERTEX",
-                                                Source = $"#{ToSidForm(meshName)}-mesh-vertices",
+                                                Source = $"#{ToMeshMeshVerticesId(mesh)}",
                                                 Offset = 0,
                                             }
                                         );
@@ -246,7 +264,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                             new InputLocalOffset
                                             {
                                                 Semantic = "TEXCOORD",
-                                                Source = $"#{ToSidForm(meshName)}-mesh-map-0",
+                                                Source = $"#{ToMeshMeshMap0Id(mesh)}",
                                                 Offset = 1,
                                                 Set = 0,
                                             }
@@ -277,8 +295,13 @@ namespace OpenKh.Tools.KhModels.Usecases
             Node[] boneNodes = new Node[daeBones.Count()];
             foreach (var (joint, index) in daeBones.Select((joint, index) => (joint, index)))
             {
-                var name = joint.Name ?? $"Bone.{index:000}";
-                var boneNode = new Node { Id = $"Armature_{ToSidForm(name)}", Name = name, Sid = ToSidForm(name), Type = NodeType.JOINT, };
+                var boneNode = new Node
+                {
+                    Id = ToArmatureBoneId(joint),
+                    Name = joint.Name,
+                    Sid = ToSidForm(joint.Name),
+                    Type = NodeType.JOINT,
+                };
 
                 var scale = joint.RelativeScale;
                 var rotation = joint.RelativeRotation;
@@ -311,11 +334,11 @@ namespace OpenKh.Tools.KhModels.Usecases
                     collada.Library_Controllers.Single().Controller.Add(
                         new Controller
                         {
-                            Id = $"Armature-{ToSidForm(mesh.Name)}-skin",
+                            Id = ToArmatureMeshSkinId(mesh),
                             Name = "Armature",
                             Skin = new Skin
                             {
-                                Source1 = $"#{ToSidForm(mesh.Name)}-mesh",
+                                Source1 = $"#{ToMeshMeshId(mesh)}",
                             }
                                 .Also(
                                     skin =>
@@ -325,12 +348,12 @@ namespace OpenKh.Tools.KhModels.Usecases
                                         skin.Source.Add(
                                             new Source
                                             {
-                                                Id = $"Armature-{ToSidForm(mesh.Name)}-joints",
+                                                Id = ToArmatureMeshSkinJointsId(mesh),
                                                 Technique_Common = new SourceTechnique_Common
                                                 {
                                                     Accessor = new Accessor
                                                     {
-                                                        Source = $"Armature-{ToSidForm(mesh.Name)}-skin-joints-array",
+                                                        Source = $"#{ToArmatureMeshSkinJointsArrayId(mesh)}",
                                                         Count = Convert.ToUInt64(skinController.Bones.Count()),
                                                         Stride = 1,
                                                     }
@@ -348,7 +371,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                                         source.Name_Array.Add(
                                                             new Name_Array
                                                             {
-                                                                Id = $"Armature-{ToSidForm(mesh.Name)}-skin-joints-array",
+                                                                Id = ToArmatureMeshSkinJointsArrayId(mesh),
                                                                 Count = Convert.ToUInt64(skinController.Bones.Count()),
                                                                 Value = string.Join(
                                                                     " ",
@@ -364,12 +387,12 @@ namespace OpenKh.Tools.KhModels.Usecases
                                         skin.Source.Add(
                                             new Source
                                             {
-                                                Id = $"Armature-{ToSidForm(mesh.Name)}-skin-bind_poses",
+                                                Id = ToArmatureMeshSkinBindPosesId(mesh),
                                                 Technique_Common = new SourceTechnique_Common
                                                 {
                                                     Accessor = new Accessor
                                                     {
-                                                        Source = $"#Armature-{ToSidForm(mesh.Name)}-skin-bind_poses-array",
+                                                        Source = $"#{ToArmatureMeshSkinBindPosesArrayId(mesh)}",
                                                         Count = Convert.ToUInt64(16 * skinController.InvBindMatrices.Count()),
                                                         Stride = 16,
                                                     }
@@ -403,12 +426,12 @@ namespace OpenKh.Tools.KhModels.Usecases
                                         skin.Source.Add(
                                             new Source
                                             {
-                                                Id = $"Armature-{ToSidForm(mesh.Name)}-skin-weights",
+                                                Id = ToArmatureMeshSkinWeightsId(mesh),
                                                 Technique_Common = new SourceTechnique_Common
                                                 {
                                                     Accessor = new Accessor
                                                     {
-                                                        Source = $"#Armature-{ToSidForm(mesh.Name)}-skin-weights-array",
+                                                        Source = $"#{ToArmatureMeshSkinWeightsArrayId(mesh)}",
                                                         Count = Convert.ToUInt64(skinController.SkinWeights.Count()),
                                                         Stride = 1,
                                                     }
@@ -438,14 +461,14 @@ namespace OpenKh.Tools.KhModels.Usecases
                                             new InputLocal
                                             {
                                                 Semantic = "JOINT",
-                                                Source = $"#Armature-{ToSidForm(mesh.Name)}-skin-joints",
+                                                Source = $"#{ToArmatureMeshSkinJointsId(mesh)}",
                                             }
                                         );
                                         skin.Joints.Input.Add(
                                             new InputLocal
                                             {
                                                 Semantic = "INV_BIND_MATRIX",
-                                                Source = $"#Armature-{ToSidForm(mesh.Name)}-skin-bind_poses",
+                                                Source = $"#{ToArmatureMeshSkinBindPosesId(mesh)}",
                                             }
                                         );
 
@@ -457,7 +480,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                             new InputLocalOffset
                                             {
                                                 Semantic = "JOINT",
-                                                Source = $"#Armature-{ToSidForm(mesh.Name)}-skin-joints",
+                                                Source = $"#{ToArmatureMeshSkinJointsId(mesh)}",
                                                 Offset = 0,
                                             }
                                         );
@@ -465,7 +488,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                             new InputLocalOffset
                                             {
                                                 Semantic = "WEIGHT",
-                                                Source = $"#Armature-{ToSidForm(mesh.Name)}-skin-weights",
+                                                Source = $"#{ToArmatureMeshSkinWeightsId(mesh)}",
                                                 Offset = 1,
                                             }
                                         );
@@ -491,21 +514,21 @@ namespace OpenKh.Tools.KhModels.Usecases
                 }
             }
 
-            foreach (var daeTexture in daeTextureList)
+            foreach (var material in model.Materials)
             {
                 collada.Library_Images.Single().Image.Add(
                     new Image
                     {
-                        Id = $"{ToSidForm(daeTexture.Name)}-png",
-                        Name = $"{ToSidForm(daeTexture.Name)}-png",
-                        Init_From = daeTexture.PngFilePath,
+                        Id = ToMaterialPngId(material),
+                        Name = ToMaterialPngId(material),
+                        Init_From = material.PngFilePath,
                     }
                 );
 
                 collada.Library_Effects.Single().Effect.Add(
                     new Effect
                     {
-                        Id = $"{ToSidForm(daeTexture.Name)}-effect",
+                        Id = ToMaterialEffectId(material),
                     }
                         .Also(
                             effect =>
@@ -518,7 +541,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                                 profile_COMMON.Newparam.Add(
                                                     new Common_Newparam_Type
                                                     {
-                                                        Sid = $"{ToSidForm(daeTexture.Name)}-surface",
+                                                        Sid = ToMaterialSurfaceId(material),
                                                         Surface = new Fx_Surface_Common
                                                         {
                                                             Type = Fx_Surface_Type_Enum.Item2D,
@@ -529,7 +552,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                                                     surface.Init_From.Add(
                                                                         new Fx_Surface_Init_From_Common
                                                                         {
-                                                                            Value = $"{ToSidForm(daeTexture.Name)}-png",
+                                                                            Value = ToMaterialPngId(material),
                                                                         }
                                                                     );
                                                                 }
@@ -540,10 +563,10 @@ namespace OpenKh.Tools.KhModels.Usecases
                                                 profile_COMMON.Newparam.Add(
                                                     new Common_Newparam_Type
                                                     {
-                                                        Sid = $"{ToSidForm(daeTexture.Name)}-sampler",
+                                                        Sid = ToMaterialSamplerId(material),
                                                         Sampler2D = new Fx_Sampler2D_Common
                                                         {
-                                                            Source = $"{ToSidForm(daeTexture.Name)}-surface",
+                                                            Source = ToMaterialSurfaceId(material),
                                                         }
                                                     }
                                                 );
@@ -558,7 +581,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                                         {
                                                             Texture = new Common_Color_Or_Texture_TypeTexture
                                                             {
-                                                                Texture = $"{ToSidForm(daeTexture.Name)}-sampler",
+                                                                Texture = ToMaterialSamplerId(material),
                                                                 Texcoord = "UVMap",
                                                             }
                                                         }
@@ -574,11 +597,11 @@ namespace OpenKh.Tools.KhModels.Usecases
                 collada.Library_Materials.Single().Material.Add(
                     new Material
                     {
-                        Id = $"{ToSidForm(daeTexture.Name)}-material",
-                        Name = daeTexture.Name,
+                        Id = ToMaterialMaterialId(material),
+                        Name = material.Name,
                         Instance_Effect = new Instance_Effect
                         {
-                            Url = $"#{ToSidForm(daeTexture.Name)}-effect",
+                            Url = $"#{ToMaterialEffectId(material)}",
                         },
                     }
                 );
@@ -643,7 +666,7 @@ namespace OpenKh.Tools.KhModels.Usecases
                                                                 geoNode.Instance_Geometry.Add(
                                                                     new Instance_Geometry
                                                                     {
-                                                                        Url = $"#{ToSidForm(mesh.Name)}-mesh",
+                                                                        Url = $"#{ToMeshMeshId(mesh)}",
                                                                         Name = mesh.Name,
                                                                     }
                                                                         .Also(
@@ -703,13 +726,13 @@ namespace OpenKh.Tools.KhModels.Usecases
                                                                 geoNode.Instance_Controller.Add(
                                                                     new Instance_Controller
                                                                     {
-                                                                        Url = $"#{ToSidForm(mesh.Name)}-skin",
+                                                                        Url = $"#{ToArmatureMeshSkinId(mesh)}",
                                                                     }
                                                                         .Also(
                                                                             instance_Controller =>
                                                                             {
                                                                                 instance_Controller.Skeleton.Add(
-                                                                                    instanceControllers.Skeleton.Name
+                                                                                    $"#{ToArmatureBoneId(instanceControllers.Skeleton)}"
                                                                                 );
 
                                                                                 if (mesh.Material != null)
