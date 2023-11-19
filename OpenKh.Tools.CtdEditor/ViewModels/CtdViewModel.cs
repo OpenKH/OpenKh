@@ -12,7 +12,6 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         private string _searchTerm;
         private readonly Ctd _ctd;
         private readonly IDrawHandler _drawHandler;
-        private FontsArc _fonts;
 
         public Ctd Ctd
         {
@@ -24,15 +23,6 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             }
         }
 
-        public FontsArc Fonts
-        {
-            get => _fonts;
-            set
-            {
-                _fonts = value;
-            }
-        }
-
         public string SearchTerm
         {
             get => _searchTerm;
@@ -41,6 +31,12 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
                 _searchTerm = value;
                 PerformFiltering();
             }
+        }
+
+        public uint CtdID
+        {
+            get => _ctd.FileID;
+            set => _ctd.FileID = value;
         }
 
         public CtdViewModel(IDrawHandler drawHandler) :
@@ -62,19 +58,16 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         protected override void OnSelectedItem(MessageViewModel item)
         {
-            if (item != null)
-                item.FontContext = Fonts?.FontMes;
-
             base.OnSelectedItem(item);
         }
 
         protected override MessageViewModel OnNewItem() =>
             new MessageViewModel(_drawHandler, _ctd, new Ctd.Message
             {
-                Id = (short)(Items.Max(x => x.Message.Id) + 1),
+                Id = (Items.Max(x => x.Message.Id) + 1),
                 Data = new byte[0],
                 LayoutIndex = 0,
-                Unknown02 = _ctd.Unknown
+                WaitFrames = 0
             });
 
         private void PerformFiltering()
@@ -88,6 +81,6 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         private bool FilterNone(MessageViewModel arg) => true;
 
         private bool FilterTextAndId(MessageViewModel arg) =>
-            $"{arg.Id.ToString()} {arg.Text}".ToLower().Contains(SearchTerm.ToLower());
+            $"{arg.Id} {arg.Text}".ToLower().Contains(SearchTerm.ToLower());
     }
 }

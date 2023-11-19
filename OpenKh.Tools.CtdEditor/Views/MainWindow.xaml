@@ -1,4 +1,4 @@
-﻿<Window x:Class="OpenKh.Tools.CtdEditor.Views.MainWindow"
+<Window x:Class="OpenKh.Tools.CtdEditor.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -29,6 +29,10 @@
                           Command="{Binding OpenFontCommand}"/>
                 <MenuItem Header="_Edit font"
                           Command="{Binding OpenFontEditorCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Layouts">
+                <MenuItem Header="_Edit layouts"
+                          Command="{Binding OpenLayoutEditorCommand}"/>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About"

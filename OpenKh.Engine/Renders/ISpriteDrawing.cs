@@ -101,6 +101,8 @@ namespace OpenKh.Engine.Renders
             ((uint)(rgba.A * 255f) << 24);
     }
 
+    // TODO: We repeatedly allocate a lot of these on every frame which causes quite a bit of GC pressure
+    //       Can we pool them?
     public class SpriteDrawingContext
     {
         public float SourceLeft { get; set; }
