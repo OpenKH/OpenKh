@@ -93,10 +93,46 @@ namespace OpenKh.Tools.KhModels.Usecases
                 )
                 .ToImmutableArray();
 
+            var instanceGeometries = new List<DaeMesh>();
+
             var skinControllers = new List<DaeSkinController>();
 
-            DaeMesh InterceptSkinMesh(MtMesh sourceMesh, DaeMesh mesh)
+            DaeMesh ConvertMesh(MtMesh sourceMesh)
             {
+                return new DaeMesh(
+                    Name: sourceMesh.Name,
+                    Material: FindMaterialOrNull(sourceMesh.MaterialId),
+                    Vertices: sourceMesh.Vertices
+                        .Select(ExtractVertex)
+                        .ToImmutableArray(),
+                    TextureCoordinates: sourceMesh.Vertices
+                        .Select(ExtractTextureCoordinate)
+                        .ToImmutableArray(),
+                    TriangleStripSets: new IReadOnlyList<DaeVertexPointer>[0],
+                    TriangleSets: sourceMesh.Faces
+                        .Select(ConvertFace)
+                        .ToImmutableArray()
+                );
+            }
+
+            var meshPairs = new List<(MtMesh SourceMesh, DaeMesh Mesh)>();
+
+            var meshes = sourceModel.Meshes
+                .Select(
+                    sourceMesh =>
+                    {
+                        var mesh = ConvertMesh(sourceMesh);
+                        meshPairs.Add((sourceMesh, mesh));
+                        return mesh;
+                    }
+                )
+                .ToImmutableArray();
+
+            foreach (var meshPair in meshPairs)
+            {
+                var sourceMesh = meshPair.SourceMesh;
+                var mesh = meshPair.Mesh;
+
                 var assocBones = new List<int>();
                 var invertedMatrices = new List<Matrix4x4>();
                 var skinWeights = new List<float>();
@@ -131,12 +167,16 @@ namespace OpenKh.Tools.KhModels.Usecases
 
                 var vertexWeightSets = new List<IReadOnlyList<DaeVertexWeight>>();
 
+                var enableSkinning = false;
+
                 foreach (var sourceVertex in sourceMesh.Vertices)
                 {
                     var vertexWeights = new List<DaeVertexWeight>();
 
                     if (sourceVertex.HasWeights)
                     {
+                        enableSkinning |= true;
+
                         foreach (var sourceWeight in sourceVertex.Weights)
                         {
                             vertexWeights.Add(
@@ -151,51 +191,35 @@ namespace OpenKh.Tools.KhModels.Usecases
                     vertexWeightSets.Add(vertexWeights.ToImmutableArray());
                 }
 
-                skinControllers.Add(
-                    new DaeSkinController(
-                        Mesh: mesh,
-                        Bones: assocBones
-                            .Select(boneIndex => bones[boneIndex])
-                            .ToImmutableArray(),
-                        InvBindMatrices: invertedMatrices
-                            .ToImmutableArray(),
-                        SkinWeights: skinWeights.ToImmutableArray(),
-                        VertexWeightSets: vertexWeightSets.ToImmutableArray()
-                    )
-                );
-
-                return mesh;
-            }
-
-            DaeMesh ConvertMesh(MtMesh sourceMesh)
-            {
-                return InterceptSkinMesh(
-                    sourceMesh,
-                    new DaeMesh(
-                        Name: sourceMesh.Name,
-                        Material: FindMaterialOrNull(sourceMesh.MaterialId),
-                        Vertices: sourceMesh.Vertices
-                            .Select(ExtractVertex)
-                            .ToImmutableArray(),
-                        TextureCoordinates: sourceMesh.Vertices
-                            .Select(ExtractTextureCoordinate)
-                            .ToImmutableArray(),
-                        TriangleStripSets: new IReadOnlyList<DaeVertexPointer>[0],
-                        TriangleSets: sourceMesh.Faces
-                            .Select(ConvertFace)
-                            .ToImmutableArray()
-                    )
-                );
+                if (enableSkinning)
+                {
+                    skinControllers.Add(
+                        new DaeSkinController(
+                            Mesh: mesh,
+                            Bones: assocBones
+                                .Select(boneIndex => bones[boneIndex])
+                                .ToImmutableArray(),
+                            InvBindMatrices: invertedMatrices
+                                .ToImmutableArray(),
+                            SkinWeights: skinWeights.ToImmutableArray(),
+                            VertexWeightSets: vertexWeightSets.ToImmutableArray()
+                        )
+                    );
+                }
+                else
+                {
+                    instanceGeometries.Add(mesh);
+                }
             }
 
             return new DaeModel(
                 GeometryScaling: geometryScaling,
                 Bones: bones,
                 Materials: materials,
-                Meshes: sourceModel.Meshes
-                    .Select(ConvertMesh)
-                    .ToImmutableArray(),
+                Meshes: meshes,
                 SkinControllers: skinControllers
+                    .ToImmutableArray(),
+                InstanceGeometries: instanceGeometries
                     .ToImmutableArray()
             );
         }

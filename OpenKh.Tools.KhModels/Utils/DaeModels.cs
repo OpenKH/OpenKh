@@ -1,3 +1,4 @@
+using COLLADASchema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,11 @@ namespace OpenKh.Tools.KhModels.Utils
             IReadOnlyList<DaeMaterial> Materials,
             IReadOnlyList<DaeMesh> Meshes,
             IReadOnlyList<DaeSkinController> SkinControllers,
+            IReadOnlyList<DaeMesh> InstanceGeometries,
             float GeometryScaling);
+
+        public record DaeInstanceGeometry(
+            );
 
         public record DaeSkinController(
             DaeMesh Mesh,

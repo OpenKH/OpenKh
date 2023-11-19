@@ -50,8 +50,6 @@ namespace OpenKh.Tools.KhModels.Usecases
             string ToSidForm(string name) => name.Replace(".", "_");
             double ToAngle(float rad) => rad / Math.PI * 180;
 
-            var daeInstanceGeometryList = new List<DaeInstanceGeometry>();
-
             var daeTextureList = model.Materials;
 
             var geometryScaling = model.GeometryScaling;
@@ -68,15 +66,6 @@ namespace OpenKh.Tools.KhModels.Usecases
                     Id = $"{ToSidForm(meshName)}-mesh",
                     Name = mesh.Name,
                 };
-
-                daeInstanceGeometryList.Add(
-                    new DaeInstanceGeometry(
-                        Url: $"#{ToSidForm(meshName)}-mesh",
-                        Name: mesh.Name,
-                        Instance_material: new string[] { ToMaterialReference(mesh.Material) }
-                            .Where(it => it.Length != 0)
-                    )
-                );
 
                 geometry.Mesh = new Mesh();
 
@@ -634,13 +623,13 @@ namespace OpenKh.Tools.KhModels.Usecases
                                                     )
                                             );
 
-                                            foreach (var daeInstanceGeometry in daeInstanceGeometryList)
+                                            foreach (var mesh in model.InstanceGeometries)
                                             {
                                                 visual_Scene.Node.Add(
                                                     new Node
                                                     {
-                                                        Id = daeInstanceGeometry.Name,
-                                                        Name = daeInstanceGeometry.Name,
+                                                        Id = mesh.Name,
+                                                        Name = mesh.Name,
                                                         Type = NodeType.NODE,
                                                     }
                                                         .Also(
@@ -654,38 +643,35 @@ namespace OpenKh.Tools.KhModels.Usecases
                                                                 geoNode.Instance_Geometry.Add(
                                                                     new Instance_Geometry
                                                                     {
-                                                                        Url = daeInstanceGeometry.Url,
-                                                                        Name = daeInstanceGeometry.Name,
+                                                                        Url = $"#{ToSidForm(mesh.Name)}-mesh",
+                                                                        Name = mesh.Name,
                                                                     }
                                                                         .Also(
                                                                             instance_Geometry =>
                                                                             {
-                                                                                if (daeInstanceGeometry.Instance_material.Any())
+                                                                                if (mesh.Material != null)
                                                                                 {
                                                                                     instance_Geometry.Bind_Material = new Bind_Material();
-                                                                                    foreach (var instanceMaterial in daeInstanceGeometry.Instance_material)
-                                                                                    {
-                                                                                        instance_Geometry.Bind_Material.Technique_Common.Add(
-                                                                                            new Instance_Material
-                                                                                            {
-                                                                                                Symbol = instanceMaterial,
-                                                                                                Target = $"#{instanceMaterial}",
-                                                                                            }
-                                                                                                .Also(
-                                                                                                    instance_Material =>
-                                                                                                    {
-                                                                                                        instance_Material.Bind_Vertex_Input.Add(
-                                                                                                            new Instance_MaterialBind_Vertex_Input
-                                                                                                            {
-                                                                                                                Semantic = "UVMap",
-                                                                                                                Input_Semantic = "TEXCOORD",
-                                                                                                                Input_Set = 0,
-                                                                                                            }
-                                                                                                        );
-                                                                                                    }
-                                                                                                )
-                                                                                        );
-                                                                                    }
+                                                                                    instance_Geometry.Bind_Material.Technique_Common.Add(
+                                                                                        new Instance_Material
+                                                                                        {
+                                                                                            Symbol = ToMaterialReference(mesh.Material),
+                                                                                            Target = $"#{ToMaterialReference(mesh.Material)}",
+                                                                                        }
+                                                                                            .Also(
+                                                                                                instance_Material =>
+                                                                                                {
+                                                                                                    instance_Material.Bind_Vertex_Input.Add(
+                                                                                                        new Instance_MaterialBind_Vertex_Input
+                                                                                                        {
+                                                                                                            Semantic = "UVMap",
+                                                                                                            Input_Semantic = "TEXCOORD",
+                                                                                                            Input_Set = 0,
+                                                                                                        }
+                                                                                                    );
+                                                                                                }
+                                                                                            )
+                                                                                    );
                                                                                 }
                                                                             }
                                                                         )
