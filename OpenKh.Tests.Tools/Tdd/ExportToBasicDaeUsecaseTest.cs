@@ -59,6 +59,8 @@ namespace OpenKh.Tests.Tools.Tdd
                             stream: daeStream
                         );
                     }
+
+                    window.Close();
                 }
             );
         }
