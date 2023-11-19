@@ -1,0 +1,88 @@
+<Window x:Class="OpenKh.Tools.CtdEditor.Views.LayoutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.CtdEditor.Views"
+        xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+        xmlns:controls1="clr-namespace:OpenKh.Tools.Common.Wpf.Controls;assembly=OpenKh.Tools.Common.Wpf"
+        mc:Ignorable="d"
+        xmlns:ViewModels="clr-namespace:OpenKh.Tools.CtdEditor.ViewModels"
+        d:DataContext="{d:DesignInstance Type=ViewModels:LayoutEditorViewModel}"
+        Title="LayoutWindow" Height="325" Width="400">
+    <Window.Resources>
+        <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
+    </Window.Resources>
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ComboBox Grid.Row="0" Margin="0 0 0 5" ItemsSource="{Binding Layouts}" SelectedValue="{Binding SelectedLayout}" DisplayMemberPath="Id" />
+        <Grid Grid.Row="1" IsEnabled="{Binding IsLayoutSelected}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <controls:TwoColumnsPanel Grid.Column="0" Margin="0 0 0 5" RowSpacing="3" DataContext="{Binding SelectedLayout}">
+                <TextBlock Text="Dialog Position" Margin="{StaticResource LabelMargin}" />
+                <controls:TwoEqualColumnsPanel>
+                    <TextBox Text="{Binding DialogX, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Text="{Binding DialogY, UpdateSourceTrigger=PropertyChanged}"/>
+                </controls:TwoEqualColumnsPanel>
+                
+                <TextBlock Text="Dialog Size" Margin="{StaticResource LabelMargin}" />
+                <controls:TwoEqualColumnsPanel>
+                    <TextBox Grid.Column="0" Text="{Binding DialogWidth, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Grid.Column="1" Text="{Binding DialogHeight, UpdateSourceTrigger=PropertyChanged}"/>
+                </controls:TwoEqualColumnsPanel>
+                
+                <TextBlock Text="Dialog Alignment" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox ItemsSource="{Binding ArrangeTypes, Mode=OneTime}"
+                          SelectedValue="{Binding DialogAlignment, UpdateSourceTrigger=PropertyChanged}"
+                          DisplayMemberPath="Name"
+                          SelectedValuePath="Value"/>
+
+                <TextBlock Text="Dialog Borders" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox ItemsSource="{Binding StyleTypes, Mode=OneTime}"
+                          SelectedValue="{Binding DialogBorders, UpdateSourceTrigger=PropertyChanged}"
+                          DisplayMemberPath="Name"
+                          SelectedValuePath="Value"/>
+
+                <TextBlock Text="Text Alignment" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding TextAlignment, UpdateSourceTrigger=PropertyChanged}"/>
+                <!--<ComboBox ItemsSource="{Binding FontArrangeTypes, Mode=OneTime}"
+                          SelectedValue="{Binding TextAlignment, UpdateSourceTrigger=PropertyChanged}"
+                          DisplayMemberPath="Name"
+                          SelectedValuePath="Value"/>-->
+
+                <TextBlock Text="Font Size" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Hor/Vert Space" Margin="{StaticResource LabelMargin}"/>
+                <controls:TwoEqualColumnsPanel>
+                    <TextBox Grid.Column="0" Text="{Binding HorizontalSpace, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Grid.Column="1" Text="{Binding VerticalSpace, UpdateSourceTrigger=PropertyChanged}"/>
+                </controls:TwoEqualColumnsPanel>
+
+                <TextBlock Text="Text Pos" Margin="{StaticResource LabelMargin}"/>
+                <controls:TwoEqualColumnsPanel>
+                    <TextBox Grid.Column="0" Text="{Binding TextX, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Grid.Column="1" Text="{Binding TextY, UpdateSourceTrigger=PropertyChanged}"/>
+                </controls:TwoEqualColumnsPanel>
+
+                <TextBlock Text="Hook Style" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox ItemsSource="{Binding HookStyleTypes, Mode=OneTime}"
+                          SelectedValue="{Binding DialogHook, UpdateSourceTrigger=PropertyChanged}"
+                          DisplayMemberPath="Name"
+                          SelectedValuePath="Value"/>
+
+                <TextBlock Text="Hook Position" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding DialogHookX, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Color Idx" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding TextColorIdx, UpdateSourceTrigger=PropertyChanged}"/>
+
+            </controls:TwoColumnsPanel>
+        </Grid>
+    </Grid>
+</Window>

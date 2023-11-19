@@ -132,7 +132,8 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
                 .SpriteTexture(surface)
                 .Source(characterViewModel.PositionX, characterViewModel.PositionY, characterViewModel.Width, SelectedFont.Info.CharacterHeight)
                 .MatchSourceSize()
-                .ScaleSize(2));
+                .ScaleSize(2)
+                .ColorDefault());
         }
     }
 }
