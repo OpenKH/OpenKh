@@ -3,14 +3,14 @@
 This file is responsible for defining various environmental sound effects related to maps in [Kingdom Hearts II](../../index.md)
 It is a [BAR](bar.md) file and each subfile represents a different [World](/docs/kh2/worlds.md).
 
-###Structure
+### Structure
 
 | Amount | Description |
 |--------|---------------|
 | 1 	   | Sound Info Entry Count
 | Count  | Sound Info Entries
 
-###Sound Info Entry
+### Sound Info Entry
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 	 | uint16 | Reverb
