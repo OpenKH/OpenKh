@@ -46,9 +46,9 @@ This is referred to here as a Sound Mapping Table. </br>
 | 0x3     | uint8    | Unknown
 | 0x4     | uint16   | Unknown
 | 0x6     | uint16   | Unknown
-| 0x8     | float    | Unknown
+| 0x8     | float    | Volume to play at
 | 0xC     | int32    | Sound Effect: Index in Game
-| 0x10    | int16    | Sound Effect: Index in SCD
+| 0x10    | int16    | Sound Effect: Index in SCD?
 | 0x12    | int16    | Sound Effect: Index in SCD
 
 This table has entries of two different sizes, 0x10 and 0x14. </br>
@@ -59,8 +59,18 @@ Otherwise, entries that are 0x14 long are used where the last 4 bytes are used t
 
 
 ## Table 0
-First entry seems to be 0x58 long.
-All entries after seem to be 0x62 long.
+First entry seems to be 0x58 long. </br>
+All entries after seem to be 0x62 long. </br>
+
+## Sound Entry Table
+| Offset | Type  | Description
+|--------|-------|------------
+| 0x0     | Unknown[0x4F]   | Unknown
+| 0x50    | uint32   | Audio Length (in ms)
+| 0x54    | uint32   | Unknown
+
+Most data seems to be identical here, except for 0x50. </br>
+That int determines how long to play the sound effect for in-game, before cutting the audio off. </br>
 
 ## Stream (pointed to by SoundEntry Table)
 | Offset | Type  | Description
