@@ -32,6 +32,7 @@
 | VAS                             | Streamed music or voice (stereo audio)
 | VSB                             | A sub-type of BAR; contains VAG
 | WD                              | Instruments for BGM files; unused in the PC release.
+| [SCD](file/type/scd.md)         | Audio container, exclusive to the HD Remaster.
 | a.fm                            | A sub-type of BAR; usually used in conjunction with MDLX
 | a.fr                            | French localized a.fm
 | a.gr                            | German localized a.fm
