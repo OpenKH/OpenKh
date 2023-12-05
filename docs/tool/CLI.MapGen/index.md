@@ -205,8 +205,11 @@ textureOptions:
 ```
 
 ### uvscList
-
 ```yml
+# Values to use to control the speed of horizontal and vertical UV scrolling.
+# Mapgen doesn't seem to append these values, so they'll need to be added manually.
+# Additionally, looping will need to be fixed in the GSInfo portion of the texture that has UV Scrolling.
+# The 129th-132nd bytes in that texture control this.
 uvscList:
   - index: 0
     u: 64000000
@@ -266,11 +269,12 @@ disableBSPCollisionBuilder: true
 ```
 
 ### surfaceFlags
-4 bitflags that control various properties of surfaces. Whether or not Inverse Kinematics should apply, if a player can grab the ledge, etc. </br>
-Grabbable Ledges should only be placed on top of surfaces, some buggier interactions with ledges may occur otherwise. </br>
 ```yml
 # Specify `surfaceFlags` to this material.
 # `0x3f1` is one of floor representation.
+# This value is made up of 4 bitflags.
+# They control things like whether Inverse Kinematics should apply, if a player can grab the ledge, etc.
+# Grabbable Ledges should only be placed on top of surfaces, some buggier interactions with ledges may occur otherwise.
 - name: 'floor'
   surfaceFlags: 0x3f1
 ```
@@ -300,7 +304,6 @@ Hit_RTN: 0x8
 Nohit_Floor: 0x10
 Unk: 0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0, 0xE0, 0x100, 0x120, 0x140, 0x160
 ```
-Add up the bits you'll need to get the proper value for your surface; 0x3F1 has Kind(1), Hit_Player, Hit_Enemy, Hit_Flyenemy, Hit_Attack, Hit_Safety, and IK.
 
 ### maxColorIntensity
 
@@ -355,20 +358,21 @@ reuseImd: true
 ```
 
 ### uvscIndex
-
 ```yml
+# Index of UV Scrolling values to use.
+# These are found at the end of the texture file.
+# "_KN5" denotes the end of the number of entries.
 - name: 'six'
   uvscIndex: 0
 ```
 
-### ground
 
+### ground
 Ground value in collision. </br>
 These values are used to determine which footsteps to play when walking or running across the collision with that materials name. </br>
 Most sound effects will not play without modifying [12soundinfo.bar](/docs/kh2/file/type/12soundinfo.md) for that rooms world.</br>
 PAX like water splashes and footprints also depend on the collision having specific values. </br> 
 For light collision, this is index to `onColorTable[]`.
-
 ```yml
 - name: 'floor'
   ground: 1
