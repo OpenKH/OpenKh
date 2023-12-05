@@ -390,7 +390,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
-        public static bool LuaEngineInstalled
+        public static bool LuaBackendInstalled
         {
             get => _config.LuaEngineInstalled;
             set

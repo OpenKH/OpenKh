@@ -214,7 +214,7 @@
             Title="Install OpenKH Panacea (Optional and Experimental)"
             Description="Install automatic mod loading support into the game's folder."
             PreviousPage="{Binding PageStack.Back}"
-            NextPage="{Binding ElementName=PageLuaEngineInstall}">
+            NextPage="{Binding ElementName=PageLuaBackendInstall}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
@@ -260,32 +260,21 @@
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
-            x:Name="PageLuaEngineInstall"
+            x:Name="PageLuaBackendInstall"
             PageType="Interior"
-            Title="Install Lua Engine"
-            Description="Lua Engine allows you to use Lua Scripts with the PC version of Kingdom Hearts."
+            Title="Install Lua Backend"
+            Description="Lua Backend allows you to use Lua Scripts with the PC version of Kingdom Hearts."
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PCLaunchOption}">
             <StackPanel>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding LuaEngineNotFoundVisibility}">If you already have Lua Engine installed or wish to install Lua Engine outside of OpenKH folder select the folder location below.</TextBlock>
-                <TextBlock Margin="0 0 0 6" Visibility="{Binding LuaEngineFoundVisibility}" TextWrapping="Wrap">
-                Lua Engine is installed! If you wish to configure it so it automatically runs scripts from mods installed into OpenKH press the configure button below.
+                <TextBlock Margin="0 0 0 6" Visibility="{Binding LuaBackendFoundVisibility}" TextWrapping="Wrap">
+                Lua Backend is installed! If you wish to configure it so it runs scripts from mods installed into OpenKH press the configure button below.
                 </TextBlock>
-                <Grid Margin="0 0 0 3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="20"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{Binding LuaEngineLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectLuaEngineLocationCommand}">
-                        <Image Source="{StaticResource FolderOpen_16x}"/>
-                    </Button>
-                </Grid>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding LuaEngineNotFoundVisibility}">
-                It seems you have not installed Lua Engine or selected a filepath with Lua Engine installed. Please install Lua Engine using the button below or navigate to where it is installed using the file selector above.               
-                </TextBlock>                
-                <Button Margin="0 0 0 6" Content="Install and Configure Lua Engine" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaEngineCommand}" CommandParameter="false" Visibility="{Binding LuaEngineNotFoundVisibility}"/>
-                <Button Margin="0 0 0 6" Content="Configure Lua Engine" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaEngineCommand}" CommandParameter="true" Visibility="{Binding LuaEngineFoundVisibility}"/>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding LuaBackendNotFoundVisibility}">
+                It seems you have not installed Lua Backend. Please install Lua Backend using the button below.               
+                </TextBlock>
+                <Button Margin="0 0 0 6" Content="Install and Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="false" Visibility="{Binding LuaBackendNotFoundVisibility}"/>
+                <Button Margin="0 0 0 6" Content="Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="true" Visibility="{Binding LuaBackendFoundVisibility}"/>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage

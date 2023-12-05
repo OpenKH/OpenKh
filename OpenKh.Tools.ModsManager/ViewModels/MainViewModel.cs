@@ -617,7 +617,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     Process.Start(processStartInfo);
                     CloseAllWindows();
-                    if(ConfigurationService.LuaEngineInstalled)
+                    if(ConfigurationService.LuaBackendInstalled)
                     {
                         string startFile = ConfigurationService.LuaEngineLocation + "/LuaEngine-REBORN.exe";
                         if(File.Exists(startFile))
