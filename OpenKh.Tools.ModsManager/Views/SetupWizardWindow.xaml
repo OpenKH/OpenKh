@@ -137,10 +137,10 @@
             <StackPanel>
                 <TextBlock Margin="0,0,0,3" Visibility="{Binding PcReleaseConfigVisibility}" TextWrapping="Wrap">OpenKh can extract all games in the KH 1.5 2.5 collection. Choose the games you wish to extract. Size values are rounded up.</TextBlock>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding PcReleaseConfigVisibility}">
-                    <CheckBox IsChecked="{Binding kh1}" Content="KH1-13GB" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding kh2}" Content="KH2-25GB" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding bbs}" Content="BBS-10GB" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding recom}" Content="ReCoM-10GB" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding Extractkh1}" Content="KH1-13GB" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding Extractkh2}" Content="KH2-25GB" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding Extractbbs}" Content="BBS-10GB" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding Extractrecom}" Content="ReCoM-10GB" Margin="0 0 10 4"/>
                 </StackPanel>
                 <TextBlock Margin="0 0 0 3">Extraction folder location:</TextBlock>
                 <Grid Margin="0 0 0 3">
@@ -214,7 +214,7 @@
             Title="Install OpenKH Panacea (Optional and Experimental)"
             Description="Install automatic mod loading support into the game's folder."
             PreviousPage="{Binding PageStack.Back}"
-            NextPage="{Binding ElementName=PCLaunchOption}">
+            NextPage="{Binding ElementName=PageLuaBackendInstall}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
@@ -257,6 +257,30 @@
                         Width="160"
                         Command="{Binding RemovePanaceaCommand}"/>
                 </StackPanel>
+            </StackPanel>
+        </xctk:WizardPage>
+        <xctk:WizardPage
+            x:Name="PageLuaBackendInstall"
+            PageType="Interior"
+            Title="Install Lua Backend"
+            Description="Lua Backend allows you to use Lua Scripts with the PC version of Kingdom Hearts."
+            PreviousPage="{Binding PageStack.Back}"
+            NextPage="{Binding ElementName=PCLaunchOption}">
+            <StackPanel>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding LuaBackendNotFoundVisibility}">
+                It seems you have not installed Lua Backend for use with Panacea. If you wish to do this press the button below. Also if you wish to have OpenKH configure it so Lua Backend can load scripts installed in Mod Manager check the games below.
+                </TextBlock>
+                <TextBlock Margin="0 0 0 6" Visibility="{Binding LuaBackendFoundVisibility}" TextWrapping="Wrap">
+                Lua Backend is installed! for use with Panacea. If you have not already and wish to configure it so it runs scripts from mods installed into OpenKH check the games below and press the configure button.
+                </TextBlock>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding PcReleaseConfigVisibility}">
+                    <CheckBox IsChecked="{Binding LuaConfigkh1}" Content="KH1" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding LuaConfigkh2}" Content="KH2" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding LuaConfigbbs}" Content="BBS" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding LuaConfigrecom}" Content="ReCoM" Margin="0 0 10 4"/>
+                </StackPanel>
+                <Button Margin="0 0 0 6" Content="Install and Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="false" Visibility="{Binding LuaBackendNotFoundVisibility}"/>
+                <Button Margin="0 0 0 6" Content="Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="true" Visibility="{Binding LuaBackendFoundVisibility}"/>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
