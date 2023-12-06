@@ -48,10 +48,6 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool Extractkh2 { get; internal set; } = true;
             public bool Extractbbs { get; internal set; }
             public bool Extractrecom { get; internal set; }
-            public bool LuaConfigkh1 { get; internal set; }
-            public bool LuaConfigkh2 { get; internal set; } = true;
-            public bool LuaConfigbbs { get; internal set; }
-            public bool LuaConfigrecom { get; internal set; }
             public string LaunchGame { get; internal set; } = "kh2";
 
             public void Save(string fileName)
