@@ -205,8 +205,11 @@ textureOptions:
 ```
 
 ### uvscList
-
 ```yml
+# Values to use to control the speed of horizontal and vertical UV scrolling.
+# Mapgen doesn't seem to append these values, so they'll need to be added manually.
+# Additionally, looping will need to be fixed in the GSInfo portion of the texture that has UV Scrolling.
+# The 129th-132nd bytes in that texture control this.
 uvscList:
   - index: 0
     u: 64000000
@@ -266,12 +269,40 @@ disableBSPCollisionBuilder: true
 ```
 
 ### surfaceFlags
-
 ```yml
 # Specify `surfaceFlags` to this material.
 # `0x3f1` is one of floor representation.
+# This value is made up of 4 bitflags.
+# They control things like whether Inverse Kinematics should apply, if a player can grab the ledge, etc.
+# Grabbable Ledges should only be placed on top of surfaces, some buggier interactions with ledges may occur otherwise.
 - name: 'floor'
   surfaceFlags: 0x3f1
+```
+Bit 1
+```
+Kind: 0x1, 0x2, 0x3, 0x4, may go up to 0x0F?
+Hit_Player: 0x10
+Hit_Enemy: 0x20
+Hit_Flyenemy: 0x40
+Hit_Attack: 0x80
+```
+Bit 2
+```
+Hit_Safety: 0x1
+IK: 0x2
+Grabbable Ledge: 0x4
+Barrier: 0x8
+MSG_Wall: 0x10
+Callback: 0x20
+Carrib_Disp: 0x40 or 0x80
+```
+Bit 3 (Unknown uses an additional one?)
+```
+Belt: 0x1
+Polygon_SE: 0x2 or 0x4
+Hit_RTN: 0x8
+Nohit_Floor: 0x10
+Unk: 0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0, 0xE0, 0x100, 0x120, 0x140, 0x160
 ```
 
 ### maxColorIntensity
@@ -327,21 +358,58 @@ reuseImd: true
 ```
 
 ### uvscIndex
-
 ```yml
+# Index of UV Scrolling values to use.
+# These are found at the end of the texture file.
+# "_KN5" denotes the end of the number of entries.
 - name: 'six'
   uvscIndex: 0
 ```
 
+
 ### ground
-
-Ground value in collision. Such as 30, 25, 8, 2, 1, or 0
-
+Ground value in collision. </br>
+These values are used to determine which footsteps to play when walking or running across the collision with that materials name. </br>
+Most sound effects will not play without modifying [12soundinfo.bar](/docs/kh2/file/type/12soundinfo.md) for that rooms world.</br>
+PAX like water splashes and footprints also depend on the collision having specific values. </br> 
 For light collision, this is index to `onColorTable[]`.
-
 ```yml
 - name: 'floor'
   ground: 1
+```
+What each value corresponds to is shown below.
+```
+1: Stone
+2: Stone_SP
+3: Dirt*
+4: Dirt_SP
+5: Sand
+6: Sand_SP
+7: Wood
+8: Board
+9: Creakwood
+10: Lawn*
+11: Grass
+12: Drygrass
+13: Water*
+14: Deepwater
+15: Snow*
+16: Metal
+17: Ironwire
+18: Carpet
+19: Cloth
+20: Sofa
+21: Roof
+22: Roof_SP
+23: Electric
+24: Electric_SP
+25: Glass
+26: Rubber
+27: Bone
+28: Paper
+29: Fragment
+30: Last
+*This will play PAX Effects if available.
 ```
 
 ### floorLevel
@@ -584,5 +652,6 @@ eachFileName:
 
 - Design a full map model data with [Blender](https://www.blender.org/),
   and then export entire world to `.fbx` file format.
+- Ideally, you'll want to generate the regular map model without collision, then create a lower-poly collision mesh, where you select specific vertices and define each set as materials as needed.
+- _Note :_ The Y coordinate is up vector in KH2.
 
-_Note :_ The Y coordinate is up vector in KH2.
