@@ -47,10 +47,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _pcReleaseLanguage;
         private string _gameDataLocation;
         private bool _isEGSVersion;
-        private bool _Extractkh2 = ConfigurationService.Extractkh2;
-        private bool _Extractkh1 = ConfigurationService.Extractkh1;
-        private bool _Extractbbs = ConfigurationService.Extractbbs;
-        private bool _Extractrecom = ConfigurationService.Extractrecom;
         private List<string> LuaScriptPaths = new List<string>();
 
         private Xceed.Wpf.Toolkit.WizardPage _wizardPageAfterIntro;
@@ -223,39 +219,23 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
         public bool Extractkh1
         {
-            get => _Extractkh1;
-            set
-            {
-                _Extractkh1 = value;
-                ConfigurationService.Extractkh1 = value;
-            }
+            get => ConfigurationService.Extractkh1;
+            set => ConfigurationService.Extractkh1 = value;
         }
         public bool Extractkh2
         {
-            get => _Extractkh2;
-            set
-            {
-                _Extractkh2 = value;
-                ConfigurationService.Extractkh2 = value;
-            }
+            get => ConfigurationService.Extractkh2;
+            set => ConfigurationService.Extractkh2 = value;
         }
         public bool Extractbbs
         {
-            get => _Extractbbs;
-            set
-            {
-                _Extractbbs = value;
-                ConfigurationService.Extractbbs = value;
-            }
+            get => ConfigurationService.Extractbbs;
+            set => ConfigurationService.Extractbbs = value;
         }
         public bool Extractrecom
         {
-            get => _Extractrecom;
-            set
-            {
-                _Extractrecom = value;
-                ConfigurationService.Extractrecom = value;
-            }
+            get => ConfigurationService.Extractrecom;
+            set => ConfigurationService.Extractrecom = value;
         }
         public bool LuaConfigkh1
         {
