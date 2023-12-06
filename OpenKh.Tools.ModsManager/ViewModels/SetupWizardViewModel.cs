@@ -48,6 +48,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _gameDataLocation;
         private bool _isEGSVersion;
         private List<string> LuaScriptPaths = new List<string>();
+        private bool _overrideGameDataFound = false;
 
         private Xceed.Wpf.Toolkit.WizardPage _wizardPageAfterIntro;
         public Xceed.Wpf.Toolkit.WizardPage WizardPageAfterIntro
@@ -297,6 +298,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
             }
         }
+        public bool OverrideGameDataFound
+        {
+            get => _overrideGameDataFound;
+            set
+            {
+                _overrideGameDataFound = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+            }
+              
+        }
         public string PcReleaseLanguage
         {
             get => _pcReleaseLanguage;
@@ -332,7 +346,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             (GameEdition == EpicGames && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) || 
             GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) || 
             File.Exists(Path.Combine(GameDataLocation, "bbs", "message")) ||
-            File.Exists(Path.Combine(GameDataLocation, "Recom", "SYS")))));
+            File.Exists(Path.Combine(GameDataLocation, "Recom", "SYS"))))||
+            OverrideGameDataFound);
         public Visibility GameDataNotFoundVisibility => !IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ProgressBarVisibility => IsNotExtracting ? Visibility.Collapsed : Visibility.Visible;
