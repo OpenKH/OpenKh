@@ -208,6 +208,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
                 OnPropertyChanged(nameof(IsGameSelected));
                 OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(LuaBackendFoundVisibility));
+                OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
             }
         }
         public bool IsEGSVersion
@@ -357,9 +359,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public int RegionId { get; set; }
         public bool IsLuaBackendInstalled
         {
-            get => File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.dll")) && 
-                File.Exists(Path.Combine(PcReleaseLocation, "lua54.dll")) && 
-                File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
+            get
+            {
+                if (PcReleaseLocation != null)
+                {
+                    return File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.dll")) &&
+                        File.Exists(Path.Combine(PcReleaseLocation, "lua54.dll")) &&
+                        File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
+                }
+                else
+                    return false;
+            }
         }
         public RelayCommand InstallLuaBackendCommand { get; set; }
         public RelayCommand RemoveLuaBackendCommand { get; set; }
