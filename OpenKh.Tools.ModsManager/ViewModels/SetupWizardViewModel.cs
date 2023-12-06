@@ -367,6 +367,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
         }
         public RelayCommand InstallLuaBackendCommand { get; set; }
+        public RelayCommand RemoveLuaBackendCommand { get; set; }
         public Visibility LuaBackendFoundVisibility => IsLuaBackendInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility LuaBackendNotFoundVisibility => IsLuaBackendInstalled ? Visibility.Collapsed : Visibility.Visible;
         public RelayCommand InstallPanaceaCommand { get; }
@@ -650,6 +651,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
                     }
                 }
+            });
+            RemoveLuaBackendCommand = new RelayCommand(_ =>
+            {
+                File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.dll"));
+                File.Delete(Path.Combine(PcReleaseLocation, "lua54.dll"));
+                File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
+                OnPropertyChanged(nameof(IsLuaBackendInstalled));
+                OnPropertyChanged(nameof(LuaBackendFoundVisibility));
+                OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
             });
         }
 
