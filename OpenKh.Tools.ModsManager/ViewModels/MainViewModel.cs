@@ -1,4 +1,3 @@
-using Octokit;
 using OpenKh.Common;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Models;
@@ -29,7 +28,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private static Version _version = Assembly.GetEntryAssembly()?.GetName()?.Version;
         private static string ApplicationName = Utilities.GetApplicationName();
         private static string ApplicationVersion = Utilities.GetApplicationVersion();
-        private Window Window => System.Windows.Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+        private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
 
         private DebuggingWindow _debuggingWindow = new DebuggingWindow();
         private ModViewModel _selectedValue;
@@ -69,7 +68,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public static bool overwriteMod = false;
         public string Title => ApplicationName;
         public string CurrentVersion => ApplicationVersion;
-        public static Release releases = new GitHubClient(new ProductHeaderValue("LuaEngine.exe")).Repository.Release.GetLatest(owner: "TopazTK", name: "LuaEngine").Result;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
         public ObservableCollection<string> PresetList { get; set; }
         public RelayCommand ExitCommand { get; set; }
@@ -269,7 +267,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _isBuilding = value;
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                Application.Current.Dispatcher.Invoke(() =>
                 {
                     OnPropertyChanged(nameof(BuildCommand));
                     OnPropertyChanged(nameof(BuildAndRunCommand));
@@ -322,7 +320,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         var name = view.RepositoryName;
                         var isZipFile = view.IsZipFile;
                         var isLuaFile = view.IsLuaFile;
-                        progressWindow = System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        progressWindow = Application.Current.Dispatcher.Invoke(() =>
                         {
                             var progressWindow = new InstallModProgressWindow
                             {
@@ -335,14 +333,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         });
                         await ModsService.InstallMod(name, isZipFile, isLuaFile, progress =>
                         {
-                            System.Windows.Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
+                            Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
                         }, nProgress =>
                         {
-                            System.Windows.Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
+                            Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
                         });
                         var actualName = isZipFile || isLuaFile ? Path.GetFileNameWithoutExtension(name) : name;
                         var mod = ModsService.GetMods(new string[] { actualName }).First();
-                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        Application.Current.Dispatcher.Invoke(() =>
                         {
                             progressWindow.Close();
                             if (overwriteMod)
@@ -362,7 +360,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     finally
                     {
-                        System.Windows.Application.Current.Dispatcher.Invoke(() => progressWindow?.Close());
+                        Application.Current.Dispatcher.Invoke(() => progressWindow?.Close());
                     }
                 });
             }, _ => true);
@@ -514,7 +512,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public void CloseAllWindows()
         {
             CloseRunningProcess();
-            System.Windows.Application.Current.Dispatcher.Invoke(_debuggingWindow.Close);
+            Application.Current.Dispatcher.Invoke(_debuggingWindow.Close);
         }
 
         public void CloseRunningProcess()
@@ -533,9 +531,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private void ResetLogWindow()
         {
             if (_debuggingWindow != null)
-                System.Windows.Application.Current.Dispatcher.Invoke(_debuggingWindow.Close);
+                Application.Current.Dispatcher.Invoke(_debuggingWindow.Close);
             _debuggingWindow = new DebuggingWindow();
-            System.Windows.Application.Current.Dispatcher.Invoke(_debuggingWindow.Show);
+            Application.Current.Dispatcher.Invoke(_debuggingWindow.Show);
             _debuggingWindow.ClearLogs();
         }
 
@@ -936,7 +934,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (mod == null)
                     continue;
 
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                Application.Current.Dispatcher.Invoke(() =>
                     mod.UpdateCount = modUpdate.UpdateCount);
             }
             if (AutoUpdateMods)

@@ -46,7 +46,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _pcReleaseLocation;
         private string _pcReleaseLanguage;
         private string _gameDataLocation;
-        private string _luaEngineLocation;
         private bool _isEGSVersion;
         private bool _Extractkh2 = ConfigurationService.Extractkh2;
         private bool _Extractkh1 = ConfigurationService.Extractkh1;
@@ -77,7 +76,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Xceed.Wpf.Toolkit.WizardPage PageIsoSelection { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageEosInstall { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageEosConfig { get; internal set; }
-        public Xceed.Wpf.Toolkit.WizardPage PageLuaEngineInstall { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PageLuaBackendInstall { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageRegion { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PCLaunchOption { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage LastPage { get; internal set; }
@@ -361,18 +360,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand ExtractGameDataCommand { get; set; }
         public float ExtractionProgress { get; set; }
         public int RegionId { get; set; }
-        public RelayCommand SelectLuaEngineLocationCommand { get; }
-        public string LuaBackendLocation
-        {
-            get => _luaEngineLocation;
-            set
-            {
-                _luaEngineLocation = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(LuaBackendFoundVisibility));
-                OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
-            }
-        }
         public bool IsLuaBackendInstalled
         {
             get => File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.dll")) && 
@@ -450,7 +437,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     return false;
                 }
             }
-        }     
+        }
 
         public SetupWizardViewModel()
         {
