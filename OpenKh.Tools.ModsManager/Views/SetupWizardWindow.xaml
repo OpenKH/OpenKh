@@ -179,7 +179,7 @@
                 </TextBlock>
                 <TextBlock Margin="0 0 0 3" Visibility="{Binding PcReleaseConfigVisibility}" TextWrapping="Wrap">               
                     <Run Foreground="Red">WARNING</Run>
-                    If you do not extract a games data only Lua Scripts will function properly. Only check the box below if you will only be installing Lua Scripts in mod manager.
+                    If you do not extract a games data only Lua Scripts will function properly. Only check the box below if you will only be installing Lua Scripts in Mods Manager.
                 </TextBlock>
                 <CheckBox IsChecked="{Binding OverrideGameDataFound}" Content="Skip Game Extraction" Visibility="{Binding PcReleaseConfigVisibility}" Margin="0 0 0 4"/>
             </StackPanel>
