@@ -449,7 +449,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigRegionId = ConfigurationService.RegionId,
                     ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
                     ConfigIsEGSVersion = ConfigurationService.IsEGSVersion,
-                    ConfigLuaEngineLocation = ConfigurationService.LuaEngineLocation,
                 };
                 if (dialog.ShowDialog() == true)
                 {
@@ -463,7 +462,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
                     ConfigurationService.IsEGSVersion = dialog.ConfigIsEGSVersion;
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
-                    ConfigurationService.LuaEngineLocation = dialog.ConfigLuaEngineLocation;
 
                     const int EpicGamesPC = 2;
                     if (ConfigurationService.GameEdition == EpicGamesPC &&
@@ -617,20 +615,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     Process.Start(processStartInfo);
                     CloseAllWindows();
-                    if(ConfigurationService.LuaBackendInstalled)
-                    {
-                        string startFile = ConfigurationService.LuaEngineLocation + "/LuaEngine-REBORN.exe";
-                        if(File.Exists(startFile))
-                        {
-                            processStartInfo = new ProcessStartInfo
-                            {
-                                FileName = startFile,
-                                WorkingDirectory = ConfigurationService.LuaEngineLocation,
-                                UseShellExecute = false,
-                            };
-                            Process.Start(processStartInfo);
-                        }
-                    }
                     return Task.CompletedTask;
                 default:
                     return Task.CompletedTask;

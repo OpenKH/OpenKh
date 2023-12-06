@@ -34,8 +34,6 @@ namespace OpenKh.Tools.ModsManager.Services
             public string OpenKhGameEngineLocation { get; internal set; }
             public string Pcsx2Location { get; internal set; }
             public string PcReleaseLocation { get; internal set; }
-            public string LuaEnginePath { get; internal set; }
-            public bool LuaEngineInstalled { get; internal set; }
             public string PcReleaseLanguage { get; internal set; } = "en";
             public int RegionId { get; internal set; }
             public bool PanaceaInstalled { get; internal set; }
@@ -46,10 +44,14 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool DevView { get; internal set; } = false;
             public bool AutoUpdateMods { get; internal set; }
             public bool isEGSVersion { get; internal set; } = true;
-            public bool kh1 { get; internal set; }
-            public bool kh2 { get; internal set; } = true;
-            public bool bbs { get; internal set; }
-            public bool recom { get; internal set; }
+            public bool Extractkh1 { get; internal set; }
+            public bool Extractkh2 { get; internal set; } = true;
+            public bool Extractbbs { get; internal set; }
+            public bool Extractrecom { get; internal set; }
+            public bool LuaConfigkh1 { get; internal set; }
+            public bool LuaConfigkh2 { get; internal set; } = true;
+            public bool LuaConfigbbs { get; internal set; }
+            public bool LuaConfigrecom { get; internal set; }
             public string LaunchGame { get; internal set; } = "kh2";
 
             public void Save(string fileName)
@@ -336,39 +338,39 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
-        public static bool kh1
+        public static bool Extractkh1
         {
-            get => _config.kh1;
+            get => _config.Extractkh1;
             set
             {
-                _config.kh1 = value;
+                _config.Extractkh1 = value;
                 _config.Save(ConfigPath);
             }
         }
-        public static bool kh2
+        public static bool Extractkh2
         {
-            get => _config.kh2;
+            get => _config.Extractkh2;
             set
             {
-                _config.kh2 = value;
+                _config.Extractkh2 = value;
                 _config.Save(ConfigPath);
             }
         }
-        public static bool bbs
+        public static bool Extractbbs
         {
-            get => _config.bbs;
+            get => _config.Extractbbs;
             set
             {
-                _config.bbs = value;
+                _config.Extractbbs = value;
                 _config.Save(ConfigPath);
             }
         }
-        public static bool recom
+        public static bool Extractrecom
         {
-            get => _config.recom;
+            get => _config.Extractrecom;
             set
             {
-                _config.recom = value;
+                _config.Extractrecom = value;
                 _config.Save(ConfigPath);
             }
         }
@@ -378,24 +380,6 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.LaunchGame = value;
-                _config.Save(ConfigPath);
-            }
-        }
-        public static string LuaEngineLocation
-        {
-            get => _config.LuaEnginePath ?? Path.Combine(StoragePath, "LuaEngine");
-            set
-            {
-                _config.LuaEnginePath = value;
-                _config.Save(ConfigPath);
-            }
-        }
-        public static bool LuaBackendInstalled
-        {
-            get => _config.LuaEngineInstalled;
-            set
-            {
-                _config.LuaEngineInstalled = value;
                 _config.Save(ConfigPath);
             }
         }
