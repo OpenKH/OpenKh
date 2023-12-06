@@ -591,22 +591,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     if (LuaScriptPaths.Contains("kh1"))
                     {
                         int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
-                        config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts , relative = false}").Replace("\\", "/"));
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));
                     }
                     if (LuaScriptPaths.Contains("kh2"))
                     {
                         int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
-                        config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts , relative = false}").Replace("\\", "/"));
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
                     }
                     if (LuaScriptPaths.Contains("bbs"))
                     {
                         int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
-                        config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts , relative = false}").Replace("\\", "/"));
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
                     }
                     if (LuaScriptPaths.Contains("Recom"))
                     {
                         int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
-                        config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts , relative = false}").Replace("\\", "/"));
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
                     }
                     File.WriteAllText(Path.Combine(PcReleaseLocation, "LuaBackend.toml"), config);
                     File.Delete(DownPath);
@@ -623,22 +623,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         if (LuaScriptPaths.Contains("kh1") && !config.Contains("mod/kh1/scripts"))
                         {
                             int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
-                            config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts , relative = false}").Replace("\\", "/"));     
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));     
                         }
                         if (LuaScriptPaths.Contains("kh2") && !config.Contains("mod/kh2/scripts"))
                         {
                             int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
-                            config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts , relative = false}").Replace("\\", "/"));
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
                         }
                         if (LuaScriptPaths.Contains("bbs") && !config.Contains("mod/bbs/scripts"))
                         {
                             int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
-                            config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts , relative = false}").Replace("\\", "/"));
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
                         }
                         if (LuaScriptPaths.Contains("Recom") && !config.Contains("mod/Recom/scripts"))
                         {
                             int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
-                            config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts , relative = false}").Replace("\\", "/"));
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
                         }
                         File.WriteAllText(Path.Combine(PcReleaseLocation, "LuaBackend.toml"), config);
                         OnPropertyChanged(nameof(IsLuaBackendInstalled));
