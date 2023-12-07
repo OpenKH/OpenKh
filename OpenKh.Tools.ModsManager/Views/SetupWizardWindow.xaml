@@ -177,6 +177,11 @@
                 <TextBlock Margin="0 0 0 3" Visibility="{Binding ExtractionCompleteVisibility}">
                     The extraction of the game's data succeded!
                 </TextBlock>
+                <TextBlock Margin="0 0 0 3" Visibility="{Binding PcReleaseConfigVisibility}" TextWrapping="Wrap">               
+                    <Run Foreground="Red">WARNING</Run>
+                    If you do not extract a games data only Lua Scripts will function properly. Only check the box below if you will only be installing Lua Scripts in Mods Manager.
+                </TextBlock>
+                <CheckBox IsChecked="{Binding OverrideGameDataFound}" Content="Skip Game Extraction" Visibility="{Binding PcReleaseConfigVisibility}" Margin="0 0 0 4"/>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
@@ -281,6 +286,10 @@
                 </StackPanel>
                 <Button Margin="0 0 0 6" Content="Install and Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="false" Visibility="{Binding LuaBackendNotFoundVisibility}"/>
                 <Button Margin="0 0 0 6" Content="Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="true" Visibility="{Binding LuaBackendFoundVisibility}"/>
+                <TextBlock Margin="0 2 0 10" Visibility="{Binding LuaBackendFoundVisibility}" TextWrapping="Wrap">
+                If you wish to reinstall Lua Backend to fix scripts not loading and the configure button did not work or just to uninstall completely press the button below.
+                </TextBlock>
+                <Button Margin="0 0 0 6" Content="Uninstall Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveLuaBackendCommand}" Visibility="{Binding LuaBackendFoundVisibility}"/>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage

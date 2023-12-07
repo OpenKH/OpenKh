@@ -44,10 +44,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool DevView { get; internal set; } = false;
             public bool AutoUpdateMods { get; internal set; }
             public bool isEGSVersion { get; internal set; } = true;
-            public bool Extractkh1 { get; internal set; }
-            public bool Extractkh2 { get; internal set; } = true;
-            public bool Extractbbs { get; internal set; }
-            public bool Extractrecom { get; internal set; }
+            public List<string> GamesToExtract { get; internal set; } = new List<string> { "kh2" };
             public string LaunchGame { get; internal set; } = "kh2";
 
             public void Save(string fileName)
@@ -336,37 +333,65 @@ namespace OpenKh.Tools.ModsManager.Services
         }
         public static bool Extractkh1
         {
-            get => _config.Extractkh1;
+            get => _config.GamesToExtract.Contains("kh1");
             set
             {
-                _config.Extractkh1 = value;
+                if (value)
+                {
+                    _config.GamesToExtract.Add("kh1");
+                }
+                else
+                {
+                    _config.GamesToExtract.Remove("kh1");
+                }
                 _config.Save(ConfigPath);
             }
         }
         public static bool Extractkh2
         {
-            get => _config.Extractkh2;
+            get => _config.GamesToExtract.Contains("kh2");
             set
             {
-                _config.Extractkh2 = value;
+                if (value)
+                {
+                    _config.GamesToExtract.Add("kh2");
+                }
+                else
+                {
+                    _config.GamesToExtract.Remove("kh2");
+                }
                 _config.Save(ConfigPath);
             }
         }
         public static bool Extractbbs
         {
-            get => _config.Extractbbs;
+            get => _config.GamesToExtract.Contains("bbs");
             set
             {
-                _config.Extractbbs = value;
+                if (value)
+                {
+                    _config.GamesToExtract.Add("bbs");
+                }
+                else
+                {
+                    _config.GamesToExtract.Remove("bbs");
+                }
                 _config.Save(ConfigPath);
             }
         }
         public static bool Extractrecom
         {
-            get => _config.Extractrecom;
+            get => _config.GamesToExtract.Contains("Recom");
             set
             {
-                _config.Extractrecom = value;
+                if (value)
+                {
+                    _config.GamesToExtract.Add("Recom");
+                }
+                else
+                {
+                    _config.GamesToExtract.Remove("Recom");
+                }
                 _config.Save(ConfigPath);
             }
         }

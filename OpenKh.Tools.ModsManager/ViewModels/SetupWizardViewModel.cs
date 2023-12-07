@@ -47,11 +47,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _pcReleaseLanguage;
         private string _gameDataLocation;
         private bool _isEGSVersion;
-        private bool _Extractkh2 = ConfigurationService.Extractkh2;
-        private bool _Extractkh1 = ConfigurationService.Extractkh1;
-        private bool _Extractbbs = ConfigurationService.Extractbbs;
-        private bool _Extractrecom = ConfigurationService.Extractrecom;
         private List<string> LuaScriptPaths = new List<string>();
+        private bool _overrideGameDataFound = false;
 
         private Xceed.Wpf.Toolkit.WizardPage _wizardPageAfterIntro;
         public Xceed.Wpf.Toolkit.WizardPage WizardPageAfterIntro
@@ -211,6 +208,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
                 OnPropertyChanged(nameof(IsGameSelected));
                 OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(LuaBackendFoundVisibility));
+                OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
             }
         }
         public bool IsEGSVersion
@@ -223,39 +222,23 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
         public bool Extractkh1
         {
-            get => _Extractkh1;
-            set
-            {
-                _Extractkh1 = value;
-                ConfigurationService.Extractkh1 = value;
-            }
+            get => ConfigurationService.Extractkh1;
+            set => ConfigurationService.Extractkh1 = value;
         }
         public bool Extractkh2
         {
-            get => _Extractkh2;
-            set
-            {
-                _Extractkh2 = value;
-                ConfigurationService.Extractkh2 = value;
-            }
+            get => ConfigurationService.Extractkh2;
+            set => ConfigurationService.Extractkh2 = value;
         }
         public bool Extractbbs
         {
-            get => _Extractbbs;
-            set
-            {
-                _Extractbbs = value;
-                ConfigurationService.Extractbbs = value;
-            }
+            get => ConfigurationService.Extractbbs;
+            set => ConfigurationService.Extractbbs = value;
         }
         public bool Extractrecom
         {
-            get => _Extractrecom;
-            set
-            {
-                _Extractrecom = value;
-                ConfigurationService.Extractrecom = value;
-            }
+            get => ConfigurationService.Extractrecom;
+            set => ConfigurationService.Extractrecom = value;
         }
         public bool LuaConfigkh1
         {
@@ -317,6 +300,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
             }
         }
+        public bool OverrideGameDataFound
+        {
+            get => _overrideGameDataFound;
+            set
+            {
+                _overrideGameDataFound = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+            }
+              
+        }
         public string PcReleaseLanguage
         {
             get => _pcReleaseLanguage;
@@ -352,7 +348,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             (GameEdition == EpicGames && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) || 
             GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) || 
             File.Exists(Path.Combine(GameDataLocation, "bbs", "message")) ||
-            File.Exists(Path.Combine(GameDataLocation, "Recom", "SYS")))));
+            File.Exists(Path.Combine(GameDataLocation, "Recom", "SYS"))))||
+            OverrideGameDataFound);
         public Visibility GameDataNotFoundVisibility => !IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ProgressBarVisibility => IsNotExtracting ? Visibility.Collapsed : Visibility.Visible;
@@ -362,11 +359,20 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public int RegionId { get; set; }
         public bool IsLuaBackendInstalled
         {
-            get => File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.dll")) && 
-                File.Exists(Path.Combine(PcReleaseLocation, "lua54.dll")) && 
-                File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
+            get
+            {
+                if (PcReleaseLocation != null)
+                {
+                    return File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.dll")) &&
+                        File.Exists(Path.Combine(PcReleaseLocation, "lua54.dll")) &&
+                        File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
+                }
+                else
+                    return false;
+            }
         }
         public RelayCommand InstallLuaBackendCommand { get; set; }
+        public RelayCommand RemoveLuaBackendCommand { get; set; }
         public Visibility LuaBackendFoundVisibility => IsLuaBackendInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility LuaBackendNotFoundVisibility => IsLuaBackendInstalled ? Visibility.Collapsed : Visibility.Visible;
         public RelayCommand InstallPanaceaCommand { get; }
@@ -595,22 +601,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     if (LuaScriptPaths.Contains("kh1"))
                     {
                         int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
-                        config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts , relative = false}").Replace("\\", "/"));
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));
                     }
                     if (LuaScriptPaths.Contains("kh2"))
                     {
                         int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
-                        config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts , relative = false}").Replace("\\", "/"));
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
                     }
                     if (LuaScriptPaths.Contains("bbs"))
                     {
                         int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
-                        config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts , relative = false}").Replace("\\", "/"));
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
                     }
                     if (LuaScriptPaths.Contains("Recom"))
                     {
                         int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
-                        config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts , relative = false}").Replace("\\", "/"));
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
                     }
                     File.WriteAllText(Path.Combine(PcReleaseLocation, "LuaBackend.toml"), config);
                     File.Delete(DownPath);
@@ -627,22 +633,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         if (LuaScriptPaths.Contains("kh1") && !config.Contains("mod/kh1/scripts"))
                         {
                             int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
-                            config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts , relative = false}").Replace("\\", "/"));     
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));     
                         }
                         if (LuaScriptPaths.Contains("kh2") && !config.Contains("mod/kh2/scripts"))
                         {
                             int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
-                            config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts , relative = false}").Replace("\\", "/"));
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
                         }
                         if (LuaScriptPaths.Contains("bbs") && !config.Contains("mod/bbs/scripts"))
                         {
                             int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
-                            config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts , relative = false}").Replace("\\", "/"));
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
                         }
                         if (LuaScriptPaths.Contains("Recom") && !config.Contains("mod/Recom/scripts"))
                         {
                             int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
-                            config = config.Insert(index, ", {path = " + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts , relative = false}").Replace("\\", "/"));
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
                         }
                         File.WriteAllText(Path.Combine(PcReleaseLocation, "LuaBackend.toml"), config);
                         OnPropertyChanged(nameof(IsLuaBackendInstalled));
@@ -650,6 +656,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
                     }
                 }
+            });
+            RemoveLuaBackendCommand = new RelayCommand(_ =>
+            {
+                File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.dll"));
+                File.Delete(Path.Combine(PcReleaseLocation, "lua54.dll"));
+                File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
+                OnPropertyChanged(nameof(IsLuaBackendInstalled));
+                OnPropertyChanged(nameof(LuaBackendFoundVisibility));
+                OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
             });
         }
 
