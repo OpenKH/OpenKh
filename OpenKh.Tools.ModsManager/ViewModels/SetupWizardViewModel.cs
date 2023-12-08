@@ -630,25 +630,117 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     if (File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml")))
                     {
                         string config = File.ReadAllText(Path.Combine(PcReleaseLocation, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
-                        if (LuaScriptPaths.Contains("kh1") && !config.Contains("mod/kh1/scripts"))
+                        if (LuaScriptPaths.Contains("kh1"))
                         {
-                            int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));     
+                            if (config.Contains("mod/kh1/scripts"))
+                            {
+                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for KH1 from an OpenKH Mod Manager." +
+                                    $" Do you want to change Lua Backend to run scripts for KH1 from this version of OpenKH Mod Manager instead?", "Warning",
+                                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
+
+                                switch (errorMessage)
+                                {
+                                    case MessageBoxResult.Yes:
+                                    {
+                                        int index = config.IndexOf("scripts", config.IndexOf("[kh1]"));
+                                        config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                        config = config.Insert(index, "scripts = [{ path = \"scripts/kh1/\", relative = true }" +
+                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                int index = config.IndexOf("scripts", config.IndexOf("[kh1]"));
+                                config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                config = config.Insert(index, "scripts = [{ path = \"scripts/kh1/\", relative = true }" +
+                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
+                            }
                         }
-                        if (LuaScriptPaths.Contains("kh2") && !config.Contains("mod/kh2/scripts"))
+                        if (LuaScriptPaths.Contains("kh2"))
                         {
-                            int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
+                            if (config.Contains("mod/kh2/scripts"))
+                            {
+                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for KH2 from an OpenKH Mod Manager." +
+                                    $" Do you want to change Lua Backend to run scripts for KH2 from this version of OpenKH Mod Manager instead?", "Warning",
+                                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
+
+                                switch (errorMessage)
+                                {
+                                    case MessageBoxResult.Yes:
+                                    {
+                                        int index = config.IndexOf("scripts", config.IndexOf("[kh2]"));
+                                        config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                        config = config.Insert(index, "scripts = [{ path = \"scripts/kh2/\", relative = true }" +
+                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
+                                        break;
+                                    }                                       
+                                }
+                            }
+                            else
+                            {
+                                int index = config.IndexOf("scripts", config.IndexOf("[kh2]"));
+                                config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                config = config.Insert(index, "scripts = [{ path = \"scripts/kh2/\", relative = true }" +
+                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
+                            }
                         }
-                        if (LuaScriptPaths.Contains("bbs") && !config.Contains("mod/bbs/scripts"))
+                        if (LuaScriptPaths.Contains("bbs"))
                         {
-                            int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
+                            if (config.Contains("mod/bbs/scripts"))
+                            {
+                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for BBS from an OpenKH Mod Manager." +
+                                    $" Do you want to change Lua Backend to run scripts for BBS from this version of OpenKH Mod Manager instead?", "Warning",
+                                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
+
+                                switch (errorMessage)
+                                {
+                                    case MessageBoxResult.Yes:
+                                    {
+                                        int index = config.IndexOf("scripts", config.IndexOf("[bbs]"));
+                                        config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                        config = config.Insert(index, "scripts = [{ path = \"scripts/bbs/\", relative = true }" +
+                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                int index = config.IndexOf("scripts", config.IndexOf("[bbs]"));
+                                config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                config = config.Insert(index, "scripts = [{ path = \"scripts/bbs/\", relative = true }" +
+                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
+                            }
                         }
-                        if (LuaScriptPaths.Contains("Recom") && !config.Contains("mod/Recom/scripts"))
+                        if (LuaScriptPaths.Contains("Recom"))
                         {
-                            int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
+                            if (config.Contains("mod/Recom/scripts"))
+                            {
+                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for ReCoM from an OpenKH Mod Manager." +
+                                    $" Do you want to change Lua Backend to run scripts for ReCoM from this version of OpenKH Mod Manager instead?", "Warning",
+                                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
+
+                                switch (errorMessage)
+                                {
+                                    case MessageBoxResult.Yes:
+                                    {
+                                        int index = config.IndexOf("scripts", config.IndexOf("[recom]"));
+                                        config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                        config = config.Insert(index, "scripts = [{ path = \"scripts/recom/\", relative = true }" +
+                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                int index = config.IndexOf("scripts", config.IndexOf("[recom]"));
+                                config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                config = config.Insert(index, "scripts = [{ path = \"scripts/recom/\", relative = true }" +
+                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
+                            }
                         }
                         File.WriteAllText(Path.Combine(PcReleaseLocation, "LuaBackend.toml"), config);
                         OnPropertyChanged(nameof(IsLuaBackendInstalled));
