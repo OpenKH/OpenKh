@@ -634,8 +634,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             if (config.Contains("mod/kh1/scripts"))
                             {
-                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run scripts from an OpenKH Mod Manager installation." +
-                                    $" Do you want to change it so Lua Backend runs scripts from this version of OpenKH Mod Manager instead?", "Warning",
+                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for KH1 from an OpenKH Mod Manager." +
+                                    $" Do you want to change Lua Backend to run scripts for KH1 from this version of OpenKH Mod Manager instead?", "Warning",
                                     MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
 
                                 switch (errorMessage)
@@ -662,8 +662,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             if (config.Contains("mod/kh2/scripts"))
                             {
-                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run scripts from an OpenKH Mod Manager installation." +
-                                    $" Do you want to change it so Lua Backend runs scripts from this version of OpenKH Mod Manager instead?", "Warning",
+                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for KH2 from an OpenKH Mod Manager." +
+                                    $" Do you want to change Lua Backend to run scripts for KH2 from this version of OpenKH Mod Manager instead?", "Warning",
                                     MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
 
                                 switch (errorMessage)
@@ -690,8 +690,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             if (config.Contains("mod/bbs/scripts"))
                             {
-                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run mods from an OpenKH Mod Manager installation." +
-                                    $" Do you want to change it so Lua Backend runs scripts from this version of OpenKH Mod Manager instead?", "Warning",
+                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for BBS from an OpenKH Mod Manager." +
+                                    $" Do you want to change Lua Backend to run scripts for BBS from this version of OpenKH Mod Manager instead?", "Warning",
                                     MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
 
                                 switch (errorMessage)
@@ -718,8 +718,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             if (config.Contains("mod/Recom/scripts"))
                             {
-                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run mods from an OpenKH Mod Manager installation." +
-                                    $" Do you want to change it so Lua Backend runs scripts from this version of OpenKH Mod Manager instead?", "Warning",
+                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for ReCoM from an OpenKH Mod Manager." +
+                                    $" Do you want to change Lua Backend to run scripts for ReCoM from this version of OpenKH Mod Manager instead?", "Warning",
                                     MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
 
                                 switch (errorMessage)
