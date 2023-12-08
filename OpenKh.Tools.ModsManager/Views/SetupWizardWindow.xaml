@@ -287,7 +287,7 @@
                 <Button Margin="0 0 0 6" Content="Install and Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="false" Visibility="{Binding LuaBackendNotFoundVisibility}"/>
                 <Button Margin="0 0 0 6" Content="Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="true" Visibility="{Binding LuaBackendFoundVisibility}"/>
                 <TextBlock Margin="0 2 0 10" Visibility="{Binding LuaBackendFoundVisibility}" TextWrapping="Wrap">
-                If you wish to reinstall Lua Backend to fix scripts not loading and the configure button did not work or just to uninstall completely press the button below.
+                If you wish to uninstall Lua Backend completely press the button below.
                 </TextBlock>
                 <Button Margin="0 0 0 6" Content="Uninstall Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveLuaBackendCommand}" Visibility="{Binding LuaBackendFoundVisibility}"/>
             </StackPanel>
