@@ -39,10 +39,23 @@ namespace OpenKh.Command.Bdxio.Utils
 
             var labels = new SortedDictionary<string, ILabel>();
 
-            var instructionDict = BdxInstructionDescs.GetDescs()
-                .GroupBy(it => it.Name)
+            var instructionDict = new (string, BdxInstructionDesc)[0]
+                .Concat(
+                    BdxInstructionDescs.GetDescs()
+                        .Select(desc => (desc.Name, desc))
+                )
+                .Concat(
+                    BdxInstructionDescs.GetDescs()
+                        .SelectMany(
+                            desc => desc.OldNames
+                                .Select(
+                                    oldName => (oldName, desc)
+                                )
+                        )
+                )
+                .GroupBy(pair => pair.Item1)
                 .Select(it => it.First())
-                .ToDictionary(it => it.Name, it => it);
+                .ToDictionary(it => it.Item1, it => it.Item2);
 
             Func<ArgContext, CompilePass, int> ResolveInt32Factory(
                 Func<NumberdataContext, int> stringToInt32,

@@ -11,21 +11,23 @@ namespace OpenKh.Command.Bdxio.Models
         public ushort Code { get; set; }
         public ushort CodeMask { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
         public bool IsSyscall { get; set; }
         public bool IsGosub { get; set; }
         public bool IsJump { get; set; }
         public bool IsJumpConditional { get; set; }
         public bool NeverReturn { get; set; }
         public bool IsGosubRet { get; set; }
+        public bool CodeRevealerLabeling { get; set; }
         public int CodeSize { get; set; }
-        public Arg[] Args { get; set; }
+        public Arg[] Args { get; set; } = new Arg[0];
+        public string[] OldNames { get; set; } = new string[0];
 
         public override string ToString() => Name;
 
         public record Arg
         {
-            public string Name { get; set; }
+            public string Name { get; set; } = "";
             public ArgType Type { get; set; }
 
             /// <summary>

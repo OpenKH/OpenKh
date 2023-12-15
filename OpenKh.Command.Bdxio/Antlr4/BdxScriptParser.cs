@@ -1025,9 +1025,9 @@ public partial class BdxScriptParser : Parser {
 	}
 
 	public partial class IdContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ID() { return GetToken(BdxScriptParser.ID, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode DEC() { return GetToken(BdxScriptParser.DEC, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode HEX() { return GetToken(BdxScriptParser.HEX, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ID() { return GetToken(BdxScriptParser.ID, 0); }
 		public IdContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
