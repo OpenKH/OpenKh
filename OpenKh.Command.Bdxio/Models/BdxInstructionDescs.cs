@@ -39,7 +39,7 @@ namespace OpenKh.Command.Bdxio.Models
             new BdxInstructionDesc { Code = 0x0042, CodeMask = 0xFFCF, Name = "memcpy.wp", CodeSize = 3, Args = new[] { new Arg { Name = "imm16", Type = ArgType.Imm16 }, new Arg { Name = "imm16_2", Type = ArgType.Imm16, WorkPos = true } }, OldNames = new[] { "memcpyToWp" } },
             new BdxInstructionDesc { Code = 0x0082, CodeMask = 0xFFCF, Name = "memcpy.sp.d", CodeSize = 3, Args = new[] { new Arg { Name = "imm16", Type = ArgType.Imm16 }, new Arg { Name = "imm16_2", Type = ArgType.Imm16 } }, OldNames = new[] { "memcpyToSpVal" } },
             new BdxInstructionDesc { Code = 0x00C2, CodeMask = 0xFFCF, Name = "memcpy.bd", CodeSize = 3, Args = new[] { new Arg { Name = "imm16", Type = ArgType.Imm16 }, new Arg { Name = "imm16_2", Type = ArgType.Imm16, AiPos = true } }, OldNames = new[] { "memcpyToSpAi" } },
-            new BdxInstructionDesc { Code = 0x0003, CodeMask = 0x000F, Name = "fetch", CodeSize = 2, Args = new[] { new Arg { Name = "imm16", Type = ArgType.Imm16 } }, OldNames = new[] { "fetchValue" } },
+            new BdxInstructionDesc { Code = 0x0003, CodeMask = 0x000F, Name = "deref", CodeSize = 2, Args = new[] { new Arg { Name = "imm16", Type = ArgType.Imm16 } }, OldNames = new[] { "fetchValue" } },
             new BdxInstructionDesc { Code = 0x0004, CodeMask = 0x000F, Name = "memcpy", CodeSize = 1, Args = new[] { new Arg { Name = "ssub", Type = ArgType.Ssub } } },
             new BdxInstructionDesc { Code = 0x0005, CodeMask = 0xFFFF, Name = "cvt.w.s", CodeSize = 1, OldNames = new[] { "citf" } },
             new BdxInstructionDesc { Code = 0x0085, CodeMask = 0xFFFF, Name = "neg", CodeSize = 1 },
