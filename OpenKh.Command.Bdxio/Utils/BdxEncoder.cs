@@ -2,16 +2,9 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using NLog;
 using OpenKh.Command.Bdxio.Models;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using Xe.BinaryMapper;
-using YamlDotNet.Core.Tokens;
 using static BdxScriptParser;
 using static OpenKh.Command.Bdxio.Models.BdxHeader;
 using static OpenKh.Command.Bdxio.Models.BdxInstructionDesc;
@@ -20,7 +13,7 @@ namespace OpenKh.Command.Bdxio.Utils
 {
     public class BdxEncoder
     {
-        public byte[] Content { get; }
+        public byte[] Content { get; } = new byte[0];
 
         public BdxEncoder(
             BdxHeader header,
@@ -33,7 +26,6 @@ namespace OpenKh.Command.Bdxio.Utils
 
             if (string.IsNullOrWhiteSpace(script) && header.IsEmpty)
             {
-                Content = new byte[0];
                 return;
             }
 
