@@ -26,15 +26,17 @@ namespace OpenKh.Tests.Commands
             Assert.Equal(expected: opcode, actual: id.GetText());
         }
 
-        [Fact]
-        public void TestUnexpectedOpcodeNameCannotBeParsedCorrectly()
+        [Theory]
+        [InlineData("cvt.s.w")]
+        [InlineData("keyword.12345")]
+        public void TestTokenCanBeParsedAsIdCollectly(string token)
         {
-            var stream = FromString("x.1");
+            var stream = FromString(token);
             var lexer = new BdxScriptLexer(stream);
             var tokens = new CommonTokenStream(lexer);
             var parser = new BdxScriptParser(tokens);
             var id = parser.id();
-            Assert.Equal(expected: "x", actual: id.GetText());
+            Assert.Equal(expected: token, actual: id.GetText());
         }
 
         public static IEnumerable<object[]> GetOpcodes()
