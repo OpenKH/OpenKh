@@ -29,7 +29,7 @@ namespace OpenKh.Tests.Commands
         [Theory]
         [InlineData("cvt.s.w")]
         [InlineData("keyword.12345")]
-        public void TestTokenCanBeParsedAsIdCollectly(string token)
+        public void TestTokenCanBeParsedAsIdCorrectly(string token)
         {
             var stream = FromString(token);
             var lexer = new BdxScriptLexer(stream);
