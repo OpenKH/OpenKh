@@ -205,7 +205,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(isPC));
                 OnPropertyChanged(nameof(PanaceaSettings));
             }
-        }       
+        }
 
         public int GametoLaunch
         {
