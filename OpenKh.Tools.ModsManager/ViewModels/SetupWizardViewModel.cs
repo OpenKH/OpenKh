@@ -22,6 +22,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 {
     public class SetupWizardViewModel : BaseNotifyPropertyChanged
     {
+        public ColorThemeService ColorTheme => ColorThemeService.Instance;
         private const int BufferSize = 65536;
         private static readonly string PanaceaDllName = "OpenKH.Panacea.dll";
         private static string ApplicationName = Utilities.GetApplicationName();

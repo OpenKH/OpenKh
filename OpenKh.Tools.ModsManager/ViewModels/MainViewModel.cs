@@ -25,6 +25,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
     public class MainViewModel : BaseNotifyPropertyChanged, IChangeModEnableState
     {
+        public ColorThemeService ColorTheme => ColorThemeService.Instance;
         private static Version _version = Assembly.GetEntryAssembly()?.GetName()?.Version;
         private static string ApplicationName = Utilities.GetApplicationName();
         private static string ApplicationVersion = Utilities.GetApplicationVersion();
@@ -44,7 +45,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private bool _devView;
         private bool _autoUpdateMods = false;
         private string _launchGame = "kh2";
-        private bool _darkMode;
         private List<string> _supportedGames = new List<string>()
         {
             "kh2",
@@ -205,46 +205,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(isPC));
                 OnPropertyChanged(nameof(PanaceaSettings));
             }
-        }
-        public bool DarkMode
-        {
-            get => _darkMode;
-            set
-            {
-                _darkMode = value;
-                ConfigurationService.DarkMode = _darkMode;
-            }
-        }
-
-        public string BackgroundColor
-        {
-            get
-            {
-                if (DarkMode)
-                {
-                    return "#2D2D2D";
-                }
-                else
-                {
-                    return "white";
-                }
-            }
-        }
-
-        public string TextColor
-        {
-            get
-            {
-                if (DarkMode)
-                {
-                    return "white";
-                }
-                else
-                {
-                    return "black";
-                }
-            }
-        }
+        }       
 
         public int GametoLaunch
         {
@@ -337,7 +298,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 ConfigurationService.LaunchGame = _launchGame;
 
             AutoUpdateMods = ConfigurationService.AutoUpdateMods;
-            DarkMode = ConfigurationService.DarkMode;
 
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
