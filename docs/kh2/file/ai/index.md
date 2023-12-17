@@ -159,19 +159,19 @@ void main() {
 | 5,0,4 | _eqz_ | seqz | set 1 if: equal to 0 |
 | 5,0,5 |  | abs | get absolute integer (negative to positive) |
 | 5,0,6 | _msb_ | sltz | set 1 if: less than 0 (negative) |
-| 5,0,7 | _info_ | slez | set 1 if: less or equal to 0 (negative and zero) |
+| 5,0,7 | _info_ | slez | set 1 if: less than or equal to 0 (negative and zero) |
 | 5,0,8 | _eqz_ | seqz | set 1 if: equal to 0 |
 | 5,0,9 | _neqz_ | snez | set 1 if: not equal to 0 |
-| 5,0,10 | _msbi_ | sgez | set 1 if: greater or equal to 0 (zero and positive) |
+| 5,0,10 | _msbi_ | sgez | set 1 if: greater than or equal to 0 (zero and positive) |
 | 5,0,11 | _ipos_ | sgtz | set 1 if: greater than 0 (positive) |
 | 5,1,1 | _cfti_ | cvt.s.w | float to int (convert single to word) |
 | 5,1,2 | _negf_ | neg.s | 1.0 to -1.0, -1.0 to 1.0 |
 | 5,1,5 | _absf_ | abs.s | get absolute float (negative to positive) |
 | 5,1,6 | _infzf_ | sltz.s | set 1 if: less than 0 (negative) |
-| 5,1,7 | _infoezf_ | slez.s | set 1 if: less or equal to 0 (negative and zero) |
+| 5,1,7 | _infoezf_ | slez.s | set 1 if: less than or equal to 0 (negative and zero) |
 | 5,1,8 | _eqzf_ | seqz.s | set 1 if: equal to 0 |
 | 5,1,9 | _neqzf_ | snez.s | set 1 if: not equal to 0 |
-| 5,1,10 | _supoezf_ | sgez.s | set 1 if: greater or equal to 0 (zero and positive) |
+| 5,1,10 | _supoezf_ | sgez.s | set 1 if: greater than or equal to 0 (zero and positive) |
 | 5,1,11 | _supzf_ | sgtz.s | set 1 if: greater than 0 (positive) |
 | 6,0,0 |  | add | `push a; push b; (a + b)` |
 | 6,0,1 |  | sub | `push a; push b; (a - b)` |
