@@ -46,6 +46,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool isEGSVersion { get; internal set; } = true;
             public List<string> GamesToExtract { get; internal set; } = new List<string> { "kh2" };
             public string LaunchGame { get; internal set; } = "kh2";
+            public bool DarkMode { get; internal set; } = true;
 
             public void Save(string fileName)
             {
@@ -401,6 +402,15 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.LaunchGame = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool DarkMode
+        {
+            get => _config.DarkMode;
+            set
+            {
+                _config.DarkMode = value;
                 _config.Save(ConfigPath);
             }
         }

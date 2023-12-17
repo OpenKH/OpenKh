@@ -14,12 +14,12 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
         <Style TargetType="CheckBox">
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
         </Style>
         <Style TargetType="xctk:WizardPage">
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="#2D2D2D"/>
-            <Setter Property="HeaderBackground" Value="#2D2D2D"/>
+            <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
+            <Setter Property="Background" Value="{Binding ColorTheme.BackgroundColor}"/>
+            <Setter Property="HeaderBackground" Value="{Binding ColorTheme.BackgroundColor}"/>
             <Setter Property="ExteriorPanelBackground" Value="#FF4E4E4E"/>
         </Style>
     </Window.Resources>
@@ -30,7 +30,7 @@
         FinishButtonClosesWindow="True"
         CurrentPage="{Binding ElementName=PageGameEdition}"
         PageChanged="Wizard_PageChanged"
-        Finish="Wizard_Finish" Background="#2D2D2D">
+        Finish="Wizard_Finish" Background="{Binding ColorTheme.BackgroundColor}">
 
         <xctk:WizardPage
             x:Name="IntroPage" 
