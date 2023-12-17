@@ -77,6 +77,18 @@
         </ListBox>
         <Grid Grid.Column="1">
             <StackPanel VerticalAlignment="Center">
+                <Button Grid.Row="0" Margin="0 3 0 3" Command="{Binding MoveTop}" ToolTip="Moves Selected mod to the top.">
+                    <Image Source="{StaticResource ExpandChevronRightGroup_16x}" RenderTransformOrigin="0.5,0.5">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="-90"/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+                </Button>
                 <Button Grid.Row="0" Margin="0 3 0 3" Command="{Binding MoveUp}" ToolTip="Moves selected mod up increasing its priority.">
                     <Image Source="{StaticResource AddRowToAbove_16x}"/>
                 </Button>
