@@ -67,9 +67,9 @@
                             </CheckBox.Content>
                         </CheckBox>
                         <StackPanel Grid.Column="1">
-                            <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding Author}"/>
-                            <TextBlock Visibility="{Binding UpdateVisibility}" Text="Update available" Foreground="Gray"/>
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White"/>
+                            <TextBlock Text="{Binding Author}" Foreground="White"/>
+                            <TextBlock Visibility="{Binding UpdateVisibility}" Text="Update available" Foreground="White"/>
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
