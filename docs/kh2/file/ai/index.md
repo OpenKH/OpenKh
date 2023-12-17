@@ -184,7 +184,7 @@ void main() {
 | 6,0,8 |  | sll | Shift left logical (unsigned) |
 | 6,0,9 |  | sra | Shift right arithmetic (signed) |
 | 6,0,10 | _eqzv_ | land | `push a; push b; (a && b)` |
-| 6,0,11 | _neqzv_ | lor | `push a; push b; (a || b)` |
+| 6,0,11 | _neqzv_ | lor | `push a; push b; (a \|\| b)` |
 | 6,1,0 | _addf_ | add.s | `push a; push b; (a + b)` float |
 | 6,1,1 | _subf_ | sub.s | `push a; push b; (a - b)` float |
 | 6,1,2 | _mulf_ | mul.s | `push a; push b; (a * b)` float |
@@ -205,3 +205,14 @@ void main() {
 | 9,x,9 |  | radd | degree to radian: `value / 180.0 * PI` |
 | 10,x,x |  | syscall | syscall |
 | 11,x,x | _gosub32_ | jal32 | local function call (32-bit address) |
+
+### Reading of comparators
+
+| Comparator | Reading |
+|:-:|---|
+| EQZ | `x == 0` |
+| GEZ | `x >= 0` |
+| GTZ | `x > 0` |
+| LEZ | `x <= 0` |
+| LTZ | `x < 0` |
+| NEZ | `x != 0` |
