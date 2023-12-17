@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="600">
+             d:DesignHeight="450" d:DesignWidth="600" Background="#2D2D2D">
     <UserControl.Resources>
         <ControlTemplate x:Key="modList" TargetType="ListBox">
             <Border Name="Border" BorderThickness="1">
@@ -18,20 +18,23 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Margin="3">
-                        <TextBlock HorizontalAlignment="Center" Text="Highest priority"/>
+                    <StackPanel Grid.Row="0" Margin="3" Background="#2D2D2D">
+                        <TextBlock HorizontalAlignment="Center" Text="Highest priority" Foreground="White"/>
                         <Separator Margin="3" Background="#FFABADB3"/>
                     </StackPanel>
-                    <StackPanel Grid.Row="2" Margin="3">
+                    <StackPanel Grid.Row="2" Margin="3" Background="#2D2D2D">
                         <Separator Margin="3" Background="#FFABADB3"/>
-                        <TextBlock HorizontalAlignment="Center" Text="Lowest priority"/>
+                        <TextBlock HorizontalAlignment="Center" Text="Lowest priority" Foreground="White"/>
                     </StackPanel>
-                    <ScrollViewer Grid.Row="1" Margin="0" Focusable="false">
-                        <StackPanel Margin="0" IsItemsHost="True" />
+                    <ScrollViewer Grid.Row="1" Margin="0" Background="#2D2D2D">
+                        <StackPanel Margin="0" IsItemsHost="True"/>
                     </ScrollViewer>
                 </Grid>
             </Border>
         </ControlTemplate>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
     </UserControl.Resources>
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
