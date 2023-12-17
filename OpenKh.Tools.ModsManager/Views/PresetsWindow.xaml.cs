@@ -10,6 +10,35 @@ namespace OpenKh.Tools.ModsManager.Views
         public MainViewModel MainVm { get; set; }
         public RelayCommand CloseCommand { get; }
         public string PresetName { get; set; }
+        //public string BackgroundColor
+        //{
+        //    get
+        //    {
+        //        if (ConfigurationService.DarkMode)
+        //        {
+        //            return "#2D2D2D";
+        //        }
+        //        else
+        //        {
+        //            return "white";
+        //        }
+        //    }
+        //}
+
+        //public string TextColor
+        //{
+        //    get
+        //    {
+        //        if (ConfigurationService.DarkMode)
+        //        {
+        //            return "white";
+        //        }
+        //        else
+        //        {
+        //            return "black";
+        //        }
+        //    }
+        //}
 
         public PresetsWindow()
         {
