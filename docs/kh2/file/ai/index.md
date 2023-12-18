@@ -206,6 +206,11 @@ void main() {
 | 10,x,x |  | syscall | syscall |
 | 11,x,x | _gosub32_ | jal32 | local function call (32-bit address) |
 
+*Notes*:
+
+- `.d.` is short of `.dereference.`. It is shorten for optimization in case of keyboard typing.
+- For example `push.d.sp`, it reads from left to right as English grammar does. A reading example is: *push dereferenced value of (sp + imm16)*
+
 ### Reading of comparators
 
 | Comparator | Reading |
