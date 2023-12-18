@@ -9,10 +9,10 @@
     <UserControl.Resources>
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
         <Style TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{Binding ColorThemeService.TextColor}"/>
+            <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
         </Style>
         <Style TargetType="Expander">
-            <Setter Property="Foreground" Value="{Binding ColorThemeService.TextColor}"/>
+            <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
         </Style>
     </UserControl.Resources>
     <StackPanel Background="{Binding BackgroundColor}">
