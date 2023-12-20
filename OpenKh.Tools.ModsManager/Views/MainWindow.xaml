@@ -85,7 +85,7 @@
                 <MenuItem Header="Auto Update Mods" IsCheckable="True" ToolTip="When enabled Mod Manager will automatically update all mods on startup." IsChecked="{Binding AutoUpdateMods}" StaysOpenOnClick="True"/>
                 <MenuItem Header="Check for update" Command="{Binding CheckOpenkhUpdateCommand}"/>
                 <MenuItem Header="Check Mods for Updates" Command="{Binding CheckForModUpdatesCommand}"/>
-                <MenuItem Header="DarkMode" IsCheckable="True" IsChecked="{Binding ColorTheme.DarkMode}" StaysOpenOnClick="True"/>
+                <MenuItem Header="Dark Mode" IsCheckable="True" IsChecked="{Binding ColorTheme.DarkMode}" StaysOpenOnClick="True"/>
                 <MenuItem Header="Panacea Settings" Visibility="{Binding PanaceaSettings}">
                     <MenuItem Header="Enable Console" IsCheckable="True" IsChecked="{Binding PanaceaConsoleEnabled}" StaysOpenOnClick="True"/>
                     <MenuItem Header="Enable Debug Log" IsCheckable="True" IsChecked="{Binding PanaceaDebugLogEnabled}" IsEnabled="{Binding PanaceaConsoleEnabled}" StaysOpenOnClick="True"/>
