@@ -1,5 +1,6 @@
 using OpenKh.Command.TexFooter.Models;
 using OpenKh.Command.TexFooter.Utils;
+using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.TextureFooter;
 using OpenKh.Kh2.Utils;
@@ -277,7 +278,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Utils
                 throw new NotSupportedException($"BitsPerPixel: {BitsPerPixel} ≠ 4 or 8");
             }
 
-            var pixFmt = (BitsPerPixel == 8) ? PixelFormat.Format8bppIndexed : PixelFormat.Format4bppIndexed;
+            var pixFmt = (BitsPerPixel == 8) ? System.Drawing.Imaging.PixelFormat.Format8bppIndexed : System.Drawing.Imaging.PixelFormat.Format4bppIndexed;
 
             var bitmap = new Bitmap(SpriteWidth, SpriteHeight * NumSpritesInImageData, pixFmt);
             var bitmapData = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, pixFmt);
@@ -375,9 +376,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Utils
                 Imgd imgd;
 
                 // Alpha enabled png → always 32 bpp
-                using (var bitmap = new Bitmap(inputFile))
+                using (var pngStream = File.OpenRead(inputFile))
                 {
-                    imgd = ImgdBitmapUtil.ToImgd(bitmap, 8, null);
+                    imgd = ImgdBitmapUtil.ToImgd(PngImage.Read(pngStream), 8, null);
 
                     var buffer = new MemoryStream();
                     imgd.Write(buffer);

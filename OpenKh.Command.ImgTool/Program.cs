@@ -2,12 +2,12 @@ using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Command.ImgTool.Interfaces;
 using OpenKh.Command.ImgTool.Utils;
 using OpenKh.Common;
+using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -76,8 +76,8 @@ namespace OpenKh.Command.ImgTool
                 using (var stream = File.OpenRead(inputFile))
                 {
                     var imgd = Imgd.Read(stream);
-                    var bitmap = ImgdBitmapUtil.ToBitmap(imgd);
-                    bitmap.Save(outputFile);
+                    using var outputStream = File.Create(outputFile);
+                    PngImage.Write(outputStream, imgd);
                 }
                 return 0;
             }
@@ -123,8 +123,8 @@ namespace OpenKh.Command.ImgTool
                         {
                             var outputFile = Path.Combine(outputDir, $"{Path.GetFileNameWithoutExtension(inputFile)}-{1 + index}.png");
 
-                            var bitmap = ImgdBitmapUtil.ToBitmap(imgd);
-                            bitmap.Save(outputFile);
+                            using var outputStream = File.Create(outputFile);
+                            PngImage.Write(outputStream, imgd);
                         }
                     }
                 }
@@ -164,7 +164,7 @@ namespace OpenKh.Command.ImgTool
                 Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
 
                 // Alpha enabled png → always 32 bpp
-                using (var bitmap = new Bitmap(inputFile))
+                var bitmap = PngImage.Read(new MemoryStream(File.ReadAllBytes(inputFile)));
                 {
                     var imgd = ImgdBitmapUtil.ToImgd(bitmap, BitsPerPixel, QuantizerFactory.MakeFrom(this), Swizzle);
 

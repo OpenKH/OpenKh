@@ -1,11 +1,13 @@
-﻿using OpenKh.Imaging;
+using OpenKh.Imaging;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace OpenKh.Tools.Common.Imaging
 {
+    [SupportedOSPlatform("windows")]
     internal class GdiImage : IImageRead
     {
         private readonly Bitmap _bitmap;

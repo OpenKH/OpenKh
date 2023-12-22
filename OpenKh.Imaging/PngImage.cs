@@ -1,10 +1,13 @@
+using Force.Crc32;
+using Ionic.Zlib;
 using OpenKh.Common;
 using OpenKh.Imaging;
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using Xe.BinaryMapper;
 
@@ -65,6 +68,11 @@ namespace OpenKh.Imaging
             [Data] public byte InterlaceMethod { get; set; }
         }
 
+        internal class Empty
+        {
+
+        }
+
         public PngImage(Stream stream)
         {
             stream.SetPosition(0);
@@ -74,10 +82,10 @@ namespace OpenKh.Imaging
                 throw new InvalidDataException("Bad signature code!");
             }
 
-            var fullData = new MemoryStream();
             IHdr ihdr = null;
             byte[] PLTE = null;
             byte[] tRNS = null;
+            byte[] IDAT = null;
 
             while (stream.Position < stream.Length)
             {
@@ -108,7 +116,7 @@ namespace OpenKh.Imaging
                         break;
 
                     case Chunk.IDAT:
-                        fullData.Write(chunk.RawData);
+                        IDAT = chunk.RawData;
                         break;
                 }
             }
@@ -132,11 +140,7 @@ namespace OpenKh.Imaging
                 throw new NotSupportedException($"comprMethod {comprMethod} not supported!");
             }
 
-            fullData.Position = 2;
-
-            using var deflated = new MemoryStream((int)fullData.Length * 2);
-            using (var deflater = new DeflateStream(fullData, CompressionMode.Decompress))
-                deflater.CopyTo(deflated);
+            using var deflated = new MemoryStream(ZlibStream.UncompressBuffer(IDAT));
             deflated.FromBegin();
 
             var bits = ihdr.Bits;
@@ -179,6 +183,22 @@ namespace OpenKh.Imaging
                     var filter = deflated.ReadByte();
                     deflated.Read(_data, y * stride, stride);
                     ApplyFilter(_data, y * stride, 3, stride, filter);
+                }
+
+                int localOfs = 0;
+
+                for (int y = 0; y < Size.Height; y++)
+                {
+                    for (int x = 0; x < Size.Width; x++, localOfs += 3)
+                    {
+                        var r = _data[localOfs + 0];
+                        var g = _data[localOfs + 1];
+                        var b = _data[localOfs + 2];
+
+                        _data[localOfs + 0] = b;
+                        _data[localOfs + 1] = g;
+                        _data[localOfs + 2] = r;
+                    }
                 }
             }
             else if (bits == 8 && colorType == ColorType.AlphaTrueColor)
@@ -318,6 +338,10 @@ namespace OpenKh.Imaging
                 {
                     clut[4 * y + 3] = tRNS[y];
                 }
+                else
+                {
+                    clut[4 * y + 3] = 255;
+                }
             }
             return clut;
         }
@@ -361,5 +385,167 @@ namespace OpenKh.Imaging
 
         public byte[] GetClut() => _clut;
         #endregion
+
+        public void Write(Stream stream) => Write(stream, this);
+
+        public static void Write(Stream stream, IImageRead bitmap)
+        {
+            BinaryMapping.WriteObject(stream, new Signature { Magic = Signature.Valid });
+            byte bits;
+            byte colorType;
+            int stride;
+            int width = bitmap.Size.Width;
+            int height = bitmap.Size.Height;
+            switch (bitmap.PixelFormat)
+            {
+                case PixelFormat.Indexed4:
+                    bits = 4;
+                    colorType = (byte)ColorType.Indexed;
+                    stride = (width + 1) / 2;
+                    break;
+                case PixelFormat.Indexed8:
+                    bits = 8;
+                    colorType = (byte)ColorType.Indexed;
+                    stride = width;
+                    break;
+                case PixelFormat.Rgb888:
+                    bits = 8;
+                    colorType = (byte)ColorType.TrueColor;
+                    stride = 3 * width;
+                    break;
+                case PixelFormat.Rgba8888:
+                    bits = 8;
+                    colorType = (byte)ColorType.AlphaTrueColor;
+                    stride = 4 * width;
+                    break;
+                default:
+                    throw new NotSupportedException($"{bitmap.PixelFormat}");
+            }
+
+            WriteChunk(
+                stream,
+                Chunk.IHDR,
+                new IHdr
+                {
+                    Width = Turn(bitmap.Size.Width),
+                    Height = Turn(bitmap.Size.Height),
+                    Bits = bits,
+                    ColorType = colorType,
+                    ComprMethod = 0,
+                    FilterMethod = 0,
+                    InterlaceMethod = 0,
+                }
+            );
+
+            if (colorType == (byte)ColorType.Indexed)
+            {
+                var num = 1 << bits;
+                var plte = new byte[3 * num];
+                var trns = new byte[num];
+                var clut = bitmap.GetClut();
+                for (int idx = 0; idx < num; idx++)
+                {
+                    plte[3 * idx + 0] = clut[4 * idx + 0];
+                    plte[3 * idx + 1] = clut[4 * idx + 1];
+                    plte[3 * idx + 2] = clut[4 * idx + 2];
+                    trns[idx] = clut[4 * idx + 3];
+                }
+                WriteChunk(
+                    stream,
+                    Chunk.PLTE,
+                    plte
+                );
+                WriteChunk(
+                    stream,
+                    Chunk.tRNS,
+                    trns
+                );
+            }
+
+            {
+                var source = bitmap.GetData();
+                var destination = new byte[(1 + stride) * height];
+
+                if (colorType == (byte)ColorType.AlphaTrueColor && bits == 8)
+                {
+                    int srcOfs = 0;
+                    int dstOfs = 0;
+                    for (int y = 0; y < height; y++)
+                    {
+                        dstOfs++;
+                        for (int x = 0; x < width; x++)
+                        {
+                            destination[dstOfs + 2] = source[srcOfs + 0];
+                            destination[dstOfs + 1] = source[srcOfs + 1];
+                            destination[dstOfs + 0] = source[srcOfs + 2];
+                            destination[dstOfs + 3] = source[srcOfs + 3];
+                            dstOfs += 4;
+                            srcOfs += 4;
+                        }
+                    }
+                }
+                else if (colorType == (byte)ColorType.TrueColor && bits == 8)
+                {
+                    int srcOfs = 0;
+                    int dstOfs = 0;
+                    for (int y = 0; y < height; y++)
+                    {
+                        dstOfs++;
+                        for (int x = 0; x < width; x++)
+                        {
+                            destination[dstOfs + 2] = source[srcOfs + 0];
+                            destination[dstOfs + 1] = source[srcOfs + 1];
+                            destination[dstOfs + 0] = source[srcOfs + 2];
+                            dstOfs += 3;
+                            srcOfs += 3;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        Buffer.BlockCopy(source, stride * y, destination, 1 + (1 + stride) * y, stride);
+                    }
+                }
+
+                WriteChunk(
+                    stream,
+                    Chunk.IDAT,
+                    ZlibStream.CompressBuffer(destination)
+                );
+            }
+
+            WriteChunk(
+                stream,
+                Chunk.IEND,
+                new Empty { }
+            );
+        }
+
+        private static void WriteChunk<T>(Stream stream, int type, T content) where T : class
+        {
+            byte[] bytes;
+            if (content is byte[] raw)
+            {
+                bytes = raw;
+            }
+            else
+            {
+                using var temp = new MemoryStream();
+                BinaryMapping.WriteObject(temp, content);
+                bytes = temp.ToArray();
+            }
+
+            stream.Write(Turn(bytes.Length));
+
+            using var crcStream = new MemoryStream();
+            crcStream.Write(Turn(type));
+            crcStream.Write(bytes);
+            crcStream.Write(Turn(Crc32Algorithm.Compute(crcStream.ToArray())));
+
+            crcStream.FromBegin();
+            crcStream.CopyTo(stream);
+        }
     }
 }

@@ -7,6 +7,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
+
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="Crc32.NET" Version="1.2.0" />
+    <PackageReference Include="DotNetZip" Version="1.16.0" />
   </ItemGroup>
 
 </Project>
