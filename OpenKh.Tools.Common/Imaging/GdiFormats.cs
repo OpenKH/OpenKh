@@ -1,6 +1,7 @@
 using OpenKh.Imaging;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.Versioning;
 
 namespace OpenKh.Tools.Common.Imaging
 {
@@ -27,14 +28,12 @@ namespace OpenKh.Tools.Common.Imaging
 
         public static void Write(Stream stream, IImageRead image)
         {
-            using (var bitmap = image.CreateBitmap())
-            {
-                stream.Position = 0;
-                bitmap.Save(stream, ImageFormat.Png);
-            }
+            stream.Position = 0;
+            PngImage.Write(stream, image);
         }
     }
 
+    [SupportedOSPlatform("windows")]
     public static class Bmp
     {
         public static bool IsValid(Stream stream)
@@ -56,6 +55,7 @@ namespace OpenKh.Tools.Common.Imaging
         }
     }
 
+    [SupportedOSPlatform("windows")]
     public static class Tiff
     {
         public static bool IsValid(Stream stream)

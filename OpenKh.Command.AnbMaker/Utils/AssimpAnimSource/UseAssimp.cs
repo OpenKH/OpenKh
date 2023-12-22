@@ -1,3 +1,4 @@
+using Assimp;
 using OpenKh.Command.AnbMaker.Extensions;
 using OpenKh.Command.AnbMaker.Utils.Builder;
 using OpenKh.Command.AnbMaker.Utils.Builder.Models;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
 {
@@ -19,7 +21,8 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
             string meshName,
             string rootName,
             string animationName,
-            float nodeScaling
+            float nodeScaling,
+            float positionScaling
         )
         {
             var outputList = new List<BasicSourceMotion>();
@@ -40,8 +43,8 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
 
             foreach (var fbxMesh in scene.Meshes.Where(mesh => IsMeshNameMatched(mesh.Name)))
             {
-                var fbxArmatureRoot = scene.RootNode.FindNode(rootName ?? "bone000"); //"kh_sk"
-                var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot);
+                var fbxArmatureRoot = AssimpHelper.FindRootBone(scene.RootNode, rootName);
+                var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot, fbxMesh);
                 var fbxArmatureBoneCount = fbxArmatureNodes.Length;
 
                 foreach (var fbxAnim in scene.Animations.Where(anim => IsAnimationNameMatched(anim.Name)))
@@ -59,9 +62,11 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
                         TicksPerSecond = (float)fbxAnim.TicksPerSecond,
                         BoneCount = fbxArmatureBoneCount,
                         NodeScaling = nodeScaling,
+                        PositionScaling = positionScaling,
                         GetAChannel = boneIdx =>
                         {
-                            var name = fbxArmatureNodes[boneIdx].ArmatureNode.Name;
+                            var armatureNode = fbxArmatureNodes[boneIdx].ArmatureNode;
+                            var name = armatureNode.Name;
                             var hit = fbxAnim.NodeAnimationChannels.FirstOrDefault(it => it.NodeName == name);
                             if (hit != null)
                             {
@@ -124,6 +129,11 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
                                 }
                             )
                             .ToArray(),
+                        GetInitialMatrix = (boneIdx) =>
+                        {
+                            return fbxArmatureNodes[boneIdx].ArmatureNode.Transform
+                                .ToDotNetMatrix4x4();
+                        },
                     };
 
                     outputList.Add(output);

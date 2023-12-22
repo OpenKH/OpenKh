@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
          FocusManager.FocusedElement="{Binding ElementName=txtSourceModUrl}"
-        Title="Presets" Height="300" Width="300" SizeToContent="Height">
+        Title="Presets" Height="300" Width="300" SizeToContent="Height" Background="{Binding ColorTheme.BackgroundColor}">
     
     <Window.InputBindings>
         <KeyBinding Key="Esc" Command="{Binding CloseCommand}"/>
@@ -23,7 +23,7 @@
 
         <!-- Add new preset -->
         <StackPanel DockPanel.Dock="Bottom">
-            <TextBlock Margin="0 0 0 3">Name Preset</TextBlock>
+            <TextBlock Margin="0 0 0 3" Foreground="{Binding ColorTheme.TextColor}">Name Preset</TextBlock>
             <Grid Margin="0 0 0 5" Background="White">
                 <TextBlock Margin="5,1" MinWidth="50" Text="Enter New Preset Name" 
                    Foreground="Gray" Visibility="{Binding ElementName=txtSourceModUrl, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" IsHitTestVisible="False"/>
@@ -38,7 +38,7 @@
                 <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
             <ScrollViewer Grid.Column="0" MinHeight="200">
-                <ListView Name="List_Presets" ItemsSource="{Binding Path=MainVm.PresetList}">
+                <ListView Name="List_Presets" ItemsSource="{Binding Path=MainVm.PresetList}" Background="{Binding ColorTheme.BackgroundColor}" Foreground="{Binding ColorTheme.TextColor}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">

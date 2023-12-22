@@ -25,6 +25,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
     public class MainViewModel : BaseNotifyPropertyChanged, IChangeModEnableState
     {
+        public ColorThemeService ColorTheme => ColorThemeService.Instance;
         private static Version _version = Assembly.GetEntryAssembly()?.GetName()?.Version;
         private static string ApplicationName = Utilities.GetApplicationName();
         private static string ApplicationVersion = Utilities.GetApplicationVersion();
@@ -74,6 +75,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand AddModCommand { get; set; }
         public RelayCommand RemoveModCommand { get; set; }
         public RelayCommand OpenModFolderCommand { get; set; }
+        public RelayCommand MoveTop { get; set; }
         public RelayCommand MoveUp { get; set; }
         public RelayCommand MoveDown { get; set; }
         public RelayCommand BuildCommand { get; set; }
@@ -391,6 +393,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     UseShellExecute = true
                 });
             }, _ => IsModSelected);
+            MoveTop = new RelayCommand(_ => MoveSelectedModTop(), _ => CanSelectedModMoveUp());
             MoveUp = new RelayCommand(_ => MoveSelectedModUp(), _ => CanSelectedModMoveUp());
             MoveDown = new RelayCommand(_ => MoveSelectedModDown(), _ => CanSelectedModMoveDown());
             BuildCommand = new RelayCommand(async _ =>
@@ -698,6 +701,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             var item = ModsList[selectedIndex];
             ModsList.RemoveAt(selectedIndex);
             ModsList.Insert(--selectedIndex, item);
+            SelectedValue = ModsList[selectedIndex];
+            ModEnableStateChanged();
+        }
+        private void MoveSelectedModTop()
+        {
+            var selectedIndex = ModsList.IndexOf(SelectedValue);
+            if (selectedIndex < 0)
+                return;
+
+            var item = ModsList[selectedIndex];
+            ModsList.RemoveAt(selectedIndex);
+            ModsList.Insert(selectedIndex = 0, item);
             SelectedValue = ModsList[selectedIndex];
             ModEnableStateChanged();
         }

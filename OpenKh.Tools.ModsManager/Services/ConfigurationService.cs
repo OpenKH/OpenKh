@@ -44,11 +44,9 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool DevView { get; internal set; } = false;
             public bool AutoUpdateMods { get; internal set; }
             public bool isEGSVersion { get; internal set; } = true;
-            public bool kh1 { get; internal set; }
-            public bool kh2 { get; internal set; } = true;
-            public bool bbs { get; internal set; }
-            public bool recom { get; internal set; }
+            public List<string> GamesToExtract { get; internal set; } = new List<string> { "kh2" };
             public string LaunchGame { get; internal set; } = "kh2";
+            public bool DarkMode { get; internal set; } = true;
 
             public void Save(string fileName)
             {
@@ -334,39 +332,67 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
-        public static bool kh1
+        public static bool Extractkh1
         {
-            get => _config.kh1;
+            get => _config.GamesToExtract.Contains("kh1");
             set
             {
-                _config.kh1 = value;
+                if (value)
+                {
+                    _config.GamesToExtract.Add("kh1");
+                }
+                else
+                {
+                    _config.GamesToExtract.Remove("kh1");
+                }
                 _config.Save(ConfigPath);
             }
         }
-        public static bool kh2
+        public static bool Extractkh2
         {
-            get => _config.kh2;
+            get => _config.GamesToExtract.Contains("kh2");
             set
             {
-                _config.kh2 = value;
+                if (value)
+                {
+                    _config.GamesToExtract.Add("kh2");
+                }
+                else
+                {
+                    _config.GamesToExtract.Remove("kh2");
+                }
                 _config.Save(ConfigPath);
             }
         }
-        public static bool bbs
+        public static bool Extractbbs
         {
-            get => _config.bbs;
+            get => _config.GamesToExtract.Contains("bbs");
             set
             {
-                _config.bbs = value;
+                if (value)
+                {
+                    _config.GamesToExtract.Add("bbs");
+                }
+                else
+                {
+                    _config.GamesToExtract.Remove("bbs");
+                }
                 _config.Save(ConfigPath);
             }
         }
-        public static bool recom
+        public static bool Extractrecom
         {
-            get => _config.recom;
+            get => _config.GamesToExtract.Contains("Recom");
             set
             {
-                _config.recom = value;
+                if (value)
+                {
+                    _config.GamesToExtract.Add("Recom");
+                }
+                else
+                {
+                    _config.GamesToExtract.Remove("Recom");
+                }
                 _config.Save(ConfigPath);
             }
         }
@@ -376,6 +402,15 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.LaunchGame = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool DarkMode
+        {
+            get => _config.DarkMode;
+            set
+            {
+                _config.DarkMode = value;
                 _config.Save(ConfigPath);
             }
         }

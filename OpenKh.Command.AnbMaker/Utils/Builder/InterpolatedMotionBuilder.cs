@@ -1,4 +1,5 @@
 using NLog;
+using OpenKh.Command.AnbMaker.Extensions;
 using OpenKh.Command.AnbMaker.Utils.Builder.Models;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,9 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
 
             // convert source animation's keyTime to KH2 internal frame rate 60 fps which is called GFR (Global Frame Rate)
             var keyTimeMultiplier = 60 / parm.TicksPerSecond;
+
+            logger.Info($"BoneCount {parm.BoneCount}");
+            logger.Debug($"Frame {0} to {frameCount - 1}, framesPerSecond {parm.TicksPerSecond}, consumes {frameCount * 1.0f / parm.TicksPerSecond:0.0} seconds");
 
             Ipm.InterpolatedMotionHeader.BoneCount = Convert.ToInt16(parm.BoneCount);
             Ipm.InterpolatedMotionHeader.TotalBoneCount = Convert.ToInt16(parm.BoneCount);
@@ -79,25 +83,29 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                 return (short)Convert.ToUInt16(idx);
             }
 
+            var initialPoseDict = new SortedDictionary<InitialPoseKey, float>(
+                ComparerOfInitialPoseKey.Instance
+            );
+
             for (int boneIdx = 0; boneIdx < parm.BoneCount; boneIdx++)
             {
+                float FixScaling(float value)
+                {
+                    return ((boneIdx == 0) ? parm.NodeScaling : 1f) * value;
+                }
+
+                float FixScalingValue(float value) => GetLowerPrecisionValue(FixScaling(value));
+
+                float FixPos(float value)
+                {
+                    return value / ((boneIdx == 0) ? 1 : parm.NodeScaling) * parm.PositionScaling;
+                }
+
+                float FixPosValue(float value) => GetLowerPrecisionValue(FixPos(value));
+
                 var hit = parm.GetAChannel(boneIdx);
                 if (hit != null)
                 {
-                    float FixScaling(float value)
-                    {
-                        return ((boneIdx == 0) ? parm.NodeScaling : 1f) * value;
-                    }
-
-                    float FixScalingValue(float value) => GetLowerPrecisionValue(FixScaling(value));
-
-                    float FixPos(float value)
-                    {
-                        return value / ((boneIdx == 0) ? 1 : parm.NodeScaling);
-                    }
-
-                    float FixPosValue(float value) => GetLowerPrecisionValue(FixPos(value));
-
                     var channels = new ChannelProvider[]
                     {
                         new ChannelProvider
@@ -204,6 +212,36 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                     }
                 }
 
+                {
+                    Matrix4x4.Decompose(
+                        parm.GetInitialMatrix(boneIdx),
+                        out Vector3 scale,
+                        out Quaternion quaternion,
+                        out Vector3 translation
+                    );
+
+                    Vector3 rotation;
+                    if (quaternion.IsIdentity)
+                    {
+                        rotation = Vector3.Zero;
+                    }
+                    else
+                    {
+                        rotation = quaternion.ToEulerAngles();
+                    }
+
+
+                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.SCALE_X)] = FixScalingValue(scale.X);
+                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.SCALE_Y)] = FixScalingValue(scale.Y);
+                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.SCALE_Z)] = FixScalingValue(scale.Z);
+                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.ROTATATION_X)] = rotation.X;
+                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.ROTATATION_Y)] = rotation.Y;
+                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.ROTATATION_Z)] = rotation.Z;
+                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.TRANSLATION_X)] = FixPosValue(translation.X);
+                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.TRANSLATION_Y)] = FixPosValue(translation.Y);
+                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.TRANSLATION_Z)] = FixPosValue(translation.Z);
+                }
+
                 Ipm.Joints.Add(
                     new Joint
                     {
@@ -239,14 +277,7 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                     {
                         numSames++;
 
-                        Ipm.InitialPoses.Add(
-                            new InitialPose
-                            {
-                                BoneId = fCurve.JointId,
-                                ChannelValue = fCurve.ChannelValue,
-                                Value = Ipm.KeyValues[sames.Single()],
-                            }
-                        );
+                        initialPoseDict[new InitialPoseKey(fCurve.JointId, fCurve.ChannelValue)] = Ipm.KeyValues[sames.Single()];
 
                         Ipm.FCurvesForward.Remove(fCurve);
                     }
@@ -273,6 +304,18 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                             fCurveKeyReuseTable[fCurveKeyReuseKey] = newIdx;
                         }
                     }
+                }
+
+                foreach (var set in initialPoseDict)
+                {
+                    Ipm.InitialPoses.Add(
+                        new InitialPose
+                        {
+                            BoneId = Convert.ToInt16(set.Key.BoneIndex),
+                            ChannelValue = set.Key.Type,
+                            Value = set.Value,
+                        }
+                    );
                 }
 
                 if (numSames != 0)
@@ -322,6 +365,27 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
             internal JointFlags jointFlags;
             internal AScalarKey[] keys;
             internal Func<float, float> fixValue;
+        }
+
+        private record InitialPoseKey(int BoneIndex, Channel Type);
+
+        private class ComparerOfInitialPoseKey : IComparer<InitialPoseKey>
+        {
+            public static readonly ComparerOfInitialPoseKey Instance = new ComparerOfInitialPoseKey();
+
+            private static readonly InitialPoseKey _fallback = new InitialPoseKey(-1, Channel.UNKNOWN);
+
+            public int Compare(InitialPoseKey? left, InitialPoseKey? right)
+            {
+                left = left ?? _fallback;
+                right = right ?? _fallback;
+                var diff = left.BoneIndex.CompareTo(right.BoneIndex);
+                if (diff == 0)
+                {
+                    diff = left.Type.CompareTo(right.Type);
+                }
+                return diff;
+            }
         }
     }
 }

@@ -39,8 +39,11 @@ namespace OpenKh.Command.AnbMaker.Commands
         [Option(Description = "specify animation name to read bone data", ShortName = "a")]
         public string AnimationName { get; set; }
 
-        [Option(Description = "apply scaling to each source node", ShortName = "x")]
+        [Option(Description = "apply scaling to each source node", ShortName = "x", LongName = "node-scaling")]
         public float NodeScaling { get; set; } = 1;
+
+        [Option(Description = "apply scaling to each bone position", ShortName = "p", LongName = "position-scaling")]
+        public float PositionScaling { get; set; } = 1;
 
         [Option(Description = "optionally inject new motion into mset directly", ShortName = "w")]
         public string MsetFile { get; set; }
@@ -75,7 +78,8 @@ namespace OpenKh.Command.AnbMaker.Commands
                     meshName: MeshName,
                     rootName: RootName,
                     animationName: AnimationName,
-                    nodeScaling: NodeScaling
+                    nodeScaling: NodeScaling,
+                    positionScaling: PositionScaling
                 )
                     .Parameters;
             }

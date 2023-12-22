@@ -12,17 +12,17 @@ Name: aaa
 ; codeRevealer: 
  section .text
 OBJ_INIT:
- pushImm 123456789
+ push 123456789
  drop 
- pushImmf 123.45
+ push.s 123.45
  drop 
- pushFromPWp W0
+ push.wp W0
  drop 
- pushFromPWp W12
+ push.wp W12
  drop 
- pushFromPWp W24
+ push.wp W24
  drop 
- gosub 2, L34
+ jal 2, L34
  ret 
 L34:
  ret 

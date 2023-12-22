@@ -11,11 +11,13 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpSupplemental
     {
         public int ParentIndex { get; set; }
         public Node ArmatureNode { get; set; }
+        public Bone? MeshBone { get; set; }
 
-        public NodeRef(int parentIndex, Node armatureNode)
+        public NodeRef(int parentIndex, Node armatureNode, Bone? meshBone)
         {
             ParentIndex = parentIndex;
             ArmatureNode = armatureNode;
+            MeshBone = meshBone;
         }
     }
 }

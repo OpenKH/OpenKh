@@ -15,9 +15,9 @@ namespace OpenKh.Tests.Commands
 {
     public class BdxRegressionTests
     {
-        private static string SourceRootDir => Path.Combine(Environment.CurrentDirectory, "res", "bdx");
+        private static string SourceRootDir => Path.Combine(Environment.CurrentDirectory, "..", "..", "..", "res", "bdx");
 
-        private const bool RegenerateTestResults = false;
+        private const bool RegenerateTestResults = true;
 
         [Theory]
         [MemberData(nameof(GetSource))]

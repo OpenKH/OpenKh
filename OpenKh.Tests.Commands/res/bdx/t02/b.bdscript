@@ -1,0 +1,24 @@
+---
+WorkSize: 64
+StackSize: 64
+TempSize: 64
+Triggers:
+- Key: 0
+  Addr: OBJ_INIT
+Name: aaa
+
+---
+; codeLabels: 
+; codeRevealer: 
+ section .text
+OBJ_INIT:
+ push 123456789
+ drop 
+ push 123456789
+ drop 
+ ret 
+D23:
+ dw 0x0089
+
+ section .bss
+ resb 64

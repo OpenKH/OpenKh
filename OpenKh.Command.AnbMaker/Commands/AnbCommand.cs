@@ -1,5 +1,6 @@
 using Assimp;
 using McMaster.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils.Conventions;
 using NLog;
 using OpenKh.Command.AnbMaker.Commands.Interfaces;
 using OpenKh.Command.AnbMaker.Commands.Utils;
@@ -14,6 +15,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using static OpenKh.Command.AnbMaker.Utils.Builder.RawMotionBuilder;
 using static OpenKh.Kh2.Motion;
 
@@ -37,8 +39,11 @@ namespace OpenKh.Command.AnbMaker.Commands
         [Option(Description = "specify mesh name to read bone data", ShortName = "m")]
         public string MeshName { get; set; }
 
-        [Option(Description = "apply scaling to each source node", ShortName = "x")]
+        [Option(Description = "apply scaling to each source node", ShortName = "x", LongName = "node-scaling")]
         public float NodeScaling { get; set; } = 1;
+
+        [Option(Description = "apply scaling to each bone position", ShortName = "p", LongName = "position-scaling")]
+        public float PositionScaling { get; set; } = 1;
 
         [Option(Description = "specify animation name to read bone data", ShortName = "a")]
         public string AnimationName { get; set; }
@@ -62,7 +67,8 @@ namespace OpenKh.Command.AnbMaker.Commands
                 MeshName,
                 RootName,
                 AnimationName,
-                NodeScaling
+                NodeScaling,
+                PositionScaling
             )
                 .Parameters;
 
@@ -111,10 +117,11 @@ namespace OpenKh.Command.AnbMaker.Commands
                 string meshName,
                 string rootName,
                 string animationName,
-                float nodeScaling
+                float nodeScaling,
+                float positionScaling
             )
             {
-                var assimp = new Assimp.AssimpContext();
+                using var assimp = new Assimp.AssimpContext();
                 var scene = assimp.ImportFile(inputModel, Assimp.PostProcessSteps.None);
 
                 var outputList = new List<RawMotionBuilder.Parameter>();
@@ -129,10 +136,33 @@ namespace OpenKh.Command.AnbMaker.Commands
                         ? true
                         : it == animationName;
 
-                foreach (var fbxMesh in scene.Meshes.Where(mesh => IsMeshNameMatched(mesh.Name)))
+                var hits = new List<(Mesh mesh, Matrix4x4 transform)>();
+
+                void WalkNode(Assimp.Node node, Matrix4x4 parentTransform)
                 {
-                    var fbxArmatureRoot = scene.RootNode.FindNode(rootName ?? "bone000"); //"kh_sk"
-                    var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot);
+                    var transform = node.Transform * parentTransform;
+
+                    foreach (var childNode in node.Children)
+                    {
+                        WalkNode(childNode, transform);
+                    }
+
+                    foreach (var meshIdx in node.MeshIndices)
+                    {
+                        var fbxMesh = scene.Meshes[meshIdx];
+                        if (IsMeshNameMatched(fbxMesh.Name))
+                        {
+                            hits.Add((fbxMesh, transform));
+                        }
+                    }
+                }
+
+                WalkNode(scene.RootNode, Matrix4x4.Identity);
+
+                foreach (var hit in hits.Take(1))
+                {
+                    var fbxArmatureRoot = AssimpHelper.FindRootBone(scene.RootNode, rootName);
+                    var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot, hit.mesh);
                     var fbxArmatureBoneCount = fbxArmatureNodes.Length;
 
                     foreach (var fbxAnim in scene.Animations.Where(anim => IsAnimationNameMatched(anim.Name)))
@@ -156,27 +186,45 @@ namespace OpenKh.Command.AnbMaker.Commands
 
                                 GetRelativeMatrix = (frameIdx, boneIdx) =>
                                 {
-                                    var name = fbxArmatureNodes[boneIdx].ArmatureNode.Name;
+                                    var nodeRef = fbxArmatureNodes[boneIdx];
+                                    var armatureNode = nodeRef.ArmatureNode;
+                                    var name = armatureNode.Name;
+
+                                    var oldTransform = armatureNode.Transform;
+
+                                    oldTransform.Decompose(
+                                        out Vector3D initialScaling,
+                                        out Quaternion initialQuaternion,
+                                        out Vector3D initialTranslation
+                                    );
 
                                     var hit = fbxAnim.NodeAnimationChannels.FirstOrDefault(it => it.NodeName == name);
 
                                     var translation = (hit == null)
-                                        ? new Vector3D(0, 0, 0)
+                                        ? initialTranslation
                                         : hit.PositionKeys.GetInterpolatedVector(frameIdx);
 
                                     var rotation = (hit == null)
-                                        ? new Assimp.Quaternion(w: 1, 0, 0, 0)
+                                        ? initialQuaternion
                                         : hit.RotationKeys.GetInterpolatedQuaternion(frameIdx);
 
                                     var scale = (hit == null)
-                                        ? new Vector3D(1, 1, 1)
+                                        ? initialScaling
                                         : hit.ScalingKeys.GetInterpolatedVector(frameIdx);
 
-                                    return System.Numerics.Matrix4x4.Identity
-                                        * System.Numerics.Matrix4x4.CreateFromQuaternion(rotation.ToDotNetQuaternion())
-                                        * System.Numerics.Matrix4x4.CreateScale(scale.ToDotNetVector3())
-                                        * System.Numerics.Matrix4x4.CreateTranslation(translation.ToDotNetVector3())
+                                    Vector3D FixScaling(Vector3D value) =>
+                                        value;
+
+                                    Vector3D FixPos(Vector3D value) =>
+                                        value * positionScaling;
+
+                                    var newTransform = Matrix4x4.Identity
+                                        * new Matrix4x4(rotation.GetMatrix())
+                                        * Matrix4x4.FromScaling(FixScaling(scale))
+                                        * Matrix4x4.FromTranslation(FixPos(translation))
                                         ;
+
+                                    return newTransform.ToDotNetMatrix4x4();
                                 }
                             }
                         );

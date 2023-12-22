@@ -1,8 +1,9 @@
 using OpenKh.Command.TexFooter.Interfaces;
+using OpenKh.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -12,30 +13,17 @@ namespace OpenKh.Command.TexFooter.Utils
     {
         public SpriteBitmap(string pngFile)
         {
-            using Bitmap bitmap = new Bitmap(pngFile);
+            var bitmap = PngImage.Read(new MemoryStream(File.ReadAllBytes(pngFile)));
 
-            var bitmapData = bitmap.LockBits(
-                new Rectangle(Point.Empty, bitmap.Size),
-                ImageLockMode.WriteOnly,
-                bitmap.PixelFormat
-            );
-            try
-            {
-                Data = new byte[bitmapData.Stride * bitmapData.Height];
-                Marshal.Copy(bitmapData.Scan0, Data, 0, Data.Length);
-            }
-            finally
-            {
-                bitmap.UnlockBits(bitmapData);
-            }
+            Data = bitmap.GetData();
 
             switch (bitmap.PixelFormat)
             {
-                case PixelFormat.Format8bppIndexed:
+                case PixelFormat.Indexed8:
                     BitsPerPixel = 8;
                     break;
 
-                case PixelFormat.Format4bppIndexed:
+                case PixelFormat.Indexed4:
                     BitsPerPixel = 4;
 
                     PerformSwapPixelOrder(Data);
