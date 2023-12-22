@@ -297,7 +297,7 @@ namespace OpenKh.Tools.Common.CustomImGui
 
         public static bool ForChild(string name, float w, float h, bool border, Action action)
         {
-            var ret = ImGui.BeginChild(name, new Vector2(w, h), border);
+            var ret = ImGui.BeginChild(name, new Vector2(w, h), border ? ImGuiChildFlags.Border : ImGuiChildFlags.None);
             action();
             ImGui.EndChild();
 
