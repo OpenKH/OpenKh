@@ -1,13 +1,15 @@
-﻿using OpenKh.Imaging;
+using OpenKh.Imaging;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace OpenKh.Tools.Common.Imaging
 {
     public static class ImageExtensions
     {
+        [SupportedOSPlatform("windows")]
         public static void SaveImage(this IImageRead imageRead, string fileName)
         {
             using (var gdiBitmap = imageRead.CreateBitmap())
@@ -16,6 +18,7 @@ namespace OpenKh.Tools.Common.Imaging
             }
         }
 
+        [SupportedOSPlatform("windows")]
         public static Bitmap CreateBitmap(this IImageRead imageRead)
         {
             var drawingPixelFormat = imageRead.PixelFormat.GetDrawingPixelFormat();

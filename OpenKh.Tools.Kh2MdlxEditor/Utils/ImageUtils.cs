@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.TextureFooter;
 using OpenKh.Kh2.Utils;
@@ -22,7 +23,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
                 Imgd imgd;
 
                 // Alpha enabled png → always 32 bpp
-                using (var bitmap = new Bitmap(inputFile))
+                var bitmap = PngImage.Read(new MemoryStream(File.ReadAllBytes(inputFile)));
                 {
                     imgd = ImgdBitmapUtil.ToImgd(bitmap, 8, null);
 
@@ -32,7 +33,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
 
                 return imgd;
             }
-            catch(Exception excep)
+            catch (Exception excep)
             {
                 throw new Exception("Error loading texture: " + filePath);
             }
@@ -107,7 +108,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             return imgdFile;
         }
 
-        
+
 
         class RunCmd
         {

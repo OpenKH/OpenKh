@@ -8,10 +8,15 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
     {
         ISpriteDrawing DrawingContext { get; }
 
+        void Create();
+
+        void SetFont(FontsArc.Font font);
+        
         void DrawHandler(
             ICtdMessageEncoder encoder,
-            FontsArc.Font fontContext,
             Ctd.Message message,
             Ctd.Layout layout);
+
+        void Destroy();
     }
 }

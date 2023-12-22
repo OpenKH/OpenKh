@@ -16,17 +16,29 @@
 
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
+            <Grid Grid.Row="0" Margin="0 5 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="3"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="File ID"/>
+                <TextBox Grid.Column="2"
+                    Text="{Binding CtdID, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+
             <ListBox
-                Grid.Column="0"
+                Grid.Row="1"
                 ItemsSource="{Binding Items}"
                 SelectedItem="{Binding SelectedItem}"
                 DisplayMemberPath="Title"/>
 
-            <Grid Grid.Row="1" Margin="0 5 0 5">
+            <Grid Grid.Row="2" Margin="0 5 0 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="3"/>
@@ -42,6 +54,11 @@
             Grid.Column="1"
             Grid.ColumnSpan="2"
             DataContext="{Binding SelectedItem}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="8*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -49,16 +66,24 @@
             </Grid.RowDefinitions>
 
             <TextBox
-                Grid.Row="0"
+                Grid.Row="0" Grid.Column="0"
+                Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBox
+                Grid.Row="0" Grid.Column="1"
                 MaxLines="7" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
                 Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True"/>
 
             <TextBox
-                Grid.Row="1" Visibility="Collapsed"
+                 Grid.Row="0" Grid.Column="2"
+                 Text="{Binding LayoutID, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBox
+                Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Visibility="Collapsed"
                 TextWrapping="Wrap" MaxLines="99"
                 Text="{Binding TextDump, Mode=OneWay}" IsReadOnly="True"/>
 
-            <controls:DrawPanel Grid.Row="2"
+            <controls:DrawPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
                 Drawing="{Binding DrawingContext}"
                 DrawBegin="{Binding DrawHandler}"
                 />

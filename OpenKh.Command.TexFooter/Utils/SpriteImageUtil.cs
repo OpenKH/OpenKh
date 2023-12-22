@@ -1,16 +1,16 @@
+using OpenKh.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace OpenKh.Command.TexFooter.Utils
 {
-    static class SpriteImageUtil
+    internal static class SpriteImageUtil
     {
-        public static Bitmap ToBitmap(
+        public static IImageRead ToBitmap(
             int BitsPerPixel,
             int SpriteWidth,
             int SpriteHeight,
@@ -24,50 +24,59 @@ namespace OpenKh.Command.TexFooter.Utils
                 throw new NotSupportedException($"BitsPerPixel: {BitsPerPixel} ≠ 4 or 8");
             }
 
-            var pixFmt = (BitsPerPixel == 8) ? PixelFormat.Format8bppIndexed : PixelFormat.Format4bppIndexed;
+            var pixFmt = (BitsPerPixel == 8) ? PixelFormat.Indexed8 : PixelFormat.Indexed4;
 
-            var bitmap = new Bitmap(SpriteWidth, SpriteHeight * NumSpritesInImageData, pixFmt);
-            var bitmapData = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, pixFmt);
-            try
-            {
-                if (SpriteStride != bitmapData.Stride)
-                {
-                    throw new NotSupportedException($"Stride: {SpriteStride} ≠ {bitmapData.Stride}");
-                }
-
-                if (BitsPerPixel == 8)
-                {
-                    Marshal.Copy(SpriteImage, 0, bitmapData.Scan0, bitmapData.Stride * bitmapData.Height);
-                }
-                else
-                {
-                    Marshal.Copy(SwapPixelOrder(SpriteImage), 0, bitmapData.Scan0, bitmapData.Stride * bitmapData.Height);
-                }
-            }
-            finally
-            {
-                bitmap.UnlockBits(bitmapData);
-            }
-            var palette = bitmap.Palette;
+            byte[] bitmapData;
             if (BitsPerPixel == 8)
             {
-                Enumerable.Range(0, 256).ToList().ForEach(
-                    index => palette.Entries[index] = Color.FromArgb(index, index, index)
-                );
+                bitmapData = SpriteImage;
             }
             else
             {
-                Enumerable.Range(0, 16).ToList().ForEach(
-                    index =>
-                    {
-                        var light = Math.Min(255, 16 * index);
-                        palette.Entries[index] = Color.FromArgb(light, light, light);
-                    }
-                );
+                bitmapData = SwapPixelOrder(SpriteImage);
             }
-            bitmap.Palette = palette;
 
-            return bitmap;
+            byte[] palette;
+            if (BitsPerPixel == 8)
+            {
+                palette = Enumerable.Range(0, 256)
+                    .SelectMany(
+                        index => new byte[] { (byte)index, (byte)index, (byte)index, 255, }
+                    )
+                    .ToArray();
+            }
+            else
+            {
+                palette = Enumerable.Range(0, 16)
+                    .Select(index => (byte)(index | (index << 4)))
+                    .SelectMany(
+                        light =>
+                        {
+                            return new byte[] { light, light, light, 255, };
+                        }
+                    )
+                    .ToArray();
+            }
+
+            return new LocalBitmap
+            {
+                Size = new Size(SpriteWidth, SpriteHeight * NumSpritesInImageData),
+                PixelFormat = pixFmt,
+                Clut = palette,
+                Data = bitmapData,
+            };
+        }
+
+        private class LocalBitmap : IImageRead
+        {
+            public Size Size { get; internal set; }
+            public PixelFormat PixelFormat { get; internal set; }
+
+            internal byte[] Clut { get; set; }
+            internal byte[] Data { get; set; }
+
+            public byte[] GetClut() => Clut;
+            public byte[] GetData() => Data;
         }
 
         private static byte[] SwapPixelOrder(byte[] src)

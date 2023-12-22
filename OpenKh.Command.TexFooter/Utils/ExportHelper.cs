@@ -1,7 +1,8 @@
 using OpenKh.Command.TexFooter.Models;
+using OpenKh.Common;
+using OpenKh.Imaging;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,7 +34,7 @@ namespace OpenKh.Command.TexFooter.Utils
                                 src.SpriteImage
                             );
                             var pngFile = Path.Combine(outDir, $"{baseName}.footer-{key}-{pair.index}.png");
-                            bitmap.Save(pngFile, ImageFormat.Png);
+                            File.Create(pngFile).Using(stream => PngImage.Write(stream, bitmap));
 
                             pair.it.SpriteImageFile = "./" + Path.GetFileName(pngFile);
                         }

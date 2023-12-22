@@ -33,7 +33,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         public string Title => $"{Path.GetFileName(FileName) ?? "untitled"} | {ApplicationName}";
 
-        private string FileName
+        public string FileName
         {
             get => _fileName;
             set
@@ -43,6 +43,8 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             }
         }
 
+        public string FontName { get; set; }
+
         public RelayCommand OpenCommand { get; }
         public RelayCommand SaveCommand { get; }
         public RelayCommand SaveAsCommand { get; }
@@ -51,6 +53,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         public RelayCommand OpenFontCommand { get; }
         public RelayCommand OpenFontEditorCommand { get; }
+        public RelayCommand OpenLayoutEditorCommand { get; }
 
         public CtdViewModel CtdViewModel
         {
@@ -61,10 +64,11 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         public Ctd Ctd
         {
             get => CtdViewModel?.Ctd;
-            set => CtdViewModel = new CtdViewModel(_drawHandler, value)
+            set
             {
-                Fonts = _fonts
-            };
+                CtdViewModel = new CtdViewModel(_drawHandler, value);
+                OnPropertyChanged(nameof(OpenLayoutEditorCommand));
+            }
         }
 
         public FontsArc Fonts
@@ -73,7 +77,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             set
             {
                 _fonts = value;
-                CtdViewModel.Fonts = _fonts;
+                _drawHandler.SetFont(value.FontMes);
                 OnPropertyChanged(nameof(OpenFontEditorCommand));
             }
         }
@@ -114,12 +118,40 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
                 }.ShowDialog(),
                 x => Fonts != null);
 
+            OpenLayoutEditorCommand = new RelayCommand(x =>
+                new LayoutWindow()
+                {
+                    DataContext = new LayoutEditorViewModel(Ctd)
+                }.ShowDialog(),
+                x => Ctd != null
+            );
+
             AboutCommand = new RelayCommand(x =>
             {
-                new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
+                var about = new AboutDialog(Assembly.GetExecutingAssembly());
+                about.Author = "Open KH Team";
+                about.AuthorWebsite = "https://www.openkh.dev";
+                about.ShowDialog();
             }, x => true);
 
             CtdViewModel = new CtdViewModel(_drawHandler);
+
+            string[] args = Environment.GetCommandLineArgs();
+            for (int a = 0; a < args.Length; a++)
+            {
+                if (string.Equals(args[a], "--font", StringComparison.InvariantCultureIgnoreCase)
+                    || string.Equals(args[a], "-f", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    a++;
+                    OpenFontFile(args[a]);
+                }
+                else if (string.Equals(args[a], "--message", StringComparison.InvariantCultureIgnoreCase)
+                    || string.Equals(args[a], "-m", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    a++;
+                    OpenFile(args[a]);                       
+                }
+            }
         }
 
         private bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
@@ -143,15 +175,14 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             });
         }
 
-        private void OpenFontFile(string fileName)
+        private void OpenFontFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
-            Fonts = File.OpenRead(fileName).Using(stream =>
-            {
-                if (!Arc.IsValid(stream))
-                    throw new Exception("Not a valid ARC file");
+            if (!Arc.IsValid(stream))
+                throw new Exception("Not a valid ARC file");
 
-                return FontsArc.Read(stream);
-            });
-        }
+            Fonts = FontsArc.Read(stream);
+            FontName = fileName;
+        });
+
     }
 }

@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
          FocusManager.FocusedElement="{Binding ElementName=txtSourceModUrl}"
-        Title="Install a new mod or Lua Script..." Height="160" Width="300" SizeToContent="Height">
+        Title="Install a new mod or Lua Script..." Height="160" Width="300" SizeToContent="Height" Background="{Binding ColorTheme.BackgroundColor}" Foreground="{Binding ColorTheme.TextColor}">
     <Window.InputBindings>
         <KeyBinding Key="Esc" Command="{Binding CloseCommand}"/>
     </Window.InputBindings>

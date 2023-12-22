@@ -1,3 +1,4 @@
+using OpenKh.Tools.ModsManager.Services;
 using OpenKh.Tools.ModsManager.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,6 +8,7 @@ namespace OpenKh.Tools.ModsManager.Views
 {
     public partial class PresetsWindow : Window
     {
+        public ColorThemeService ColorTheme => ColorThemeService.Instance;
         public MainViewModel MainVm { get; set; }
         public RelayCommand CloseCommand { get; }
         public string PresetName { get; set; }

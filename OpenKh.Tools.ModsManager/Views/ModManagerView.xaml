@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="600">
+             d:DesignHeight="450" d:DesignWidth="600" Background="{Binding ColorTheme.BackgroundColor}">
     <UserControl.Resources>
         <ControlTemplate x:Key="modList" TargetType="ListBox">
             <Border Name="Border" BorderThickness="1">
@@ -18,20 +18,23 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Margin="3">
-                        <TextBlock HorizontalAlignment="Center" Text="Highest priority"/>
+                    <StackPanel Grid.Row="0" Margin="3" Background="{Binding ColorTheme.BackgroundColor}">
+                        <TextBlock HorizontalAlignment="Center" Text="Highest priority" Foreground="{Binding ColorTheme.TextColor}"/>
                         <Separator Margin="3" Background="#FFABADB3"/>
                     </StackPanel>
-                    <StackPanel Grid.Row="2" Margin="3">
+                    <StackPanel Grid.Row="2" Margin="3" Background="{Binding ColorTheme.BackgroundColor}">
                         <Separator Margin="3" Background="#FFABADB3"/>
-                        <TextBlock HorizontalAlignment="Center" Text="Lowest priority"/>
+                        <TextBlock HorizontalAlignment="Center" Text="Lowest priority" Foreground="{Binding ColorTheme.TextColor}"/>
                     </StackPanel>
-                    <ScrollViewer Grid.Row="1" Margin="0" Focusable="false">
-                        <StackPanel Margin="0" IsItemsHost="True" />
+                    <ScrollViewer Grid.Row="1" Margin="0" Background="{Binding ColorTheme.BackgroundColor}">
+                        <StackPanel Margin="0" IsItemsHost="True"/>
                     </ScrollViewer>
                 </Grid>
             </Border>
         </ControlTemplate>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
+        </Style>
     </UserControl.Resources>
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
@@ -64,9 +67,9 @@
                             </CheckBox.Content>
                         </CheckBox>
                         <StackPanel Grid.Column="1">
-                            <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding Author}"/>
-                            <TextBlock Visibility="{Binding UpdateVisibility}" Text="Update available" Foreground="Gray"/>
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="{Binding ColorTheme.TextColor}"/>
+                            <TextBlock Text="{Binding Author}" Foreground="{Binding ColorTheme.TextColor}"/>
+                            <TextBlock Visibility="{Binding UpdateVisibility}" Text="Update available" Foreground="{Binding ColorTheme.TextColor}"/>
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
@@ -74,6 +77,18 @@
         </ListBox>
         <Grid Grid.Column="1">
             <StackPanel VerticalAlignment="Center">
+                <Button Grid.Row="0" Margin="0 3 0 3" Command="{Binding MoveTop}" ToolTip="Moves Selected mod to the top.">
+                    <Image Source="{StaticResource ExpandChevronRightGroup_16x}" RenderTransformOrigin="0.5,0.5">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="-90"/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+                </Button>
                 <Button Grid.Row="0" Margin="0 3 0 3" Command="{Binding MoveUp}" ToolTip="Moves selected mod up increasing its priority.">
                     <Image Source="{StaticResource AddRowToAbove_16x}"/>
                 </Button>

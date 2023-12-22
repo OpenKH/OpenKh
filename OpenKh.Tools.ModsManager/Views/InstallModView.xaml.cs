@@ -11,6 +11,7 @@ namespace OpenKh.Tools.ModsManager.Views
     /// </summary>
     public partial class InstallModView : Window
     {
+        public ColorThemeService ColorTheme => ColorThemeService.Instance;
         private static readonly IEnumerable<FileDialogFilter> _zipFilter = FileDialogFilterComposer
             .Compose()
             .AddExtensions("Mod archive", "zip", "kh2pcpatch", "kh1pcpatch", "compcpatch", "bbspcpatch", "lua");

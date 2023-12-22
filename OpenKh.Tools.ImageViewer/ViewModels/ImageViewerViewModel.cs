@@ -268,7 +268,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                                 var bpp = Convert.ToInt32(parameter);
 
                                 var newImage = ImgdBitmapUtil.ToImgd(
-                                    sourceImage.CreateBitmap(),
+                                    sourceImage,
                                     bpp,
                                     QuantizerFactory.MakeFrom(
                                         bpp,

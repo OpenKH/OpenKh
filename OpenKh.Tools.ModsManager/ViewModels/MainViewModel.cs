@@ -25,6 +25,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
     public class MainViewModel : BaseNotifyPropertyChanged, IChangeModEnableState
     {
+        public ColorThemeService ColorTheme => ColorThemeService.Instance;
         private static Version _version = Assembly.GetEntryAssembly()?.GetName()?.Version;
         private static string ApplicationName = Utilities.GetApplicationName();
         private static string ApplicationVersion = Utilities.GetApplicationVersion();
@@ -74,6 +75,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand AddModCommand { get; set; }
         public RelayCommand RemoveModCommand { get; set; }
         public RelayCommand OpenModFolderCommand { get; set; }
+        public RelayCommand MoveTop { get; set; }
         public RelayCommand MoveUp { get; set; }
         public RelayCommand MoveDown { get; set; }
         public RelayCommand BuildCommand { get; set; }
@@ -86,6 +88,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand OpenLinkCommand { get; set; }
         public RelayCommand CheckOpenkhUpdateCommand { get; set; }
         public RelayCommand OpenPresetMenuCommand { get; set; }
+        public RelayCommand CheckForModUpdatesCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -390,6 +393,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     UseShellExecute = true
                 });
             }, _ => IsModSelected);
+            MoveTop = new RelayCommand(_ => MoveSelectedModTop(), _ => CanSelectedModMoveUp());
             MoveUp = new RelayCommand(_ => MoveSelectedModUp(), _ => CanSelectedModMoveUp());
             MoveDown = new RelayCommand(_ => MoveSelectedModDown(), _ => CanSelectedModMoveDown());
             BuildCommand = new RelayCommand(async _ =>
@@ -485,6 +489,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 PresetsWindow view = new PresetsWindow(this);
                 view.ShowDialog();
+            });
+
+            CheckForModUpdatesCommand = new RelayCommand(_ =>
+            {
+                FetchUpdates();
             });
 
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
@@ -692,6 +701,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             var item = ModsList[selectedIndex];
             ModsList.RemoveAt(selectedIndex);
             ModsList.Insert(--selectedIndex, item);
+            SelectedValue = ModsList[selectedIndex];
+            ModEnableStateChanged();
+        }
+        private void MoveSelectedModTop()
+        {
+            var selectedIndex = ModsList.IndexOf(SelectedValue);
+            if (selectedIndex < 0)
+                return;
+
+            var item = ModsList[selectedIndex];
+            ModsList.RemoveAt(selectedIndex);
+            ModsList.Insert(selectedIndex = 0, item);
             SelectedValue = ModsList[selectedIndex];
             ModEnableStateChanged();
         }
@@ -1008,9 +1029,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             .Select(x => x.Source)
             .ToList();
             File.WriteAllLines(Path.Combine(ConfigurationService.PresetPath, name + ".txt"), enabledMods);
-            if (!PresetList.Contains(presetName))
+            if (!PresetList.Contains(name))
             {
-                PresetList.Add(presetName);
+                PresetList.Add(name);
             }
         }
         public void RemovePreset(string presetName)

@@ -1,0 +1,19 @@
+---
+WorkSize: 64
+StackSize: 64
+TempSize: 64
+Triggers:
+- Key: 0
+  Addr: TR0
+Name: aaa
+
+---
+ section .text
+TR0:
+ pushImm 123456789
+ drop
+ push 123456789
+ drop
+ ret 
+DUMMY:
+ ret 

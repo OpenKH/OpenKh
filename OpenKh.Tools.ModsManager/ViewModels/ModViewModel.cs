@@ -17,6 +17,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 {
     public class ModViewModel : BaseNotifyPropertyChanged
     {
+        public ColorThemeService ColorTheme => ColorThemeService.Instance;
         private static readonly string FallbackImage = null;
         private readonly ModModel _model;
         private readonly IChangeModEnableState _changeModEnableState;
