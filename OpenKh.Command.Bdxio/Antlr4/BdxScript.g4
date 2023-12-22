@@ -30,7 +30,7 @@ numberdata:
 	| '0x' hexnumber = (DEC | HEX)
 	| floatnumber = FLOATNUM;
 hexbody: DEC | HEX;
-id: ID | DEC | HEX;
+id: DEC | HEX | ID;
 include: '%include' FileName NL;
 section: 'section' section_id NL;
 section_id: '.text' | '.bss';
@@ -41,7 +41,7 @@ HEX: [0-9a-fA-F]+;
 FLOATNUM:
 	[-+]? ([0-9]* '.' [0-9]+)
 	| ([0-9]+ [eE] [-+]? [0-9]+);
-ID: [a-zA-Z_][a-zA-Z0-9_]*;
+ID: [a-zA-Z_][a-zA-Z0-9_]* ('.' [a-zA-Z0-9_]+)*;
 WS: [ \t] -> skip;
 NL: '\r'? '\n' | '\r';
 FileName: '"' ~["]* '"';

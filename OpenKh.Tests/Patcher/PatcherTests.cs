@@ -549,7 +549,7 @@ namespace OpenKh.Tests.Patcher
                 writer.WriteLine("  Addr: TR0");
                 writer.WriteLine("Name: aaa");
                 writer.WriteLine("---");
-                writer.WriteLine(" section.text");
+                writer.WriteLine(" section .text");
                 writer.WriteLine("TR0:");
                 writer.WriteLine(" ret");
                 writer.WriteLine("DUMMY:");

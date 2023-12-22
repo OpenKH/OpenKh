@@ -443,7 +443,7 @@ namespace OpenKh.Command.Bdxio.Utils
                 {
                     if (pair.Value is CodeContent content)
                     {
-                        if (content.Desc.Name == "pushImm"
+                        if (content.Desc.CodeRevealerLabeling
                             && content.Args.Length == 1
                             && content.Args[0] is ParsedArg arg
                             && arg.Label == null
