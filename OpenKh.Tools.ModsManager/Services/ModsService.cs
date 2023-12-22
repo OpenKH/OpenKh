@@ -315,19 +315,19 @@ namespace OpenKh.Tools.ModsManager.Services
                 var options = new CloneOptions
                 {
                     RecurseSubmodules = true,
-                    OnProgress = (serverProgressOutput) =>
-                    {
-                        progressOutput?.Invoke(serverProgressOutput);
-                        return true;
-                    },
-                    OnTransferProgress = (progress) =>
-                    {
-                        var nProgress = ((float)progress.ReceivedObjects / (float)progress.TotalObjects);
-                        progressNumber?.Invoke(nProgress);
+                };
+                options.FetchOptions.OnProgress = (serverProgressOutput) =>
+                {
+                    progressOutput?.Invoke(serverProgressOutput);
+                    return true;
+                };
+                options.FetchOptions.OnTransferProgress = (progress) =>
+                {
+                    var nProgress = ((float)progress.ReceivedObjects / (float)progress.TotalObjects);
+                    progressNumber?.Invoke(nProgress);
 
-                        progressOutput?.Invoke("Received Bytes: " + (progress.ReceivedBytes / 1048576) + " MB");
-                        return true;
-                    }
+                    progressOutput?.Invoke("Received Bytes: " + (progress.ReceivedBytes / 1048576) + " MB");
+                    return true;
                 };
 
                 Repository.Clone($"https://github.com/{repositoryName}", modPath, options);
