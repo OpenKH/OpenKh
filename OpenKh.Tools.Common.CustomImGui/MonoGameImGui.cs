@@ -62,7 +62,7 @@ namespace OpenKh.Tools.Common.CustomImGui
         // Input
         private int _scrollWheelValue;
 
-        private List<int> _keys = new List<int>();
+        private List<(ImGuiKey ImGuiKey, Keys XnaKey)> _keys = new List<(ImGuiKey ImGuiKey, Keys XnaKey)>();
 
         public bool ImGuiWantCaptureKeyboard => ImGui.GetIO().WantCaptureKeyboard;
         public bool ImGuiWantCaptureMouse => ImGui.GetIO().WantCaptureMouse;
@@ -101,6 +101,26 @@ namespace OpenKh.Tools.Common.CustomImGui
                     Y = game.Window.ClientBounds.Height
                 };
             };
+
+            _keys.Add((ImGuiKey.Tab, Keys.Tab));
+            _keys.Add((ImGuiKey.LeftArrow, Keys.Left));
+            _keys.Add((ImGuiKey.RightArrow, Keys.Right));
+            _keys.Add((ImGuiKey.UpArrow, Keys.Up));
+            _keys.Add((ImGuiKey.DownArrow, Keys.Down));
+            _keys.Add((ImGuiKey.PageUp, Keys.PageUp));
+            _keys.Add((ImGuiKey.PageDown, Keys.PageDown));
+            _keys.Add((ImGuiKey.Home, Keys.Home));
+            _keys.Add((ImGuiKey.End, Keys.End));
+            _keys.Add((ImGuiKey.Delete, Keys.Delete));
+            _keys.Add((ImGuiKey.Backspace, Keys.Back));
+            _keys.Add((ImGuiKey.Enter, Keys.Enter));
+            _keys.Add((ImGuiKey.Escape, Keys.Escape));
+            _keys.Add((ImGuiKey.A, Keys.A));
+            _keys.Add((ImGuiKey.C, Keys.C));
+            _keys.Add((ImGuiKey.V, Keys.V));
+            _keys.Add((ImGuiKey.X, Keys.X));
+            _keys.Add((ImGuiKey.Y, Keys.Y));
+            _keys.Add((ImGuiKey.Z, Keys.Z));
 
             SetupInput();
         }
@@ -197,26 +217,6 @@ namespace OpenKh.Tools.Common.CustomImGui
         {
             var io = ImGui.GetIO();
 
-            _keys.Add(io.KeyMap[(int)ImGuiKey.Tab] = (int)Keys.Tab);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.LeftArrow] = (int)Keys.Left);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.RightArrow] = (int)Keys.Right);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.UpArrow] = (int)Keys.Up);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.DownArrow] = (int)Keys.Down);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.PageUp] = (int)Keys.PageUp);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.PageDown] = (int)Keys.PageDown);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.Home] = (int)Keys.Home);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.End] = (int)Keys.End);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.Delete] = (int)Keys.Delete);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.Backspace] = (int)Keys.Back);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.Enter] = (int)Keys.Enter);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.Escape] = (int)Keys.Escape);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.A] = (int)Keys.A);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.C] = (int)Keys.C);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.V] = (int)Keys.V);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.X] = (int)Keys.X);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.Y] = (int)Keys.Y);
-            _keys.Add(io.KeyMap[(int)ImGuiKey.Z] = (int)Keys.Z);
-
             // MonoGame-specific //////////////////////
             _game.Window.TextInput += (s, a) =>
             {
@@ -276,9 +276,9 @@ namespace OpenKh.Tools.Common.CustomImGui
             var mouse = Mouse.GetState();
             var keyboard = Keyboard.GetState();
 
-            for (int i = 0; i < _keys.Count; i++)
+            foreach (var pair in _keys)
             {
-                io.KeysDown[_keys[i]] = keyboard.IsKeyDown((Keys)_keys[i]);
+                io.AddKeyEvent(pair.ImGuiKey, keyboard.IsKeyDown(pair.XnaKey));
             }
 
             io.KeyShift = keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift);
