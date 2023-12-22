@@ -191,7 +191,6 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                 bool isOpen = false;
                 ImGui.Begin("Child Tooltip?", ref isOpen, ImGuiWindowFlags.Tooltip |
                     ImGuiWindowFlags.NoTitleBar |
-                    ImGuiWindowFlags.AlwaysUseWindowPadding |
                     ImGuiWindowFlags.AlwaysAutoResize |
                     ImGuiWindowFlags.NoResize);
                 ImGui.Text(description);
@@ -288,7 +287,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                 Vector2 childFramePos = ImGui.GetCursorScreenPos();
                 var childFrameSize = new Vector2(canvas_size.X, canvas_size.Y - 8f - headerSize.Y - (hasScrollBar ? scrollBarSize.Y : 0));
                 ImGui.PushStyleColor(ImGuiCol.FrameBg, 0);
-                ImGui.BeginChildFrame(889, childFrameSize);
+                ImGui.BeginChild(889, childFrameSize, ImGuiChildFlags.FrameStyle);
                 sequence.focused = ImGui.IsWindowFocused();
                 ImGui.InvisibleButton("contentBar", new Vector2(canvas_size.X, (float)(controlHeight)));
                 Vector2 contentMin = ImGui.GetItemRectMin();
@@ -709,7 +708,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                 }
                 //
 
-                ImGui.EndChildFrame();
+                ImGui.EndChild();
                 ImGui.PopStyleColor();
                 if (hasScrollBar)
                 {
