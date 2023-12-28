@@ -37,6 +37,7 @@ namespace OpenKh.Tests.Patcher
 
                 //Filenames may be formatted as text (msg/jp/lk.bar) or hash (0x030b45da).
 
+                Assert.Equal(expected: "author", actual: patch.Author);
                 Assert.Equal(expected: 1234567890U, actual: patch.Revision);
                 Assert.Equal(expected: new string[] { "cl1", "cl2", "cl3" }, actual: patch.ChangeLogs);
                 Assert.Equal(expected: new string[] { "cr1", "cr2", "cr3" }, actual: patch.Credits);

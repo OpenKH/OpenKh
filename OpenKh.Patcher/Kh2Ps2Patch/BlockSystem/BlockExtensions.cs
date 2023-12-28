@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenKh.Patcher.Kh2Ps2Patch.BlockSystem
 {
-    public static class BlockExtensions
+    internal static class BlockExtensions
     {
         public static T PrependTo<T>(this T self, IBlock parent) where T : IBlock
         {
