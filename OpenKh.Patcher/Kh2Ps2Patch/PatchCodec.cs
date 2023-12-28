@@ -21,7 +21,7 @@ namespace OpenKh.Patcher.Kh2Ps2Patch
             "pBxrgTANI1tcOqfe2/RzWqDCcNEoSKpyYrWafHwg4MciIHLMJsa8gC14tZXbNyF0BhG1fe+JSNcBp27Qbu58zA=="
         );
 
-        public byte[] ApplyXeeynamosMethod(byte[] input)
+        public byte[] ApplyXeeynamosMethod(ReadOnlySpan<byte> input)
         {
             var tab = _xTab;
             var length = input.Length;
@@ -33,7 +33,7 @@ namespace OpenKh.Patcher.Kh2Ps2Patch
             return output;
         }
 
-        public byte[] ApplyGovanifYsMethod(byte[] input)
+        public byte[] ApplyGovanifYsMethod(ReadOnlySpan<byte> input)
         {
             var tab = _gTab;
             var length = input.Length;

@@ -9,6 +9,26 @@ namespace OpenKh.Tests.Patcher
     public class Kh2Ps2PatchTests
     {
         private readonly PatchIO _patchIo = new PatchIO();
+        private readonly PatchIOHelper _patchIoHelper = new PatchIOHelper();
+        private readonly PatchCodec _patchCodec = new PatchCodec();
+
+        [Fact]
+        public void TestGMethod()
+        {
+            var bytes = Enumerable.Range(0, 255).Select(it => (byte)it).ToArray();
+            var encoded = _patchCodec.ApplyGovanifYsMethod(bytes);
+            var decoded = _patchCodec.ApplyGovanifYsMethod(encoded);
+            Assert.Equal(expected: bytes, actual: decoded);
+        }
+
+        [Fact]
+        public void TestXMethod()
+        {
+            var bytes = Enumerable.Range(0, 255).Select(it => (byte)it).ToArray();
+            var encoded = _patchCodec.ApplyXeeynamosMethod(bytes);
+            var decoded = _patchCodec.ApplyXeeynamosMethod(encoded);
+            Assert.Equal(expected: bytes, actual: decoded);
+        }
 
         [Fact]
         public void TestPatchIO()
@@ -18,7 +38,14 @@ namespace OpenKh.Tests.Patcher
             var reRaw1 = _patchIo.Write(patch1);
             var rePatch1 = _patchIo.Read(reRaw1);
 
-            foreach (var patch in new[] { patch1, rePatch1 })
+            var xForm = _patchCodec.ApplyXeeynamosMethod(raw);
+            var gForm = _patchCodec.ApplyGovanifYsMethod(raw);
+
+            var patchReadByHelper = _patchIoHelper.Read(raw);
+            var patchGReadByHelper = _patchIoHelper.Read(gForm);
+            var patchXReadByHelper = _patchIoHelper.Read(xForm);
+
+            foreach (var patch in new[] { patch1, rePatch1, patchReadByHelper, patchGReadByHelper, patchXReadByHelper })
             {
                 //Press enter to run using the file: output.kh2patch
                 //Enter author's name: author
