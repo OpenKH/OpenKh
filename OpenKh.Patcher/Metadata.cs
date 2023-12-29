@@ -35,8 +35,13 @@ namespace OpenKh.Patcher
 
         public static Metadata Read(Stream stream) =>
             deserializer.Deserialize<Metadata>(new StreamReader(stream));
-        public void Write(Stream stream) =>
-            serializer.Serialize(new StreamWriter(stream), this);
+        public void Write(Stream stream)
+        {
+            using (var writer = new StreamWriter(stream))
+            {
+                serializer.Serialize(writer, this);
+            }
+        }
         public override string ToString() =>
         serializer.Serialize(this);
     }
