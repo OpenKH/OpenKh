@@ -20,7 +20,7 @@
             </Style>
         </DockPanel.Resources>
         <StackPanel Orientation="Vertical">
-            <Label>Select a diff tool to observe changes:</Label>
+            <Label>You can select a diff tool to see changes:</Label>
             <ComboBox ItemsSource="{Binding Tools}" SelectedItem="{Binding SelectedTool}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>

@@ -35,9 +35,9 @@ namespace OpenKh.Tools.ModsManager.Services
 
             var assets = new List<AssetFile>();
 
-            void TryToSearchDir(string firstDir)
+            foreach (var subDir in "anm ard bgm dbg effect event field2d file gumibattle gumiblock gumimenu itempic libretto limit magic map menu minigame msg msn npack obj se vagstream voice remastered".Split(' '))
             {
-                var firstDirPath = Path.Combine(sourceDir, firstDir);
+                var firstDirPath = Path.Combine(sourceDir, subDir);
                 if (Directory.Exists(firstDirPath))
                 {
                     assets.AddRange(
@@ -45,7 +45,7 @@ namespace OpenKh.Tools.ModsManager.Services
                             .Select(
                                 filePath =>
                                 {
-                                    var relativePath = Path.GetRelativePath(firstDir, filePath);
+                                    var relativePath = Path.GetRelativePath(sourceDir, filePath).Replace('/', '\\');
                                     return new AssetFile
                                     {
                                         Name = relativePath,
@@ -65,9 +65,6 @@ namespace OpenKh.Tools.ModsManager.Services
                     );
                 }
             }
-
-            TryToSearchDir("field2d");
-            TryToSearchDir("menu");
 
             foreach (var asset in assets)
             {
