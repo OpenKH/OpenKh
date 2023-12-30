@@ -24,12 +24,40 @@ namespace OpenKh.Tools.ModsManager.Services
                 ? Metadata.Read(new MemoryStream(rawInput, false))
                 : new Metadata();
 
+            string NormalizePath(string path) => path?.Replace('\\', '/');
+
+            void Apply(IEnumerable<AssetFile> list, Action<AssetFile> applyToAssetFile)
+            {
+                if (list != null)
+                {
+                    foreach (var one in list)
+                    {
+                        applyToAssetFile(one);
+
+                        if (one.Source != null)
+                        {
+                            Apply(one.Source, applyToAssetFile);
+                        }
+                    }
+                }
+            }
+
             if (mod.Assets == null)
             {
                 mod.Assets = new List<AssetFile>();
             }
+            else
+            {
+                mod.Assets
+                    .ForEach(
+                        rootAsset =>
+                        {
+                            rootAsset.Name = NormalizePath(rootAsset.Name);
 
-            mod.Assets.Clear();
+                            Apply(rootAsset.Source, asset => asset.Name = NormalizePath(asset.Name));
+                        }
+                    );
+            }
 
             var sourceDir = Path.GetDirectoryName(ymlFile);
 
@@ -45,7 +73,7 @@ namespace OpenKh.Tools.ModsManager.Services
                             .Select(
                                 filePath =>
                                 {
-                                    var relativePath = Path.GetRelativePath(sourceDir, filePath).Replace('/', '\\');
+                                    var relativePath = Path.GetRelativePath(sourceDir, filePath).Replace('\\', '/');
                                     return new AssetFile
                                     {
                                         Name = relativePath,

@@ -6,5 +6,5 @@
              xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="15" d:DesignWidth="100">
-    <Label Content="(Task result here)" Name="_label" />
+    <TextBlock Text="(Task result here)" Name="_label" />
 </UserControl>

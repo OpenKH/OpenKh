@@ -13,19 +13,25 @@
     <DockPanel Margin="7">
         <DockPanel.Resources>
             <Style TargetType="TextBlock">
-                <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
-            </Style>
-            <Style TargetType="Label">
+                <Setter Property="Padding" Value="3"/>
                 <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
             </Style>
         </DockPanel.Resources>
         <StackPanel Orientation="Vertical">
-            <Label>mod.yml</Label>
+            <TextBlock>mod.yml</TextBlock>
             <userControls:SaveFileSelectorControl FilePath="{Binding ModYmlFilePath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                                   Filter="mod.yml|mod.yml|*|*" />
+            <TextBlock>You can select a diff tool to see changes:</TextBlock>
+            <ComboBox ItemsSource="{Binding Tools}" SelectedItem="{Binding SelectedTool}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
             <TextBlock />
             <Button Content="Generate or update mod.yml" Command="{Binding GenerateCommand}" HorizontalAlignment="Left" Padding="7" />
-            <userControls:TaskStatusObserverControl Task="{Binding GeneratingTask}" />
+            <userControls:TaskStatusObserverControl Padding="3" Task="{Binding GeneratingTask}" />
         </StackPanel>
     </DockPanel>
 </Window>

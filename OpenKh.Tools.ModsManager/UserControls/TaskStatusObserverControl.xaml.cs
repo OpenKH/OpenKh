@@ -37,7 +37,7 @@ namespace OpenKh.Tools.ModsManager.UserControls
         {
             if (value == null)
             {
-                _label.Content = "(Task result here)";
+                _label.Text = "(Task result here)";
             }
             else
             {
@@ -45,20 +45,20 @@ namespace OpenKh.Tools.ModsManager.UserControls
                 {
                     try
                     {
-                        _label.Content = "(Awaiting task result)";
+                        _label.Text = "(Awaiting task result)";
 
                         await task;
 
                         if (ReferenceEquals(task, Task))
                         {
-                            _label.Content = $"Done on {DateTime.Now}";
+                            _label.Text = $"Done on {DateTime.Now}";
                         }
                     }
                     catch (Exception ex)
                     {
                         if (ReferenceEquals(task, Task))
                         {
-                            _label.Content = $"Error: {ex.Message}";
+                            _label.Text = $"Error: {ex.Message}";
                             _label.ToolTip = ex + "";
                         }
                     }
