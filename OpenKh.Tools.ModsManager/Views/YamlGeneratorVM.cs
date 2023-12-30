@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
@@ -36,6 +37,7 @@ namespace OpenKh.Tools.ModsManager.Views
         private readonly GetDiffToolsService _getDiffToolsService = new GetDiffToolsService();
         private readonly Func<SelectDiffToolWindow> _newSelectDiffToolWindow = () => new SelectDiffToolWindow();
         private readonly GetActiveWindowService _getActiveWindowService = new GetActiveWindowService();
+        private readonly QueryApplyPatchService _queryApplyPatchService = new QueryApplyPatchService();
 
         public YamlGeneratorVM()
         {
@@ -78,7 +80,22 @@ namespace OpenKh.Tools.ModsManager.Views
                             var diffTool = await diffToolSource.Task;
                             if (diffTool != null)
                             {
-                                return await diffTool.DiffAsync(rawInput, rawOutput);
+                                var rawOutput2 = await diffTool.DiffAsync(rawInput, rawOutput);
+                                if (rawOutput2 != null)
+                                {
+                                    if (await _queryApplyPatchService.QueryAsync())
+                                    {
+                                        return rawOutput2;
+                                    }
+                                    else
+                                    {
+                                        return null;
+                                    }
+                                }
+                                else
+                                {
+                                    return null;
+                                }
                             }
                             else
                             {

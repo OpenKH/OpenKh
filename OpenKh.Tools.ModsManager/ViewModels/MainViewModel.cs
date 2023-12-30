@@ -510,7 +510,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             YamlGeneratorCommand = new RelayCommand(
                 _ =>
                 {
-                    new YamlGeneratorWindow() { Owner = _getActiveWindowService.GetActiveWindow(), }.Show();
+                    var window = new YamlGeneratorWindow()
+                    {
+                        Owner = _getActiveWindowService.GetActiveWindow(),
+                    };
+                    window.Closing += (_, e) =>
+                    {
+                        if (!e.Cancel)
+                        {
+                            window.Owner?.Focus();
+                        }
+                    };
+                    window.Show();
                 }
             );
 

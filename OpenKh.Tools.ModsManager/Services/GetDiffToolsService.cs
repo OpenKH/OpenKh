@@ -48,42 +48,65 @@ namespace OpenKh.Tools.ModsManager.Services
                 };
             }
 
-            IEnumerable<GetDiffService> TryToUseExe(string name, string exe)
-            {
-                if (File.Exists(exe))
-                {
-                    yield return new GetDiffService
-                    {
-                        Name = name,
-                        DiffAsync = CreateDiffAsync(exe),
-                    };
-                }
-            }
-
-            IEnumerable<GetDiffService> TryToReadReg(string fullPath)
+            IEnumerable<string> TryToReadReg(string fullPath)
             {
                 var exe = Registry.GetValue(Path.GetDirectoryName(fullPath), Path.GetFileName(fullPath), "") + "";
                 if (File.Exists(exe))
                 {
-                    yield return new GetDiffService
-                    {
-                        Name = Path.GetFileName(exe),
-                        DiffAsync = CreateDiffAsync(exe),
-                    };
+                    yield return exe;
                 }
             }
 
+            IEnumerable<string> TryToFindExe(string exe)
+            {
+                if (File.Exists(exe))
+                {
+                    yield return exe;
+                }
+            }
+
+            IEnumerable<GetDiffService> TwoFileDiff(string name, IEnumerable<string> exeFiles)
+            {
+                return exeFiles
+                    .Distinct(StringComparer.InvariantCultureIgnoreCase)
+                    .Select(
+                        exe => new GetDiffService
+                        {
+                            Name = $"{name} ({Path.GetDirectoryName(exe)})",
+                            DiffAsync = CreateDiffAsync(exe),
+                        }
+                    );
+            }
+
             foreach (var one in new GetDiffService[0]
-                .Concat(TryToUseExe("WinMerge.exe", @"C:\Program Files\WinMerge\WinMergeU.exe"))
-                .Concat(TryToUseExe("WinMerge.exe", @"C:\Program Files (x86)\WinMerge\WinMergeU.exe"))
-                .Concat(TryToUseExe("TortoiseGitMerge.exe", @"C:\Program Files\TortoiseGit\bin\TortoiseGitMerge.exe"))
-                .Concat(TryToUseExe("TortoiseGitMerge.exe", @"C:\Program Files (x86)\TortoiseGit\bin\TortoiseGitMerge.exe"))
-                .Concat(TryToUseExe("TortoiseMerge.exe", @"C:\Program Files\TortoiseSVN\bin\TortoiseMerge.exe"))
-                .Concat(TryToUseExe("TortoiseMerge.exe", @"C:\Program Files (x86)\TortoiseSVN\bin\TortoiseMerge.exe"))
-                .Concat(TryToReadReg(@"HKEY_LOCAL_MACHINE\SOFTWARE\TortoiseGit\TMergePath"))
-                .Concat(TryToReadReg(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\TortoiseGit\TMergePath"))
-                .Concat(TryToReadReg(@"HKEY_LOCAL_MACHINE\SOFTWARE\TortoiseSVN\TMergePath"))
-                .Concat(TryToReadReg(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\TortoiseSVN\TMergePath"))
+                .Concat(
+                    TwoFileDiff(
+                        "WinMerge.exe",
+                        new string[0]
+                            .Concat(TryToFindExe(@"C:\Program Files\WinMerge\WinMergeU.exe"))
+                            .Concat(TryToFindExe(@"C:\Program Files (x86)\WinMerge\WinMergeU.exe"))
+                    )
+                )
+                .Concat(
+                    TwoFileDiff(
+                        "TortoiseGitMerge.exe",
+                        new string[0]
+                            .Concat(TryToReadReg(@"HKEY_LOCAL_MACHINE\SOFTWARE\TortoiseGit\TMergePath"))
+                            .Concat(TryToReadReg(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\TortoiseGit\TMergePath"))
+                            .Concat(TryToFindExe(@"C:\Program Files\TortoiseGit\bin\TortoiseGitMerge.exe"))
+                            .Concat(TryToFindExe(@"C:\Program Files (x86)\TortoiseGit\bin\TortoiseGitMerge.exe"))
+                    )
+                )
+                .Concat(
+                    TwoFileDiff(
+                        "TortoiseMerge.exe",
+                        new string[0]
+                            .Concat(TryToReadReg(@"HKEY_LOCAL_MACHINE\SOFTWARE\TortoiseSVN\TMergePath"))
+                            .Concat(TryToReadReg(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\TortoiseSVN\TMergePath"))
+                            .Concat(TryToFindExe(@"C:\Program Files\TortoiseSVN\bin\TortoiseGitMerge.exe"))
+                            .Concat(TryToFindExe(@"C:\Program Files (x86)\TortoiseSVN\bin\TortoiseGitMerge.exe"))
+                    )
+                )
             )
             {
                 yield return one;
