@@ -26,17 +26,17 @@ namespace OpenKh.Tools.ModsManager.Services
 
             string NormalizePath(string path) => path?.Replace('\\', '/');
 
-            void Apply(IEnumerable<AssetFile> list, Action<AssetFile> applyToAssetFile)
+            IEnumerable<AssetFile> EnumerateAllSources(IEnumerable<AssetFile> list)
             {
                 if (list != null)
                 {
                     foreach (var one in list)
                     {
-                        applyToAssetFile(one);
+                        yield return one;
 
-                        if (one.Source != null)
+                        foreach (var child in EnumerateAllSources(one.Source))
                         {
-                            Apply(one.Source, applyToAssetFile);
+                            yield return child;
                         }
                     }
                 }
@@ -48,15 +48,10 @@ namespace OpenKh.Tools.ModsManager.Services
             }
             else
             {
-                mod.Assets
-                    .ForEach(
-                        rootAsset =>
-                        {
-                            rootAsset.Name = NormalizePath(rootAsset.Name);
-
-                            Apply(rootAsset.Source, asset => asset.Name = NormalizePath(asset.Name));
-                        }
-                    );
+                foreach (var asset in EnumerateAllSources(mod.Assets))
+                {
+                    asset.Name = NormalizePath(asset.Name);
+                }
             }
 
             var sourceDir = Path.GetDirectoryName(ymlFile);
@@ -96,7 +91,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
             foreach (var asset in assets)
             {
-                if (!mod.Assets.Any(it => it.Name == asset.Name))
+                if (!EnumerateAllSources(mod.Assets).Any(it => it.Name == asset.Name))
                 {
                     mod.Assets.Add(asset);
                 }
