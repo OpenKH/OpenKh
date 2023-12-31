@@ -1,5 +1,7 @@
 using LibGit2Sharp;
+using OpenKh.Patcher;
 using OpenKh.Tools.Common.Wpf;
+using OpenKh.Tools.ModsManager.Models.ViewHelper;
 using OpenKh.Tools.ModsManager.Services;
 using System;
 using System.Collections.Generic;
@@ -80,42 +82,210 @@ namespace OpenKh.Tools.ModsManager.Views
         }
         #endregion
 
+        #region GameDataPath 
+        private string _gameDataPath = "";
+        public string GameDataPath
+        {
+            get => _gameDataPath;
+            set
+            {
+                _gameDataPath = value;
+                OnPropertyChanged(nameof(GameDataPath));
+                OnGameDataPathChanged(_gameDataPath);
+            }
+        }
+        #endregion 
+
+        public ICommand AppenderCommand { get; set; }
+
+        #region AppenderTask
+        private Task _appenderTask;
+        public Task AppenderTask
+        {
+            get => _appenderTask;
+            set
+            {
+                _appenderTask = value;
+                OnPropertyChanged(nameof(AppenderTask));
+            }
+        }
+        #endregion
+
+        private Action<string> OnGameDataPathChanged { get; set; } = _ => { };
+
         private readonly YamlGeneratorService _yamlGeneratorService = new YamlGeneratorService();
         private readonly GetDiffToolsService _getDiffToolsService = new GetDiffToolsService();
         private readonly GetActiveWindowService _getActiveWindowService = new GetActiveWindowService();
         private readonly QueryApplyPatchService _queryApplyPatchService = new QueryApplyPatchService();
+        private readonly KeywordsMatcherService _keywordsMatcherService = new KeywordsMatcherService();
 
         public YamlGeneratorVM()
         {
             GetDiffService diffTool = null;
+
+            async Task ModifyMetadataAsync(
+                Func<Metadata, Task> action
+            )
+            {
+                var rawInput = await Task.Run(() => File.Exists(ModYmlFilePath))
+                    ? await File.ReadAllBytesAsync(ModYmlFilePath)
+                    : null;
+
+                var createNewModYml = rawInput == null;
+
+                var mod = (rawInput != null)
+                    ? Metadata.Read(new MemoryStream(rawInput, false))
+                    : new Metadata();
+
+                mod.Title ??= Path.GetFileName(Path.GetDirectoryName(ModYmlFilePath));
+                mod.OriginalAuthor ??= "You";
+                mod.Description ??= $"Generated on {DateTime.UtcNow:R}";
+                mod.Assets ??= new List<AssetFile>();
+
+                await action(mod);
+
+                {
+                    var temp = new MemoryStream();
+                    mod.Write(temp);
+                    var rawOutput = temp.ToArray();
+
+                    var rawOutput2 = await diffTool.DiffAsync(rawInput, rawOutput);
+                    if (rawOutput2 != null)
+                    {
+                        if (createNewModYml || await _queryApplyPatchService.QueryAsync())
+                        {
+                            await File.WriteAllBytesAsync(ModYmlFilePath, rawOutput2);
+                            return;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            }
+
+            SimpleAsyncActionCommand<object> appenderCommand;
+
+            AppenderCommand = appenderCommand = new SimpleAsyncActionCommand<object>(
+                async _ =>
+                {
+                    SimpleAsyncActionCommand<object> searchCommand;
+
+                    var window = new SelectModTargetFilesWindow();
+                    var vm = window.VM;
+                    vm.SearchCommand = searchCommand = new SimpleAsyncActionCommand<object>(
+                        async _ =>
+                        {
+                            var sourceDir = GameDataPath;
+                            var destDir = Path.GetDirectoryName(ModYmlFilePath);
+
+                            var ifMatch = _keywordsMatcherService.CreateMatcher(window.VM.SearchKeywords);
+                            window.VM.SearchHits = await Task.Run(
+                                () => Directory.EnumerateFiles(sourceDir, "*", SearchOption.AllDirectories)
+                                    .Select(
+                                        file => (
+                                            Path: file,
+                                            Relative: Path.GetRelativePath(sourceDir, file)
+                                                .Replace('\\', '/')
+                                        )
+                                    )
+                                    .Where(pair => ifMatch(pair.Relative))
+                                    .Select(
+                                        pair => new SearchHit(
+                                            FullPath: pair.Path,
+                                            Display: pair.Relative
+                                        )
+                                    )
+                                    .ToArray()
+                            );
+                        }
+                    );
+
+                    var selectionIsGood = new BehaviorSubject<bool>(false);
+
+                    var actions = new List<ActionCommand>();
+
+                    SimpleAsyncActionCommand<object> copyBinCommand;
+
+                    var hits = Enumerable.Empty<SearchHit>();
+
+                    actions.Add(
+                        new ActionCommand(
+                            "Copy bin",
+                            copyBinCommand = new SimpleAsyncActionCommand<object>(
+                                async _ =>
+                                {
+
+                                    await ModifyMetadataAsync(
+                                        async mod =>
+                                        {
+                                            await Task.Yield();
+
+                                            mod.Assets.AddRange(
+                                                hits
+                                                .Select(
+                                                    hit => new AssetFile
+                                                    {
+                                                        Name = hit.RelativePath,
+                                                        Method = "copy",
+                                                        Source = new List<AssetFile>(
+                                                            new AssetFile[]
+                                                            {
+                                                                new AssetFile
+                                                                {
+                                                                    Name = hit.RelativePath,
+                                                                }
+                                                            }
+                                                        ),
+                                                    }
+                                                )
+                                            );
+                                        }
+                                    );
+                                }
+                            )
+                            {
+                                IsEnabled = false,
+                            }
+                        )
+                    );
+
+                    vm.Actions = actions;
+
+                    selectionIsGood
+                        .ObserveOn(Scheduler.Immediate)
+                        .Subscribe(it => copyBinCommand.IsEnabled = it);
+
+                    vm.OnSearchHitsSelected = them =>
+                    {
+                        hits = them;
+                        selectionIsGood.OnNext(them.Any());
+                    };
+
+                    window.Owner = _getActiveWindowService.GetActiveWindow();
+                    window.Closed += (_, __) => window.Owner?.Focus();
+                    window.Show();
+                },
+                task => AppenderTask = task
+            );
 
             SimpleAsyncActionCommand<object> generateCommand;
 
             GenerateCommand = generateCommand = new SimpleAsyncActionCommand<object>(
                 async _ =>
                 {
-                    await _yamlGeneratorService.GenerateAsync(
-                        ModYmlFilePath,
-                        async (rawInput, rawOutput) =>
+                    await ModifyMetadataAsync(
+                        async mod =>
                         {
-                            var diffToolSource = new TaskCompletionSource<GetDiffService>();
-
-                            var rawOutput2 = await diffTool.DiffAsync(rawInput, rawOutput);
-                            if (rawOutput2 != null)
-                            {
-                                if (await _queryApplyPatchService.QueryAsync())
-                                {
-                                    return rawOutput2;
-                                }
-                                else
-                                {
-                                    return null;
-                                }
-                            }
-                            else
-                            {
-                                return null;
-                            }
+                            await _yamlGeneratorService.RefillAssetFilesAsync(
+                                assetFiles: mod.Assets,
+                                sourceDir: Path.GetDirectoryName(ModYmlFilePath)
+                            );
                         }
                     );
                 },
@@ -140,12 +310,26 @@ namespace OpenKh.Tools.ModsManager.Views
             Observable
                 .CombineLatest(toolIsGood, ymlFilePathIsGood)
                 .ObserveOn(Scheduler.Immediate)
-                .Subscribe(
-                    list =>
-                    {
-                        generateCommand.IsEnabled = list.All(it => it);
-                    }
-                );
+                .Subscribe(array => generateCommand.IsEnabled = array.All(it => it));
+
+            var gameDataPathIsGood = new BehaviorSubject<bool>(false);
+
+            OnGameDataPathChanged = path =>
+            {
+                try
+                {
+                    gameDataPathIsGood.OnNext((1 <= path?.Length) && Directory.Exists(path));
+                }
+                catch
+                {
+                    // ignore
+                }
+            };
+
+            Observable
+                .CombineLatest(ymlFilePathIsGood, gameDataPathIsGood)
+                .ObserveOn(Scheduler.Immediate)
+                .Subscribe(array => appenderCommand.IsEnabled = array.All(it => it));
 
             {
                 Tools = _getDiffToolsService.GetDiffServices(".yml")

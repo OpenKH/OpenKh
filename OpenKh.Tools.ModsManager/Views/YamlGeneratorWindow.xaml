@@ -9,11 +9,14 @@
         WindowStartupLocation="CenterOwner"
         d:DataContext="{d:DesignInstance Type=local:YamlGeneratorVM}"
         mc:Ignorable="d"
-        Title="YamlGeneratorWindow" Height="232" Width="426">
+        Title="YamlGeneratorWindow" Height="456" Width="426">
     <DockPanel Margin="7">
         <DockPanel.Resources>
             <Style TargetType="TextBlock">
                 <Setter Property="Padding" Value="3"/>
+                <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
+            </Style>
+            <Style TargetType="GroupBox">
                 <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
             </Style>
         </DockPanel.Resources>
@@ -29,9 +32,21 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <TextBlock />
-            <Button Content="Generate or update mod.yml" Command="{Binding GenerateCommand}" HorizontalAlignment="Left" Padding="7" />
-            <userControls:TaskStatusObserverControl Padding="3" Task="{Binding GeneratingTask}" />
+            <GroupBox Header="Generator" Padding="7">
+                <StackPanel>
+                    <Button Content="Generate or update mod.yml" Command="{Binding GenerateCommand}" HorizontalAlignment="Left" Padding="7" />
+                    <userControls:TaskStatusObserverControl Padding="3" Task="{Binding GeneratingTask}" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Target files appender" Padding="7">
+                <StackPanel>
+                    <TextBlock>GameDataPath</TextBlock>
+                    <userControls:FolderSelectorControl FolderPath="{Binding GameDataPath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock />
+                    <Button Content="Begin" Command="{Binding AppenderCommand}" HorizontalAlignment="Left" Padding="7" />
+                    <userControls:TaskStatusObserverControl Padding="3" Task="{Binding AppenderTask}" />
+                </StackPanel>
+            </GroupBox>
         </StackPanel>
     </DockPanel>
 </Window>

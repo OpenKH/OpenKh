@@ -13,17 +13,11 @@ namespace OpenKh.Tools.ModsManager.Services
         /// <returns>Return final yml blob if it is good to save. Otherwise return `null` if it is not fit to save.</returns>
         public delegate Task<byte[]> GetDiffAsyncDelegate(byte[] rawInput, byte[] rawOutput);
 
-        public async Task GenerateAsync(
-            string ymlFile,
-            GetDiffAsyncDelegate diffAsync
+        public async Task RefillAssetFilesAsync(
+            List<AssetFile> assetFiles,
+            string sourceDir
         )
         {
-            var rawInput = await File.ReadAllBytesAsync(ymlFile);
-
-            var mod = await Task.Run(() => File.Exists(ymlFile))
-                ? Metadata.Read(new MemoryStream(rawInput, false))
-                : new Metadata();
-
             string NormalizePath(string path) => path?.Replace('\\', '/');
 
             IEnumerable<AssetFile> EnumerateAllSources(IEnumerable<AssetFile> list)
@@ -42,19 +36,10 @@ namespace OpenKh.Tools.ModsManager.Services
                 }
             }
 
-            if (mod.Assets == null)
+            foreach (var asset in EnumerateAllSources(assetFiles))
             {
-                mod.Assets = new List<AssetFile>();
+                asset.Name = NormalizePath(asset.Name);
             }
-            else
-            {
-                foreach (var asset in EnumerateAllSources(mod.Assets))
-                {
-                    asset.Name = NormalizePath(asset.Name);
-                }
-            }
-
-            var sourceDir = Path.GetDirectoryName(ymlFile);
 
             var assets = new List<AssetFile>();
 
@@ -91,21 +76,9 @@ namespace OpenKh.Tools.ModsManager.Services
 
             foreach (var asset in assets)
             {
-                if (!EnumerateAllSources(mod.Assets).Any(it => it.Name == asset.Name))
+                if (!EnumerateAllSources(assetFiles).Any(it => it.Name == asset.Name))
                 {
-                    mod.Assets.Add(asset);
-                }
-            }
-
-            {
-                var temp = new MemoryStream();
-                mod.Write(temp);
-                var rawOutput = temp.ToArray();
-
-                var rawFinalOutput = await diffAsync(rawInput, rawOutput);
-                if (rawFinalOutput != null)
-                {
-                    await File.WriteAllBytesAsync(ymlFile, rawFinalOutput);
+                    assetFiles.Add(asset);
                 }
             }
         }
