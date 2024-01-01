@@ -170,6 +170,52 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             }
 
+            void DisplayCopy(
+                IEnumerable<PrimarySource> primarySourceList,
+                Func<PrimarySource, IEnumerable<CopySourceFile>> getCopySourceList,
+                Func<IEnumerable<CopySourceFile>, Task> proceedAsync
+            )
+            {
+                var copyWin = new CopySourceFilesWindow();
+                copyWin.Owner = _getActiveWindowService.GetActiveWindow();
+                copyWin.Closed += (_, __) => copyWin.Owner?.Focus();
+                var copyVm = copyWin.VM;
+                SearchHit selectedHit = null;
+                SimpleAsyncActionCommand<object> proceedCopyCommand;
+                copyVm.ProceedCommand = proceedCopyCommand = new SimpleAsyncActionCommand<object>(
+                    async _ =>
+                    {
+                        if (selectedHit == null)
+                        {
+                            throw new NullReferenceException("selectedHit");
+                        }
+
+                        await proceedAsync(copyVm.CopySourceList);
+
+                        copyWin.Close();
+                    },
+                    task => copyVm.ProceedTask = task
+                )
+                {
+                    IsEnabled = false,
+                };
+                copyVm.PropertyChanged += (_, e) =>
+                {
+                    if (e.PropertyName == null || e.PropertyName == nameof(copyVm.SelectedPrimarySource))
+                    {
+                        var one = copyVm.SelectedPrimarySource;
+
+                        proceedCopyCommand.IsEnabled = one != null;
+
+                        copyVm.CopySourceList = getCopySourceList(one)
+                            .ToArray();
+                    }
+                };
+                copyVm.PrimarySourceList = primarySourceList
+                    .ToArray();
+                copyWin.Show();
+            }
+
             SimpleAsyncActionCommand<object> appenderCommand;
 
             AppenderCommand = appenderCommand = new SimpleAsyncActionCommand<object>(
@@ -223,78 +269,14 @@ namespace OpenKh.Tools.ModsManager.Views
                             copyMultiCommand = new SimpleAsyncActionCommand<object>(
                                 async _ =>
                                 {
-                                    var copyWin = new CopySourceFilesWindow();
-                                    copyWin.Owner = _getActiveWindowService.GetActiveWindow();
-                                    copyWin.Closed += (_, __) => copyWin.Owner?.Focus();
-                                    var copyVm = copyWin.VM;
                                     SearchHit selectedHit = null;
-                                    SimpleAsyncActionCommand<object> proceedCopyCommand;
-                                    copyVm.ProceedCommand = proceedCopyCommand = new SimpleAsyncActionCommand<object>(
-                                        async _ =>
+
+                                    DisplayCopy(
+                                        primarySourceList: hits
+                                            .Select(hit => new PrimarySource(hit.Display)),
+                                        getCopySourceList: one =>
                                         {
-                                            if (selectedHit == null)
-                                            {
-                                                throw new NullReferenceException("selectedHit");
-                                            }
-
-                                            foreach (var source in copyVm.CopySourceList.Where(it => it.DoAction))
-                                            {
-                                                await source.AsyncAction();
-                                            }
-
-                                            await ModifyMetadataAsync(
-                                                async mod =>
-                                                {
-                                                    await Task.Yield();
-
-                                                    mod.Assets.Add(
-                                                        new AssetFile
-                                                        {
-                                                            Name = selectedHit.RelativePath,
-                                                            Multi = new List<Multi>(
-                                                                hits
-                                                                    .Where(
-                                                                        hit => hit.RelativePath != selectedHit.RelativePath
-                                                                    )
-                                                                    .Select(
-                                                                        hit => new Multi
-                                                                        {
-                                                                            Name = hit.RelativePath,
-                                                                        }
-                                                                    )
-                                                                    .ToArray()
-                                                            ),
-                                                            Method = "copy",
-                                                            Source = new List<AssetFile>(
-                                                                new AssetFile[]
-                                                                {
-                                                                    new AssetFile
-                                                                    {
-                                                                        Name = selectedHit.RelativePath,
-                                                                    }
-                                                                }
-                                                            ),
-                                                        }
-                                                    );
-                                                }
-                                            );
-
-                                            copyWin.Close();
-                                        },
-                                        task => copyVm.ProceedTask = task
-                                    )
-                                    {
-                                        IsEnabled = false,
-                                    };
-                                    copyVm.PropertyChanged += (_, e) =>
-                                    {
-                                        if (e.PropertyName == null || e.PropertyName == nameof(copyVm.SelectedPrimarySource))
-                                        {
-                                            var one = copyVm.SelectedPrimarySource;
-
-                                            proceedCopyCommand.IsEnabled = one != null;
-
-                                            copyVm.CopySourceList = hits
+                                            return hits
                                                 .Where(
                                                     hit => hit.Display == one?.Display
                                                 )
@@ -321,14 +303,53 @@ namespace OpenKh.Tools.ModsManager.Views
                                                             DoAction = !exists,
                                                         };
                                                     }
-                                                )
-                                                .ToArray();
+                                                );
+                                        },
+                                        proceedAsync: async copySourceList =>
+                                        {
+                                            foreach (var source in copySourceList.Where(it => it.DoAction))
+                                            {
+                                                await source.AsyncAction();
+                                            }
+
+                                            await ModifyMetadataAsync(
+                                                async mod =>
+                                                {
+                                                    await Task.Yield();
+
+                                                    mod.Assets.Add(
+                                                        new AssetFile
+                                                        {
+                                                            Name = selectedHit.RelativePath,
+                                                            Multi = new List<Multi>(
+                                                                hits
+                                                                    .Where(
+                                                                        hit => !ReferenceEquals(hit, selectedHit)
+                                                                    )
+                                                                    .Select(
+                                                                        hit => new Multi
+                                                                        {
+                                                                            Name = hit.RelativePath,
+                                                                        }
+                                                                    )
+                                                                    .ToArray()
+                                                            ),
+                                                            Method = "copy",
+                                                            Source = new List<AssetFile>(
+                                                                new AssetFile[]
+                                                                {
+                                                                    new AssetFile
+                                                                    {
+                                                                        Name = selectedHit.RelativePath,
+                                                                    }
+                                                                }
+                                                            ),
+                                                        }
+                                                    );
+                                                }
+                                            );
                                         }
-                                    };
-                                    copyVm.PrimarySourceList = hits
-                                        .Select(hit => new PrimarySource(hit.Display))
-                                        .ToArray();
-                                    copyWin.Show();
+                                    );
                                 }
                             )
                             {
@@ -343,30 +364,68 @@ namespace OpenKh.Tools.ModsManager.Views
                             copyEachCommand = new SimpleAsyncActionCommand<object>(
                                 async _ =>
                                 {
+                                    await Task.Yield();
 
-                                    await ModifyMetadataAsync(
-                                        async mod =>
+                                    DisplayCopy(
+                                        primarySourceList: new PrimarySource[] { new PrimarySource("(No selection available)") },
+                                        getCopySourceList: one =>
                                         {
-                                            await Task.Yield();
-
-                                            mod.Assets.AddRange(
-                                                hits
+                                            return hits
                                                 .Select(
-                                                    hit => new AssetFile
+                                                    hit =>
                                                     {
-                                                        Name = hit.RelativePath,
-                                                        Method = "copy",
-                                                        Source = new List<AssetFile>(
-                                                            new AssetFile[]
+                                                        var sourcePath = Path.Combine(sourceDir, hit.RelativePath);
+                                                        var destPath = Path.Combine(destDir, hit.RelativePath);
+                                                        var exists = File.Exists(destPath);
+                                                        return new CopySourceFile(
+                                                            hit.RelativePath,
+                                                            "Copy",
+                                                            exists,
+                                                            async () =>
                                                             {
-                                                                new AssetFile
+                                                                await Task.Run(
+                                                                    () => File.Copy(sourcePath, destPath, true)
+                                                                );
+                                                            }
+                                                        )
+                                                        {
+                                                            DoAction = !exists,
+                                                        };
+                                                    }
+                                                );
+                                        },
+                                        proceedAsync: async copySourceList =>
+                                        {
+                                            foreach (var source in copySourceList.Where(it => it.DoAction))
+                                            {
+                                                await source.AsyncAction();
+                                            }
+
+                                            await ModifyMetadataAsync(
+                                                async mod =>
+                                                {
+                                                    await Task.Yield();
+
+                                                    mod.Assets.AddRange(
+                                                        hits
+                                                            .Select(
+                                                                hit => new AssetFile
                                                                 {
                                                                     Name = hit.RelativePath,
+                                                                    Method = "copy",
+                                                                    Source = new List<AssetFile>(
+                                                                        new AssetFile[]
+                                                                        {
+                                                                            new AssetFile
+                                                                            {
+                                                                                Name = hit.RelativePath,
+                                                                            }
+                                                                        }
+                                                                    ),
                                                                 }
-                                                            }
-                                                        ),
-                                                    }
-                                                )
+                                                            )
+                                                    );
+                                                }
                                             );
                                         }
                                     );

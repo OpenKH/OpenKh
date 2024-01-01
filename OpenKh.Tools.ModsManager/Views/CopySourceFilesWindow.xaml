@@ -31,31 +31,33 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
         <TextBlock Text="Select actions for source:" Padding="7" DockPanel.Dock="Top" />
-        <ItemsControl ItemsSource="{Binding CopySourceList}" Margin="7" BorderBrush="Gray" BorderThickness="1"
-                      ScrollViewer.VerticalScrollBarVisibility="Visible"
-                      >
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <DockPanel LastChildFill="True" VerticalAlignment="Top">
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                            <CheckBox Content="Exists" IsChecked="{Binding DestinationFileExists}" IsEnabled="False" VerticalAlignment="Center" Margin="3" 
+        <Border Margin="7" BorderBrush="Gray" BorderThickness="1">
+            <ScrollViewer VerticalScrollBarVisibility="Visible">
+                <ItemsControl ItemsSource="{Binding CopySourceList}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel LastChildFill="True" VerticalAlignment="Top" Margin="3">
+                                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                                    <CheckBox Content="Exists" IsChecked="{Binding DestinationFileExists}" IsEnabled="False" VerticalAlignment="Center" Margin="3" 
                                       Foreground="{Binding Foreground,ElementName=_forTheme}"
                                       />
-                            <CheckBox Content="{Binding ActionName}" IsChecked="{Binding DoAction}" VerticalAlignment="Center" Margin="3" 
+                                    <CheckBox Content="{Binding ActionName}" IsChecked="{Binding DoAction}" VerticalAlignment="Center" Margin="3" 
                                       Foreground="{Binding Foreground,ElementName=_forTheme}"
                                       />
-                        </StackPanel>
-                        <TextBlock Text="{Binding Display}" Padding="3" TextTrimming="CharacterEllipsis"
+                                </StackPanel>
+                                <TextBlock Text="{Binding Display}" Padding="3" TextTrimming="CharacterEllipsis"
                                    Foreground="{Binding Foreground,ElementName=_forTheme}"
                                    />
-                    </DockPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
     </DockPanel>
 </Window>
