@@ -980,7 +980,9 @@ namespace OpenKh.Tools.ModsManager.Views
                     );
                     ConfigurationService.YamlGenPrefs = prefList;
 
+                    var prev = SelectedPref;
                     Prefs = prefList;
+                    SelectedPref = prefList.LastOrDefault(it => it.Label == prev?.Label);
                 }
             );
 

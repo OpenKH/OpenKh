@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterOwner"
         d:DataContext="{d:DesignInstance Type=local:YamlGeneratorVM}"
         mc:Ignorable="d"
-        Title="YamlGeneratorWindow" Height="456" Width="426">
+        Title="YamlGeneratorWindow" Height="510" Width="426">
     <DockPanel Margin="7">
         <DockPanel.Resources>
             <Style TargetType="TextBlock">

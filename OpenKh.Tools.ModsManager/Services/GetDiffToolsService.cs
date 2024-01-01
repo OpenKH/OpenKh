@@ -22,8 +22,8 @@ namespace OpenKh.Tools.ModsManager.Services
                     var tempOutput = Path.GetTempFileName() + extension;
                     try
                     {
-                        await File.WriteAllBytesAsync(tempInput, rawInput);
-                        await File.WriteAllBytesAsync(tempOutput, rawOutput);
+                        await File.WriteAllBytesAsync(tempInput, rawInput ?? new byte[0]);
+                        await File.WriteAllBytesAsync(tempOutput, rawOutput ?? new byte[0]);
 
                         var process = System.Diagnostics.Process.Start(
                             exe,
