@@ -5,6 +5,7 @@ using OpenKh.Tools.ModsManager.Models.ViewHelper;
 using OpenKh.Tools.ModsManager.Services;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -176,16 +177,16 @@ namespace OpenKh.Tools.ModsManager.Views
                 {
                     SimpleAsyncActionCommand<object> searchCommand;
 
-                    var window = new SelectModTargetFilesWindow();
-                    var vm = window.VM;
-                    vm.SearchCommand = searchCommand = new SimpleAsyncActionCommand<object>(
+                    var sourceDir = GameDataPath;
+                    var destDir = Path.GetDirectoryName(ModYmlFilePath);
+
+                    var targetWindow = new SelectModTargetFilesWindow();
+                    var targetVm = targetWindow.VM;
+                    targetVm.SearchCommand = searchCommand = new SimpleAsyncActionCommand<object>(
                         async _ =>
                         {
-                            var sourceDir = GameDataPath;
-                            var destDir = Path.GetDirectoryName(ModYmlFilePath);
-
-                            var ifMatch = _keywordsMatcherService.CreateMatcher(window.VM.SearchKeywords);
-                            window.VM.SearchHits = await Task.Run(
+                            var ifMatch = _keywordsMatcherService.CreateMatcher(targetWindow.VM.SearchKeywords);
+                            targetWindow.VM.SearchHits = await Task.Run(
                                 () => Directory.EnumerateFiles(sourceDir, "*", SearchOption.AllDirectories)
                                     .Select(
                                         file => (
@@ -198,6 +199,7 @@ namespace OpenKh.Tools.ModsManager.Views
                                     .Select(
                                         pair => new SearchHit(
                                             FullPath: pair.Path,
+                                            RelativePath: pair.Relative,
                                             Display: pair.Relative
                                         )
                                     )
@@ -210,14 +212,135 @@ namespace OpenKh.Tools.ModsManager.Views
 
                     var actions = new List<ActionCommand>();
 
-                    SimpleAsyncActionCommand<object> copyBinCommand;
+                    SimpleAsyncActionCommand<object> copyMultiCommand;
+                    SimpleAsyncActionCommand<object> copyEachCommand;
 
                     var hits = Enumerable.Empty<SearchHit>();
 
                     actions.Add(
                         new ActionCommand(
-                            "Copy bin",
-                            copyBinCommand = new SimpleAsyncActionCommand<object>(
+                            "Copy multi",
+                            copyMultiCommand = new SimpleAsyncActionCommand<object>(
+                                async _ =>
+                                {
+                                    var copyWin = new CopySourceFilesWindow();
+                                    copyWin.Owner = _getActiveWindowService.GetActiveWindow();
+                                    copyWin.Closed += (_, __) => copyWin.Owner?.Focus();
+                                    var copyVm = copyWin.VM;
+                                    SearchHit selectedHit = null;
+                                    SimpleAsyncActionCommand<object> proceedCopyCommand;
+                                    copyVm.ProceedCommand = proceedCopyCommand = new SimpleAsyncActionCommand<object>(
+                                        async _ =>
+                                        {
+                                            if (selectedHit == null)
+                                            {
+                                                throw new NullReferenceException("selectedHit");
+                                            }
+
+                                            foreach (var source in copyVm.CopySourceList.Where(it => it.DoAction))
+                                            {
+                                                await source.AsyncAction();
+                                            }
+
+                                            await ModifyMetadataAsync(
+                                                async mod =>
+                                                {
+                                                    await Task.Yield();
+
+                                                    mod.Assets.Add(
+                                                        new AssetFile
+                                                        {
+                                                            Name = selectedHit.RelativePath,
+                                                            Multi = new List<Multi>(
+                                                                hits
+                                                                    .Where(
+                                                                        hit => hit.RelativePath != selectedHit.RelativePath
+                                                                    )
+                                                                    .Select(
+                                                                        hit => new Multi
+                                                                        {
+                                                                            Name = hit.RelativePath,
+                                                                        }
+                                                                    )
+                                                                    .ToArray()
+                                                            ),
+                                                            Method = "copy",
+                                                            Source = new List<AssetFile>(
+                                                                new AssetFile[]
+                                                                {
+                                                                    new AssetFile
+                                                                    {
+                                                                        Name = selectedHit.RelativePath,
+                                                                    }
+                                                                }
+                                                            ),
+                                                        }
+                                                    );
+                                                }
+                                            );
+
+                                            copyWin.Close();
+                                        },
+                                        task => copyVm.ProceedTask = task
+                                    )
+                                    {
+                                        IsEnabled = false,
+                                    };
+                                    copyVm.PropertyChanged += (_, e) =>
+                                    {
+                                        if (e.PropertyName == null || e.PropertyName == nameof(copyVm.SelectedPrimarySource))
+                                        {
+                                            var one = copyVm.SelectedPrimarySource;
+
+                                            proceedCopyCommand.IsEnabled = one != null;
+
+                                            copyVm.CopySourceList = hits
+                                                .Where(
+                                                    hit => hit.Display == one?.Display
+                                                )
+                                                .Select(
+                                                    hit =>
+                                                    {
+                                                        selectedHit = hit;
+
+                                                        var sourcePath = Path.Combine(sourceDir, hit.RelativePath);
+                                                        var destPath = Path.Combine(destDir, hit.RelativePath);
+                                                        var exists = File.Exists(destPath);
+                                                        return new CopySourceFile(
+                                                            one.Display,
+                                                            "Copy",
+                                                            exists,
+                                                            async () =>
+                                                            {
+                                                                await Task.Run(
+                                                                    () => File.Copy(sourcePath, destPath, true)
+                                                                );
+                                                            }
+                                                        )
+                                                        {
+                                                            DoAction = !exists,
+                                                        };
+                                                    }
+                                                )
+                                                .ToArray();
+                                        }
+                                    };
+                                    copyVm.PrimarySourceList = hits
+                                        .Select(hit => new PrimarySource(hit.Display))
+                                        .ToArray();
+                                    copyWin.Show();
+                                }
+                            )
+                            {
+                                IsEnabled = false,
+                            }
+                        )
+                    );
+
+                    actions.Add(
+                        new ActionCommand(
+                            "Copy each",
+                            copyEachCommand = new SimpleAsyncActionCommand<object>(
                                 async _ =>
                                 {
 
@@ -255,21 +378,27 @@ namespace OpenKh.Tools.ModsManager.Views
                         )
                     );
 
-                    vm.Actions = actions;
+                    targetVm.Actions = actions;
 
                     selectionIsGood
                         .ObserveOn(Scheduler.Immediate)
-                        .Subscribe(it => copyBinCommand.IsEnabled = it);
+                        .Subscribe(
+                            it =>
+                            {
+                                copyMultiCommand.IsEnabled = it;
+                                copyEachCommand.IsEnabled = it;
+                            }
+                        );
 
-                    vm.OnSearchHitsSelected = them =>
+                    targetVm.OnSearchHitsSelected = them =>
                     {
                         hits = them;
                         selectionIsGood.OnNext(them.Any());
                     };
 
-                    window.Owner = _getActiveWindowService.GetActiveWindow();
-                    window.Closed += (_, __) => window.Owner?.Focus();
-                    window.Show();
+                    targetWindow.Owner = _getActiveWindowService.GetActiveWindow();
+                    targetWindow.Closed += (_, __) => targetWindow.Owner?.Focus();
+                    targetWindow.Show();
                 },
                 task => AppenderTask = task
             );

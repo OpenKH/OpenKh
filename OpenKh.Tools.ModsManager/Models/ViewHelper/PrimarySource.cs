@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenKh.Tools.ModsManager.Models.ViewHelper
 {
-    public record SearchHit(string Display, string RelativePath, string FullPath)
+    public record PrimarySource(string Display)
     {
     }
 }

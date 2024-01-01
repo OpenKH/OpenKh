@@ -1,0 +1,61 @@
+<Window x:Class="OpenKh.Tools.ModsManager.Views.CopySourceFilesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+        xmlns:userControls="clr-namespace:OpenKh.Tools.ModsManager.UserControls"
+        d:DataContext="{d:DesignInstance local:CopySourceFilesVM}"
+        Background="{Binding ColorTheme.BackgroundColor}"
+        WindowStartupLocation="CenterOwner"
+        mc:Ignorable="d"
+        Title="CopySourceFilesWindow" Height="348" Width="868">
+    <FrameworkElement.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
+        </Style>
+    </FrameworkElement.Resources>
+    <DockPanel LastChildFill="True">
+        <TextBlock Visibility="Collapsed" Foreground="{Binding ColorTheme.TextColor}" Name="_forTheme" />
+        <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Orientation="Horizontal">
+            <Button Content="Proceed" HorizontalAlignment="Left" Padding="7" Margin="7" Command="{Binding ProceedCommand}" />
+            <userControls:TaskStatusObserverControl VerticalAlignment="Center" Task="{Binding ProceedTask}" />
+        </StackPanel>
+        <TextBlock Text="Select primary one if applicable:" Padding="7" DockPanel.Dock="Top" />
+        <ComboBox DockPanel.Dock="Top" Margin="7" ItemsSource="{Binding PrimarySourceList}" SelectedItem="{Binding SelectedPrimarySource}"
+                  >
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Display}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Text="Select actions for source:" Padding="7" DockPanel.Dock="Top" />
+        <ItemsControl ItemsSource="{Binding CopySourceList}" Margin="7" BorderBrush="Gray" BorderThickness="1"
+                      ScrollViewer.VerticalScrollBarVisibility="Visible"
+                      >
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel LastChildFill="True" VerticalAlignment="Top">
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                            <CheckBox Content="Exists" IsChecked="{Binding DestinationFileExists}" IsEnabled="False" VerticalAlignment="Center" Margin="3" 
+                                      Foreground="{Binding Foreground,ElementName=_forTheme}"
+                                      />
+                            <CheckBox Content="{Binding ActionName}" IsChecked="{Binding DoAction}" VerticalAlignment="Center" Margin="3" 
+                                      Foreground="{Binding Foreground,ElementName=_forTheme}"
+                                      />
+                        </StackPanel>
+                        <TextBlock Text="{Binding Display}" Padding="3" TextTrimming="CharacterEllipsis"
+                                   Foreground="{Binding Foreground,ElementName=_forTheme}"
+                                   />
+                    </DockPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </DockPanel>
+</Window>
