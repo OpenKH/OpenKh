@@ -21,6 +21,23 @@
             </Style>
         </DockPanel.Resources>
         <StackPanel Orientation="Vertical">
+            <TextBlock>Preferences</TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <ComboBox ItemsSource="{Binding Prefs}" VerticalAlignment="Center" IsEditable="True" Width="200"
+                          Text="{Binding PrefLabel,UpdateSourceTrigger=PropertyChanged}"
+                          SelectedItem="{Binding SelectedPref}"
+                          >
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Label}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <TextBlock />
+                <Button Content="Load from it" Command="{Binding LoadPrefCommand}" HorizontalAlignment="Left" Padding="7" />
+                <TextBlock />
+                <Button Content="Save to it" Command="{Binding SavePrefCommand}" HorizontalAlignment="Left" Padding="7" />
+            </StackPanel>
             <TextBlock>mod.yml</TextBlock>
             <userControls:SaveFileSelectorControl FilePath="{Binding ModYmlFilePath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                                   Filter="mod.yml|mod.yml|*|*" />

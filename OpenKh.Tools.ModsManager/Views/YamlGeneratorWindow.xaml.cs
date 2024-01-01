@@ -26,9 +26,5 @@ namespace OpenKh.Tools.ModsManager.Views
             InitializeComponent();
             DataContext = VM = new YamlGeneratorVM();
         }
-
-        private void FolderSelectorControl_LostFocus(object sender, RoutedEventArgs e)
-        {
-        }
     }
 }

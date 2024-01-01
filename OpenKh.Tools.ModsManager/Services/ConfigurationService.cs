@@ -47,6 +47,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public List<string> GamesToExtract { get; internal set; } = new List<string> { "kh2" };
             public string LaunchGame { get; internal set; } = "kh2";
             public bool DarkMode { get; internal set; } = true;
+            public List<YamlGenPref> YamlGenPrefs { get; internal set; } = new List<YamlGenPref>();
 
             public void Save(string fileName)
             {
@@ -72,6 +73,15 @@ namespace OpenKh.Tools.ModsManager.Services
         private static string EnabledModsPathRECOM = Path.Combine(StoragePath, "mods-ReCoM.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
         public static string PresetPath = Path.Combine(StoragePath, "presets");
+
+        public class YamlGenPref
+        {
+            public string Label { get; set; }
+            public string GameDataPath { get; set; }
+            public string ModYmlFilePath { get; set; }
+
+            public override string ToString() => Label;
+        }
 
         static ConfigurationService()
         {
@@ -110,7 +120,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     .ToList();
             });
         }
-        
+
         public static ICollection<string> EnabledMods
         {
             get
@@ -411,6 +421,16 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.DarkMode = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static IEnumerable<YamlGenPref> YamlGenPrefs
+        {
+            get => _config.YamlGenPrefs.AsReadOnly();
+            set
+            {
+                _config.YamlGenPrefs = value.ToList();
                 _config.Save(ConfigPath);
             }
         }

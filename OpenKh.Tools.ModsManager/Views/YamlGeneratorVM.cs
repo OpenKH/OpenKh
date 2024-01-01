@@ -1,4 +1,8 @@
 using LibGit2Sharp;
+using OpenKh.Bbs;
+using OpenKh.Common;
+using OpenKh.Kh2;
+using OpenKh.Kh2.SystemData;
 using OpenKh.Patcher;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Models.ViewHelper;
@@ -17,6 +21,8 @@ using System.Windows;
 using System.Windows.Input;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
+using YamlDotNet.Serialization;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace OpenKh.Tools.ModsManager.Views
 {
@@ -24,9 +30,50 @@ namespace OpenKh.Tools.ModsManager.Views
     {
         public ColorThemeService ColorTheme => ColorThemeService.Instance;
         public ICommand GenerateCommand { get; set; }
+        public ICommand LoadPrefCommand { get; set; }
+        public ICommand SavePrefCommand { get; set; }
 
         private Action<GetDiffService> OnToolSelected { get; set; } = _ => { };
         private Action<string> OnYmlChanged { get; set; } = _ => { };
+
+        #region SelectedPref
+        private ConfigurationService.YamlGenPref _selectedPref = null;
+        public ConfigurationService.YamlGenPref SelectedPref
+        {
+            get => _selectedPref;
+            set
+            {
+                _selectedPref = value;
+                OnPropertyChanged(nameof(SelectedPref));
+            }
+        }
+        #endregion
+
+        #region PrefLabel
+        private string _prefLabel = "";
+        public string PrefLabel
+        {
+            get => _prefLabel;
+            set
+            {
+                _prefLabel = value;
+                OnPropertyChanged(nameof(PrefLabel));
+            }
+        }
+        #endregion
+
+        #region Prefs
+        private IEnumerable<ConfigurationService.YamlGenPref> _prefs = Array.Empty<ConfigurationService.YamlGenPref>();
+        public IEnumerable<ConfigurationService.YamlGenPref> Prefs
+        {
+            get => _prefs;
+            set
+            {
+                _prefs = value;
+                OnPropertyChanged(nameof(Prefs));
+            }
+        }
+        #endregion
 
         #region ModYmlFilePath 
         private string _modYmlFilePath = "";
@@ -119,9 +166,229 @@ namespace OpenKh.Tools.ModsManager.Views
         private readonly GetActiveWindowService _getActiveWindowService = new GetActiveWindowService();
         private readonly QueryApplyPatchService _queryApplyPatchService = new QueryApplyPatchService();
         private readonly KeywordsMatcherService _keywordsMatcherService = new KeywordsMatcherService();
+        private readonly ISerializer _listSer = new SerializerBuilder()
+            .Build();
 
         public YamlGeneratorVM()
         {
+            var extractors = new List<(
+                string BarEntryName, 
+                string YmlEntryName, 
+                Bar.EntryType Type, 
+                string FileExtension,
+                Func<Bar.Entry, Task<byte[]>> ExtractAsync
+            )>();
+
+
+            extractors.Add((
+                "trsr",
+                "trsr",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.SystemData.Trsr.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+            extractors.Add((
+                "item",
+                "item",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.SystemData.Item.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+            extractors.Add((
+                "fmlv",
+                "fmlv",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.Battle.Fmlv.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+            extractors.Add((
+                "lvup",
+                "lvup",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.Battle.Lvup.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+            extractors.Add((
+                "bons",
+                "bons",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.Battle.Bons.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+            extractors.Add((
+                "atkp",
+                "atkp",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.Battle.Atkp.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+            extractors.Add((
+                "plrp",
+                "plrp",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.Battle.Plrp.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+            extractors.Add((
+                "plrp",
+                "plrp",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.Battle.Plrp.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+            extractors.Add((
+                "cmd",
+                "cmd",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.SystemData.Cmd.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+            extractors.Add((
+                "enmp",
+                "enmp",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.Battle.Enmp.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+            extractors.Add((
+                "sklt",
+                "sklt",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.SystemData.Sklt.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+            extractors.Add((
+                "przt",
+                "przt",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.Battle.Przt.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+            extractors.Add((
+                "magc",
+                "magc",
+                Bar.EntryType.List,
+                ".yml",
+                async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            OpenKh.Kh2.Battle.Magc.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                }
+            ));
+
+
             GetDiffService diffTool = null;
 
             async Task ModifyMetadataAsync(
@@ -180,16 +447,10 @@ namespace OpenKh.Tools.ModsManager.Views
                 copyWin.Owner = _getActiveWindowService.GetActiveWindow();
                 copyWin.Closed += (_, __) => copyWin.Owner?.Focus();
                 var copyVm = copyWin.VM;
-                SearchHit selectedHit = null;
                 SimpleAsyncActionCommand<object> proceedCopyCommand;
                 copyVm.ProceedCommand = proceedCopyCommand = new SimpleAsyncActionCommand<object>(
                     async _ =>
                     {
-                        if (selectedHit == null)
-                        {
-                            throw new NullReferenceException("selectedHit");
-                        }
-
                         await proceedAsync(copyVm.CopySourceList);
 
                         copyWin.Close();
@@ -215,6 +476,9 @@ namespace OpenKh.Tools.ModsManager.Views
                     .ToArray();
                 copyWin.Show();
             }
+
+            List<AssetFile> CreateSourceFromArgs(params AssetFile[] assetFiles) => new List<AssetFile>(assetFiles);
+
 
             SimpleAsyncActionCommand<object> appenderCommand;
 
@@ -260,6 +524,7 @@ namespace OpenKh.Tools.ModsManager.Views
 
                     SimpleAsyncActionCommand<object> copyMultiCommand;
                     SimpleAsyncActionCommand<object> copyEachCommand;
+                    SimpleAsyncActionCommand<object> binArcCommand;
 
                     var hits = Enumerable.Empty<SearchHit>();
 
@@ -269,6 +534,8 @@ namespace OpenKh.Tools.ModsManager.Views
                             copyMultiCommand = new SimpleAsyncActionCommand<object>(
                                 async _ =>
                                 {
+                                    await Task.Yield();
+
                                     SearchHit selectedHit = null;
 
                                     DisplayCopy(
@@ -335,13 +602,10 @@ namespace OpenKh.Tools.ModsManager.Views
                                                                     .ToArray()
                                                             ),
                                                             Method = "copy",
-                                                            Source = new List<AssetFile>(
-                                                                new AssetFile[]
+                                                            Source = CreateSourceFromArgs(
+                                                                new AssetFile
                                                                 {
-                                                                    new AssetFile
-                                                                    {
-                                                                        Name = selectedHit.RelativePath,
-                                                                    }
+                                                                    Name = selectedHit.RelativePath,
                                                                 }
                                                             ),
                                                         }
@@ -366,34 +630,34 @@ namespace OpenKh.Tools.ModsManager.Views
                                 {
                                     await Task.Yield();
 
-                                    DisplayCopy(
-                                        primarySourceList: new PrimarySource[] { new PrimarySource("(No selection available)") },
-                                        getCopySourceList: one =>
-                                        {
-                                            return hits
-                                                .Select(
-                                                    hit =>
+                                    var copySourceList = hits
+                                        .Select(
+                                            hit =>
+                                            {
+                                                var sourcePath = Path.Combine(sourceDir, hit.RelativePath);
+                                                var destPath = Path.Combine(destDir, hit.RelativePath);
+                                                var exists = File.Exists(destPath);
+                                                return new CopySourceFile(
+                                                    hit.RelativePath,
+                                                    "Copy",
+                                                    exists,
+                                                    async () =>
                                                     {
-                                                        var sourcePath = Path.Combine(sourceDir, hit.RelativePath);
-                                                        var destPath = Path.Combine(destDir, hit.RelativePath);
-                                                        var exists = File.Exists(destPath);
-                                                        return new CopySourceFile(
-                                                            hit.RelativePath,
-                                                            "Copy",
-                                                            exists,
-                                                            async () =>
-                                                            {
-                                                                await Task.Run(
-                                                                    () => File.Copy(sourcePath, destPath, true)
-                                                                );
-                                                            }
-                                                        )
-                                                        {
-                                                            DoAction = !exists,
-                                                        };
+                                                        await Task.Run(
+                                                            () => File.Copy(sourcePath, destPath, true)
+                                                        );
                                                     }
-                                                );
-                                        },
+                                                )
+                                                {
+                                                    DoAction = !exists,
+                                                };
+                                            }
+                                        )
+                                        .ToArray();
+
+                                    DisplayCopy(
+                                        primarySourceList: new PrimarySource[] { new PrimarySource("(No selection needed)") },
+                                        getCopySourceList: one => copySourceList,
                                         proceedAsync: async copySourceList =>
                                         {
                                             foreach (var source in copySourceList.Where(it => it.DoAction))
@@ -413,16 +677,158 @@ namespace OpenKh.Tools.ModsManager.Views
                                                                 {
                                                                     Name = hit.RelativePath,
                                                                     Method = "copy",
-                                                                    Source = new List<AssetFile>(
-                                                                        new AssetFile[]
+                                                                    Source = CreateSourceFromArgs(
+                                                                        new AssetFile
                                                                         {
-                                                                            new AssetFile
-                                                                            {
-                                                                                Name = hit.RelativePath,
-                                                                            }
+                                                                            Name = hit.RelativePath,
                                                                         }
                                                                     ),
                                                                 }
+                                                            )
+                                                    );
+                                                }
+                                            );
+                                        }
+                                    );
+                                }
+                            )
+                            {
+                                IsEnabled = false,
+                            }
+                        )
+                    );
+
+                    actions.Add(
+                        new ActionCommand(
+                            "binarc",
+                            binArcCommand = new SimpleAsyncActionCommand<object>(
+                                async _ =>
+                                {
+                                    await Task.Yield();
+
+                                    var mixedSourceList = hits
+                                        .SelectMany(
+                                            hit =>
+                                            {
+                                                var sourcePath = Path.Combine(sourceDir, hit.RelativePath);
+
+                                                var stream = new MemoryStream(File.ReadAllBytes(sourcePath), false);
+
+                                                var barEntries = Bar.IsValid(stream)
+                                                    ? Bar.Read(stream).AsEnumerable()
+                                                    : Array.Empty<Bar.Entry>();
+
+                                                return barEntries
+                                                    .Select(
+                                                        barEntry =>
+                                                        {
+                                                            var extractor = extractors.FirstOrDefault(
+                                                                one => one.BarEntryName == barEntry.Name
+                                                                    && one.Type == barEntry.Type
+                                                            );
+
+                                                            var destRelative = Path.Combine(
+                                                                Path.GetDirectoryName(hit.RelativePath),
+                                                                $"{Path.GetFileNameWithoutExtension(hit.RelativePath)}_{barEntry.Name}{extractor.FileExtension}"
+                                                            );
+                                                            var destPath = Path.Combine(
+                                                                destDir,
+                                                                destRelative
+                                                            );
+
+                                                            var exists = File.Exists(destPath);
+
+                                                            var copySourceFile = new CopySourceFile(
+                                                                $"{hit.RelativePath} ({barEntry.Name} {barEntry.Type} {extractor.FileExtension})",
+                                                                "Extract",
+                                                                exists,
+                                                                async () =>
+                                                                {
+                                                                    await Task.Run(
+                                                                        async () =>
+                                                                        {
+                                                                            Directory.CreateDirectory(Path.GetDirectoryName(destPath));
+
+                                                                            using (var destStream = File.Create(destPath))
+                                                                            {
+                                                                                if (extractor.ExtractAsync != null)
+                                                                                {
+                                                                                    await destStream.WriteAsync(
+                                                                                        await extractor.ExtractAsync(barEntry)
+                                                                                    );
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    barEntry.Stream.FromBegin().CopyTo(destStream);
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                }
+                                                            )
+                                                            {
+                                                                DoAction = !exists,
+                                                            };
+
+                                                            var assetFile = new AssetFile
+                                                            {
+                                                                Name = hit.RelativePath,
+                                                                Method = "binarc",
+                                                                Source = CreateSourceFromArgs(
+                                                                    new AssetFile
+                                                                    {
+                                                                        Name = barEntry.Name,
+                                                                        Type = barEntry.Type.ToString(),
+                                                                        Method = "copy",
+                                                                        Source = CreateSourceFromArgs(
+                                                                            new AssetFile
+                                                                            {
+                                                                                Name = destRelative.Replace('\\', '/'),
+                                                                            }
+                                                                        ),
+                                                                    }
+                                                                ),
+                                                            };
+
+                                                            return (CopySourceFile: copySourceFile, AssetFile: assetFile);
+                                                        }
+                                                    );
+                                            }
+                                        );
+
+                                    DisplayCopy(
+                                        primarySourceList: new PrimarySource[] { new PrimarySource("(No selection needed)") },
+                                        getCopySourceList: one =>
+                                        {
+                                            return mixedSourceList
+                                                .Select(tuple => tuple.CopySourceFile);
+                                        },
+                                        proceedAsync: async copySourceList =>
+                                        {
+                                            foreach (var source in copySourceList.Where(it => it.DoAction))
+                                            {
+                                                try
+                                                {
+                                                    await source.AsyncAction();
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    throw new Exception($"Error while processing of: {source.Display}", ex);
+                                                }
+                                            }
+
+                                            await ModifyMetadataAsync(
+                                                async mod =>
+                                                {
+                                                    await Task.Yield();
+
+                                                    mod.Assets.AddRange(
+                                                        mixedSourceList
+                                                            .Where(
+                                                                tuple => tuple.CopySourceFile.DoAction || tuple.CopySourceFile.DestinationFileExists
+                                                            )
+                                                            .Select(
+                                                                tuple => tuple.AssetFile
                                                             )
                                                     );
                                                 }
@@ -446,6 +852,7 @@ namespace OpenKh.Tools.ModsManager.Views
                             {
                                 copyMultiCommand.IsEnabled = it;
                                 copyEachCommand.IsEnabled = it;
+                                binArcCommand.IsEnabled = it;
                             }
                         );
 
@@ -466,19 +873,19 @@ namespace OpenKh.Tools.ModsManager.Views
 
             GenerateCommand = generateCommand = new SimpleAsyncActionCommand<object>(
                 async _ =>
-                {
-                    await ModifyMetadataAsync(
-                        async mod =>
-                        {
-                            await _yamlGeneratorService.RefillAssetFilesAsync(
+                    {
+                        await ModifyMetadataAsync(
+                            async mod =>
+                            {
+                                await _yamlGeneratorService.RefillAssetFilesAsync(
                                 assetFiles: mod.Assets,
                                 sourceDir: Path.GetDirectoryName(ModYmlFilePath)
                             );
-                        }
-                    );
-                },
-                task => GeneratingTask = task
-            );
+                            }
+                        );
+                    },
+                    task => GeneratingTask = task
+                );
 
             var toolIsGood = new BehaviorSubject<bool>(false);
 
@@ -533,6 +940,56 @@ namespace OpenKh.Tools.ModsManager.Views
                         }
                     )
                     .ToArray();
+            }
+
+            void LoadPref(ConfigurationService.YamlGenPref pref)
+            {
+                GameDataPath = pref.GameDataPath;
+                ModYmlFilePath = pref.ModYmlFilePath;
+            }
+
+            LoadPrefCommand = new RelayCommand(
+                _ =>
+                {
+                    if (ConfigurationService.YamlGenPrefs.LastOrDefault(it => it.Label == PrefLabel) is ConfigurationService.YamlGenPref pref)
+                    {
+                        LoadPref(pref);
+                    }
+                }
+            );
+
+            SavePrefCommand = new RelayCommand(
+                _ =>
+                {
+                    if (PrefLabel.Length == 0)
+                    {
+                        PrefLabel = $"Saved at {DateTime.Now}";
+                    }
+
+                    var prefList = ConfigurationService.YamlGenPrefs.ToList();
+                    prefList.RemoveAll(
+                        pref => pref.Label == PrefLabel
+                    );
+                    prefList.Add(
+                        new ConfigurationService.YamlGenPref
+                        {
+                            Label = PrefLabel,
+                            GameDataPath = GameDataPath,
+                            ModYmlFilePath = ModYmlFilePath,
+                        }
+                    );
+                    ConfigurationService.YamlGenPrefs = prefList;
+
+                    Prefs = prefList;
+                }
+            );
+
+            Prefs = ConfigurationService.YamlGenPrefs;
+
+            if (ConfigurationService.YamlGenPrefs.LastOrDefault(it => it.Label == "default") is ConfigurationService.YamlGenPref pref)
+            {
+                SelectedPref = pref;
+                LoadPref(pref);
             }
         }
     }
