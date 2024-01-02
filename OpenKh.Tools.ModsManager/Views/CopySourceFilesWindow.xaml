@@ -9,7 +9,7 @@
         Background="{Binding ColorTheme.BackgroundColor}"
         WindowStartupLocation="CenterOwner"
         mc:Ignorable="d"
-        Title="CopySourceFilesWindow" Height="348" Width="868">
+        Title="CopySourceFilesWindow" Height="543" Width="422">
     <FrameworkElement.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>

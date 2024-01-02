@@ -172,9 +172,9 @@ namespace OpenKh.Tools.ModsManager.Views
         public YamlGeneratorVM()
         {
             var extractors = new List<(
-                string BarEntryName, 
-                string YmlEntryName, 
-                Bar.EntryType Type, 
+                string BarEntryName,
+                string YmlEntryName,
+                Bar.EntryType Type,
                 string FileExtension,
                 Func<Bar.Entry, Task<byte[]>> ExtractAsync
             )>();
@@ -525,6 +525,7 @@ namespace OpenKh.Tools.ModsManager.Views
                     SimpleAsyncActionCommand<object> copyMultiCommand;
                     SimpleAsyncActionCommand<object> copyEachCommand;
                     SimpleAsyncActionCommand<object> binArcCommand;
+                    SimpleAsyncActionCommand<object> pathCommand;
 
                     var hits = Enumerable.Empty<SearchHit>();
 
@@ -843,6 +844,35 @@ namespace OpenKh.Tools.ModsManager.Views
                         )
                     );
 
+                    actions.Add(
+                        new ActionCommand(
+                            "path",
+                            pathCommand = new SimpleAsyncActionCommand<object>(
+                                async _ =>
+                                {
+                                    await Task.Yield();
+
+                                    var noteWin = new NotepadWindow();
+                                    var noteVm = noteWin.VM;
+                                    noteVm.Text = _listSer.Serialize(
+                                        new
+                                        {
+                                            name = hits
+                                                .Select(hit => hit.RelativePath)
+                                                .ToArray(),
+                                        }
+                                    );
+                                    noteWin.Owner = _getActiveWindowService.GetActiveWindow();
+                                    noteWin.Closed += (_, __) => noteWin.Owner?.Focus();
+                                    noteWin.Show();
+                                }
+                            )
+                            {
+                                IsEnabled = false,
+                            }
+                        )
+                    );
+
                     targetVm.Actions = actions;
 
                     selectionIsGood
@@ -853,6 +883,7 @@ namespace OpenKh.Tools.ModsManager.Views
                                 copyMultiCommand.IsEnabled = it;
                                 copyEachCommand.IsEnabled = it;
                                 binArcCommand.IsEnabled = it;
+                                pathCommand.IsEnabled = it;
                             }
                         );
 
