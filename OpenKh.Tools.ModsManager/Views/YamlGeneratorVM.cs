@@ -175,12 +175,14 @@ namespace OpenKh.Tools.ModsManager.Views
 
         private delegate bool IfApplyToBarEntryDelegate(string EntryName, Bar.EntryType EntryType, int EntryIndex);
 
+        private record SourceBuilderArg(string DestName, string DestType, string SourceName);
+
         private record Extractor(
             IfApplyToBarEntryDelegate IfApply,
             Func<string, bool> SourceFileTest,
-            string YmlEntryName,
             string FileExtension,
-            Func<Bar.Entry, Task<byte[]>> ExtractAsync
+            Func<Bar.Entry, Task<byte[]>> ExtractAsync,
+            Func<SourceBuilderArg, IEnumerable<AssetFile>> SourceBuilder = null
         );
 
         public YamlGeneratorVM()
@@ -191,7 +193,6 @@ namespace OpenKh.Tools.ModsManager.Views
             extractors.Add(new Extractor(
                 IfApply: (name, type, index) => name == "trsr" && type == Bar.EntryType.List,
                 SourceFileTest: (relativePath) => relativePath == "03system.bin",
-                YmlEntryName: "trsr",
                 FileExtension: ".yml",
                 ExtractAsync: async (Bar.Entry barEntry) =>
                 {
@@ -201,13 +202,27 @@ namespace OpenKh.Tools.ModsManager.Views
                             OpenKh.Kh2.SystemData.Trsr.Read(barEntry.Stream.FromBegin())
                         )
                     );
-                }
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = "trsr",
+                        Type = "list",
+                        Method = "listpatch",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                                Type = "trsr",
+                            }
+                        ),
+                    }
+                )
             ));
 
             extractors.Add(new Extractor(
                 IfApply: (name, type, index) => name == "item" && type == Bar.EntryType.List,
                 SourceFileTest: (relativePath) => relativePath == "03system.bin",
-                YmlEntryName: "item",
                 FileExtension: ".yml",
                 ExtractAsync: async (Bar.Entry barEntry) =>
                 {
@@ -217,13 +232,27 @@ namespace OpenKh.Tools.ModsManager.Views
                             OpenKh.Kh2.SystemData.Item.Read(barEntry.Stream.FromBegin())
                         )
                     );
-                }
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = "item",
+                        Type = "list",
+                        Method = "listpatch",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                                Type = "item",
+                            }
+                        ),
+                    }
+                )
             ));
 
             extractors.Add(new Extractor(
                 IfApply: (name, type, index) => name == "fmlv" && type == Bar.EntryType.List,
                 SourceFileTest: (relativePath) => relativePath == "00battle.bin",
-                YmlEntryName: "fmlv",
                 FileExtension: ".yml",
                 ExtractAsync: async (Bar.Entry barEntry) =>
                 {
@@ -233,13 +262,27 @@ namespace OpenKh.Tools.ModsManager.Views
                             OpenKh.Kh2.Battle.Fmlv.Read(barEntry.Stream.FromBegin())
                         )
                     );
-                }
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = "fmlv",
+                        Type = "list",
+                        Method = "listpatch",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                                Type = "fmlv",
+                            }
+                        ),
+                    }
+                )
             ));
 
             extractors.Add(new Extractor(
                 IfApply: (name, type, index) => name == "lvup" && type == Bar.EntryType.List,
                 SourceFileTest: (relativePath) => relativePath == "00battle.bin",
-                YmlEntryName: "lvup",
                 FileExtension: ".yml",
                 ExtractAsync: async (Bar.Entry barEntry) =>
                 {
@@ -249,13 +292,27 @@ namespace OpenKh.Tools.ModsManager.Views
                             OpenKh.Kh2.Battle.Lvup.Read(barEntry.Stream.FromBegin())
                         )
                     );
-                }
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = "lvup",
+                        Type = "list",
+                        Method = "listpatch",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                                Type = "lvup",
+                            }
+                        ),
+                    }
+                )
             ));
 
             extractors.Add(new Extractor(
                 IfApply: (name, type, index) => name == "bons" && type == Bar.EntryType.List,
                 SourceFileTest: (relativePath) => relativePath == "00battle.bin",
-                YmlEntryName: "bons",
                 FileExtension: ".yml",
                 ExtractAsync: async (Bar.Entry barEntry) =>
                 {
@@ -265,13 +322,27 @@ namespace OpenKh.Tools.ModsManager.Views
                             OpenKh.Kh2.Battle.Bons.Read(barEntry.Stream.FromBegin())
                         )
                     );
-                }
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = "bons",
+                        Type = "list",
+                        Method = "listpatch",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                                Type = "bons",
+                            }
+                        ),
+                    }
+                )
             ));
 
             extractors.Add(new Extractor(
                 IfApply: (name, type, index) => name == "atkp" && type == Bar.EntryType.List,
                 SourceFileTest: (relativePath) => relativePath == "00battle.bin",
-                YmlEntryName: "atkp",
                 FileExtension: ".yml",
                 ExtractAsync: async (Bar.Entry barEntry) =>
                 {
@@ -281,13 +352,27 @@ namespace OpenKh.Tools.ModsManager.Views
                             OpenKh.Kh2.Battle.Atkp.Read(barEntry.Stream.FromBegin())
                         )
                     );
-                }
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = "atkp",
+                        Type = "list",
+                        Method = "listpatch",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                                Type = "atkp",
+                            }
+                        ),
+                    }
+                )
             ));
 
             extractors.Add(new Extractor(
                 IfApply: (name, type, index) => name == "plrp" && type == Bar.EntryType.List,
                 SourceFileTest: (relativePath) => relativePath == "00battle.bin",
-                YmlEntryName: "plrp",
                 FileExtension: ".yml",
                 ExtractAsync: async (Bar.Entry barEntry) =>
                 {
@@ -297,29 +382,27 @@ namespace OpenKh.Tools.ModsManager.Views
                             OpenKh.Kh2.Battle.Plrp.Read(barEntry.Stream.FromBegin())
                         )
                     );
-                }
-            ));
-
-            extractors.Add(new Extractor(
-                IfApply: (name, type, index) => name == "plrp" && type == Bar.EntryType.List,
-                SourceFileTest: (relativePath) => relativePath == "00battle.bin",
-                YmlEntryName: "plrp",
-                FileExtension: ".yml",
-                ExtractAsync: async (Bar.Entry barEntry) =>
-                {
-                    await Task.Yield();
-                    return Encoding.UTF8.GetBytes(
-                        _listSer.Serialize(
-                            OpenKh.Kh2.Battle.Plrp.Read(barEntry.Stream.FromBegin())
-                        )
-                    );
-                }
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = "plrp",
+                        Type = "list",
+                        Method = "listpatch",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                                Type = "plrp",
+                            }
+                        ),
+                    }
+                )
             ));
 
             extractors.Add(new Extractor(
                 IfApply: (name, type, index) => name == "cmd" && type == Bar.EntryType.List,
                 SourceFileTest: (relativePath) => relativePath == "03system.bin",
-                YmlEntryName: "cmd",
                 FileExtension: ".yml",
                 ExtractAsync: async (Bar.Entry barEntry) =>
                 {
@@ -329,13 +412,27 @@ namespace OpenKh.Tools.ModsManager.Views
                             OpenKh.Kh2.SystemData.Cmd.Read(barEntry.Stream.FromBegin())
                         )
                     );
-                }
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = "cmd",
+                        Type = "list",
+                        Method = "listpatch",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                                Type = "cmd",
+                            }
+                        ),
+                    }
+                )
             ));
 
             extractors.Add(new Extractor(
                 IfApply: (name, type, index) => name == "enmp" && type == Bar.EntryType.List,
                 SourceFileTest: (relativePath) => relativePath == "00battle.bin",
-                YmlEntryName: "enmp",
                 FileExtension: ".yml",
                 ExtractAsync: async (Bar.Entry barEntry) =>
                 {
@@ -345,13 +442,27 @@ namespace OpenKh.Tools.ModsManager.Views
                             OpenKh.Kh2.Battle.Enmp.Read(barEntry.Stream.FromBegin())
                         )
                     );
-                }
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = "enmp",
+                        Type = "list",
+                        Method = "listpatch",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                                Type = "enmp",
+                            }
+                        ),
+                    }
+                )
             ));
 
             extractors.Add(new Extractor(
                 IfApply: (name, type, index) => name == "sklt" && type == Bar.EntryType.List,
                 SourceFileTest: (relativePath) => relativePath == "03system.bin",
-                YmlEntryName: "sklt",
                 FileExtension: ".yml",
                 ExtractAsync: async (Bar.Entry barEntry) =>
                 {
@@ -361,13 +472,27 @@ namespace OpenKh.Tools.ModsManager.Views
                             OpenKh.Kh2.SystemData.Sklt.Read(barEntry.Stream.FromBegin())
                         )
                     );
-                }
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = "sklt",
+                        Type = "list",
+                        Method = "listpatch",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                                Type = "sklt",
+                            }
+                        ),
+                    }
+                )
             ));
 
             extractors.Add(new Extractor(
                 IfApply: (name, type, index) => name == "przt" && type == Bar.EntryType.List,
                 SourceFileTest: (relativePath) => relativePath == "00battle.bin",
-                YmlEntryName: "przt",
                 FileExtension: ".yml",
                 ExtractAsync: async (Bar.Entry barEntry) =>
                 {
@@ -377,13 +502,27 @@ namespace OpenKh.Tools.ModsManager.Views
                             OpenKh.Kh2.Battle.Przt.Read(barEntry.Stream.FromBegin())
                         )
                     );
-                }
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = "przt",
+                        Type = "list",
+                        Method = "listpatch",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                                Type = "przt",
+                            }
+                        ),
+                    }
+                )
             ));
 
             extractors.Add(new Extractor(
                 IfApply: (name, type, index) => name == "magc" && type == Bar.EntryType.List,
                 SourceFileTest: (relativePath) => relativePath == "00battle.bin",
-                YmlEntryName: "magc",
                 FileExtension: ".yml",
                 ExtractAsync: async (Bar.Entry barEntry) =>
                 {
@@ -393,6 +532,43 @@ namespace OpenKh.Tools.ModsManager.Views
                             OpenKh.Kh2.Battle.Magc.Read(barEntry.Stream.FromBegin())
                         )
                     );
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = "magc",
+                        Type = "list",
+                        Method = "listpatch",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                                Type = "magc",
+                            }
+                        ),
+                    }
+                )
+            ));
+
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => type == Bar.EntryType.Model,
+                SourceFileTest: (relativePath) => true,
+                FileExtension: ".model",
+                ExtractAsync: async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return barEntry.Stream.ReadAllBytes();
+                }
+            ));
+
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => type == Bar.EntryType.ModelTexture,
+                SourceFileTest: (relativePath) => true,
+                FileExtension: ".tim",
+                ExtractAsync: async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return barEntry.Stream.ReadAllBytes();
                 }
             ));
 
@@ -801,19 +977,29 @@ namespace OpenKh.Tools.ModsManager.Views
                                                                 {
                                                                     Name = hit.RelativePath,
                                                                     Method = "binarc",
-                                                                    Source = CreateSourceFromArgs(
-                                                                        new AssetFile
-                                                                        {
-                                                                            Name = barEntry.Name,
-                                                                            Type = barEntry.Type.ToString(),
-                                                                            Method = "copy",
-                                                                            Source = CreateSourceFromArgs(
-                                                                                new AssetFile
-                                                                                {
-                                                                                    Name = destRelative.Replace('\\', '/'),
-                                                                                }
-                                                                            ),
-                                                                        }
+                                                                    Source = (extractor?
+                                                                        .SourceBuilder(
+                                                                            new SourceBuilderArg(
+                                                                                DestName: barEntry.Name,
+                                                                                DestType: barEntry.Type.ToString().ToLowerInvariant(),
+                                                                                SourceName: destRelative.Replace('\\', '/')
+                                                                            )
+                                                                        )?
+                                                                        .ToList()
+                                                                    )
+                                                                        ?? CreateSourceFromArgs(
+                                                                            new AssetFile
+                                                                            {
+                                                                                Name = barEntry.Name,
+                                                                                Type = barEntry.Type.ToString().ToLowerInvariant(),
+                                                                                Method = "copy",
+                                                                                Source = CreateSourceFromArgs(
+                                                                                    new AssetFile
+                                                                                    {
+                                                                                        Name = destRelative.Replace('\\', '/'),
+                                                                                    }
+                                                                                ),
+                                                                            }
                                                                     ),
                                                                 };
 
