@@ -69,5 +69,7 @@ namespace OpenKh.Tools.ModsManager.Views
         }
         #endregion
 
+        public ICommand CheckAllCommand { get; set; }
+        public ICommand UncheckAllCommand { get; set; }
     }
 }

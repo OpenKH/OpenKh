@@ -15,10 +15,12 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Xml.Linq;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using YamlDotNet.Serialization;
@@ -169,23 +171,29 @@ namespace OpenKh.Tools.ModsManager.Views
         private readonly ISerializer _listSer = new SerializerBuilder()
             .Build();
 
+        private record MixedSource(CopySourceFile CopySourceFile, AssetFile AssetFile);
+
+        private delegate bool IfApplyToBarEntryDelegate(string EntryName, Bar.EntryType EntryType, int EntryIndex);
+
+        private record Extractor(
+            IfApplyToBarEntryDelegate IfApply,
+            Func<string, bool> SourceFileTest,
+            string YmlEntryName,
+            string FileExtension,
+            Func<Bar.Entry, Task<byte[]>> ExtractAsync
+        );
+
         public YamlGeneratorVM()
         {
-            var extractors = new List<(
-                string BarEntryName,
-                string YmlEntryName,
-                Bar.EntryType Type,
-                string FileExtension,
-                Func<Bar.Entry, Task<byte[]>> ExtractAsync
-            )>();
+            var extractors = new List<Extractor>();
 
 
-            extractors.Add((
-                "trsr",
-                "trsr",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "trsr" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "03system.bin",
+                YmlEntryName: "trsr",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -196,12 +204,12 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             ));
 
-            extractors.Add((
-                "item",
-                "item",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "item" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "03system.bin",
+                YmlEntryName: "item",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -212,12 +220,12 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             ));
 
-            extractors.Add((
-                "fmlv",
-                "fmlv",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "fmlv" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "00battle.bin",
+                YmlEntryName: "fmlv",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -228,12 +236,12 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             ));
 
-            extractors.Add((
-                "lvup",
-                "lvup",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "lvup" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "00battle.bin",
+                YmlEntryName: "lvup",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -244,12 +252,12 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             ));
 
-            extractors.Add((
-                "bons",
-                "bons",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "bons" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "00battle.bin",
+                YmlEntryName: "bons",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -260,12 +268,12 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             ));
 
-            extractors.Add((
-                "atkp",
-                "atkp",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "atkp" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "00battle.bin",
+                YmlEntryName: "atkp",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -276,12 +284,12 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             ));
 
-            extractors.Add((
-                "plrp",
-                "plrp",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "plrp" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "00battle.bin",
+                YmlEntryName: "plrp",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -292,12 +300,12 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             ));
 
-            extractors.Add((
-                "plrp",
-                "plrp",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "plrp" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "00battle.bin",
+                YmlEntryName: "plrp",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -308,12 +316,12 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             ));
 
-            extractors.Add((
-                "cmd",
-                "cmd",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "cmd" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "03system.bin",
+                YmlEntryName: "cmd",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -324,12 +332,12 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             ));
 
-            extractors.Add((
-                "enmp",
-                "enmp",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "enmp" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "00battle.bin",
+                YmlEntryName: "enmp",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -340,12 +348,12 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             ));
 
-            extractors.Add((
-                "sklt",
-                "sklt",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "sklt" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "03system.bin",
+                YmlEntryName: "sklt",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -356,12 +364,12 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             ));
 
-            extractors.Add((
-                "przt",
-                "przt",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "przt" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "00battle.bin",
+                YmlEntryName: "przt",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -372,12 +380,12 @@ namespace OpenKh.Tools.ModsManager.Views
                 }
             ));
 
-            extractors.Add((
-                "magc",
-                "magc",
-                Bar.EntryType.List,
-                ".yml",
-                async (Bar.Entry barEntry) =>
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => name == "magc" && type == Bar.EntryType.List,
+                SourceFileTest: (relativePath) => relativePath == "00battle.bin",
+                YmlEntryName: "magc",
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
                 {
                     await Task.Yield();
                     return Encoding.UTF8.GetBytes(
@@ -472,6 +480,18 @@ namespace OpenKh.Tools.ModsManager.Views
                             .ToArray();
                     }
                 };
+                copyVm.CheckAllCommand = new RelayCommand(
+                    _ =>
+                    {
+                        copyVm.CopySourceList.ToList().ForEach(it => it.DoAction = true);
+                    }
+                );
+                copyVm.UncheckAllCommand = new RelayCommand(
+                    _ =>
+                    {
+                        copyVm.CopySourceList.ToList().ForEach(it => it.DoAction = false);
+                    }
+                );
                 copyVm.PrimarySourceList = primarySourceList
                     .ToArray();
                 copyWin.Show();
@@ -707,101 +727,114 @@ namespace OpenKh.Tools.ModsManager.Views
                                 {
                                     await Task.Yield();
 
-                                    var mixedSourceList = hits
-                                        .SelectMany(
-                                            hit =>
-                                            {
-                                                var sourcePath = Path.Combine(sourceDir, hit.RelativePath);
+                                    IEnumerable<MixedSource> mixedSourceList = Array.Empty<MixedSource>();
 
-                                                var stream = new MemoryStream(File.ReadAllBytes(sourcePath), false);
+                                    IEnumerable<MixedSource> UpdateMixedSourceListAndReturn(bool applyExtractors)
+                                    {
+                                        return mixedSourceList = hits
+                                            .SelectMany(
+                                                hit =>
+                                                {
+                                                    var sourcePath = Path.Combine(sourceDir, hit.RelativePath);
 
-                                                var barEntries = Bar.IsValid(stream)
-                                                    ? Bar.Read(stream).AsEnumerable()
-                                                    : Array.Empty<Bar.Entry>();
+                                                    var stream = new MemoryStream(File.ReadAllBytes(sourcePath), false);
 
-                                                return barEntries
-                                                    .Select(
-                                                        barEntry =>
-                                                        {
-                                                            var extractor = extractors.FirstOrDefault(
-                                                                one => one.BarEntryName == barEntry.Name
-                                                                    && one.Type == barEntry.Type
-                                                            );
+                                                    var barEntries = Bar.IsValid(stream)
+                                                        ? Bar.Read(stream).AsEnumerable()
+                                                        : Array.Empty<Bar.Entry>();
 
-                                                            var destRelative = Path.Combine(
-                                                                Path.GetDirectoryName(hit.RelativePath),
-                                                                $"{Path.GetFileNameWithoutExtension(hit.RelativePath)}_{barEntry.Name}{extractor.FileExtension}"
-                                                            );
-                                                            var destPath = Path.Combine(
-                                                                destDir,
-                                                                destRelative
-                                                            );
-
-                                                            var exists = File.Exists(destPath);
-
-                                                            var copySourceFile = new CopySourceFile(
-                                                                $"{hit.RelativePath} ({barEntry.Name} {barEntry.Type} {extractor.FileExtension})",
-                                                                "Extract",
-                                                                exists,
-                                                                async () =>
-                                                                {
-                                                                    await Task.Run(
-                                                                        async () =>
-                                                                        {
-                                                                            Directory.CreateDirectory(Path.GetDirectoryName(destPath));
-
-                                                                            using (var destStream = File.Create(destPath))
-                                                                            {
-                                                                                if (extractor.ExtractAsync != null)
-                                                                                {
-                                                                                    await destStream.WriteAsync(
-                                                                                        await extractor.ExtractAsync(barEntry)
-                                                                                    );
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    barEntry.Stream.FromBegin().CopyTo(destStream);
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    );
-                                                                }
-                                                            )
+                                                    return barEntries
+                                                        .Select(
+                                                            barEntry =>
                                                             {
-                                                                DoAction = !exists,
-                                                            };
+                                                                var extractor = applyExtractors
+                                                                    ? extractors.FirstOrDefault(
+                                                                        one => one.IfApply(barEntry.Name, barEntry.Type, barEntry.Index)
+                                                                            && one.SourceFileTest(hit.RelativePath)
+                                                                    )
+                                                                    : null;
 
-                                                            var assetFile = new AssetFile
-                                                            {
-                                                                Name = hit.RelativePath,
-                                                                Method = "binarc",
-                                                                Source = CreateSourceFromArgs(
-                                                                    new AssetFile
+                                                                var destRelative = Path.Combine(
+                                                                    Path.GetDirectoryName(hit.RelativePath),
+                                                                    $"{Path.GetFileNameWithoutExtension(hit.RelativePath)}_{barEntry.Name}{extractor?.FileExtension}"
+                                                                );
+                                                                var destPath = Path.Combine(
+                                                                    destDir,
+                                                                    destRelative
+                                                                );
+
+                                                                var exists = File.Exists(destPath);
+
+                                                                var copySourceFile = new CopySourceFile(
+                                                                    $"{hit.RelativePath} ({barEntry.Name} {barEntry.Type} {extractor?.FileExtension})",
+                                                                    "Extract",
+                                                                    exists,
+                                                                    async () =>
                                                                     {
-                                                                        Name = barEntry.Name,
-                                                                        Type = barEntry.Type.ToString(),
-                                                                        Method = "copy",
-                                                                        Source = CreateSourceFromArgs(
-                                                                            new AssetFile
+                                                                        await Task.Run(
+                                                                            async () =>
                                                                             {
-                                                                                Name = destRelative.Replace('\\', '/'),
-                                                                            }
-                                                                        ),
-                                                                    }
-                                                                ),
-                                                            };
+                                                                                Directory.CreateDirectory(Path.GetDirectoryName(destPath));
 
-                                                            return (CopySourceFile: copySourceFile, AssetFile: assetFile);
-                                                        }
-                                                    );
-                                            }
-                                        );
+                                                                                using (var destStream = File.Create(destPath))
+                                                                                {
+                                                                                    if (extractor?.ExtractAsync != null)
+                                                                                    {
+                                                                                        await destStream.WriteAsync(
+                                                                                            await extractor.ExtractAsync(barEntry)
+                                                                                        );
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        barEntry.Stream.FromBegin().CopyTo(destStream);
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        );
+                                                                    }
+                                                                )
+                                                                {
+                                                                    DoAction = !exists,
+                                                                };
+
+                                                                var assetFile = new AssetFile
+                                                                {
+                                                                    Name = hit.RelativePath,
+                                                                    Method = "binarc",
+                                                                    Source = CreateSourceFromArgs(
+                                                                        new AssetFile
+                                                                        {
+                                                                            Name = barEntry.Name,
+                                                                            Type = barEntry.Type.ToString(),
+                                                                            Method = "copy",
+                                                                            Source = CreateSourceFromArgs(
+                                                                                new AssetFile
+                                                                                {
+                                                                                    Name = destRelative.Replace('\\', '/'),
+                                                                                }
+                                                                            ),
+                                                                        }
+                                                                    ),
+                                                                };
+
+                                                                return new MixedSource(copySourceFile, assetFile);
+                                                            }
+                                                        );
+                                                }
+                                            )
+                                            .ToArray();
+                                    }
+
+                                    var applyExtractors = new PrimarySource("Apply built in extractors");
+                                    var applyNone = new PrimarySource("None");
 
                                     DisplayCopy(
-                                        primarySourceList: new PrimarySource[] { new PrimarySource("(No selection needed)") },
+                                        primarySourceList: new PrimarySource[] { applyExtractors, applyNone, },
                                         getCopySourceList: one =>
                                         {
-                                            return mixedSourceList
+                                            return UpdateMixedSourceListAndReturn(
+                                                applyExtractors: ReferenceEquals(one, applyExtractors)
+                                            )
                                                 .Select(tuple => tuple.CopySourceFile);
                                         },
                                         proceedAsync: async copySourceList =>

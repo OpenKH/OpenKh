@@ -30,6 +30,15 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
+        <TextBlock Text="Tools:" Padding="7" DockPanel.Dock="Top" />
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Button Margin="7,7,0,7" Padding="3" Command="{Binding CheckAllCommand}" MinWidth="60">
+                <TextBlock TextAlignment="Center">Check<LineBreak />all</TextBlock>
+            </Button>
+            <Button Margin="7,7,0,7" Padding="3" Command="{Binding UncheckAllCommand}" MinWidth="60">
+                <TextBlock TextAlignment="Center">Uncheck<LineBreak />all</TextBlock>
+            </Button>
+        </StackPanel>
         <TextBlock Text="Select actions for source:" Padding="7" DockPanel.Dock="Top" />
         <Border Margin="7" BorderBrush="Gray" BorderThickness="1">
             <ScrollViewer VerticalScrollBarVisibility="Visible">
