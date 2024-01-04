@@ -1,8 +1,5 @@
-using LibGit2Sharp;
-using OpenKh.Bbs;
 using OpenKh.Common;
 using OpenKh.Kh2;
-using OpenKh.Kh2.SystemData;
 using OpenKh.Patcher;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Models.ViewHelper;
@@ -24,7 +21,6 @@ using System.Xml.Linq;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using YamlDotNet.Serialization;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace OpenKh.Tools.ModsManager.Views
 {
