@@ -51,11 +51,7 @@ namespace OpenKh.Command.MapGenUtils
 
             protected int OnExecute(CommandLineApplication app)
             {
-                var schema = JsonSchema.FromType<MapGenConfig>(
-                    new JsonSchemaGeneratorSettings
-                    {
-                    }
-                );
+                var schema = JsonSchema.FromType<MapGenConfig>();
                 var schemaData = schema.ToJson();
 
                 File.WriteAllText(
