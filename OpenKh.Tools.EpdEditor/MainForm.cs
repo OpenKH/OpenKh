@@ -159,10 +159,7 @@ namespace OpenKh.Tools.EpdEditor
                 char[] arr = new char[4];
                 if(txt.Text != "")
                 {
-                    arr[0] = txt.Text.ToCharArray()[0];
-                    arr[1] = txt.Text.ToCharArray()[1];
-                    arr[2] = txt.Text.ToCharArray()[2];
-                    arr[3] = (char)0;
+                    arr = txt.Text.Substring(0, Math.Min(txt.Text.Length, 3)).PadRight(4, '\0').ToCharArray();
                 }
                 epd.AnimationList.Add(arr);
             }
