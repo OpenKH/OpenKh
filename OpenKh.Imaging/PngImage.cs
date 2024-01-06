@@ -85,7 +85,7 @@ namespace OpenKh.Imaging
             IHdr ihdr = null;
             byte[] PLTE = null;
             byte[] tRNS = null;
-            byte[] IDAT = null;
+            var IDAT = new MemoryStream();
 
             while (stream.Position < stream.Length)
             {
@@ -116,7 +116,7 @@ namespace OpenKh.Imaging
                         break;
 
                     case Chunk.IDAT:
-                        IDAT = chunk.RawData;
+                        IDAT.Write(chunk.RawData);
                         break;
                 }
             }
@@ -140,7 +140,7 @@ namespace OpenKh.Imaging
                 throw new NotSupportedException($"comprMethod {comprMethod} not supported!");
             }
 
-            using var deflated = new MemoryStream(ZlibStream.UncompressBuffer(IDAT));
+            using var deflated = new MemoryStream(ZlibStream.UncompressBuffer(IDAT.ToArray()));
             deflated.FromBegin();
 
             var bits = ihdr.Bits;
