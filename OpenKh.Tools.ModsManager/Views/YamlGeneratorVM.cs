@@ -1,5 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Messages;
 using OpenKh.Patcher;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Models.ViewHelper;
@@ -14,6 +15,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -171,7 +173,7 @@ namespace OpenKh.Tools.ModsManager.Views
 
         private delegate bool IfApplyToBarEntryDelegate(string EntryName, Bar.EntryType EntryType, int EntryIndex);
 
-        private record SourceBuilderArg(string DestName, string DestType, string SourceName);
+        private record SourceBuilderArg(string DestName, string DestType, string SourceName, string OriginalRelativePath);
 
         private record Extractor(
             IfApplyToBarEntryDelegate IfApply,
@@ -566,6 +568,79 @@ namespace OpenKh.Tools.ModsManager.Views
                     await Task.Yield();
                     return barEntry.Stream.ReadAllBytes();
                 }
+            ));
+
+
+            Extractor CreateMessageExtractor(
+                Regex sourceFilePattern,
+                Func<Match, string> languageSelector,
+                IMessageDecode decoder
+            )
+            {
+                return new Extractor(
+                    IfApply: (name, type, index) => type == Bar.EntryType.List,
+                    SourceFileTest: relativePath => sourceFilePattern.IsMatch(relativePath),
+                    FileExtension: ".yml",
+                    ExtractAsync: async (Bar.Entry barEntry) =>
+                    {
+                        await Task.Yield();
+                        var msgEntries = Msg.Read(barEntry.Stream.FromBegin());
+                        return Encoding.UTF8.GetBytes(
+                            _listSer.Serialize(
+                                msgEntries
+                                    .Select(
+                                        msgEntry => new IdText(
+                                            msgEntry.Id,
+                                            MsgSerializer.SerializeText(decoder.Decode(msgEntry.Data))
+                                        )
+                                    )
+                            )
+                        );
+                    },
+                    SourceBuilder: arg => CreateSourceFromArgs(
+                        new AssetFile
+                        {
+                            Name = "sys",
+                            Type = "list",
+                            Method = "kh2msg",
+                            Source = CreateSourceFromArgs(
+                                new AssetFile
+                                {
+                                    Name = "sys",
+                                    Language = languageSelector(sourceFilePattern.Match(arg.OriginalRelativePath)),
+                                }
+                            ),
+                        }
+                    )
+                );
+            }
+
+            extractors.Add(CreateMessageExtractor(
+                sourceFilePattern: new Regex(@"msg/(?<language>us|fr|gr|it|sp)/(sys|[a-z]{2})\.bar"),
+                languageSelector: match => match.Groups["language"].Value,
+                decoder: Encoders.InternationalSystem
+            ));
+
+            extractors.Add(CreateMessageExtractor(
+                sourceFilePattern: new Regex(@"msg/tr/sys\.bar"),
+                languageSelector: match => "tr",
+                decoder: Encoders.TurkishSystem
+            ));
+            extractors.Add(CreateMessageExtractor(
+                sourceFilePattern: new Regex(@"msg/tr/[a-z]{2}\.bar"),
+                languageSelector: match => "tr",
+                decoder: Encoders.TurkishSystem
+            ));
+
+            extractors.Add(CreateMessageExtractor(
+                sourceFilePattern: new Regex(@"msg/jp/sys\.bar"),
+                languageSelector: match => "jp",
+                decoder: Encoders.JapaneseSystem
+            ));
+            extractors.Add(CreateMessageExtractor(
+                sourceFilePattern: new Regex(@"msg/jp/[a-z]{2}.bar"),
+                languageSelector: match => "je",
+                decoder: Encoders.JapaneseEvent
             ));
 
 
@@ -978,7 +1053,8 @@ namespace OpenKh.Tools.ModsManager.Views
                                                                             new SourceBuilderArg(
                                                                                 DestName: barEntry.Name,
                                                                                 DestType: barEntry.Type.ToString().ToLowerInvariant(),
-                                                                                SourceName: destRelative.Replace('\\', '/')
+                                                                                SourceName: destRelative.Replace('\\', '/'),
+                                                                                OriginalRelativePath: hit.RelativePath
                                                                             )
                                                                         )?
                                                                         .ToList()
@@ -1240,5 +1316,7 @@ namespace OpenKh.Tools.ModsManager.Views
                 LoadPref(pref);
             }
         }
+
+        private record IdText(int Id, string Text);
     }
 }
