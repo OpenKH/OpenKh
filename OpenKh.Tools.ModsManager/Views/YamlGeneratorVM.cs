@@ -1,3 +1,4 @@
+using OpenKh.Command.Bdxio.Utils;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
@@ -641,6 +642,101 @@ namespace OpenKh.Tools.ModsManager.Views
                 sourceFilePattern: new Regex(@"msg/jp/[a-z]{2}.bar"),
                 languageSelector: match => "je",
                 decoder: Encoders.JapaneseEvent
+            ));
+
+
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => type == Bar.EntryType.Bdx,
+                SourceFileTest: (relativePath) => true,
+                FileExtension: ".bdscript",
+                ExtractAsync: async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    var decoder = new BdxDecoder(
+                        read: new MemoryStream(barEntry.Stream.ReadAllBytes(), false),
+                        codeRevealer: true,
+                        codeRevealerLabeling: true
+                    );
+                    return Encoding.UTF8.GetBytes(
+                        BdxDecoder.TextFormatter.Format(decoder)
+                    );
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = arg.DestName,
+                        Type = "bdx",
+                        Method = "bdscript",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                            }
+                        ),
+                    }
+                )
+            ));
+
+
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => type == Bar.EntryType.AreaDataScript,
+                SourceFileTest: (relativePath) => true,
+                FileExtension: ".script",
+                ExtractAsync: async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        Kh2.Ard.AreaDataScript.Decompile(
+                            Kh2.Ard.AreaDataScript.Read(barEntry.Stream.FromBegin())
+                        )
+                    );
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = arg.DestName,
+                        Type = "areadatascript",
+                        Method = "areadatascript",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                            }
+                        ),
+                    }
+                )
+            ));
+
+
+            extractors.Add(new Extractor(
+                IfApply: (name, type, index) => type == Bar.EntryType.AreaDataSpawn,
+                SourceFileTest: (relativePath) => true,
+                FileExtension: ".yml",
+                ExtractAsync: async (Bar.Entry barEntry) =>
+                {
+                    await Task.Yield();
+                    return Encoding.UTF8.GetBytes(
+                        _listSer.Serialize(
+                            Kh2.Ard.SpawnPoint.Read(
+                                barEntry.Stream.FromBegin()
+                            )
+                        )
+                    );
+                },
+                SourceBuilder: arg => CreateSourceFromArgs(
+                    new AssetFile
+                    {
+                        Name = arg.DestName,
+                        Type = "areadataspawn",
+                        Method = "spawnpoint",
+                        Source = CreateSourceFromArgs(
+                            new AssetFile
+                            {
+                                Name = arg.SourceName,
+                            }
+                        ),
+                    }
+                )
             ));
 
 
