@@ -20,6 +20,21 @@ namespace OpenKh.Tools.ModsManager.UserControls
     /// </summary>
     public partial class TaskStatusByIconControl : UserControl
     {
+        private DependencyProperty _state = ReadyIconProperty;
+
+        private static void IconPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((TaskStatusByIconControl)d).IconPropertyChangedCallback(e.Property);
+        }
+
+        private void IconPropertyChangedCallback(DependencyProperty property)
+        {
+            if (ReferenceEquals(_state, property))
+            {
+                _icon.Source = (ImageSource)GetValue(property);
+            }
+        }
+
         #region ReadyIcon Property
         public ImageSource ReadyIcon
         {
@@ -30,8 +45,10 @@ namespace OpenKh.Tools.ModsManager.UserControls
         public static readonly DependencyProperty ReadyIconProperty = DependencyProperty.Register(
             nameof(ReadyIcon),
             typeof(ImageSource),
-            typeof(TaskStatusByIconControl)
+            typeof(TaskStatusByIconControl),
+            new PropertyMetadata(null, IconPropertyChangedCallback)
         );
+
         #endregion
 
         #region InProgressIcon Property
@@ -44,7 +61,8 @@ namespace OpenKh.Tools.ModsManager.UserControls
         public static readonly DependencyProperty InProgressIconProperty = DependencyProperty.Register(
             nameof(InProgressIcon),
             typeof(ImageSource),
-            typeof(TaskStatusByIconControl)
+            typeof(TaskStatusByIconControl),
+            new PropertyMetadata(null, IconPropertyChangedCallback)
         );
         #endregion
 
@@ -58,7 +76,8 @@ namespace OpenKh.Tools.ModsManager.UserControls
         public static readonly DependencyProperty SuccessfulIconProperty = DependencyProperty.Register(
             nameof(SuccessfulIcon),
             typeof(ImageSource),
-            typeof(TaskStatusByIconControl)
+            typeof(TaskStatusByIconControl),
+            new PropertyMetadata(null, IconPropertyChangedCallback)
         );
         #endregion
 
@@ -72,7 +91,8 @@ namespace OpenKh.Tools.ModsManager.UserControls
         public static readonly DependencyProperty FailureIconProperty = DependencyProperty.Register(
             nameof(FailureIcon),
             typeof(ImageSource),
-            typeof(TaskStatusByIconControl)
+            typeof(TaskStatusByIconControl),
+            new PropertyMetadata(null, IconPropertyChangedCallback)
         );
         #endregion
 
@@ -101,7 +121,7 @@ namespace OpenKh.Tools.ModsManager.UserControls
 
             if (value == null)
             {
-                _icon.Source = ReadyIcon;
+                IconPropertyChangedCallback(_state = ReadyIconProperty);
             }
             else
             {
@@ -109,20 +129,20 @@ namespace OpenKh.Tools.ModsManager.UserControls
                 {
                     try
                     {
-                        _icon.Source = InProgressIcon;
+                        IconPropertyChangedCallback(_state = InProgressIconProperty);
 
                         await task;
 
                         if (ReferenceEquals(task, Task))
                         {
-                            _icon.Source = SuccessfulIcon;
+                            IconPropertyChangedCallback(_state = SuccessfulIconProperty);
                         }
                     }
                     catch (Exception ex)
                     {
                         if (ReferenceEquals(task, Task))
                         {
-                            _icon.Source = FailureIcon;
+                            IconPropertyChangedCallback(_state = FailureIconProperty);
                             _icon.ToolTip = ex + "";
                         }
                     }
