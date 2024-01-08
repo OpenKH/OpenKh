@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
         xmlns:viewHelper="clr-namespace:OpenKh.Tools.ModsManager.Models.ViewHelper"
+        xmlns:userControls="clr-namespace:OpenKh.Tools.ModsManager.UserControls"
         Background="{Binding ColorTheme.BackgroundColor}"
         WindowStartupLocation="CenterOwner"
         d:DataContext="{d:DesignInstance Type=local:SelectModTargetFilesVM}"
@@ -19,6 +20,13 @@
         </DockPanel.Resources>
         <DockPanel LastChildFill="True" DockPanel.Dock="Top" VerticalAlignment="Top">
             <TextBlock Margin="3" DockPanel.Dock="Left" VerticalAlignment="Center" HorizontalAlignment="Left">Search keywords:</TextBlock>
+            <userControls:TaskStatusByIconControl Width="32" Height="32" DockPanel.Dock="Right" Margin="3,0,3,0"
+                                                  Task="{Binding SearchingTask}"
+                                                  ReadyIcon="{StaticResource StatusNotStarted_16x}"
+                                                  InProgressIcon="{StaticResource Search_16x}"
+                                                  SuccessfulIcon="{StaticResource StatusNotStartedGreen_16x}"
+                                                  FailureIcon="{StaticResource StatusCriticalError_16x}"
+                                                  />
             <Button Margin="3" DockPanel.Dock="Right" Content="_Search" Padding="7" Command="{Binding SearchCommand}" IsDefault="True" />
             <TextBox Margin="3" VerticalAlignment="Center" Padding="3" Text="{Binding SearchKeywords,UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>

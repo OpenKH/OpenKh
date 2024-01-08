@@ -319,7 +319,8 @@ namespace OpenKh.Tools.ModsManager.Views
                                     )
                                     .ToArray()
                             );
-                        }
+                        },
+                        it => targetVm.SearchingTask = it
                     );
 
                     var selectionIsGood = new BehaviorSubject<bool>(false);

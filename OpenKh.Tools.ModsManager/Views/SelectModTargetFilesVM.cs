@@ -43,6 +43,19 @@ namespace OpenKh.Tools.ModsManager.Views
         }
         #endregion
 
+        #region SearchingTask
+        private Task _searchingTask = null;
+        public Task SearchingTask
+        {
+            get => _searchingTask;
+            set
+            {
+                _searchingTask = value;
+                OnPropertyChanged(nameof(SearchingTask));
+            }
+        }
+        #endregion
+
         public IEnumerable<ActionCommand> Actions { get; set; }
 
         public Action<IEnumerable<SearchHit>> OnSearchHitsSelected { get; set; } = _ => { };
