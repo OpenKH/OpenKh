@@ -129,6 +129,8 @@ public:
         if (!OpenKH::m_ExtractPath.empty())
             ScanFolder(OpenKH::m_ExtractPath);
         ScanFolder(OpenKH::m_ModPath);
+        if (!OpenKH::m_DevPath.empty())
+            ScanFolder(OpenKH::m_DevPath);
         std::wstring rawfol = OpenKH::m_ModPath + L"\\raw";
         ScanFolder(rawfol);
     }
@@ -288,7 +290,14 @@ void Panacea::Initialize()
     //Hook_Bbs_File_load = NewHook(pfn_Bbs_File_load, Panacea::BbsFileLoad, "Bbs::File::Load");
     //Hook_CRsrcData_loadCallback = NewHook(pfn_Bbs_CRsrcData_loadCallback, Panacea::BbsCRsrcDataloadCallback, "Bbs::CRsrcData::loadCallback");
 
-    auto dllpath = CombinePaths(OpenKH::m_ModPath, L"dll\\");
+    if (!OpenKH::m_DevPath.empty())
+        LoadDLLs(OpenKH::m_DevPath);
+    LoadDLLs(OpenKH::m_ModPath);
+}
+
+void LoadDLLs(const std::wstring& folder)
+{
+    auto dllpath = CombinePaths(folder, L"dll\\");
     
     wchar_t search[MAX_PATH];
     std::wcscpy(search, dllpath.c_str());
@@ -319,7 +328,7 @@ void Panacea::Initialize()
         FindClose(fh);
     }
     for (auto f : initfuncs)
-        f(OpenKH::m_ModPath.c_str());
+        f(folder.c_str());
 }
 
 int Panacea::FrameHook(__int64 a1)
@@ -366,6 +375,12 @@ bool Panacea::GetRawFile(wchar_t* strOutPath, int maxLength, const char* origina
 bool Panacea::TransformFilePath(wchar_t* strOutPath, int maxLength, const char* originalPath)
 {
     const char* actualFileName = originalPath + strlen(BasePath) + 1;
+    if (!OpenKH::m_DevPath.empty())
+    {
+        swprintf_s(strOutPath, maxLength, L"%ls\\%hs", OpenKH::m_DevPath.c_str(), actualFileName);
+        if (FileExists(strOutPath))
+            return true;
+    }
     swprintf_s(strOutPath, maxLength, L"%ls\\%hs", OpenKH::m_ModPath.c_str(), actualFileName);
     if (FileExists(strOutPath))
         return true;
