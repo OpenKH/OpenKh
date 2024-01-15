@@ -247,6 +247,42 @@ std::vector<void(*)()> framefuncs;
 int bassinit;
 int basschan;
 
+void LoadDLLs(const std::wstring& folder)
+{
+    auto dllpath = CombinePaths(folder, L"dll\\");
+    
+    wchar_t search[MAX_PATH];
+    std::wcscpy(search, dllpath.c_str());
+    std::wcscat(search, L"*.dll");
+    std::vector<void(*)(const wchar_t*)> initfuncs;
+    WIN32_FIND_DATAW find;
+    HANDLE fh = FindFirstFileW(search, &find);
+    if (fh != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            wchar_t filepath[MAX_PATH];
+            std::wcscpy(filepath, dllpath.c_str());
+            std::wcscat(filepath, find.cFileName);
+            HMODULE dllhandle = LoadLibraryW(filepath);
+            if (dllhandle)
+            {
+                if (OpenKH::m_DebugLog)
+                    fprintf(stdout, "Loaded DLL \"%ls\".\n", find.cFileName);
+                void (*initfunc)(const wchar_t*) = (void(*)(const wchar_t*))GetProcAddress(dllhandle, "OnInit");
+                if (initfunc)
+                    initfuncs.push_back(initfunc);
+                void (*framefunc)() = (void(*)())GetProcAddress(dllhandle, "OnFrame");
+                if (framefunc)
+                    framefuncs.push_back(framefunc);
+            }
+        } while (FindNextFileW(fh, &find));
+        FindClose(fh);
+    }
+    for (auto f : initfuncs)
+        f(folder.c_str());
+}
+
 void Panacea::Initialize()
 {
     ULONG_PTR baseImage = (ULONG_PTR)GetModuleHandle(nullptr);
@@ -293,42 +329,6 @@ void Panacea::Initialize()
     if (!OpenKH::m_DevPath.empty())
         LoadDLLs(OpenKH::m_DevPath);
     LoadDLLs(OpenKH::m_ModPath);
-}
-
-void LoadDLLs(const std::wstring& folder)
-{
-    auto dllpath = CombinePaths(folder, L"dll\\");
-    
-    wchar_t search[MAX_PATH];
-    std::wcscpy(search, dllpath.c_str());
-    std::wcscat(search, L"*.dll");
-    std::vector<void(*)(const wchar_t*)> initfuncs;
-    WIN32_FIND_DATAW find;
-    HANDLE fh = FindFirstFileW(search, &find);
-    if (fh != INVALID_HANDLE_VALUE)
-    {
-        do
-        {
-            wchar_t filepath[MAX_PATH];
-            std::wcscpy(filepath, dllpath.c_str());
-            std::wcscat(filepath, find.cFileName);
-            HMODULE dllhandle = LoadLibraryW(filepath);
-            if (dllhandle)
-            {
-                if (OpenKH::m_DebugLog)
-                    fprintf(stdout, "Loaded DLL \"%ls\".\n", find.cFileName);
-                void (*initfunc)(const wchar_t*) = (void(*)(const wchar_t*))GetProcAddress(dllhandle, "OnInit");
-                if (initfunc)
-                    initfuncs.push_back(initfunc);
-                void (*framefunc)() = (void(*)())GetProcAddress(dllhandle, "OnFrame");
-                if (framefunc)
-                    framefuncs.push_back(framefunc);
-            }
-        } while (FindNextFileW(fh, &find));
-        FindClose(fh);
-    }
-    for (auto f : initfuncs)
-        f(folder.c_str());
 }
 
 int Panacea::FrameHook(__int64 a1)
