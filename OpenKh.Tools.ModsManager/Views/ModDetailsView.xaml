@@ -7,15 +7,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="256">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
-        <Style TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
-        </Style>
+        <SolidColorBrush x:Key="textHyperlink" Color="#569CD6"/>
         <Style TargetType="Expander">
             <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
         </Style>
     </UserControl.Resources>
-    <StackPanel Background="{Binding BackgroundColor}">
+    <StackPanel>
         <TextBlock Margin="0 0 0 3" FontWeight="Bold" Text="{Binding Title}" d:Text="Mod title"/>
         <StackPanel Visibility="{Binding SourceVisibility}">
             <TextBlock Margin="0 0 0 3">
