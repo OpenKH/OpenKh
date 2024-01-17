@@ -147,6 +147,7 @@
             <ComboBoxItem>Kingdom Hearts 1</ComboBoxItem>
             <ComboBoxItem>Birth by Sleep</ComboBoxItem>
             <ComboBoxItem>Re:Chain of Memories</ComboBoxItem>
+            <ComboBoxItem>Dream Drop Distance</ComboBoxItem>
         </ComboBox>
         <local:ModManagerView Grid.Row="1" DataContext="{Binding}"/>
 

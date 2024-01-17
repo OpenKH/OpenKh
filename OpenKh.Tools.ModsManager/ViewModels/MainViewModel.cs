@@ -50,7 +50,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             "kh2",
             "kh1",
             "bbs",
-            "Recom"
+            "Recom",
+            "kh3d"
         };
         private int _wizardVersionNumber = 1;
         private string[] executable = new string[]
@@ -58,7 +59,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             "KINGDOM HEARTS II FINAL MIX.exe",
             "KINGDOM HEARTS FINAL MIX.exe",
             "KINGDOM HEARTS Birth by Sleep FINAL MIX.exe",
-            "KINGDOM HEARTS Re_Chain of Memories.exe"
+            "KINGDOM HEARTS Re_Chain of Memories.exe",
+            "KINGDOM HEARTS Dream Drop Distance.exe"
         };
         private int launchExecutable = 0;
 
@@ -226,6 +228,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     case "Recom":
                         launchExecutable = 3;
                         return 3;
+                    case "kh3d":
+                        launchExecutable = 4;
+                        return 4;
                     default:
                         launchExecutable = 0;
                         return 0;
@@ -251,6 +256,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     case 3:
                         _launchGame = "Recom";
                         ConfigurationService.LaunchGame = "Recom";
+                        break;
+                    case 4:
+                        _launchGame = "kh3d";
+                        ConfigurationService.LaunchGame = "kh3d";
                         break;
                     default:
                         _launchGame = "kh2";
@@ -585,7 +594,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     isPcsx2 = true;
                     break;
                 case 2:
-                    if (ConfigurationService.IsEGSVersion)
+                    if (ConfigurationService.IsEGSVersion && !(_launchGame == "kh3d"))
                     {
                         if (ConfigurationService.PanaceaInstalled)
                         {
@@ -597,11 +606,33 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             UseShellExecute = true,
                         };
                     }
-                    else
+                    else if (ConfigurationService.IsEGSVersion && _launchGame == "kh3d")
                     {
+                        if (ConfigurationService.PanaceaInstalled)
+                        {
+                            File.AppendAllText(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"), "\nquick_launch=" + _launchGame);
+                        }
                         processStartInfo = new ProcessStartInfo
                         {
-                            FileName = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]),
+                            FileName = "com.epicgames.launcher://apps/c8ff067c1c984cd7ab1998e8a9afc8b6%3Aaa743b9f52e84930b0ba1b701951e927%3Ad1a8f7c478d4439b8c60a5808715dc05?action=launch&silent=true",
+                            UseShellExecute = true,
+                        };
+
+                    }
+                    else
+                    {
+                        string filename;
+                        if (!(_launchGame == "kh3d"))
+                        {
+                            filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
+                        }
+                        else
+                        {
+                            filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
+                        }
+                        processStartInfo = new ProcessStartInfo
+                        {    
+                            FileName = filename,
                             WorkingDirectory = ConfigurationService.PcReleaseLocation,
                             UseShellExecute = false,
                         };

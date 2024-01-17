@@ -241,6 +241,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             get => ConfigurationService.Extractrecom;
             set => ConfigurationService.Extractrecom = value;
         }
+        public bool Extractkh3d
+        {
+            get => ConfigurationService.Extractkh3d;
+            set => ConfigurationService.Extractkh3d = value;
+        }
         public bool LuaConfigkh1
         {
             get => LuaScriptPaths.Contains("kh1");
@@ -874,6 +879,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             "third",
                             "fourth"
                         };
+                        var _nameListkh3d = new string[]
+                        {
+                            "first",
+                            "second",
+                            "third",
+                            "fourth"
+                        };
 
                         var _totalFiles = 0;
                         var _procTotalFiles = 0;
@@ -910,6 +922,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"), System.IO.FileMode.Open);
                             var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                             _totalFiles += _hedFile.Count();
+                        }
+                        if (ConfigurationService.Extractkh3d)
+                        {
+                            for (int i = 0; i < 4; i++)
+                            {
+                                using var _stream = new FileStream(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "Image", _pcReleaseLanguage, "kh3d_" + _nameListbbs[i] + ".hed"), System.IO.FileMode.Open);
+                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
+                                _totalFiles += _hedFile.Count();
+                            }
                         }
 
                         if (ConfigurationService.Extractkh1)
@@ -1067,7 +1088,46 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     OnPropertyChanged(nameof(ExtractionProgress));
                                 }
                             }
-                        }                        
+                        }
+                        if (ConfigurationService.Extractkh3d)
+                        {
+                            for (int i = 0; i < 4; i++)
+                            {
+                                var outputDir = Path.Combine(gameDataLocation, "kh3d");
+                                using var hedStream = File.OpenRead(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "Image", _pcReleaseLanguage, "kh3d_" + _nameListkh3d[i] + ".hed"));
+                                using var img = File.OpenRead(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "Image", _pcReleaseLanguage, "kh3d_" + _nameListkh3d[i] + ".pkg"));
+
+                                foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
+                                {
+                                    var hash = OpenKh.Egs.Helpers.ToString(entry.MD5);
+                                    if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var fileName))
+                                        fileName = $"{hash}.dat";
+
+                                    var outputFileName = Path.Combine(outputDir, fileName);
+
+                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileName);
+
+                                    var hdAsset = new OpenKh.Egs.EgsHdAsset(img.SetPosition(entry.Offset));
+
+                                    File.Create(outputFileName).Using(stream => stream.Write(hdAsset.OriginalData));
+
+                                    outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
+
+                                    foreach (var asset in hdAsset.Assets)
+                                    {
+                                        var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
+                                        OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
+
+                                        var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
+                                        File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
+                                    }
+                                    _procTotalFiles++;
+
+                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
+                                    OnPropertyChanged(nameof(ExtractionProgress));
+                                }
+                            }
+                        }
                         System.Windows.Application.Current.Dispatcher.Invoke(() =>
                         {
                             IsNotExtracting = true;
