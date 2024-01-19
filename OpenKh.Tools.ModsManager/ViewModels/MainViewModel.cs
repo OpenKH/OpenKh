@@ -620,34 +620,37 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                     }
                     else
-                    {
-                        string filename;
-                        if (!(_launchGame == "kh3d"))
+                    {                        
+                        try
                         {
-                            filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
-                        }
-                        else
-                        {
-                            filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
-                        }
-                        processStartInfo = new ProcessStartInfo
-                        {    
-                            FileName = filename,
-                            WorkingDirectory = ConfigurationService.PcReleaseLocation,
-                            UseShellExecute = false,
-                        };
-                        if (processStartInfo == null || !File.Exists(processStartInfo.FileName))
-                        {
-                            MessageBox.Show(
-                                "Unable to start game. Please make sure your Kingdom Hearts executable is correctly named and in the correct folder.",
-                                "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            string filename;
+                            if (!(_launchGame == "kh3d"))
+                            {
+                                filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);                           
+                            }
+                            else
+                            {
+                                filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
+                            }
+                            processStartInfo = new ProcessStartInfo
+                            {    
+                                FileName = filename,
+                                WorkingDirectory = ConfigurationService.PcReleaseLocation,
+                                UseShellExecute = false,
+                            };
+                            Process.Start(processStartInfo);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
-                    }
-                    Process.Start(processStartInfo);
-                    CloseAllWindows();
-                    return Task.CompletedTask;
+                        catch
+                        {
+                            MessageBox.Show(
+                           "Unable to locate game executable. Please make sure your Kingdom Hearts executable is correctly named and in the correct folder.",
+                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            CloseAllWindows();
+                            return Task.CompletedTask;
+                        }
+                    }                    
                 default:
                     return Task.CompletedTask;
             }
