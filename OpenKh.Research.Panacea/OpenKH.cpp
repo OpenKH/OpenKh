@@ -140,18 +140,21 @@ void OpenKH::Initialize()
 
     fprintf(stdout, "Executable instance at %p\n", g_hInstance);
     m_GameID = DetectGame();
-    if (m_GameID == OpenKH::GameId::Unknown)
+    switch (m_GameID)
     {
+    case OpenKH::GameId::Unknown:
         fprintf(stderr, "Unable to detect the running game. Panacea will not be executed.\n");
         return;
-    }
-    if (m_GameID == OpenKH::GameId::Launcher1_5_2_5)
-    {
+    case OpenKH::GameId::Launcher1_5_2_5:
+    case OpenKH::GameId::Launcher2_8:
         DWORD pp;
         if (QuickLaunch > 0)
         {
             uint8_t* framefunc;
-            Hook(framefunc, "\x40\x57\x48\x83\xEC\x40\x48\xC7\x44\x24\x00\x00\x00\x00\x00\x48\x89\x5C\x24\x00\x48\x8B\xD9\x8B\x41\x34", "xxxxxxxxxx?????xxxx?xxxxxx");
+            if (m_GameID == OpenKH::GameId::Launcher1_5_2_5)
+                Hook(framefunc, "\x40\x57\x48\x83\xEC\x40\x48\xC7\x44\x24\x00\x00\x00\x00\x00\x48\x89\x5C\x24\x00\x48\x8B\xD9\x8B\x41\x34", "xxxxxxxxxx?????xxxx?xxxxxx");
+            else
+                Hook(framefunc, "\x40\x57\x48\x83\xEC\x40\x48\xC7\x44\x24\x00\x00\x00\x00\x00\x48\x89\x5C\x24\x00\x48\x8B\xF9\x83\x79\x34\x00", "xxxxxxxxxx?????xxxx?xxxxxxx");
             Hook(LaunchGame, "\x40\x53\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x8B\xD9", "xxxxx????xxx????xxxxxxx????xx");
             FindAllFuncs();
             intptr_t m_pReplaceFunc = (intptr_t)QuickBootHook;
@@ -201,11 +204,21 @@ void OpenKH::Initialize()
         else if (QuickMenu)
         {
             uint8_t* axaAppMain;
-            Hook(axaAppMain, "\x48\x89\x5C\x24\x00\x57\xB8", "xxxx?xx");
+            size_t off;
+            if (m_GameID == OpenKH::GameId::Launcher1_5_2_5)
+            {
+                Hook(axaAppMain, "\x48\x89\x5C\x24\x00\x57\xB8", "xxxx?xx");
+                off = 0x108;
+            }
+            else
+            {
+                Hook(axaAppMain, "\x40\x53\xB8", "xxx");
+                off = 0x150;
+            }
             FindAllFuncs();
-            VirtualProtect(axaAppMain + 0x108, sizeof(quickmenupat), PAGE_EXECUTE_READWRITE, &pp);
-            memcpy(axaAppMain + 0x108, quickmenupat, sizeof(quickmenupat));
-            VirtualProtect(axaAppMain + 0x108, sizeof(quickmenupat), pp, &pp);
+            VirtualProtect(axaAppMain + off, sizeof(quickmenupat), PAGE_EXECUTE_READWRITE, &pp);
+            memcpy(axaAppMain + off, quickmenupat, sizeof(quickmenupat));
+            VirtualProtect(axaAppMain + off, sizeof(quickmenupat), pp, &pp);
         }
         return;
     }
@@ -275,9 +288,9 @@ void OpenKH::ReadSettings(const char* filename)
             parseBool(value, m_EnableCache);
         else if (!strncmp(key, "quick_launch", sizeof(buf)))
         {
-            if (!_stricmp(value, "kh1"))
+            if (!_stricmp(value, "kh1") || !_stricmp(value, "ddd"))
                 QuickLaunch = 1;
-            else if (!_stricmp(value, "Recom"))
+            else if (!_stricmp(value, "Recom") || !_stricmp(value, "0.2"))
                 QuickLaunch = 2;
             else if (!_stricmp(value, "kh2"))
                 QuickLaunch = 3;
@@ -309,6 +322,8 @@ OpenKH::GameId OpenKH::DetectGame()
         return GameId::KingdomHeartsDdd;
     if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS HD 1.5+2.5 Launcher.exe") == 0)
         return GameId::Launcher1_5_2_5;
+    if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS HD 2.8 Launcher.exe") == 0)
+        return GameId::Launcher2_8;
 
     return GameId::Unknown;
 }
