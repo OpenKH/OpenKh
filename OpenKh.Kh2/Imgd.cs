@@ -190,6 +190,8 @@ namespace OpenKh.Kh2
 
         public PixelFormat PixelFormat => GetPixelFormat(_format);
 
+        public PixelFormat ClutFormat => PixelFormat.Rgba8888;
+
         /// <summary>
         /// Get pixels
         /// </summary>

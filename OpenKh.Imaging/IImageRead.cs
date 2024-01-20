@@ -1,7 +1,15 @@
+using System.Drawing;
+
 namespace OpenKh.Imaging
 {
-    public interface IImageRead : IImage
+    public interface IImageRead
     {
+        Size Size { get; }
+
+        PixelFormat PixelFormat { get; }
+
+        PixelFormat ClutFormat { get; }
+
         /// <summary>
         /// Get pixels
         /// </summary>

@@ -18,6 +18,7 @@ namespace OpenKh.Tests.Engine
         {
             public Size Size { get; set; }
             public PixelFormat PixelFormat { get; set; }
+            public PixelFormat ClutFormat { get; set; }
             public byte[] ClutPassThru { get; set; }
             public byte[] DataPassThru { get; set; }
 
@@ -32,6 +33,7 @@ namespace OpenKh.Tests.Engine
             {
                 Size = new Size(2, 1),
                 PixelFormat = PixelFormat.Indexed4,
+                ClutFormat = PixelFormat.Rgba8888,
                 DataPassThru = new byte[] { 0x10 },
                 ClutPassThru = new byte[]
                 {
@@ -59,6 +61,7 @@ namespace OpenKh.Tests.Engine
             {
                 Size = new Size(2, 1),
                 PixelFormat = PixelFormat.Indexed8,
+                ClutFormat = PixelFormat.Rgba8888,
                 DataPassThru = new byte[] { 1, 0 },
                 ClutPassThru = new byte[]
                 {
@@ -86,6 +89,7 @@ namespace OpenKh.Tests.Engine
             {
                 Size = new Size(2, 1),
                 PixelFormat = PixelFormat.Rgba8888,
+                ClutFormat = PixelFormat.Undefined,
                 DataPassThru = new byte[] {
                     // B G R A
                     0x88, 0x44, 0x22, 0x11, // 0
@@ -110,6 +114,7 @@ namespace OpenKh.Tests.Engine
             {
                 Size = new Size(2, 1),
                 PixelFormat = PixelFormat.Indexed4,
+                ClutFormat = PixelFormat.Rgba8888,
                 DataPassThru = new byte[] { 0x10 },
                 ClutPassThru = new byte[]
                 {
@@ -137,6 +142,7 @@ namespace OpenKh.Tests.Engine
             {
                 Size = new Size(2, 1),
                 PixelFormat = PixelFormat.Indexed8,
+                ClutFormat = PixelFormat.Rgba8888,
                 DataPassThru = new byte[] { 1, 0 },
                 ClutPassThru = new byte[]
                 {
@@ -164,6 +170,7 @@ namespace OpenKh.Tests.Engine
             {
                 Size = new Size(2, 1),
                 PixelFormat = PixelFormat.Rgba8888,
+                ClutFormat = PixelFormat.Undefined,
                 DataPassThru = new byte[] {
                     // B G R A
                     0x22, 0x44, 0x88, 0x11, // 0

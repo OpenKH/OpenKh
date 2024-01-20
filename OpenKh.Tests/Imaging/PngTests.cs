@@ -376,6 +376,7 @@ namespace OpenKh.Tests.Imaging
         {
             public Size Size => new Size(1, 1);
             public PixelFormat PixelFormat => PixelFormat.Rgba8888;
+            public PixelFormat ClutFormat => PixelFormat.Undefined;
 
             public byte[] GetClut() => null;
             public byte[] GetData() => new byte[] { 0x44, 0x22, 0x11, 0x88 };
@@ -401,6 +402,7 @@ namespace OpenKh.Tests.Imaging
         {
             public Size Size => new Size(1, 1);
             public PixelFormat PixelFormat => PixelFormat.Rgb888;
+            public PixelFormat ClutFormat => PixelFormat.Undefined;
 
             public byte[] GetClut() => null;
             public byte[] GetData() => new byte[] { 0x44, 0x22, 0x11 };
@@ -426,6 +428,7 @@ namespace OpenKh.Tests.Imaging
         {
             public Size Size => new Size(4, 4);
             public PixelFormat PixelFormat => PixelFormat.Indexed4;
+            public PixelFormat ClutFormat => PixelFormat.Rgba8888;
 
             public byte[] GetClut() => new byte[] {
                 0x00, 0x00, 0x00, 0xFF,
@@ -473,6 +476,7 @@ namespace OpenKh.Tests.Imaging
         {
             public Size Size => new Size(16, 16);
             public PixelFormat PixelFormat => PixelFormat.Indexed8;
+            public PixelFormat ClutFormat => PixelFormat.Rgba8888;
 
             public byte[] GetClut() => Enumerable.Range(0, 256)
                 .SelectMany(index => new byte[] { (byte)index, 0, 0, 255 })

@@ -150,6 +150,7 @@ namespace OpenKh.Imaging
             if (bits == 4 && colorType == ColorType.Indexed)
             {
                 PixelFormat = PixelFormat.Indexed4;
+                ClutFormat = PixelFormat.Rgba8888;
                 var stride = (1 + Size.Width) / 2;
                 _data = new byte[stride * Size.Height];
                 for (int y = 0; y < Size.Height; y++)
@@ -163,6 +164,7 @@ namespace OpenKh.Imaging
             else if (bits == 8 && colorType == ColorType.Indexed)
             {
                 PixelFormat = PixelFormat.Indexed8;
+                ClutFormat = PixelFormat.Rgba8888;
                 var stride = Size.Width;
                 _data = new byte[stride * Size.Height];
                 for (int y = 0; y < Size.Height; y++)
@@ -176,6 +178,7 @@ namespace OpenKh.Imaging
             else if (bits == 8 && colorType == ColorType.TrueColor)
             {
                 PixelFormat = PixelFormat.Rgb888;
+                ClutFormat = PixelFormat.Undefined;
                 var stride = 3 * Size.Width;
                 _data = new byte[stride * Size.Height];
                 for (int y = 0; y < Size.Height; y++)
@@ -204,6 +207,7 @@ namespace OpenKh.Imaging
             else if (bits == 8 && colorType == ColorType.AlphaTrueColor)
             {
                 PixelFormat = PixelFormat.Rgba8888;
+                ClutFormat = PixelFormat.Undefined;
                 var stride = 4 * Size.Width;
                 _data = new byte[stride * Size.Height];
                 for (int y = 0; y < Size.Height; y++)
@@ -380,6 +384,8 @@ namespace OpenKh.Imaging
         public Size Size { get; internal set; }
 
         public PixelFormat PixelFormat { get; internal set; }
+        
+        public PixelFormat ClutFormat { get; internal set; }
 
         public byte[] GetData() => _data;
 

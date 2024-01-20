@@ -101,6 +101,7 @@ namespace OpenKh.Command.ImgTool.Utils
         {
             public Size Size { get; set; }
             public PixelFormat PixelFormat { get; set; }
+            public PixelFormat ClutFormat { get; set; }
 
             internal byte[] Clut { get; set; }
             internal byte[] Data { get; set; }
@@ -119,6 +120,7 @@ namespace OpenKh.Command.ImgTool.Utils
                     {
                         Size = size,
                         PixelFormat = PixelFormat.Indexed4,
+                        ClutFormat = PixelFormat.Rgba8888,
                         Clut = ConvertClutFrom(output.Palette),
                         Data = ConvertDataFrom(output.PixelLines, (output.Width + 1) / 2, output.Height),
                     };
@@ -127,6 +129,7 @@ namespace OpenKh.Command.ImgTool.Utils
                     {
                         Size = size,
                         PixelFormat = PixelFormat.Indexed8,
+                        ClutFormat = PixelFormat.Rgba8888,
                         Clut = ConvertClutFrom(output.Palette),
                         Data = ConvertDataFrom(output.PixelLines, output.Width, output.Height),
                     };

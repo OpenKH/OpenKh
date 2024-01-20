@@ -10,6 +10,7 @@ namespace OpenKh.Tests.Imaging
         {
             public Size Size => new Size(Width, Height);
             public PixelFormat PixelFormat => PixelFormat.Indexed4;
+            public PixelFormat ClutFormat => PixelFormat.Rgba8888;
             public byte[] GetData() => Data4bpp;
             public byte[] GetClut() => Clut4bpp;
         }

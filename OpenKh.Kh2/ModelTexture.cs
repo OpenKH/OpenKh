@@ -53,6 +53,8 @@ namespace OpenKh.Kh2
 
             public PixelFormat PixelFormat { get; }
 
+            public PixelFormat ClutFormat => PixelFormat.Rgba8888;
+
             public TextureAddressMode TextureAddressMode { get; }
 
             public byte[] GetClut()

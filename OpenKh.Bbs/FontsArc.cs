@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using System;
 using System.Collections.Generic;
@@ -20,6 +20,7 @@ namespace OpenKh.Bbs
                 Name = name;
                 Size = new Size(width, maxHeight);
                 PixelFormat = pixelFormat;
+                ClutFormat = PixelFormat.Rgba8888;
 
                 var bpp = 0;
                 switch (pixelFormat)
@@ -47,6 +48,8 @@ namespace OpenKh.Bbs
             public Size Size { get; }
 
             public PixelFormat PixelFormat { get; }
+
+            public PixelFormat ClutFormat { get; }
 
             public byte[] GetClut() => _clutData;
 

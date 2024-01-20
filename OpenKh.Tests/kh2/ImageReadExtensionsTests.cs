@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
@@ -18,6 +18,7 @@ namespace OpenKh.Tests.kh2
             public Size Size { get; set; }
 
             public PixelFormat PixelFormat { get; set; }
+            public PixelFormat ClutFormat { get; set; }
 
             public byte[] ForGetClut { get; set; }
             public byte[] ForGetData { get; set; }
@@ -34,6 +35,7 @@ namespace OpenKh.Tests.kh2
                 new SampleImager
                 {
                     PixelFormat = PixelFormat.Rgba8888,
+                    ClutFormat = PixelFormat.Undefined,
                     Size = new Size(1, 1),
                     ForGetData = new byte[]
                     {

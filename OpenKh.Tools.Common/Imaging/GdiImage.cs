@@ -22,6 +22,8 @@ namespace OpenKh.Tools.Common.Imaging
 
         public OpenKh.Imaging.PixelFormat PixelFormat => _bitmap.PixelFormat.GetPixelFormat();
 
+        public OpenKh.Imaging.PixelFormat ClutFormat => OpenKh.Imaging.PixelFormat.Rgba8888;
+
         public byte[] GetClut()
         {
             var palette = _bitmap.Palette?.Entries ?? new Color[0];

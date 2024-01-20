@@ -62,6 +62,7 @@ namespace OpenKh.Command.TexFooter.Utils
             {
                 Size = new Size(SpriteWidth, SpriteHeight * NumSpritesInImageData),
                 PixelFormat = pixFmt,
+                ClutFormat = PixelFormat.Rgba8888,
                 Clut = palette,
                 Data = bitmapData,
             };
@@ -71,6 +72,7 @@ namespace OpenKh.Command.TexFooter.Utils
         {
             public Size Size { get; internal set; }
             public PixelFormat PixelFormat { get; internal set; }
+            public PixelFormat ClutFormat { get; internal set; }
 
             internal byte[] Clut { get; set; }
             internal byte[] Data { get; set; }
