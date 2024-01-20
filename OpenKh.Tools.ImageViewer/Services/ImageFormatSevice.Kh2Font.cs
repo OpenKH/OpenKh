@@ -20,7 +20,7 @@ namespace OpenKh.Tools.ImageViewer.Services
                 .Any(x => x.Type == Bar.EntryType.RawBitmap);
         }
 
-        private static IEnumerable<IImageRead> ReadKh2Font(Stream inputStream)
+        private static IEnumerable<IImage> ReadKh2Font(Stream inputStream)
         {
             var fontContext = new FontContext();
             fontContext.Read(Bar.Read(inputStream.SetPosition(0))
@@ -36,7 +36,7 @@ namespace OpenKh.Tools.ImageViewer.Services
             }.Where(x => x != null);
         }
 
-        private static void WriteKh2Font(Stream outputStream, IEnumerable<IImageRead> images)
+        private static void WriteKh2Font(Stream outputStream, IEnumerable<IImage> images)
         {
             throw new NotImplementedException();
         }

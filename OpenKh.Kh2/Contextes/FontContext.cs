@@ -8,20 +8,20 @@ namespace OpenKh.Kh2.Contextes
 {
     public class FontContext
     {
-        private IImageRead imageSystem;
-        private IImageRead imageSystem2;
-        private IImageRead imageEvent;
-        private IImageRead imageEvent2;
-        private IImageRead imageIcon;
+        private IImage imageSystem;
+        private IImage imageSystem2;
+        private IImage imageEvent;
+        private IImage imageEvent2;
+        private IImage imageIcon;
         private byte[] spacingSystem;
         private byte[] spacingEvent;
         private byte[] spacingIcon;
 
-        public IImageRead ImageSystem { get => imageSystem; set => imageSystem = value; }
-        public IImageRead ImageSystem2 { get => imageSystem2; set => imageSystem2 = value; }
-        public IImageRead ImageEvent { get => imageEvent; set => imageEvent = value; }
-        public IImageRead ImageEvent2 { get => imageEvent2; set => imageEvent2 = value; }
-        public IImageRead ImageIcon { get => imageIcon; set => imageIcon = value; }
+        public IImage ImageSystem { get => imageSystem; set => imageSystem = value; }
+        public IImage ImageSystem2 { get => imageSystem2; set => imageSystem2 = value; }
+        public IImage ImageEvent { get => imageEvent; set => imageEvent = value; }
+        public IImage ImageEvent2 { get => imageEvent2; set => imageEvent2 = value; }
+        public IImage ImageIcon { get => imageIcon; set => imageIcon = value; }
 
         public byte[] SpacingSystem { get => spacingSystem; set => spacingSystem = value; }
         public byte[] SpacingEvent { get => spacingEvent; set => spacingEvent = value; }
@@ -52,7 +52,7 @@ namespace OpenKh.Kh2.Contextes
             }
         }
 
-        private void ReadFont(Bar.Entry entry, ref IImageRead image1, ref IImageRead image2, ref byte[] spacing)
+        private void ReadFont(Bar.Entry entry, ref IImage image1, ref IImage image2, ref byte[] spacing)
         {
             switch (entry.Type)
             {
@@ -68,7 +68,7 @@ namespace OpenKh.Kh2.Contextes
             }
         }
 
-        private void ReadIcon(Bar.Entry entry, ref IImageRead image, ref byte[] spacing, int width, int height)
+        private void ReadIcon(Bar.Entry entry, ref IImage image, ref byte[] spacing, int width, int height)
         {
             switch (entry.Type)
             {
@@ -87,18 +87,18 @@ namespace OpenKh.Kh2.Contextes
             return new BinaryReader(entry.Stream).ReadBytes((int)entry.Stream.Length);
         }
 
-        private static IImageRead ReadImage8bit(Bar.Entry entry, int width, int height)
+        private static IImage ReadImage8bit(Bar.Entry entry, int width, int height)
         {
             return RawBitmap.Read8bit(entry.Stream, width, height);
         }
 
-        private static IImageRead ReadImagePalette1(Bar.Entry entry)
+        private static IImage ReadImagePalette1(Bar.Entry entry)
         {
             DeductImageSize((int)entry.Stream.Length, out var width, out var height);
             return RawBitmap.Read4bitPalette1(entry.Stream, width, height);
         }
 
-        private static IImageRead ReadImagePalette2(Bar.Entry entry)
+        private static IImage ReadImagePalette2(Bar.Entry entry)
         {
             DeductImageSize((int)entry.Stream.Length, out var width, out var height);
             return RawBitmap.Read4bitPalette2(entry.Stream, width, height);

@@ -7,8 +7,8 @@ namespace OpenKh.Tools.ImageViewer.Services
     {
         int Count { get; }
 
-        IEnumerable<IImageRead> Images { get; }
+        IEnumerable<IImage> Images { get; }
 
-        IImageRead GetImage(int index);
+        IImage GetImage(int index);
     }
 }

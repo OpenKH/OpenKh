@@ -20,13 +20,13 @@ namespace OpenKh.Tools.Common.Imaging
                 stream.ReadByte() == 0x0a;
         }
 
-        public static IImageRead Read(Stream stream)
+        public static IImage Read(Stream stream)
         {
             stream.Position = 0; // IsValid advances 8 bytes
             return new PngImage(stream);
         }
 
-        public static void Write(Stream stream, IImageRead image)
+        public static void Write(Stream stream, IImage image)
         {
             stream.Position = 0;
             PngImage.Write(stream, image);
@@ -43,9 +43,9 @@ namespace OpenKh.Tools.Common.Imaging
                 stream.ReadByte() == 0x4d;
         }
 
-        public static IImageRead Read(Stream stream) => new GdiImage(stream);
+        public static IImage Read(Stream stream) => new GdiImage(stream);
 
-        public static void Write(Stream stream, IImageRead image)
+        public static void Write(Stream stream, IImage image)
         {
             using (var bitmap = image.CreateBitmap())
             {
@@ -71,9 +71,9 @@ namespace OpenKh.Tools.Common.Imaging
             return false;
         }
 
-        public static IImageRead Read(Stream stream) => new GdiImage(stream);
+        public static IImage Read(Stream stream) => new GdiImage(stream);
 
-        public static void Write(Stream stream, IImageRead image)
+        public static void Write(Stream stream, IImage image)
         {
             using (var bitmap = image.CreateBitmap())
             {

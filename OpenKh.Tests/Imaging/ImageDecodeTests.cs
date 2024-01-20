@@ -6,7 +6,7 @@ namespace OpenKh.Tests.Imaging
 {
     public class ImageDecodeTests
     {
-        public class Fake4bppImage : IImageRead
+        public class Fake4bppImage : IImage
         {
             public Size Size => new Size(Width, Height);
             public PixelFormat PixelFormat => PixelFormat.Indexed4;

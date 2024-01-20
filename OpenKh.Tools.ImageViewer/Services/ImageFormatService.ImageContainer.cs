@@ -8,16 +8,16 @@ namespace OpenKh.Tools.ImageViewer.Services
     {
         internal class ImageContainer : IImageContainer
         {
-            private readonly IImageRead[] _images;
+            private readonly IImage[] _images;
 
-            public ImageContainer(IEnumerable<IImageRead> images)
+            public ImageContainer(IEnumerable<IImage> images)
             {
                 _images = images.ToArray();
             }
 
             public int Count => _images.Length;
-            public IEnumerable<IImageRead> Images => _images;
-            public IImageRead GetImage(int index) => _images[index];
+            public IEnumerable<IImage> Images => _images;
+            public IImage GetImage(int index) => _images[index];
         }
     }
 }

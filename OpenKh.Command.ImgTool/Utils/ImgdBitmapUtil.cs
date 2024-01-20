@@ -14,7 +14,7 @@ namespace OpenKh.Kh2.Utils
     {
         class ReadAs32bppPixels
         {
-            public ReadAs32bppPixels(IImageRead bitmap)
+            public ReadAs32bppPixels(IImage bitmap)
             {
                 Width = bitmap.Size.Width;
                 Height = bitmap.Size.Height;
@@ -88,7 +88,7 @@ namespace OpenKh.Kh2.Utils
             }
         }
 
-        public static Imgd ToImgd(IImageRead bitmap, int bpp, Func<IImageRead, IImageRead> quantizer, bool swizzle = false)
+        public static Imgd ToImgd(IImage bitmap, int bpp, Func<IImage, IImage> quantizer, bool swizzle = false)
         {
             if (quantizer != null)
             {
@@ -224,7 +224,7 @@ namespace OpenKh.Kh2.Utils
             throw new NotSupportedException($"BitsPerPixel {bpp} not recognized!");
         }
 
-        public static IEnumerable<Imgd> FromFileToImgdList(string anyFile, int bitsPerPixel, Func<IImageRead, IImageRead> quantizer, bool swizzle)
+        public static IEnumerable<Imgd> FromFileToImgdList(string anyFile, int bitsPerPixel, Func<IImage, IImage> quantizer, bool swizzle)
         {
             switch (Path.GetExtension(anyFile).ToLowerInvariant())
             {

@@ -372,7 +372,7 @@ namespace OpenKh.Tests.Imaging
             Assert.Equal(pixels, image.GetData());
         }
 
-        private class Bitmap1x1_32 : IImageRead
+        private class Bitmap1x1_32 : IImage
         {
             public Size Size => new Size(1, 1);
             public PixelFormat PixelFormat => PixelFormat.Rgba8888;
@@ -398,7 +398,7 @@ namespace OpenKh.Tests.Imaging
             }
         }
 
-        private class Bitmap1x1_24 : IImageRead
+        private class Bitmap1x1_24 : IImage
         {
             public Size Size => new Size(1, 1);
             public PixelFormat PixelFormat => PixelFormat.Rgb888;
@@ -424,7 +424,7 @@ namespace OpenKh.Tests.Imaging
             }
         }
 
-        private class Bitmap4x4_4 : IImageRead
+        private class Bitmap4x4_4 : IImage
         {
             public Size Size => new Size(4, 4);
             public PixelFormat PixelFormat => PixelFormat.Indexed4;
@@ -472,7 +472,7 @@ namespace OpenKh.Tests.Imaging
             }
         }
 
-        private class Bitmap16x16_8 : IImageRead
+        private class Bitmap16x16_8 : IImage
         {
             public Size Size => new Size(16, 16);
             public PixelFormat PixelFormat => PixelFormat.Indexed8;

@@ -237,7 +237,7 @@ namespace OpenKh.Tools.Common.Rendering
 			}
         }
 
-        public ISpriteTexture CreateSpriteTexture(IImageRead image) =>
+        public ISpriteTexture CreateSpriteTexture(IImage image) =>
             CreateSpriteTexture(image.Size.Width, image.Size.Height, image.ToBgra32());
         
         public ISpriteTexture CreateSpriteTexture(int width, int height)

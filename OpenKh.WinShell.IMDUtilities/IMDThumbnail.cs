@@ -16,7 +16,7 @@ namespace OpenKh.WinShell.IMDUtilities
     [COMServerAssociation(AssociationType.FileExtension, ".imd")]
     public class IMDThumbnail : SharpThumbnailHandler
     {
-        Lazy<IImageRead> _tImage;
+        Lazy<IImage> _tImage;
         Lazy<Bitmap> _rBitmap;
         protected override Bitmap GetThumbnailImage(uint width)
         {
@@ -25,7 +25,7 @@ namespace OpenKh.WinShell.IMDUtilities
                 SelectedItemStream.CopyTo(_cStream);
                 SelectedItemStream.Dispose();
 
-                _tImage = new Lazy<IImageRead>(() => Imgd.Read(_cStream));
+                _tImage = new Lazy<IImage>(() => Imgd.Read(_cStream));
 
                 var size = _tImage.Value.Size;
                 var data = _tImage.Value.ToBgra32();

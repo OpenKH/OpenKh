@@ -9,9 +9,9 @@ namespace OpenKh.Engine.Renders
 {
     public class RenderingMessageContext
     {
-        public IImageRead Font { get; set; }
-        public IImageRead Font2 { get; set; }
-        public IImageRead Icon { get; set; }
+        public IImage Font { get; set; }
+        public IImage Font2 { get; set; }
+        public IImage Icon { get; set; }
         public byte[] FontSpacing { get; set; }
         public byte[] IconSpacing { get; set; }
         public IMessageEncoder Encoder { get; set; }
@@ -31,9 +31,9 @@ namespace OpenKh.Engine.Renders
 
         private readonly byte[] _fontSpacing;
         private readonly byte[] _iconSpacing;
-        private readonly IImageRead _imageFont;
-        private readonly IImageRead _imageFont2;
-        private readonly IImageRead _imageIcon;
+        private readonly IImage _imageFont;
+        private readonly IImage _imageFont2;
+        private readonly IImage _imageIcon;
         private readonly ISpriteTexture _spriteFont;
         private readonly ISpriteTexture _spriteFont2;
         private readonly ISpriteTexture _spriteIcon;
@@ -237,7 +237,7 @@ namespace OpenKh.Engine.Renders
                 .Color(color)
                 .SpriteTexture(texture));
 
-        private void InitializeSurface(ref ISpriteTexture spriteTexture, IImageRead image)
+        private void InitializeSurface(ref ISpriteTexture spriteTexture, IImage image)
         {
             spriteTexture?.Dispose();
             spriteTexture = _drawing?.CreateSpriteTexture(image);

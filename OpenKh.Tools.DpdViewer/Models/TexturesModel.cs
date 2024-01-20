@@ -7,12 +7,12 @@ namespace OpenKh.Tools.DpdViewer.Models
 {
     public class TextureModel : BaseNotifyPropertyChanged
     {
-        public TextureModel(IImageRead image)
+        public TextureModel(IImage image)
         {
             MasterImage = image;
         }
 
-        public IImageRead MasterImage { get; }
+        public IImage MasterImage { get; }
 
         public string DisplayName => $"{MasterImage.Size.Width}x{MasterImage.Size.Height}";
 

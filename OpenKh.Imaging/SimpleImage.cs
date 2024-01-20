@@ -6,7 +6,7 @@ using System.Text;
 
 namespace OpenKh.Imaging
 {
-    public class SimpleImage : IImageRead
+    public class SimpleImage : IImage
     {
         public Size Size { get; private set; }
         public int Width { get => Size.Width; }

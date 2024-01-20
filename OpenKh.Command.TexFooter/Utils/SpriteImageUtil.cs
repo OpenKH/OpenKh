@@ -10,7 +10,7 @@ namespace OpenKh.Command.TexFooter.Utils
 {
     internal static class SpriteImageUtil
     {
-        public static IImageRead ToBitmap(
+        public static IImage ToBitmap(
             int BitsPerPixel,
             int SpriteWidth,
             int SpriteHeight,
@@ -68,7 +68,7 @@ namespace OpenKh.Command.TexFooter.Utils
             };
         }
 
-        private class LocalBitmap : IImageRead
+        private class LocalBitmap : IImage
         {
             public Size Size { get; internal set; }
             public PixelFormat PixelFormat { get; internal set; }

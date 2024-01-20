@@ -176,7 +176,7 @@ namespace OpenKh.Engine.MonoGame
             _indexBuffer.Dispose();
         }
 
-        public ISpriteTexture CreateSpriteTexture(IImageRead image)
+        public ISpriteTexture CreateSpriteTexture(IImage image)
         {
             var size = image.Size;
             var texture = new RenderTarget2D(_graphicsDevice, size.Width, size.Height);

@@ -4,7 +4,7 @@ namespace OpenKh.Imaging
 {
     public static class ImageExtensions
     {
-        public static byte[] ToBgra32(this IImageRead imageRead)
+        public static byte[] ToBgra32(this IImage imageRead)
         {
             switch (imageRead.PixelFormat)
             {

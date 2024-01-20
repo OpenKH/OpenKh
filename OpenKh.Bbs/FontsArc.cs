@@ -10,7 +10,7 @@ namespace OpenKh.Bbs
 {
     public class FontsArc
     {
-        private class Image : IImageRead
+        private class Image : IImage
         {
             private readonly byte[] _imageData;
             private readonly byte[] _clutData;
@@ -59,8 +59,8 @@ namespace OpenKh.Bbs
         public class Font
         {
             public string Name { get; }
-            public IImageRead Image1 { get; }
-            public IImageRead Image2 { get; }
+            public IImage Image1 { get; }
+            public IImage Image2 { get; }
             public FontInfo Info { get; }
             public FontCharacterInfo[] CharactersInfo { get; }
 
@@ -99,7 +99,7 @@ namespace OpenKh.Bbs
             FontNumeral = new Font(_entries, "numeral");
         }
 
-        public IImageRead FontIcon { get; }
+        public IImage FontIcon { get; }
         public Font FontCmd { get; }
         public Font FontHelp { get; }
         public Font FontMenu { get; }

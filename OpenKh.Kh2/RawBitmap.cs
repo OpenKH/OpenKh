@@ -5,7 +5,7 @@ using OpenKh.Imaging;
 
 namespace OpenKh.Kh2
 {
-    public class RawBitmap : IImageRead
+    public class RawBitmap : IImage
     {
         private const int PaletteCount = 256;
         private const int BitsPerColor = 32;

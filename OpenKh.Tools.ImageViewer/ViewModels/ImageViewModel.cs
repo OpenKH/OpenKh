@@ -7,14 +7,14 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 {
     public class ImageViewModel : BaseNotifyPropertyChanged
     {
-        public ImageViewModel(IImageRead image, int index = -1)
+        public ImageViewModel(IImage image, int index = -1)
         {
             Source = image;
             Bitmap = Source.GetBimapSource();
             Index = index;
         }
 
-        public IImageRead Source { get; }
+        public IImage Source { get; }
         public BitmapSource Bitmap { get; }
         public int Index { get; }
 

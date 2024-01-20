@@ -5,7 +5,7 @@ namespace OpenKh.Kh2.Extensions
 {
     public static class ImageReadExtensions
     {
-        public static Imgd AsImgd(this IImageRead image, bool isSwizzled = false)
+        public static Imgd AsImgd(this IImage image, bool isSwizzled = false)
         {
             if (image is Imgd imgd)
             {

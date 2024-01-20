@@ -11,7 +11,7 @@ namespace OpenKh.Tests.Imaging
 {
     public class ImageExtensionsTests
     {
-        private class TestImager : IImageRead
+        private class TestImager : IImage
         {
             public Size Size { get; set; }
             public PixelFormat PixelFormat { get; set; }

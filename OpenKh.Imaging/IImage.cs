@@ -2,7 +2,7 @@ using System.Drawing;
 
 namespace OpenKh.Imaging
 {
-    public interface IImageRead
+    public interface IImage
     {
         Size Size { get; }
 

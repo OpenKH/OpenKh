@@ -8,24 +8,24 @@ namespace OpenKh.Tools.ImageViewer.Services
     {
         private class SingleImageFormat : GenericImageFormat, IImageSingle
         {
-            private readonly Func<Stream, IImageRead> read;
-            private readonly Action<Stream, IImageRead> write;
+            private readonly Func<Stream, IImage> read;
+            private readonly Action<Stream, IImage> write;
 
             public SingleImageFormat(
                 string name,
                 string ext,
                 bool isCreationSupported,
                 Func<Stream, bool> isValid,
-                Func<Stream, IImageRead> read,
-                Action<Stream, IImageRead> write) :
+                Func<Stream, IImage> read,
+                Action<Stream, IImage> write) :
                 base(name, ext, false, isCreationSupported, isValid)
             {
                 this.read = read;
                 this.write = write;
             }
 
-            public IImageRead Read(Stream stream) => read(stream);
-            public void Write(Stream stream, IImageRead image) => write(stream, image);
+            public IImage Read(Stream stream) => read(stream);
+            public void Write(Stream stream, IImage image) => write(stream, image);
         }
     }
 }

@@ -57,7 +57,7 @@ namespace OpenKh.Tools.ImageViewer.Services
                     throw new NotImplementedException()),
 
                 GetImageFormat("KH2TIM", "tex", false, _ => true,
-                    s => ModelTexture.Read(s).Images.Cast<IImageRead>(),
+                    s => ModelTexture.Read(s).Images.Cast<IImage>(),
                     (stream, images) => throw new NotImplementedException()),
             };
         }

@@ -10,7 +10,7 @@ namespace OpenKh.Tools.Common.Imaging
     public static class ImageExtensions
     {
         [SupportedOSPlatform("windows")]
-        public static void SaveImage(this IImageRead imageRead, string fileName)
+        public static void SaveImage(this IImage imageRead, string fileName)
         {
             using (var gdiBitmap = imageRead.CreateBitmap())
             {
@@ -19,7 +19,7 @@ namespace OpenKh.Tools.Common.Imaging
         }
 
         [SupportedOSPlatform("windows")]
-        public static Bitmap CreateBitmap(this IImageRead imageRead)
+        public static Bitmap CreateBitmap(this IImage imageRead)
         {
             var drawingPixelFormat = imageRead.PixelFormat.GetDrawingPixelFormat();
             Bitmap bitmap = new Bitmap(imageRead.Size.Width, imageRead.Size.Height, drawingPixelFormat);

@@ -9,7 +9,7 @@ namespace OpenKh.Engine.Extensions
         private static readonly byte[] Rgba = new byte[] { 2, 1, 0, 3 };
 
         /// <returns>`BB GG RR AA`</returns>
-        public static byte[] AsBgra8888(this IImageRead image)
+        public static byte[] AsBgra8888(this IImage image)
         {
             switch (image.PixelFormat)
             {
@@ -28,7 +28,7 @@ namespace OpenKh.Engine.Extensions
             }
         }
 
-        public static byte[] AsRgba8888(this IImageRead image)
+        public static byte[] AsRgba8888(this IImage image)
         {
             switch (image.PixelFormat)
             {

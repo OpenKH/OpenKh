@@ -46,7 +46,7 @@ namespace OpenKh.Tests.kh2
             int expectedHeight,
             int bitsPerPixel,
             string name,
-            Func<FontContext, IImageRead> getter)
+            Func<FontContext, IImage> getter)
         {
             var expectedLength = expectedWidth * expectedHeight * bitsPerPixel / 8;
 

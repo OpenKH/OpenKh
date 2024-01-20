@@ -8,7 +8,7 @@ using System.Runtime.Versioning;
 namespace OpenKh.Tools.Common.Imaging
 {
     [SupportedOSPlatform("windows")]
-    internal class GdiImage : IImageRead
+    internal class GdiImage : IImage
     {
         private readonly Bitmap _bitmap;
 

@@ -10,7 +10,7 @@ using static OpenKh.Imaging.Tm2;
 
 namespace OpenKh.Kh2
 {
-    public partial class Imgd : IImageRead
+    public partial class Imgd : IImage
     {
         private class Header
         {

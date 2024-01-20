@@ -26,7 +26,7 @@ namespace OpenKh.Kh2
             [Data] public int PaletteOffset { get; set; } // clutDataOffset
         }
 
-        public class Texture : IImageRead
+        public class Texture : IImage
         {
             private readonly byte[] _data;
             private readonly byte[] _palette;

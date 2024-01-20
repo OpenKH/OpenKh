@@ -13,7 +13,7 @@ namespace OpenKh.Tests.kh2
 {
     public class ImageReadExtensionsTests
     {
-        class SampleImager : IImageRead
+        class SampleImager : IImage
         {
             public Size Size { get; set; }
 

@@ -138,7 +138,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                                 {
                                     imageFormat.As<IImageMultiple>().Write(
                                         stream,
-                                        new ImageFormatService.ImageContainer(new IImageRead[] { singleImage })
+                                        new ImageFormatService.ImageContainer(new IImage[] { singleImage })
                                     );
                                 }
                                 else
@@ -204,7 +204,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                             var newImage = CreateDummyImage();
                             return new EditResult
                             {
-                                imageList = new IImageRead[] { newImage },
+                                imageList = new IImage[] { newImage },
                                 selection = newImage,
                             };
                         }
@@ -222,7 +222,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                         {
                             return new EditResult
                             {
-                                imageList = new IImageRead[] { Image.Source },
+                                imageList = new IImage[] { Image.Source },
                                 selection = Image.Source
                             };
                         }
@@ -247,7 +247,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                         {
                             return new EditResult
                             {
-                                imageList = currentImageList.Except(new IImageRead[] { Image?.Source })
+                                imageList = currentImageList.Except(new IImage[] { Image?.Source })
                             };
                         }
                     );
@@ -487,7 +487,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             }
         }
 
-        private IImageRead CreateDummyImage()
+        private IImage CreateDummyImage()
             => Imgd.Create(
                 new System.Drawing.Size(128, 128),
                 PixelFormat.Indexed8,
@@ -498,13 +498,13 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 
         class EditResult
         {
-            internal IEnumerable<IImageRead> imageList;
-            internal IImageRead selection;
+            internal IEnumerable<IImage> imageList;
+            internal IImage selection;
         }
 
-        private void EditImageList(Func<List<IImageRead>, EditResult> editor)
+        private void EditImageList(Func<List<IImage>, EditResult> editor)
         {
-            var currentImageList = (ImageContainer?.Images.ToList()) ?? new List<IImageRead>();
+            var currentImageList = (ImageContainer?.Images.ToList()) ?? new List<IImage>();
             var currentIndex = currentImageList.IndexOf(Image?.Source);
 
             var editResult = editor(currentImageList);
@@ -546,7 +546,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             EditImageList(
                 imageList =>
                 {
-                    var incomingImages = new IImageRead[] { CreateDummyImage() };
+                    var incomingImages = new IImage[] { CreateDummyImage() };
                     var position = Math.Max(0, imageList.IndexOf(Image?.Source));
 
                     switch (addPosition)
@@ -584,7 +584,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 
                     var incomingImages = imageFormat.IsContainer
                         ? imageFormat.As<IImageMultiple>().Read(stream).Images
-                        : new IImageRead[] { imageFormat.As<IImageSingle>().Read(stream) };
+                        : new IImage[] { imageFormat.As<IImageSingle>().Read(stream) };
 
                     EditImageList(
                         imageList =>
@@ -665,7 +665,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             }
         }
 
-        private IEnumerable<IImageRead> GetImagesForExport()
+        private IEnumerable<IImage> GetImagesForExport()
         {
             if (ImageContainer != null)
             {
@@ -675,10 +675,10 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             if (Image?.Source != null)
             {
                 // currently single image format
-                return new IImageRead[] { Image.Source };
+                return new IImage[] { Image.Source };
             }
             // no image loaded
-            return new IImageRead[0];
+            return new IImage[0];
         }
     }
 }

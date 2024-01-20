@@ -6,7 +6,7 @@ namespace OpenKh.Tools.Common.Wpf
 {
     public static class ImageReadExtensions
     {
-        public static BitmapSource GetBimapSource(this IImageRead imageRead)
+        public static BitmapSource GetBimapSource(this IImage imageRead)
         {
             const double dpi = 96.0;
 

@@ -8,7 +8,7 @@ namespace OpenKh.Engine.MonoGame
 {
     public static class Extensions
     {
-        public static Texture2D CreateTexture(this IImageRead image, GraphicsDevice graphicsDevice)
+        public static Texture2D CreateTexture(this IImage image, GraphicsDevice graphicsDevice)
         {
             var size = image.Size;
             var texture = new Texture2D(graphicsDevice, size.Width, size.Height);

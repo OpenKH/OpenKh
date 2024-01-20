@@ -13,7 +13,7 @@ using Xe.BinaryMapper;
 
 namespace OpenKh.Imaging
 {
-    public class PngImage : IImageRead
+    public class PngImage : IImage
     {
         private byte[] _data;
         private byte[] _clut;
@@ -394,7 +394,7 @@ namespace OpenKh.Imaging
 
         public void Write(Stream stream) => Write(stream, this);
 
-        public static void Write(Stream stream, IImageRead bitmap)
+        public static void Write(Stream stream, IImage bitmap)
         {
             BinaryMapping.WriteObject(stream, new Signature { Magic = Signature.Valid });
             byte bits;

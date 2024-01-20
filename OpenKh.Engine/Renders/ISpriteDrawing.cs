@@ -319,7 +319,7 @@ namespace OpenKh.Engine.Renders
     {
         ISpriteTexture DestinationTexture { get; set; }
 
-        ISpriteTexture CreateSpriteTexture(IImageRead image);
+        ISpriteTexture CreateSpriteTexture(IImage image);
 
         ISpriteTexture CreateSpriteTexture(int width, int height);
 

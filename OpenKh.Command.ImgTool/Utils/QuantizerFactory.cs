@@ -20,7 +20,7 @@ namespace OpenKh.Command.ImgTool.Utils
             public bool PngQuant { get; set; }
         }
 
-        public static Func<IImageRead, IImageRead> MakeFrom(int BitsPerPixel, bool InvokePngquant) =>
+        public static Func<IImage, IImage> MakeFrom(int BitsPerPixel, bool InvokePngquant) =>
             MakeFrom(
                 new CommonQuantizerParam
                 {
@@ -29,7 +29,7 @@ namespace OpenKh.Command.ImgTool.Utils
                 }
             );
 
-        public static Func<IImageRead, IImageRead> MakeFrom(ICommonQuantizerParam param)
+        public static Func<IImage, IImage> MakeFrom(ICommonQuantizerParam param)
         {
             return bitmap =>
             {
@@ -97,7 +97,7 @@ namespace OpenKh.Command.ImgTool.Utils
             };
         }
 
-        private class LocalImager : IImageRead
+        private class LocalImager : IImage
         {
             public Size Size { get; set; }
             public PixelFormat PixelFormat { get; set; }
@@ -110,7 +110,7 @@ namespace OpenKh.Command.ImgTool.Utils
             public byte[] GetData() => Data;
         }
 
-        private static IImageRead ConvertFrom(BitmapOutput output)
+        private static IImage ConvertFrom(BitmapOutput output)
         {
             var size = new Size(output.Width, output.Height);
             switch (output.BitsPixel)
