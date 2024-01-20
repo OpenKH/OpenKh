@@ -121,7 +121,7 @@ const std::wstring gamefolders[] = {
     L"/kh2",
     L"/recom",
     L"/bbs",
-    L"/ddd",
+    L"/kh3d",
 };
 void OpenKH::Initialize()
 {
@@ -288,7 +288,7 @@ void OpenKH::ReadSettings(const char* filename)
             parseBool(value, m_EnableCache);
         else if (!strncmp(key, "quick_launch", sizeof(buf)))
         {
-            if (!_stricmp(value, "kh1") || !_stricmp(value, "ddd"))
+            if (!_stricmp(value, "kh1") || !_stricmp(value, "kh3d"))
                 QuickLaunch = 1;
             else if (!_stricmp(value, "Recom") || !_stricmp(value, "0.2"))
                 QuickLaunch = 2;
