@@ -650,7 +650,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
-                    }                    
+                    }
+                    Process.Start(processStartInfo);
+                    CloseAllWindows();
+                    return Task.CompletedTask;
                 default:
                     return Task.CompletedTask;
             }
