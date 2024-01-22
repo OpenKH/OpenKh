@@ -445,9 +445,9 @@ namespace OpenKh.Tools.ModsManager.Services
             Action<float> progressNumber = null) =>
             RepositoryService.FetchAndResetUponOrigin(GetModPath(modName), progressOutput, progressNumber);
 
-        public static Task<bool> RunPacherAsync(bool fastMode) => Task.Run(() => Handle(() =>
+        public static Task<bool> RunPacherAsync(bool fastMode, bool cleanupModDir) => Task.Run(() => Handle(() =>
         {
-            if (Directory.Exists(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame)))
+            if (Directory.Exists(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame)) && cleanupModDir)
             {
                 try
                 {

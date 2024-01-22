@@ -47,6 +47,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public List<string> GamesToExtract { get; internal set; } = new List<string> { "kh2" };
             public string LaunchGame { get; internal set; } = "kh2";
             public bool DarkMode { get; internal set; } = true;
+            public bool CleanupModDir { get; internal set; } = true;
 
             public void Save(string fileName)
             {
@@ -411,6 +412,15 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.DarkMode = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool CleanupModDir
+        {
+            get => _config.CleanupModDir;
+            set
+            {
+                _config.CleanupModDir = value;
                 _config.Save(ConfigPath);
             }
         }

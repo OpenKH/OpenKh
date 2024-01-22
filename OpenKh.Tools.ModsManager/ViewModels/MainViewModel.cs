@@ -398,15 +398,25 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             MoveDown = new RelayCommand(_ => MoveSelectedModDown(), _ => CanSelectedModMoveDown());
             BuildCommand = new RelayCommand(async _ =>
             {
+                var vm = await ShowBuildConfirmWindow();
+                if (vm == null)
+                {
+                    return;
+                }
                 ResetLogWindow();
-                await BuildPatches(false);
+                await BuildPatches(false, vm.CleanupModDir);
                 CloseAllWindows();
             }, _ => !IsBuilding);
 
             PatchCommand = new RelayCommand(async (fastMode) =>
             {
+                var vm = await ShowBuildConfirmWindow();
+                if (vm == null)
+                {
+                    return;
+                }
                 ResetLogWindow();
-                await BuildPatches(Convert.ToBoolean(fastMode));
+                await BuildPatches(Convert.ToBoolean(fastMode), vm.CleanupModDir);
                 await PatchGame(Convert.ToBoolean(fastMode));
                 CloseAllWindows();
             }, _ => !IsBuilding);
@@ -426,10 +436,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             });
             BuildAndRunCommand = new RelayCommand(async _ =>
             {
+                var vm = await ShowBuildConfirmWindow();
+                if (vm == null)
+                {
+                    return;
+                }
                 CloseRunningProcess();
                 ResetLogWindow();
-                if (await BuildPatches(false))
+                if (await BuildPatches(false, vm.CleanupModDir))
+                {
                     await RunGame();
+                }
             }, _ => !IsBuilding);
             StopRunningInstanceCommand = new RelayCommand(_ =>
             {
@@ -512,6 +529,29 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardCommand.Execute(null);
         }
 
+        public async Task<BuildConfirmWindowVM> ShowBuildConfirmWindow()
+        {
+            var taskCompletionSource = new TaskCompletionSource<BuildConfirmWindowVM>();
+
+            var window = new BuildConfirmWindow();
+            window.Owner = App.Current.Windows
+                .OfType<Window>()
+                .FirstOrDefault(x => x.IsActive);
+            window.VM.GoCommand = new RelayCommand(
+                _ =>
+                {
+                    taskCompletionSource.TrySetResult(window.VM);
+                    window.Close();
+                }
+            );
+            window.Closing += (a, b) => window.Owner?.Focus();
+            window.Closed += (a, b) => taskCompletionSource.TrySetResult(null);
+
+            window.Show();
+
+            return await taskCompletionSource.Task;
+        }
+
         public void CloseAllWindows()
         {
             CloseRunningProcess();
@@ -540,10 +580,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             _debuggingWindow.ClearLogs();
         }
 
-        private async Task<bool> BuildPatches(bool fastMode)
+        private async Task<bool> BuildPatches(bool fastMode, bool cleanupModDir)
         {
             IsBuilding = true;
-            var result = await ModsService.RunPacherAsync(fastMode);
+            var result = await ModsService.RunPacherAsync(fastMode, cleanupModDir);
             IsBuilding = false;
 
             return result;
@@ -957,7 +997,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 foreach (var mod in ModsList)
                 {
                     if (mod.UpdateCount > 0)
-                        await ModsService.Update(mod.Source);                    
+                        await ModsService.Update(mod.Source);
                 }
                 ReloadModsList();
             }
@@ -1007,8 +1047,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                 MessageBox.Show(message, "OpenKh");
             }
-        }        
-        
+        }
+
         public void UpdatePanaceaSettings()
         {
             if (PanaceaInstalled)

@@ -1,0 +1,24 @@
+<Window x:Class="OpenKh.Tools.ModsManager.Views.BuildConfirmWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+        d:DataContext="{d:DesignInstance local:BuildConfirmWindowVM}"
+        mc:Ignorable="d"
+        Background="{Binding ColorTheme.BackgroundColor}"
+        Foreground="{Binding ColorTheme.TextColor}"
+        WindowStartupLocation="CenterOwner"
+        FontSize="16"
+        Title="BuildConfirmWindow" Height="206" Width="471">
+    <DockPanel Margin="7">
+        <GroupBox Header="Build options" DockPanel.Dock="Top" HorizontalAlignment="Left" VerticalAlignment="Top"
+                  Padding="7">
+            <CheckBox IsChecked="{Binding CleanupModDir}" Foreground="{Binding ColorTheme.TextColor}">Delete all files and folders from mod directory.</CheckBox>
+        </GroupBox>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
+            <Button Padding="7" Command="{Binding GoCommand}" IsDefault="True">_Go</Button>
+        </StackPanel>
+        <TextBlock />
+    </DockPanel>
+</Window>
