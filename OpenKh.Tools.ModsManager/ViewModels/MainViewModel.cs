@@ -598,7 +598,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         if (ConfigurationService.PanaceaInstalled)
                         {
-                            File.AppendAllText(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"), "\nquick_launch=" + _launchGame);
+                            string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
+                            if (!File.Exists(panaceaSettings))
+                            {
+                                File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
+                                new string[]
+                                {
+                                $"mod_path={ConfigurationService.GameModPath}",
+                                $"show_console={false}",
+                                });
+                            }
+                            File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                         }
                         processStartInfo = new ProcessStartInfo
                         {
@@ -608,32 +618,46 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     else if (ConfigurationService.IsEGSVersion && _launchGame == "kh3d")
                     {
+                        string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
                         if (ConfigurationService.PanaceaInstalled)
                         {
-                            File.AppendAllText(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"), "\nquick_launch=" + _launchGame);
+                            if (!File.Exists(panaceaSettings))
+                            {
+                                if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                                {
+                                    File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
+                                    new string[]
+                                    {
+                                    $"mod_path={ConfigurationService.GameModPath}",
+                                    $"show_console={false}",
+                                    });
+                                }
+                                else
+                                    File.Create(panaceaSettings);
+                            }
+                            File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                         }
                         processStartInfo = new ProcessStartInfo
                         {
                             FileName = "com.epicgames.launcher://apps/c8ff067c1c984cd7ab1998e8a9afc8b6%3Aaa743b9f52e84930b0ba1b701951e927%3Ad1a8f7c478d4439b8c60a5808715dc05?action=launch&silent=true",
                             UseShellExecute = true,
                         };
-
                     }
                     else
-                    {                        
+                    {
                         try
                         {
                             string filename;
                             if (!(_launchGame == "kh3d"))
                             {
-                                filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);                           
+                                filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
                             }
                             else
                             {
                                 filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
                             }
                             processStartInfo = new ProcessStartInfo
-                            {    
+                            {
                                 FileName = filename,
                                 WorkingDirectory = ConfigurationService.PcReleaseLocation,
                                 UseShellExecute = false,
