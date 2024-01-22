@@ -204,6 +204,8 @@ namespace OpenKh.Tools.ModsManager.Views
 
                 await action(mod);
 
+                mod.Assets = MergeAssetSource(mod.Assets.ToArray());
+
                 {
                     var temp = new MemoryStream();
                     mod.Write(temp);
@@ -299,8 +301,8 @@ namespace OpenKh.Tools.ModsManager.Views
                     targetVm.SearchCommand = searchCommand = new SimpleAsyncActionCommand<object>(
                         async _ =>
                         {
-                            var ifMatch = _keywordsMatcherService.CreateMatcher(targetWindow.VM.SearchKeywords);
-                            targetWindow.VM.SearchHits = await Task.Run(
+                            var ifMatch = _keywordsMatcherService.CreateMatcher(targetVm.SearchKeywords);
+                            targetVm.SearchHits = await Task.Run(
                                 () => Directory.EnumerateFiles(sourceDir, "*", SearchOption.AllDirectories)
                                     .Select(
                                         file => (
@@ -686,7 +688,7 @@ namespace OpenKh.Tools.ModsManager.Views
                                     noteVm.Text = _listSer.Serialize(
                                         new
                                         {
-                                            name = hits
+                                            multi = hits
                                                 .Select(hit => hit.RelativePath)
                                                 .ToArray(),
                                         }
@@ -853,6 +855,42 @@ namespace OpenKh.Tools.ModsManager.Views
                 SelectedPref = pref;
                 LoadPref(pref);
             }
+        }
+
+        private List<AssetFile> MergeAssetSource(IEnumerable<AssetFile> sourceAssets)
+        {
+            var newAssets = new List<AssetFile>();
+
+            foreach (var source in sourceAssets)
+            {
+                if (false)
+                { }
+                else if (source.Method == "copy")
+                {
+                    newAssets.RemoveAll(it => it.Name == source.Name);
+                    newAssets.Add(source);
+                }
+                else if (source.Method == "binarc")
+                {
+                    var exists = newAssets.FirstOrDefault(it => it.Name == source.Name && it.Method == source.Method);
+                    if (exists == null)
+                    {
+                        exists = source;
+                        newAssets.Add(exists);
+                    }
+
+                    exists.Source ??= new List<AssetFile>();
+
+                    foreach (var one in source.Source?.ToArray() ?? Enumerable.Empty<AssetFile>())
+                    {
+                        exists.Source.RemoveAll(it => it.Name == one.Name && it.Method == one.Method);
+                        exists.Source.Add(one);
+                    }
+
+                }
+            }
+
+            return newAssets;
         }
     }
 }
