@@ -464,7 +464,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         File.Exists(Path.Combine(PcReleaseLocation, "lua54.dll")) &&
                         File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
                 }
-                else if (PcReleaseLocationKH3D != null && GameCollection == 2)
+                else if (PcReleaseLocationKH3D != null && GameCollection == 1)
                 {
                     return File.Exists(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.dll")) &&
                         File.Exists(Path.Combine(PcReleaseLocationKH3D, "lua54.dll")) &&
@@ -482,12 +482,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand RemovePanaceaCommand { get; }
         public bool PanaceaInstalled { get; set; }
         private string PanaceaSourceLocation => Path.Combine(AppContext.BaseDirectory, PanaceaDllName);
-        private string PanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "DBGHELP.dll");
-        private string PanaceaAlternateLocation => Path.Combine(PcReleaseLocation, "version.dll");
-        private string PanaceaDependenciesLocation => Path.Combine(PcReleaseLocation, "dependencies");
-        private string PanaceaDestinationLocationKH3D => Path.Combine(PcReleaseLocationKH3D, "DBGHELP.dll");
-        private string PanaceaAlternateLocationKH3D => Path.Combine(PcReleaseLocationKH3D, "version.dll");
-        private string PanaceaDependenciesLocationKH3D => Path.Combine(PcReleaseLocationKH3D, "dependencies");
         public Visibility PanaceaNotInstalledVisibility => !IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PanaceaInstalledVisibility => IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
         public bool IsLastPanaceaVersionInstalled
@@ -530,45 +524,38 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     PanaceaInstalled = true;
                     return true;
                 }
+                string PanaceaDestinationLocation = "";
+                string PanaceaAlternateLocation = "";
+                if (GameCollection == 0)
+                {
+                    PanaceaDestinationLocation = Path.Combine(PcReleaseLocation, "DBGHELP.dll");
+                    PanaceaAlternateLocation = Path.Combine(PcReleaseLocation, "version.dll");
+                }
+                else
+                {
+                    PanaceaDestinationLocation = Path.Combine(PcReleaseLocationKH3D, "DBGHELP.dll");
+                    PanaceaAlternateLocation = Path.Combine(PcReleaseLocationKH3D, "version.dll");
+                }
 
-                if (GameCollection == 0 && File.Exists(PanaceaDestinationLocation) && !File.Exists(PanaceaAlternateLocation))
+                if (File.Exists(PanaceaDestinationLocation) && !File.Exists(PanaceaAlternateLocation))
                 {
                     return IsEqual(
                         CalculateChecksum(PanaceaSourceLocation),
                         CalculateChecksum(PanaceaDestinationLocation));
                 }
-                else if (GameCollection == 0 && File.Exists(PanaceaAlternateLocation) && !File.Exists(PanaceaDestinationLocation))
+                else if (File.Exists(PanaceaAlternateLocation) && !File.Exists(PanaceaDestinationLocation))
                 {
                     return IsEqual(
                         CalculateChecksum(PanaceaSourceLocation),
                         CalculateChecksum(PanaceaAlternateLocation));
                 }
-                else if (GameCollection == 0 && File.Exists(PanaceaDestinationLocation) && File.Exists(PanaceaAlternateLocation))
+                else if (File.Exists(PanaceaDestinationLocation) && File.Exists(PanaceaAlternateLocation))
                 {
                     return IsEqual(CalculateChecksum(PanaceaSourceLocation),
                         CalculateChecksum(PanaceaDestinationLocation)) || 
                         IsEqual(CalculateChecksum(PanaceaSourceLocation),
                         CalculateChecksum(PanaceaAlternateLocation));
-                }
-                else if (GameCollection == 1 && File.Exists(PanaceaDestinationLocationKH3D) && !File.Exists(PanaceaAlternateLocationKH3D))
-                {
-                    return IsEqual(
-                        CalculateChecksum(PanaceaSourceLocation),
-                        CalculateChecksum(PanaceaDestinationLocationKH3D));
-                }
-                else if (GameCollection == 1 && File.Exists(PanaceaAlternateLocationKH3D) && !File.Exists(PanaceaDestinationLocationKH3D))
-                {
-                    return IsEqual(
-                        CalculateChecksum(PanaceaSourceLocation),
-                        CalculateChecksum(PanaceaAlternateLocationKH3D));
-                }
-                else if (GameCollection == 1 && File.Exists(PanaceaDestinationLocationKH3D) && File.Exists(PanaceaAlternateLocationKH3D))
-                {
-                    return IsEqual(CalculateChecksum(PanaceaSourceLocation),
-                        CalculateChecksum(PanaceaDestinationLocationKH3D)) ||
-                        IsEqual(CalculateChecksum(PanaceaSourceLocation),
-                        CalculateChecksum(PanaceaAlternateLocationKH3D));
-                }
+                }                
                 else
                 {
                     PanaceaInstalled = false;
@@ -617,122 +604,76 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (File.Exists(PanaceaSourceLocation))
                 {
                     // Again, do not bother in debug mode
+                    string PanaceaDestinationLocation = "";
+                    string PanaceaAlternateLocation = "";
+                    string PanaceaDependenciesLocation = "";
                     if (GameCollection == 0)
                     {
-                        if (!Directory.Exists(PanaceaDependenciesLocation))
-                        {
-                            Directory.CreateDirectory(PanaceaDependenciesLocation);
-                        }
-                        if (!Convert.ToBoolean(AlternateName))
-                        {
-                            File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation, true);
-                            File.Delete(PanaceaAlternateLocation);
-                        }
-                        else
-                        {
-                            File.Copy(PanaceaSourceLocation, PanaceaAlternateLocation, true);
-                            File.Delete(PanaceaDestinationLocation);
-                        }
-                        try
-                        {
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "avcodec-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "avformat-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "avutil-vgmstream-57.dll"), Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "bass.dll"), Path.Combine(PanaceaDependenciesLocation, "bass.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "bass_vgmstream.dll"), Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libatrac9.dll"), Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0061.dll"), Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0110.dll"), Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libg719_decode.dll"), Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libmpg123-0.dll"), Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libspeex-1.dll"), Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libvorbis.dll"), Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "swresample-vgmstream-4.dll"), Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"), true);
-                        }
-                        catch (Exception e)
-                        {
-                            MessageBox.Show(
-                                $"Missing panacea dependencies. Unable to fully install panacea.",
-                                "Extraction error",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Error);
-                            File.Delete(PanaceaDestinationLocation);
-                            File.Delete(PanaceaAlternateLocation);
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
-                            PanaceaInstalled = false;
-                            return;
-                        }
+                        PanaceaDestinationLocation = Path.Combine(PcReleaseLocation, "DBGHELP.dll");
+                        PanaceaAlternateLocation = Path.Combine(PcReleaseLocation, "version.dll");
+                        PanaceaDependenciesLocation = Path.Combine(PcReleaseLocation, "dependencies");
                     }
-                    else if (GameCollection == 1)
+                    else
                     {
-                        if (!Directory.Exists(PanaceaDependenciesLocationKH3D))
-                        {
-                            Directory.CreateDirectory(PanaceaDependenciesLocationKH3D);
-                        }
-                        if (!Convert.ToBoolean(AlternateName))
-                        {
-                            File.Copy(PanaceaSourceLocation, PanaceaDestinationLocationKH3D, true);
-                            File.Delete(PanaceaAlternateLocationKH3D);
-                        }
-                        else
-                        {
-                            File.Copy(PanaceaSourceLocation, PanaceaAlternateLocationKH3D, true);
-                            File.Delete(PanaceaDestinationLocationKH3D);
-                        }
-                        try
-                        {
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "avcodec-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "avcodec-vgmstream-59.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "avformat-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "avformat-vgmstream-59.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "avutil-vgmstream-57.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "avutil-vgmstream-57.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "bass.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "bass.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "bass_vgmstream.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "bass_vgmstream.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libatrac9.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "libatrac9.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0061.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "libcelt-0061.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0110.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "libcelt-0110.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libg719_decode.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "libg719_decode.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libmpg123-0.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "libmpg123-0.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libspeex-1.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "libspeex-1.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libvorbis.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "libvorbis.dll"), true);
-                            File.Copy(Path.Combine(AppContext.BaseDirectory, "swresample-vgmstream-4.dll"), Path.Combine(PanaceaDependenciesLocationKH3D, "swresample-vgmstream-4.dll"), true);
-                        }
-                        catch (Exception e)
-                        {
-                            MessageBox.Show(
-                                $"Missing panacea dependencies. Unable to fully install panacea.",
-                                "Extraction error",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Error);
-                            File.Delete(PanaceaDestinationLocation);
-                            File.Delete(PanaceaAlternateLocation);
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "avcodec-vgmstream-59.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "avformat-vgmstream-59.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "avutil-vgmstream-57.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "bass.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "bass_vgmstream.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libatrac9.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libcelt-0061.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libcelt-0110.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libg719_decode.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libmpg123-0.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libspeex-1.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libvorbis.dll"));
-                            File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "swresample-vgmstream-4.dll"));
-                            PanaceaInstalled = false;
-                            return;
-                        }
+                        PanaceaDestinationLocation = Path.Combine(PcReleaseLocationKH3D, "DBGHELP.dll");
+                        PanaceaAlternateLocation = Path.Combine(PcReleaseLocationKH3D, "version.dll");
+                        PanaceaDependenciesLocation = Path.Combine(PcReleaseLocationKH3D, "dependencies");
                     }
+                    if (!Directory.Exists(PanaceaDependenciesLocation))
+                    {
+                        Directory.CreateDirectory(PanaceaDependenciesLocation);
+                    }
+                    if (!Convert.ToBoolean(AlternateName))
+                    {
+                        File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation, true);
+                        File.Delete(PanaceaAlternateLocation);
+                    }
+                    else
+                    {
+                        File.Copy(PanaceaSourceLocation, PanaceaAlternateLocation, true);
+                        File.Delete(PanaceaDestinationLocation);
+                    }
+                    try
+                    {
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "avcodec-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "avformat-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "avutil-vgmstream-57.dll"), Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "bass.dll"), Path.Combine(PanaceaDependenciesLocation, "bass.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "bass_vgmstream.dll"), Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libatrac9.dll"), Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0061.dll"), Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0110.dll"), Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libg719_decode.dll"), Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libmpg123-0.dll"), Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libspeex-1.dll"), Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libvorbis.dll"), Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"), true);
+                        File.Copy(Path.Combine(AppContext.BaseDirectory, "swresample-vgmstream-4.dll"), Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"), true);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(
+                            $"Missing panacea dependencies. Unable to fully install panacea.",
+                            "Extraction error",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                        File.Delete(PanaceaDestinationLocation);
+                        File.Delete(PanaceaAlternateLocation);
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
+                        PanaceaInstalled = false;
+                        return;
+                    }                    
                 }
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
@@ -741,7 +682,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             });
             RemovePanaceaCommand = new RelayCommand(_ =>
             {
-                if (GameCollection == 0 && File.Exists(PanaceaDestinationLocation) || File.Exists(PanaceaAlternateLocation))
+                string PanaceaDestinationLocation = "";
+                string PanaceaAlternateLocation = "";
+                string PanaceaDependenciesLocation = "";
+                if (GameCollection == 0)
+                {
+                    PanaceaDestinationLocation = Path.Combine(PcReleaseLocation, "DBGHELP.dll");
+                    PanaceaAlternateLocation = Path.Combine(PcReleaseLocation, "version.dll");
+                    PanaceaDependenciesLocation = Path.Combine(PcReleaseLocation, "dependencies");
+                }
+                else
+                {
+                    PanaceaDestinationLocation = Path.Combine(PcReleaseLocationKH3D, "DBGHELP.dll");
+                    PanaceaAlternateLocation = Path.Combine(PcReleaseLocationKH3D, "version.dll");
+                    PanaceaDependenciesLocation = Path.Combine(PcReleaseLocationKH3D, "dependencies");
+                }
+                if (File.Exists(PanaceaDestinationLocation) || File.Exists(PanaceaAlternateLocation))
                 {
                     File.Delete(PanaceaDestinationLocation);
                     File.Delete(PanaceaAlternateLocation);
@@ -758,25 +714,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
                     File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
                     File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
-                }
-                else if (GameCollection == 1 && File.Exists(PanaceaDestinationLocationKH3D) || File.Exists(PanaceaAlternateLocationKH3D))
-                {
-                    File.Delete(PanaceaDestinationLocationKH3D);
-                    File.Delete(PanaceaAlternateLocationKH3D);
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "avcodec-vgmstream-59.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "avformat-vgmstream-59.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "avutil-vgmstream-57.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "bass.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "bass_vgmstream.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libatrac9.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libcelt-0061.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libcelt-0110.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libg719_decode.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libmpg123-0.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libspeex-1.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "libvorbis.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocationKH3D, "swresample-vgmstream-4.dll"));
-                }
+                }                
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
@@ -807,47 +745,45 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         File.Delete(DownPath);
                         File.Delete(TempExtractionLocation);
                     }
+                    string DestinationCollection = "";
                     if (GameCollection == 0)
                     {
-                        File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(PcReleaseLocation, "LuaBackend.dll"), true);
-                        File.Move(Path.Combine(TempExtractionLocation, "lua54.dll"), Path.Combine(PcReleaseLocation, "lua54.dll"), true);
-                        File.Move(Path.Combine(TempExtractionLocation, "LuaBackend.toml"), Path.Combine(PcReleaseLocation, "LuaBackend.toml"), true);
-                        string config = File.ReadAllText(Path.Combine(PcReleaseLocation, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
-                        if (LuaScriptPaths.Contains("kh1"))
-                        {
-                            int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));
-                        }
-                        if (LuaScriptPaths.Contains("kh2"))
-                        {
-                            int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
-                        }
-                        if (LuaScriptPaths.Contains("bbs"))
-                        {
-                            int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
-                        }
-                        if (LuaScriptPaths.Contains("Recom"))
-                        {
-                            int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
-                        }
-                        File.WriteAllText(Path.Combine(PcReleaseLocation, "LuaBackend.toml"), config);
+                        DestinationCollection = PcReleaseLocation;
                     }
-                    else if (GameCollection ==1)
+                    else
                     {
-                        File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(PcReleaseLocationKH3D, "LuaBackend.dll"), true);
-                        File.Move(Path.Combine(TempExtractionLocation, "lua54.dll"), Path.Combine(PcReleaseLocationKH3D, "lua54.dll"), true);
-                        File.Move(Path.Combine(TempExtractionLocation, "LuaBackend.toml"), Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"), true);
-                        string config = File.ReadAllText(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
-                        if (LuaScriptPaths.Contains("kh3d"))
-                        {
-                            int index = config.IndexOf("true }", config.IndexOf("[kh3d]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}").Replace("\\", "/"));
-                        }
-                        File.WriteAllText(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"), config);
+                        DestinationCollection = PcReleaseLocationKH3D;
                     }
+                    File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "LuaBackend.dll"), true);
+                    File.Move(Path.Combine(TempExtractionLocation, "lua54.dll"), Path.Combine(DestinationCollection, "lua54.dll"), true);
+                    File.Move(Path.Combine(TempExtractionLocation, "LuaBackend.toml"), Path.Combine(DestinationCollection, "LuaBackend.toml"), true);
+                    string config = File.ReadAllText(Path.Combine(DestinationCollection, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
+                    if (LuaScriptPaths.Contains("kh1") && GameCollection == 0)
+                    {
+                        int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));
+                    }
+                    if (LuaScriptPaths.Contains("kh2") && GameCollection == 0)
+                    {
+                        int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
+                    }
+                    if (LuaScriptPaths.Contains("bbs") && GameCollection == 0)
+                    {
+                        int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
+                    }
+                    if (LuaScriptPaths.Contains("Recom") && GameCollection == 0)
+                    {
+                        int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
+                    }                    
+                    if (LuaScriptPaths.Contains("kh3d") && GameCollection == 1)
+                    {
+                        int index = config.IndexOf("true }", config.IndexOf("[kh3d]")) + 6;
+                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}").Replace("\\", "/"));
+                    }
+                    File.WriteAllText(Path.Combine(DestinationCollection, "LuaBackend.toml"), config);                  
                     File.Delete(DownPath);
                     Directory.Delete(TempExtractionLocation);
                     OnPropertyChanged(nameof(IsLuaBackendInstalled));
@@ -856,10 +792,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
                 else
                 {
-                    if (File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml")) && GameCollection == 0)
+                    string DestinationCollection = "";
+                    if (GameCollection == 0)
                     {
-                        string config = File.ReadAllText(Path.Combine(PcReleaseLocation, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
-                        if (LuaScriptPaths.Contains("kh1"))
+                        DestinationCollection = PcReleaseLocation;
+                    }
+                    else
+                    {
+                        DestinationCollection = PcReleaseLocationKH3D;
+                    }
+                    if (File.Exists(Path.Combine(DestinationCollection, "LuaBackend.toml")))
+                    {
+                        string config = File.ReadAllText(Path.Combine(DestinationCollection, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
+                        if (LuaScriptPaths.Contains("kh1") && GameCollection == 0)
                         {
                             if (config.Contains("mod/kh1/scripts"))
                             {
@@ -887,7 +832,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
                             }
                         }
-                        if (LuaScriptPaths.Contains("kh2"))
+                        if (LuaScriptPaths.Contains("kh2") && GameCollection == 0)
                         {
                             if (config.Contains("mod/kh2/scripts"))
                             {
@@ -915,7 +860,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
                             }
                         }
-                        if (LuaScriptPaths.Contains("bbs"))
+                        if (LuaScriptPaths.Contains("bbs") && GameCollection == 0)
                         {
                             if (config.Contains("mod/bbs/scripts"))
                             {
@@ -943,7 +888,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
                             }
                         }
-                        if (LuaScriptPaths.Contains("Recom"))
+                        if (LuaScriptPaths.Contains("Recom") && GameCollection == 0)
                         {
                             if (config.Contains("mod/Recom/scripts"))
                             {
@@ -971,15 +916,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
                             }
                         }
-                        File.WriteAllText(Path.Combine(PcReleaseLocation, "LuaBackend.toml"), config);
-                        OnPropertyChanged(nameof(IsLuaBackendInstalled));
-                        OnPropertyChanged(nameof(LuaBackendFoundVisibility));
-                        OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
-                    }
-                    else if(File.Exists(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml")) && GameCollection == 1)
-                    {
-                        string config = File.ReadAllText(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
-                        if (LuaScriptPaths.Contains("kh3d"))
+                        if (LuaScriptPaths.Contains("kh3d") && GameCollection == 1)
                         {
                             if (config.Contains("mod/kh3d/scripts"))
                             {
@@ -1007,11 +944,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
                             }
                         }
-                        File.WriteAllText(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"), config);
+                        File.WriteAllText(Path.Combine(DestinationCollection, "LuaBackend.toml"), config);
                         OnPropertyChanged(nameof(IsLuaBackendInstalled));
                         OnPropertyChanged(nameof(LuaBackendFoundVisibility));
                         OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
-                    }
+                    }                    
                 }
             });
             RemoveLuaBackendCommand = new RelayCommand(_ =>
