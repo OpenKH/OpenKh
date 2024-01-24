@@ -608,19 +608,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     string PanaceaDestinationLocation = "";
                     string PanaceaAlternateLocation = "";
                     string PanaceaDependenciesLocation = "";
-                    if (GameCollection == 0)
+                    if (GameCollection == 0 && PcReleaseLocation != null)
                     {
                         PanaceaDestinationLocation = Path.Combine(PcReleaseLocation, "DBGHELP.dll");
                         PanaceaAlternateLocation = Path.Combine(PcReleaseLocation, "version.dll");
                         PanaceaDependenciesLocation = Path.Combine(PcReleaseLocation, "dependencies");
                     }
-                    else
+                    else if (GameCollection == 1 && PcReleaseLocationKH3D != null)
                     {
                         PanaceaDestinationLocation = Path.Combine(PcReleaseLocationKH3D, "DBGHELP.dll");
                         PanaceaAlternateLocation = Path.Combine(PcReleaseLocationKH3D, "version.dll");
                         PanaceaDependenciesLocation = Path.Combine(PcReleaseLocationKH3D, "dependencies");
                     }
-                    if (PanaceaDestinationLocation == "" || PanaceaAlternateLocation == "" || PanaceaDestinationLocation == "")
+                    else if (PanaceaDestinationLocation == "" || PanaceaAlternateLocation == "" || PanaceaDestinationLocation == "")
                     {
                         MessageBox.Show(
                                 $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to install panacea for.",
@@ -698,19 +698,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 string PanaceaDestinationLocation = "";
                 string PanaceaAlternateLocation = "";
                 string PanaceaDependenciesLocation = "";
-                if (GameCollection == 0)
+                if (GameCollection == 0 && PcReleaseLocation != null)
                 {
                     PanaceaDestinationLocation = Path.Combine(PcReleaseLocation, "DBGHELP.dll");
                     PanaceaAlternateLocation = Path.Combine(PcReleaseLocation, "version.dll");
                     PanaceaDependenciesLocation = Path.Combine(PcReleaseLocation, "dependencies");
                 }
-                else
+                else if (GameCollection == 1 && PcReleaseLocationKH3D != null)
                 {
                     PanaceaDestinationLocation = Path.Combine(PcReleaseLocationKH3D, "DBGHELP.dll");
                     PanaceaAlternateLocation = Path.Combine(PcReleaseLocationKH3D, "version.dll");
                     PanaceaDependenciesLocation = Path.Combine(PcReleaseLocationKH3D, "dependencies");
                 }                
-                if (PanaceaDestinationLocation == "" || PanaceaAlternateLocation == "" || PanaceaDestinationLocation == "")
+                else if (PanaceaDestinationLocation == "" || PanaceaAlternateLocation == "" || PanaceaDestinationLocation == "")
                 {
                     MessageBox.Show(
                             $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to uninstall panacea for.",
@@ -780,7 +780,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         DestinationCollection = PcReleaseLocationKH3D;
                     }                    
-                    if (DestinationCollection == "")
+                    if (DestinationCollection == "" || DestinationCollection == null)
                     {
                         MessageBox.Show(
                                 $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to install Lua Backend for.",
@@ -788,7 +788,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Error);
                         File.Delete(DownPath);
-                        Directory.Delete(TempExtractionLocation);
+                        Directory.Delete(TempExtractionLocation, true);
                         return;
                     }
                     else
@@ -841,7 +841,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         DestinationCollection = PcReleaseLocationKH3D;
                     }
-                    if (DestinationCollection == "")
+                    if (DestinationCollection == "" || DestinationCollection == null)
                     {
                         MessageBox.Show(
                                 $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to configure Lua Backend for.",
