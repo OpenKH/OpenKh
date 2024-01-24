@@ -620,7 +620,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         PanaceaAlternateLocation = Path.Combine(PcReleaseLocationKH3D, "version.dll");
                         PanaceaDependenciesLocation = Path.Combine(PcReleaseLocationKH3D, "dependencies");
                     }
-                    try
+                    if (PanaceaDestinationLocation == "" || PanaceaAlternateLocation == "" || PanaceaDestinationLocation == "")
+                    {
+                        MessageBox.Show(
+                                $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to install panacea for.",
+                                "Error",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                        return;
+                    }
+                    else
                     {
                         if (!Directory.Exists(PanaceaDependenciesLocation))
                         {
@@ -682,14 +691,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
                         PanaceaInstalled = true;
                     }
-                    catch
-                    {
-                        MessageBox.Show(
-                                $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to install panacea for.",
-                                "Error",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Error);
-                    }
                 }
             });
             RemovePanaceaCommand = new RelayCommand(_ =>
@@ -708,8 +709,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     PanaceaDestinationLocation = Path.Combine(PcReleaseLocationKH3D, "DBGHELP.dll");
                     PanaceaAlternateLocation = Path.Combine(PcReleaseLocationKH3D, "version.dll");
                     PanaceaDependenciesLocation = Path.Combine(PcReleaseLocationKH3D, "dependencies");
+                }                
+                if (PanaceaDestinationLocation == "" || PanaceaAlternateLocation == "" || PanaceaDestinationLocation == "")
+                {
+                    MessageBox.Show(
+                            $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to uninstall panacea for.",
+                            "Error",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                    return;
                 }
-                try
+                else
                 {
                     if (File.Exists(PanaceaDestinationLocation) || File.Exists(PanaceaAlternateLocation))
                     {
@@ -733,14 +743,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                     OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
                     PanaceaInstalled = false;
-                }
-                catch
-                {
-                    MessageBox.Show(
-                            $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to uninstall panacea for.",
-                            "Error",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error);
                 }
             });
             InstallLuaBackendCommand = new RelayCommand(installed =>
@@ -777,8 +779,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     else
                     {
                         DestinationCollection = PcReleaseLocationKH3D;
+                    }                    
+                    if (DestinationCollection == "")
+                    {
+                        MessageBox.Show(
+                                $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to install Lua Backend for.",
+                                "Error",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                        File.Delete(DownPath);
+                        Directory.Delete(TempExtractionLocation);
+                        return;
                     }
-                    try
+                    else
                     {
                         File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "LuaBackend.dll"), true);
                         File.Move(Path.Combine(TempExtractionLocation, "lua54.dll"), Path.Combine(DestinationCollection, "lua54.dll"), true);
@@ -816,14 +829,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         OnPropertyChanged(nameof(LuaBackendFoundVisibility));
                         OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
                     }
-                    catch
-                    {
-                        MessageBox.Show(
-                                $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to install Lua Backend for.",
-                                "Error",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Error);
-                    }
                 }
                 else
                 {
@@ -836,7 +841,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         DestinationCollection = PcReleaseLocationKH3D;
                     }
-                    try
+                    if (DestinationCollection == "")
+                    {
+                        MessageBox.Show(
+                                $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to configure Lua Backend for.",
+                                "Error",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                        return;
+                    }
+                    else
                     {
                         if (File.Exists(Path.Combine(DestinationCollection, "LuaBackend.toml")))
                         {
@@ -986,20 +1000,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             OnPropertyChanged(nameof(LuaBackendFoundVisibility));
                             OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
                         }
-                    }
-                    catch
-                    {
-                        MessageBox.Show(
-                                $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to configure Lua Backend for.",
-                                "Error",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Error);
-                    }                                                           
+                    }                                                    
                 }
             });
             RemoveLuaBackendCommand = new RelayCommand(_ =>
             {
-                try
+                
+                if (GameCollection == 0 && PcReleaseLocation == null || GameCollection == 1 && PcReleaseLocationKH3D == null)
+                {
+                    MessageBox.Show(
+                            $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to uninstall Lua Backend for.",
+                            "Error",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                    return;
+                }
+                else
                 {
                     if (GameCollection == 0)
                     {
@@ -1017,14 +1033,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     OnPropertyChanged(nameof(LuaBackendFoundVisibility));
                     OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
                 }
-                catch
-                {
-                    MessageBox.Show(
-                            $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to uninstall Lua Backend for.",
-                            "Error",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error);
-                }                
             });
         }
 
