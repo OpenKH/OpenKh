@@ -53,8 +53,9 @@ namespace OpenKh.Tools.ImageViewer.Services
                 }, (stream, images) =>
                     throw new NotImplementedException()),
 
-                GetImageFormat("TIM2", "tm2", false, Tm2.IsValid, s => Tm2.Read(s), (stream, images) =>
-                    throw new NotImplementedException()),
+                GetImageFormat("TIM2", "tm2", true, Tm2.IsValid,
+                    s => Tm2.Read(s),
+                    (stream, images) => Tm2.Write(stream, images.Select(i => Tm2.Create(i)))),
 
                 GetImageFormat("KH2TIM", "tex", false, _ => true,
                     s => ModelTexture.Read(s).Images.Cast<IImage>(),
@@ -82,8 +83,8 @@ namespace OpenKh.Tools.ImageViewer.Services
             string extension,
             bool isCreationSupported,
             Func<Stream, bool> isValid,
-            Func<Stream, IImageRead> read,
-            Action<Stream, IImageRead> write)
+            Func<Stream, IImage> read,
+            Action<Stream, IImage> write)
         {
             return new SingleImageFormat(name, extension, isCreationSupported, isValid, read, write);
         }
@@ -93,8 +94,8 @@ namespace OpenKh.Tools.ImageViewer.Services
             string extension,
             bool isCreationSupported,
             Func<Stream, bool> isValid,
-            Func<Stream, IEnumerable<IImageRead>> read,
-            Action<Stream, IEnumerable<IImageRead>> write)
+            Func<Stream, IEnumerable<IImage>> read,
+            Action<Stream, IEnumerable<IImage>> write)
         {
             return new MultipleImageFormat(name, extension, isCreationSupported, isValid,
                 stream => new ImageContainer(read(stream)),

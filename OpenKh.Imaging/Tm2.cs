@@ -8,7 +8,7 @@ using Xe.BinaryMapper;
 
 namespace OpenKh.Imaging
 {
-    public class Tm2 : IImageRead
+    public class Tm2 : IImage
     {
         private const uint MagicCode = 0x324D4954U;
         private const int Version = 4;
@@ -87,6 +87,9 @@ namespace OpenKh.Imaging
             GS_PSMZ16S = 58,
         };
 
+        /// <summary>
+        /// CLuT Pixel Storage Mode
+        /// </summary>
         public enum GsCPSM
         {
             GS_PSMCT32 = 0, // 32bit RGBA
@@ -95,6 +98,9 @@ namespace OpenKh.Imaging
             GS_PSMCT16S = 10,
         }
 
+        /// <summary>
+        /// Image Type
+        /// </summary>
         public enum IMG_TYPE
         {
             IT_RGBA = 3,
@@ -102,6 +108,9 @@ namespace OpenKh.Imaging
             IT_CLUT8 = 5,
         };
 
+        /// <summary>
+        /// CLuT Type
+        /// </summary>
         public enum CLT_TYPE
         {
             CT_A1BGR5 = 1,
@@ -269,16 +278,49 @@ namespace OpenKh.Imaging
 
         private class Picture
         {
+            /// <summary>
+            /// Total size of the Picture in bytes
+            /// </summary>
             [Data] public int TotalSize { get; set; }
+            /// <summary>
+            /// CLuT size in bytes
+            /// </summary>
             [Data] public int ClutSize { get; set; }
+            /// <summary>
+            /// Pixel data size in bytes
+            /// </summary>
             [Data] public int ImageSize { get; set; }
+            /// <summary>
+            /// Picture header size. Always 0x30
+            /// </summary>
             [Data] public short HeaderSize { get; set; }
+            /// <summary>
+            /// Number of colors in the CLuT
+            /// </summary>
             [Data] public short ClutColorCount { get; set; }
+            /// <summary>
+            /// Picture format???
+            /// </summary>
             [Data] public byte PictureFormat { get; set; }
+            /// <summary>
+            /// Mipmap count
+            /// </summary>
             [Data] public byte MipMapCount { get; set; }
+            /// <summary>
+            /// CLuT color format. See CLT_TYPE
+            /// </summary>
             [Data] public byte ClutType { get; set; }
+            /// <summary>
+            /// Image color format. See IMG_TYPE
+            /// </summary>
             [Data] public byte ImageType { get; set; }
+            /// <summary>
+            /// Image width in pixels
+            /// </summary>
             [Data] public short Width { get; set; }
+            /// <summary>
+            /// Image height in pixels
+            /// </summary>
             [Data] public short Height { get; set; }
             [Data] public GsTex GsTex0 { get; set; }
             [Data] public GsTex GsTex1 { get; set; }
@@ -370,6 +412,34 @@ namespace OpenKh.Imaging
             ImageDataHelpers.InvertRedBlueChannels(_imageData, Size, pixFormat);
         }
 
+        // For Create()
+        private Tm2(IImage image)
+        {
+            Size = image.Size;
+            _imageFormat = 0;
+            _mipMapCount = 1;
+            _imageType = GetImageType(image.PixelFormat);
+            _clutType = GetClutType(image.ClutFormat);
+            _gsTex0 = new GsTex
+            {
+                TW = GetSizeRegister(Size.Width),
+                TH = GetSizeRegister(Size.Height),
+                PSM = GetPixelStorageMode(image.PixelFormat),
+                CPSM = (GsCPSM)GetPixelStorageMode(image.ClutFormat)
+            };
+            _gsTex1 = new GsTex(_gsTex0);
+            _gsReg = 0;
+            _gsPal = 0;
+            _imageData = (byte[])image.GetData().Clone();
+            var clut = image.GetClut();
+            if (clut != null)
+                _clutData = (byte[])clut.Clone();
+            else
+                _clutData = [];
+
+            // TODO: If pixel/clut type is 24 bit bgr it might need expanding to 32 bit xbgr
+        }
+
         public static bool IsValid(Stream stream) =>
             stream.SetPosition(0).ReadInt32() == MagicCode &&
             stream.Length >= HeaderLength;
@@ -387,17 +457,9 @@ namespace OpenKh.Imaging
             return new Tm2(buff, clut, pic, PixelFormat.Indexed8);
         }
 
-        public static Tm2 Create(IImageRead image)
+        public static Tm2 Create(IImage image)
         {
-            byte[] buff = image.GetData();
-            byte[] clut = image.GetClut();
-            Picture pic = new Picture();
-            pic.Width = (short)image.Size.Width;
-            pic.Height = (short)image.Size.Height;
-            pic.GsTex0 = new GsTex();
-            pic.GsTex1 = new GsTex();
-            pic.ClutType = 3;
-            return new Tm2(buff, clut, pic, PixelFormat.Indexed8);
+            return new Tm2(image);
         }
 
         public void HalvedAlpha()
@@ -535,6 +597,63 @@ namespace OpenKh.Imaging
                 case 3: return PixelFormat.Rgba8888;
                 case 4: return PixelFormat.Indexed4;
                 case 5: return PixelFormat.Indexed8;
+                default:
+                    throw new ArgumentOutOfRangeException($"The format ID {format} is invalid or not supported.");
+            }
+        }
+
+        private static byte GetImageType(PixelFormat format)
+        {
+            switch (format)
+            {
+                case PixelFormat.Rgba1555:
+                    return 1;
+                case PixelFormat.Rgb888:
+                    return 2;
+                case PixelFormat.Rgba8888:
+                    return (byte)IMG_TYPE.IT_RGBA;
+                case PixelFormat.Indexed4:
+                    return (byte)IMG_TYPE.IT_CLUT4;
+                case PixelFormat.Indexed8:
+                    return (byte)IMG_TYPE.IT_CLUT8;
+                default:
+                    throw new ArgumentOutOfRangeException($"The format ID {format} is invalid or not supported.");
+            }
+        }
+
+        private static byte GetClutType(PixelFormat format)
+        {
+            switch (format)
+            {
+                case PixelFormat.Undefined:
+                    return 0;
+                case PixelFormat.Rgba1555:
+                    return (byte)CLT_TYPE.CT_A1BGR5;
+                case PixelFormat.Rgb888:
+                    return (byte)CLT_TYPE.CT_XBGR8;
+                case PixelFormat.Rgba8888:
+                    return (byte)CLT_TYPE.CT_ABGR8;
+                default:
+                    throw new ArgumentOutOfRangeException($"The format ID {format} is invalid or not supported.");
+            }
+        }
+
+        private static GsPSM GetPixelStorageMode(PixelFormat format)
+        {
+            switch (format)
+            {
+                case PixelFormat.Indexed4:
+                    return GsPSM.GS_PSMT4;
+                case PixelFormat.Indexed8:
+                    return GsPSM.GS_PSMT8;
+                case PixelFormat.Rgba1555:
+                    return GsPSM.GS_PSMCT16;
+                case PixelFormat.Rgb888:
+                case PixelFormat.Rgbx8888:
+                    return GsPSM.GS_PSMCT24;
+                case PixelFormat.Undefined:
+                case PixelFormat.Rgba8888:
+                    return GsPSM.GS_PSMCT32;
                 default:
                     throw new ArgumentOutOfRangeException($"The format ID {format} is invalid or not supported.");
             }
