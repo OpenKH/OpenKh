@@ -265,6 +265,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
+                OnPropertyChanged(nameof(GameCollection));
             }
         }
 
