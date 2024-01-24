@@ -620,66 +620,77 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         PanaceaAlternateLocation = Path.Combine(PcReleaseLocationKH3D, "version.dll");
                         PanaceaDependenciesLocation = Path.Combine(PcReleaseLocationKH3D, "dependencies");
                     }
-                    if (!Directory.Exists(PanaceaDependenciesLocation))
-                    {
-                        Directory.CreateDirectory(PanaceaDependenciesLocation);
-                    }
-                    if (!Convert.ToBoolean(AlternateName))
-                    {
-                        File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation, true);
-                        File.Delete(PanaceaAlternateLocation);
-                    }
-                    else
-                    {
-                        File.Copy(PanaceaSourceLocation, PanaceaAlternateLocation, true);
-                        File.Delete(PanaceaDestinationLocation);
-                    }
                     try
                     {
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "avcodec-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"), true);
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "avformat-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"), true);
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "avutil-vgmstream-57.dll"), Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"), true);
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "bass.dll"), Path.Combine(PanaceaDependenciesLocation, "bass.dll"), true);
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "bass_vgmstream.dll"), Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"), true);
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libatrac9.dll"), Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"), true);
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0061.dll"), Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"), true);
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0110.dll"), Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"), true);
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libg719_decode.dll"), Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"), true);
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libmpg123-0.dll"), Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"), true);
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libspeex-1.dll"), Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"), true);
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "libvorbis.dll"), Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"), true);
-                        File.Copy(Path.Combine(AppContext.BaseDirectory, "swresample-vgmstream-4.dll"), Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"), true);
+                        if (!Directory.Exists(PanaceaDependenciesLocation))
+                        {
+                            Directory.CreateDirectory(PanaceaDependenciesLocation);
+                        }
+                        if (!Convert.ToBoolean(AlternateName))
+                        {
+                            File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation, true);
+                            File.Delete(PanaceaAlternateLocation);
+                        }
+                        else
+                        {
+                            File.Copy(PanaceaSourceLocation, PanaceaAlternateLocation, true);
+                            File.Delete(PanaceaDestinationLocation);
+                        }
+                        try
+                        {
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "avcodec-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"), true);
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "avformat-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"), true);
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "avutil-vgmstream-57.dll"), Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"), true);
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "bass.dll"), Path.Combine(PanaceaDependenciesLocation, "bass.dll"), true);
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "bass_vgmstream.dll"), Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"), true);
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libatrac9.dll"), Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"), true);
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0061.dll"), Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"), true);
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libcelt-0110.dll"), Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"), true);
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libg719_decode.dll"), Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"), true);
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libmpg123-0.dll"), Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"), true);
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libspeex-1.dll"), Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"), true);
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "libvorbis.dll"), Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"), true);
+                            File.Copy(Path.Combine(AppContext.BaseDirectory, "swresample-vgmstream-4.dll"), Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"), true);
+                        }
+                        catch
+                        {
+                            MessageBox.Show(
+                                $"Missing panacea dependencies. Unable to fully install panacea.",
+                                "Extraction error",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                            File.Delete(PanaceaDestinationLocation);
+                            File.Delete(PanaceaAlternateLocation);
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"));
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"));
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"));
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass.dll"));
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"));
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"));
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"));
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"));
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"));
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"));
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
+                            File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
+                            PanaceaInstalled = false;
+                            return;
+                        }
+                        OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
+                        OnPropertyChanged(nameof(PanaceaInstalledVisibility));
+                        OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
+                        PanaceaInstalled = true;
                     }
-                    catch (Exception e)
+                    catch
                     {
                         MessageBox.Show(
-                            $"Missing panacea dependencies. Unable to fully install panacea.",
-                            "Extraction error",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error);
-                        File.Delete(PanaceaDestinationLocation);
-                        File.Delete(PanaceaAlternateLocation);
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"));
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"));
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"));
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass.dll"));
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"));
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"));
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"));
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"));
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"));
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"));
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
-                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
-                        PanaceaInstalled = false;
-                        return;
-                    }                    
+                                $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to install panacea for.",
+                                "Error",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                    }
                 }
-                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
-                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
-                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
-                PanaceaInstalled = true;
             });
             RemovePanaceaCommand = new RelayCommand(_ =>
             {
@@ -698,28 +709,39 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     PanaceaAlternateLocation = Path.Combine(PcReleaseLocationKH3D, "version.dll");
                     PanaceaDependenciesLocation = Path.Combine(PcReleaseLocationKH3D, "dependencies");
                 }
-                if (File.Exists(PanaceaDestinationLocation) || File.Exists(PanaceaAlternateLocation))
+                try
                 {
-                    File.Delete(PanaceaDestinationLocation);
-                    File.Delete(PanaceaAlternateLocation);
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
-                    File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
-                }                
-                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
-                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
-                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
-                PanaceaInstalled = false;
+                    if (File.Exists(PanaceaDestinationLocation) || File.Exists(PanaceaAlternateLocation))
+                    {
+                        File.Delete(PanaceaDestinationLocation);
+                        File.Delete(PanaceaAlternateLocation);
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "avformat-vgmstream-59.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "avutil-vgmstream-57.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "bass_vgmstream.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libatrac9.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0061.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libcelt-0110.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libg719_decode.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libmpg123-0.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
+                        File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
+                    }
+                    OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
+                    OnPropertyChanged(nameof(PanaceaInstalledVisibility));
+                    OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
+                    PanaceaInstalled = false;
+                }
+                catch
+                {
+                    MessageBox.Show(
+                            $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to uninstall panacea for.",
+                            "Error",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                }
             });
             InstallLuaBackendCommand = new RelayCommand(installed =>
             {
@@ -738,13 +760,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             zip.ExtractAll(TempExtractionLocation, ExtractExistingFileAction.OverwriteSilently);
                         }
                     }
-                    catch (Exception e)
+                    catch
                     {
                         MessageBox.Show(
                                 $"Unable to extract \"{Path.GetFileName(DownPath)}\" as it is not a zip file. You may have to install it manually.",
                                 "Run error", MessageBoxButton.OK, MessageBoxImage.Error);                        
                         File.Delete(DownPath);
                         File.Delete(TempExtractionLocation);
+                        return;
                     }
                     string DestinationCollection = "";
                     if (GameCollection == 0)
@@ -755,41 +778,52 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         DestinationCollection = PcReleaseLocationKH3D;
                     }
-                    File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "LuaBackend.dll"), true);
-                    File.Move(Path.Combine(TempExtractionLocation, "lua54.dll"), Path.Combine(DestinationCollection, "lua54.dll"), true);
-                    File.Move(Path.Combine(TempExtractionLocation, "LuaBackend.toml"), Path.Combine(DestinationCollection, "LuaBackend.toml"), true);
-                    string config = File.ReadAllText(Path.Combine(DestinationCollection, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
-                    if (LuaScriptPaths.Contains("kh1") && GameCollection == 0)
+                    try
                     {
-                        int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
-                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));
+                        File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "LuaBackend.dll"), true);
+                        File.Move(Path.Combine(TempExtractionLocation, "lua54.dll"), Path.Combine(DestinationCollection, "lua54.dll"), true);
+                        File.Move(Path.Combine(TempExtractionLocation, "LuaBackend.toml"), Path.Combine(DestinationCollection, "LuaBackend.toml"), true);
+                        string config = File.ReadAllText(Path.Combine(DestinationCollection, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
+                        if (LuaScriptPaths.Contains("kh1") && GameCollection == 0)
+                        {
+                            int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));
+                        }
+                        if (LuaScriptPaths.Contains("kh2") && GameCollection == 0)
+                        {
+                            int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
+                        }
+                        if (LuaScriptPaths.Contains("bbs") && GameCollection == 0)
+                        {
+                            int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
+                        }
+                        if (LuaScriptPaths.Contains("Recom") && GameCollection == 0)
+                        {
+                            int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
+                        }
+                        if (LuaScriptPaths.Contains("kh3d") && GameCollection == 1)
+                        {
+                            int index = config.IndexOf("true }", config.IndexOf("[kh3d]")) + 6;
+                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}").Replace("\\", "/"));
+                        }
+                        File.WriteAllText(Path.Combine(DestinationCollection, "LuaBackend.toml"), config);
+                        File.Delete(DownPath);
+                        Directory.Delete(TempExtractionLocation);
+                        OnPropertyChanged(nameof(IsLuaBackendInstalled));
+                        OnPropertyChanged(nameof(LuaBackendFoundVisibility));
+                        OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
                     }
-                    if (LuaScriptPaths.Contains("kh2") && GameCollection == 0)
+                    catch
                     {
-                        int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
-                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
+                        MessageBox.Show(
+                                $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to install Lua Backend for.",
+                                "Error",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
                     }
-                    if (LuaScriptPaths.Contains("bbs") && GameCollection == 0)
-                    {
-                        int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
-                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
-                    }
-                    if (LuaScriptPaths.Contains("Recom") && GameCollection == 0)
-                    {
-                        int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
-                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
-                    }                    
-                    if (LuaScriptPaths.Contains("kh3d") && GameCollection == 1)
-                    {
-                        int index = config.IndexOf("true }", config.IndexOf("[kh3d]")) + 6;
-                        config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}").Replace("\\", "/"));
-                    }
-                    File.WriteAllText(Path.Combine(DestinationCollection, "LuaBackend.toml"), config);                  
-                    File.Delete(DownPath);
-                    Directory.Delete(TempExtractionLocation);
-                    OnPropertyChanged(nameof(IsLuaBackendInstalled));
-                    OnPropertyChanged(nameof(LuaBackendFoundVisibility));
-                    OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
                 }
                 else
                 {
@@ -802,173 +836,195 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         DestinationCollection = PcReleaseLocationKH3D;
                     }
-                    if (File.Exists(Path.Combine(DestinationCollection, "LuaBackend.toml")))
+                    try
                     {
-                        string config = File.ReadAllText(Path.Combine(DestinationCollection, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
-                        if (LuaScriptPaths.Contains("kh1") && GameCollection == 0)
+                        if (File.Exists(Path.Combine(DestinationCollection, "LuaBackend.toml")))
                         {
-                            if (config.Contains("mod/kh1/scripts"))
+                            string config = File.ReadAllText(Path.Combine(DestinationCollection, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
+                            if (LuaScriptPaths.Contains("kh1") && GameCollection == 0)
                             {
-                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for KH1 from an OpenKH Mod Manager." +
-                                    $" Do you want to change Lua Backend to run scripts for KH1 from this version of OpenKH Mod Manager instead?", "Warning",
-                                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
-
-                                switch (errorMessage)
+                                if (config.Contains("mod/kh1/scripts"))
                                 {
-                                    case MessageBoxResult.Yes:
+                                    var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for KH1 from an OpenKH Mod Manager." +
+                                        $" Do you want to change Lua Backend to run scripts for KH1 from this version of OpenKH Mod Manager instead?", "Warning",
+                                        MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
+
+                                    switch (errorMessage)
                                     {
-                                        int index = config.IndexOf("scripts", config.IndexOf("[kh1]"));
-                                        config = config.Remove(index, config.IndexOf("]", index) - index + 1);
-                                        config = config.Insert(index, "scripts = [{ path = \"scripts/kh1/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
-                                        break;
+                                        case MessageBoxResult.Yes:
+                                        {
+                                            int index = config.IndexOf("scripts", config.IndexOf("[kh1]"));
+                                            config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                            config = config.Insert(index, "scripts = [{ path = \"scripts/kh1/\", relative = true }" +
+                                                ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            else
-                            {
-                                int index = config.IndexOf("scripts", config.IndexOf("[kh1]"));
-                                config = config.Remove(index, config.IndexOf("]", index) - index + 1);
-                                config = config.Insert(index, "scripts = [{ path = \"scripts/kh1/\", relative = true }" +
-                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
-                            }
-                        }
-                        if (LuaScriptPaths.Contains("kh2") && GameCollection == 0)
-                        {
-                            if (config.Contains("mod/kh2/scripts"))
-                            {
-                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for KH2 from an OpenKH Mod Manager." +
-                                    $" Do you want to change Lua Backend to run scripts for KH2 from this version of OpenKH Mod Manager instead?", "Warning",
-                                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
-
-                                switch (errorMessage)
+                                else
                                 {
-                                    case MessageBoxResult.Yes:
-                                    {
-                                        int index = config.IndexOf("scripts", config.IndexOf("[kh2]"));
-                                        config = config.Remove(index, config.IndexOf("]", index) - index + 1);
-                                        config = config.Insert(index, "scripts = [{ path = \"scripts/kh2/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
-                                        break;
-                                    }                                       
+                                    int index = config.IndexOf("scripts", config.IndexOf("[kh1]"));
+                                    config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                    config = config.Insert(index, "scripts = [{ path = \"scripts/kh1/\", relative = true }" +
+                                        ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
                                 }
                             }
-                            else
+                            if (LuaScriptPaths.Contains("kh2") && GameCollection == 0)
                             {
-                                int index = config.IndexOf("scripts", config.IndexOf("[kh2]"));
-                                config = config.Remove(index, config.IndexOf("]", index) - index + 1);
-                                config = config.Insert(index, "scripts = [{ path = \"scripts/kh2/\", relative = true }" +
-                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
-                            }
-                        }
-                        if (LuaScriptPaths.Contains("bbs") && GameCollection == 0)
-                        {
-                            if (config.Contains("mod/bbs/scripts"))
-                            {
-                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for BBS from an OpenKH Mod Manager." +
-                                    $" Do you want to change Lua Backend to run scripts for BBS from this version of OpenKH Mod Manager instead?", "Warning",
-                                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
-
-                                switch (errorMessage)
+                                if (config.Contains("mod/kh2/scripts"))
                                 {
-                                    case MessageBoxResult.Yes:
+                                    var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for KH2 from an OpenKH Mod Manager." +
+                                        $" Do you want to change Lua Backend to run scripts for KH2 from this version of OpenKH Mod Manager instead?", "Warning",
+                                        MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
+
+                                    switch (errorMessage)
                                     {
-                                        int index = config.IndexOf("scripts", config.IndexOf("[bbs]"));
-                                        config = config.Remove(index, config.IndexOf("]", index) - index + 1);
-                                        config = config.Insert(index, "scripts = [{ path = \"scripts/bbs/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
-                                        break;
+                                        case MessageBoxResult.Yes:
+                                        {
+                                            int index = config.IndexOf("scripts", config.IndexOf("[kh2]"));
+                                            config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                            config = config.Insert(index, "scripts = [{ path = \"scripts/kh2/\", relative = true }" +
+                                                ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            else
-                            {
-                                int index = config.IndexOf("scripts", config.IndexOf("[bbs]"));
-                                config = config.Remove(index, config.IndexOf("]", index) - index + 1);
-                                config = config.Insert(index, "scripts = [{ path = \"scripts/bbs/\", relative = true }" +
-                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
-                            }
-                        }
-                        if (LuaScriptPaths.Contains("Recom") && GameCollection == 0)
-                        {
-                            if (config.Contains("mod/Recom/scripts"))
-                            {
-                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for ReCoM from an OpenKH Mod Manager." +
-                                    $" Do you want to change Lua Backend to run scripts for ReCoM from this version of OpenKH Mod Manager instead?", "Warning",
-                                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
-
-                                switch (errorMessage)
+                                else
                                 {
-                                    case MessageBoxResult.Yes:
-                                    {
-                                        int index = config.IndexOf("scripts", config.IndexOf("[recom]"));
-                                        config = config.Remove(index, config.IndexOf("]", index) - index + 1);
-                                        config = config.Insert(index, "scripts = [{ path = \"scripts/recom/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
-                                        break;
-                                    }
+                                    int index = config.IndexOf("scripts", config.IndexOf("[kh2]"));
+                                    config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                    config = config.Insert(index, "scripts = [{ path = \"scripts/kh2/\", relative = true }" +
+                                        ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
                                 }
                             }
-                            else
+                            if (LuaScriptPaths.Contains("bbs") && GameCollection == 0)
                             {
-                                int index = config.IndexOf("scripts", config.IndexOf("[recom]"));
-                                config = config.Remove(index, config.IndexOf("]", index) - index + 1);
-                                config = config.Insert(index, "scripts = [{ path = \"scripts/recom/\", relative = true }" +
-                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
-                            }
-                        }
-                        if (LuaScriptPaths.Contains("kh3d") && GameCollection == 1)
-                        {
-                            if (config.Contains("mod/kh3d/scripts"))
-                            {
-                                var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for KH3D from an OpenKH Mod Manager." +
-                                    $" Do you want to change Lua Backend to run scripts for KH3D from this version of OpenKH Mod Manager instead?", "Warning",
-                                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
-
-                                switch (errorMessage)
+                                if (config.Contains("mod/bbs/scripts"))
                                 {
-                                    case MessageBoxResult.Yes:
+                                    var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for BBS from an OpenKH Mod Manager." +
+                                        $" Do you want to change Lua Backend to run scripts for BBS from this version of OpenKH Mod Manager instead?", "Warning",
+                                        MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
+
+                                    switch (errorMessage)
                                     {
-                                        int index = config.IndexOf("scripts", config.IndexOf("[kh3d]"));
-                                        config = config.Remove(index, config.IndexOf("]", index) - index + 1);
-                                        config = config.Insert(index, "scripts = [{ path = \"scripts/kh3d/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
-                                        break;
+                                        case MessageBoxResult.Yes:
+                                        {
+                                            int index = config.IndexOf("scripts", config.IndexOf("[bbs]"));
+                                            config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                            config = config.Insert(index, "scripts = [{ path = \"scripts/bbs/\", relative = true }" +
+                                                ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            break;
+                                        }
                                     }
                                 }
+                                else
+                                {
+                                    int index = config.IndexOf("scripts", config.IndexOf("[bbs]"));
+                                    config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                    config = config.Insert(index, "scripts = [{ path = \"scripts/bbs/\", relative = true }" +
+                                        ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
+                                }
                             }
-                            else
+                            if (LuaScriptPaths.Contains("Recom") && GameCollection == 0)
                             {
-                                int index = config.IndexOf("scripts", config.IndexOf("[kh3d]"));
-                                config = config.Remove(index, config.IndexOf("]", index) - index + 1);
-                                config = config.Insert(index, "scripts = [{ path = \"scripts/kh3d/\", relative = true }" +
-                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
+                                if (config.Contains("mod/Recom/scripts"))
+                                {
+                                    var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for ReCoM from an OpenKH Mod Manager." +
+                                        $" Do you want to change Lua Backend to run scripts for ReCoM from this version of OpenKH Mod Manager instead?", "Warning",
+                                        MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
+
+                                    switch (errorMessage)
+                                    {
+                                        case MessageBoxResult.Yes:
+                                        {
+                                            int index = config.IndexOf("scripts", config.IndexOf("[recom]"));
+                                            config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                            config = config.Insert(index, "scripts = [{ path = \"scripts/recom/\", relative = true }" +
+                                                ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    int index = config.IndexOf("scripts", config.IndexOf("[recom]"));
+                                    config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                    config = config.Insert(index, "scripts = [{ path = \"scripts/recom/\", relative = true }" +
+                                        ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
+                                }
                             }
+                            if (LuaScriptPaths.Contains("kh3d") && GameCollection == 1)
+                            {
+                                if (config.Contains("mod/kh3d/scripts"))
+                                {
+                                    var errorMessage = MessageBox.Show($"Your Lua Backend is already configured to run Lua scripts for KH3D from an OpenKH Mod Manager." +
+                                        $" Do you want to change Lua Backend to run scripts for KH3D from this version of OpenKH Mod Manager instead?", "Warning",
+                                        MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
+
+                                    switch (errorMessage)
+                                    {
+                                        case MessageBoxResult.Yes:
+                                        {
+                                            int index = config.IndexOf("scripts", config.IndexOf("[kh3d]"));
+                                            config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                            config = config.Insert(index, "scripts = [{ path = \"scripts/kh3d/\", relative = true }" +
+                                                ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    int index = config.IndexOf("scripts", config.IndexOf("[kh3d]"));
+                                    config = config.Remove(index, config.IndexOf("]", index) - index + 1);
+                                    config = config.Insert(index, "scripts = [{ path = \"scripts/kh3d/\", relative = true }" +
+                                        ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
+                                }
+                            }
+                            File.WriteAllText(Path.Combine(DestinationCollection, "LuaBackend.toml"), config);
+                            OnPropertyChanged(nameof(IsLuaBackendInstalled));
+                            OnPropertyChanged(nameof(LuaBackendFoundVisibility));
+                            OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
                         }
-                        File.WriteAllText(Path.Combine(DestinationCollection, "LuaBackend.toml"), config);
-                        OnPropertyChanged(nameof(IsLuaBackendInstalled));
-                        OnPropertyChanged(nameof(LuaBackendFoundVisibility));
-                        OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
-                    }                    
+                    }
+                    catch
+                    {
+                        MessageBox.Show(
+                                $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to configure Lua Backend for.",
+                                "Error",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                    }                                                           
                 }
             });
             RemoveLuaBackendCommand = new RelayCommand(_ =>
             {
-                if (GameCollection == 0)
+                try
                 {
-                    File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.dll"));
-                    File.Delete(Path.Combine(PcReleaseLocation, "lua54.dll"));
-                    File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
+                    if (GameCollection == 0)
+                    {
+                        File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "lua54.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
+                    }
+                    else if (GameCollection == 1)
+                    {
+                        File.Delete(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocationKH3D, "lua54.dll"));
+                        File.Delete(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"));
+                    }
+                    OnPropertyChanged(nameof(IsLuaBackendInstalled));
+                    OnPropertyChanged(nameof(LuaBackendFoundVisibility));
+                    OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
                 }
-                else if (GameCollection == 1)
+                catch
                 {
-                    File.Delete(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.dll"));
-                    File.Delete(Path.Combine(PcReleaseLocationKH3D, "lua54.dll"));
-                    File.Delete(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"));
-                }
-                OnPropertyChanged(nameof(IsLuaBackendInstalled));
-                OnPropertyChanged(nameof(LuaBackendFoundVisibility));
-                OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
+                    MessageBox.Show(
+                            $"At least one filepath is invalid check you selected a correct filepath for the collection you are trying to uninstall Lua Backend for.",
+                            "Error",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                }                
             });
         }
 
