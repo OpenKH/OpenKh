@@ -414,6 +414,7 @@ namespace OpenKh.ColladaUtils
                                                         source.Float_Array.Add(
                                                             new Float_Array
                                                             {
+                                                                Id = ToArmatureMeshSkinBindPosesArrayId(mesh),
                                                                 Value = string.Join(" ", skinController.InvBindMatrices.Select(MatrixToText)),
                                                             }
                                                         );
@@ -447,6 +448,7 @@ namespace OpenKh.ColladaUtils
                                                         source.Float_Array.Add(
                                                             new Float_Array
                                                             {
+                                                                Id = ToArmatureMeshSkinWeightsArrayId(mesh),
                                                                 Value = string.Join(" ", skinController.SkinWeights.Select(it => it.ToString())),
                                                             }
                                                         );
