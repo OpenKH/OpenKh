@@ -15,6 +15,14 @@
                 <MenuItem Header="Reload" Click="Menu_DebugReload"/>
                 <MenuItem Header="Export MDLS" Click="Menu_DebugExportMdls"/>
             </MenuItem>
+            <MenuItem Header="Loader" Name="_loader">
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}">
+                        <Setter Property="Header" Value="{Binding Header}" />
+                        <Setter Property="Command" Value="{Binding Command}" />
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
             <MenuItem Header="Export">
                 <MenuItem Header="FBX (AssimpNet)" Click="Menu_ExportAsFbx"/>
                 <MenuItem Header="Basic DAE" Click="Menu_ExportAsBasicDae"/>

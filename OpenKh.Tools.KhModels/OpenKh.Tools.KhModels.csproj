@@ -20,6 +20,7 @@
     <ProjectReference Include="..\OpenKh.Kh1\OpenKh.Kh1.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
     <ProjectReference Include="..\OpenKh.ColladaUtils\OpenKh.ColladaUtils.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.Common.Wpf\OpenKh.Tools.Common.Wpf.csproj" />
   </ItemGroup>
 
 </Project>
