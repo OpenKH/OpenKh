@@ -222,7 +222,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.KhModels", "Op
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModelingToolkit", "ModelingToolkit\ModelingToolkit\ModelingToolkit.csproj", "{3603444C-3A1B-487D-AA6B-9AACB5530DD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tests.Tools", "OpenKh.Tests.Tools\OpenKh.Tests.Tools.csproj", "{861F6823-1D67-4AAD-A9CD-5D8184B84A86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tests.Tools", "OpenKh.Tests.Tools\OpenKh.Tests.Tools.csproj", "{861F6823-1D67-4AAD-A9CD-5D8184B84A86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.ColladaUtils", "OpenKh.ColladaUtils\OpenKh.ColladaUtils.csproj", "{4E334B8C-6331-4051-8DBC-483FFAB069FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -908,6 +910,14 @@ Global
 		{861F6823-1D67-4AAD-A9CD-5D8184B84A86}.Debug|x64.Build.0 = Debug|Any CPU
 		{861F6823-1D67-4AAD-A9CD-5D8184B84A86}.Release|x64.ActiveCfg = Release|Any CPU
 		{861F6823-1D67-4AAD-A9CD-5D8184B84A86}.Release|x64.Build.0 = Release|Any CPU
+		{4E334B8C-6331-4051-8DBC-483FFAB069FF}..NET Debug|x64.ActiveCfg = Debug|Any CPU
+		{4E334B8C-6331-4051-8DBC-483FFAB069FF}..NET Debug|x64.Build.0 = Debug|Any CPU
+		{4E334B8C-6331-4051-8DBC-483FFAB069FF}..NET Release|x64.ActiveCfg = Release|Any CPU
+		{4E334B8C-6331-4051-8DBC-483FFAB069FF}..NET Release|x64.Build.0 = Release|Any CPU
+		{4E334B8C-6331-4051-8DBC-483FFAB069FF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4E334B8C-6331-4051-8DBC-483FFAB069FF}.Debug|x64.Build.0 = Debug|Any CPU
+		{4E334B8C-6331-4051-8DBC-483FFAB069FF}.Release|x64.ActiveCfg = Release|Any CPU
+		{4E334B8C-6331-4051-8DBC-483FFAB069FF}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1002,6 +1012,7 @@ Global
 		{E9AE2FAE-4335-4C75-9272-3B6C6D70072B} = {402B2669-D594-4DFA-965B-02A92626ADC6}
 		{3603444C-3A1B-487D-AA6B-9AACB5530DD6} = {4FBC958A-4685-4DF2-8D4F-98850BAE61B3}
 		{861F6823-1D67-4AAD-A9CD-5D8184B84A86} = {402B2669-D594-4DFA-965B-02A92626ADC6}
+		{4E334B8C-6331-4051-8DBC-483FFAB069FF} = {0FB7CD6A-EE31-467D-A590-267DCD028618}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DF3960B-4FE5-4E56-92D4-2FC0A912E823}

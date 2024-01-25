@@ -1,5 +1,4 @@
-using ModelingToolkit.HelixModule;
-using ModelingToolkit.Objects;
+using OpenKh.ColladaUtils;
 using OpenKh.Tests.Tools.Helpers;
 using OpenKh.Tools.KhModels.Usecases;
 using OpenKh.Tools.KhModels.View;
@@ -13,12 +12,13 @@ using Xunit;
 
 namespace OpenKh.Tests.Tools.Tdd
 {
-    public class ExportToBasicDaeUsecaseTest
+    public class SaveDaeModelUsecaseTest
     {
-        private readonly SaveBasicDaeUsecase _saveBasicDaeUsecase = new();
-        private readonly ConvertToBasicDaeUsecase _convertToBasicDaeUsecase = new();
+        private readonly SaveDaeModelUsecase _saveDaeModelUsecase = new();
+        private readonly ConvertToDaeModelUsecase _convertToDaeModelUsecase = new();
 
         [Theory]
+        [InlineData(@"%KH2FM_EXTRACTION_DIR%\obj\H_EX500.mdlx", "H_EX500")]
         [InlineData(@"%KH2FM_EXTRACTION_DIR%\obj\P_EX100.mdlx", "P_EX100")]
         [InlineData(@"%KH2FM_EXTRACTION_DIR%\map\jp\tt00.map", "tt00")]
         [InlineData(@"%KH2FM_EXTRACTION_DIR%\map\jp\tt01.map", "tt01")]
@@ -29,6 +29,9 @@ namespace OpenKh.Tests.Tools.Tdd
             {
                 return;
             }
+
+            var saveToDir = Path.Combine(Environment.CurrentDirectory, daeOutputPrefix);
+            Directory.CreateDirectory(saveToDir);
 
             RunOnSta.Run(
                 () =>
@@ -49,11 +52,12 @@ namespace OpenKh.Tests.Tools.Tdd
 
                     foreach (var sourceModel in vm.VpService.Models)
                     {
-                        using var daeStream = File.Create($"{daeOutputPrefix}_{sourceModel.Name}.dae");
+                        using var daeStream = File.Create(Path.Combine(saveToDir, $"{daeOutputPrefix}_{sourceModel.Name}.dae"));
 
-                        _saveBasicDaeUsecase.Save(
-                            model: _convertToBasicDaeUsecase.Convert(
+                        _saveDaeModelUsecase.Save(
+                            model: _convertToDaeModelUsecase.Convert(
                                 sourceModel: sourceModel,
+                                savePngToDir: saveToDir,
                                 filePrefix: $"{daeOutputPrefix}_{sourceModel.Name}"
                             ),
                             stream: daeStream

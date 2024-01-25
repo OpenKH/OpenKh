@@ -7,26 +7,26 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using static OpenKh.Tools.KhModels.Utils.DaeModels;
+using static OpenKh.ColladaUtils.DaeModels;
 
 namespace OpenKh.Tools.KhModels.Usecases
 {
-    public class ConvertToBasicDaeUsecase
+    public class ConvertToDaeModelUsecase
     {
-        public DaeModel Convert(MtModel sourceModel, string filePrefix, float geometryScaling = 1f)
+        public DaeModel Convert(MtModel sourceModel, string savePngToDir, string filePrefix, float geometryScaling = 1f)
         {
             string ExportTexture(MtMaterial material)
             {
                 if (!string.IsNullOrEmpty(material.DiffuseTextureFileName))
                 {
                     var pngFilePath = $"{filePrefix}_{material.DiffuseTextureFileName}.png";
-                    material.ExportAsPng(pngFilePath);
+                    material.ExportAsPng(Path.Combine(savePngToDir, pngFilePath));
                     return pngFilePath;
                 }
                 else if (material.DiffuseTextureBitmap != null)
                 {
                     var pngFilePath = $"{filePrefix}_{material.Name}.png";
-                    material.DiffuseTextureBitmap.Save(pngFilePath, System.Drawing.Imaging.ImageFormat.Png);
+                    material.DiffuseTextureBitmap.Save(Path.Combine(savePngToDir, pngFilePath), System.Drawing.Imaging.ImageFormat.Png);
                     return pngFilePath;
                 }
                 else

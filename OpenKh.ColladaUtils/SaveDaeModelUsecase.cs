@@ -1,6 +1,4 @@
 using COLLADASchema;
-using ModelingToolkit.Objects;
-using OpenKh.Tools.KhModels.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -10,11 +8,11 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using static OpenKh.Tools.KhModels.Utils.DaeModels;
+using static OpenKh.ColladaUtils.DaeModels;
 
-namespace OpenKh.Tools.KhModels.Usecases
+namespace OpenKh.ColladaUtils
 {
-    public class SaveBasicDaeUsecase
+    public class SaveDaeModelUsecase
     {
         public void Save(DaeModel model, Stream stream)
         {

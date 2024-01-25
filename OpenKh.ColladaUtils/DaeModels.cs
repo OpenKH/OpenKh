@@ -6,7 +6,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenKh.Tools.KhModels.Utils
+namespace OpenKh.ColladaUtils
 {
     public static class DaeModels
     {

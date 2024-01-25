@@ -5,6 +5,7 @@ using ModelingToolkit.HelixModule;
 using ModelingToolkit.Objects;
 using OpenKh.AssimpUtils;
 using OpenKh.Bbs;
+using OpenKh.ColladaUtils;
 using OpenKh.Common;
 using OpenKh.Ddd;
 using OpenKh.Kh1;
@@ -36,8 +37,8 @@ namespace OpenKh.Tools.KhModels.View
         public bool ShowBoundingBox { get; set; }
         public bool ShowOrigin { get; set; }
 
-        private readonly SaveBasicDaeUsecase _saveBasicDaeUsecase = new();
-        private readonly ConvertToBasicDaeUsecase _convertToBasicDaeUsecase = new();
+        private readonly SaveDaeModelUsecase _saveDaeModelUsecase = new();
+        private readonly ConvertToDaeModelUsecase _convertToDaeModelUsecase = new();
 
         public MainWindowVM(HelixViewport3D viewport)
         {
@@ -307,17 +308,18 @@ namespace OpenKh.Tools.KhModels.View
             sfd.ShowDialog();
             if (sfd.FileName != "")
             {
-                string dirPath = Path.GetDirectoryName(sfd.FileName);
+                string dirPath = Path.GetDirectoryName(sfd.FileName) ?? ".";
 
-                var daeOutputPrefix = Path.Combine(Path.GetDirectoryName(sfd.FileName)!, Path.GetFileNameWithoutExtension(sfd.FileName));
+                var daeOutputPrefix = Path.GetFileNameWithoutExtension(sfd.FileName);
 
                 foreach (var sourceModel in VpService.Models)
                 {
-                    using var daeStream = File.Create($"{daeOutputPrefix}_{sourceModel.Name}.dae");
+                    using var daeStream = File.Create(Path.Combine(dirPath, $"{daeOutputPrefix}_{sourceModel.Name}.dae"));
 
-                    _saveBasicDaeUsecase.Save(
-                        model: _convertToBasicDaeUsecase.Convert(
+                    _saveDaeModelUsecase.Save(
+                        model: _convertToDaeModelUsecase.Convert(
                             sourceModel: sourceModel,
+                            savePngToDir: dirPath,
                             filePrefix: $"{daeOutputPrefix}_{sourceModel.Name}"
                         ),
                         stream: daeStream
