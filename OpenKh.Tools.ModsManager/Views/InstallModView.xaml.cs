@@ -14,7 +14,7 @@ namespace OpenKh.Tools.ModsManager.Views
         public ColorThemeService ColorTheme => ColorThemeService.Instance;
         private static readonly IEnumerable<FileDialogFilter> _zipFilter = FileDialogFilterComposer
             .Compose()
-            .AddExtensions("Mod archive", "zip", "kh2pcpatch", "kh1pcpatch", "compcpatch", "bbspcpatch", "lua");
+            .AddExtensions("Mod archive", "zip", "kh2pcpatch", "kh1pcpatch", "compcpatch", "bbspcpatch", "dddpcpatch", "lua");
 
         public RelayCommand CloseCommand { get; }
         public string RepositoryName { get; set; }
