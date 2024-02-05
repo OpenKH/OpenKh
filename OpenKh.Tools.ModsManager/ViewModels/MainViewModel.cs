@@ -1152,13 +1152,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (_launchGame != "kh3d" && ConfigurationService.PcReleaseLocation != null)
                 {
                     string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
-                    string[] a = File.ReadAllLines(panaceaSettings);
+                    string[] lines = File.ReadAllLines(panaceaSettings);
                     string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\n";
-                    foreach (string s in a)
+                    foreach (string entry in lines)
                     {
-                        if (s.Contains("dev_path"))
+                        if (entry.Contains("dev_path"))
                         {
-                            textToWrite += s;
+                            textToWrite += entry;
                             break;
                         }
                     }
@@ -1169,13 +1169,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 else if (ConfigurationService.PcReleaseLocationKH3D != null)
                 {
                     string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
-                    string[] a = File.ReadAllLines(panaceaSettings);
+                    string[] lines = File.ReadAllLines(panaceaSettings);
                     string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\n";
-                    foreach (string s in a)
+                    foreach (string entry in lines)
                     {
-                        if (s.Contains("dev_path"))
+                        if (entry.Contains("dev_path"))
                         {
-                            textToWrite += s;
+                            textToWrite += entry;
                             break;
                         }
                     }
