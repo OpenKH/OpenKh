@@ -889,16 +889,33 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             case "Recom":
                                 _pkgSoft = "Recom";
                                 break;
+                            case "kh3d":
+                                _pkgSoft = fastMode ? "kh3d_first" : _dirPart;
+                                break;
                             default:
                                 _pkgSoft = fastMode ? "kh2_first" : _dirPart;
                                 break;
 
                         }
-                        var _pkgName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", ConfigurationService.PcReleaseLanguage, _pkgSoft + ".pkg");
+                        string _pkgName = null;
+                        string _backupDir = null;
+                        if (_launchGame != "kh3d" && ConfigurationService.PcReleaseLocation != null)
+                        {
+                            _pkgName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", ConfigurationService.PcReleaseLanguage, _pkgSoft + ".pkg");
+                            _backupDir = Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage");
+                        }
+                        else if (ConfigurationService.PcReleaseLocationKH3D != null)
+                        {
+                            _pkgName = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "Image", ConfigurationService.PcReleaseLanguage, _pkgSoft + ".pkg");
+                            _backupDir = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "BackupImage");                           
+                        }
+                        else
+                        {
+                            Log.Warn("Game Location for selected game cannot be found! Re-run th setup wizard to confirm the path is correct and/or confirm launchgame in the top right is correct.");
+                            break;
+                        }
 
-                        var _backupDir = Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage");
-
-                        if (!Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")))
+                        if (!Directory.Exists(_backupDir))
                             Directory.CreateDirectory(_backupDir);
 
                         var outputDir = "patchedpkgs";
@@ -990,9 +1007,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 if (ConfigurationService.GameEdition == 2)
                 {
-                    if (patched)
+                    if (patched && _launchGame != "kh3d")
                     {
-                        if (!Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")))
+                        if (ConfigurationService.PcReleaseLocation == null || !Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")))
                         {
                             Log.Warn("backup folder cannot be found! Cannot restore the game.");
                         }
@@ -1004,6 +1021,30 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                                 var _fileBare = Path.GetFileName(file);
                                 var _trueName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", ConfigurationService.PcReleaseLanguage, _fileBare);
+
+                                File.Delete(Path.ChangeExtension(_trueName, "hed"));
+                                File.Delete(_trueName);
+
+                                File.Copy(file, _trueName);
+                                File.Copy(Path.ChangeExtension(file, "hed"), Path.ChangeExtension(_trueName, "hed"));
+                            }
+                        }
+
+                    }
+                    else if (patched)
+                    {
+                        if (ConfigurationService.PcReleaseLocationKH3D == null || !Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "BackupImage")))
+                        {
+                            Log.Warn("backup folder cannot be found! Cannot restore the game.");
+                        }
+                        else
+                        {
+                            foreach (var file in Directory.GetFiles(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "BackupImage")).Where(x => x.Contains(".pkg") && (x.Contains(_launchGame))))
+                            {
+                                Log.Info($"Restoring Package File {file.Replace(".pkg", "")}");
+
+                                var _fileBare = Path.GetFileName(file);
+                                var _trueName = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "Image", ConfigurationService.PcReleaseLanguage, _fileBare);
 
                                 File.Delete(Path.ChangeExtension(_trueName, "hed"));
                                 File.Delete(_trueName);
@@ -1108,20 +1149,40 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             if (PanaceaInstalled)
             {
-                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
-                string[] a = File.ReadAllLines(panaceaSettings);
-                string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\n";
-                foreach (string s in a)
+                if (_launchGame != "kh3d" && ConfigurationService.PcReleaseLocation != null)
                 {
-                    if (s.Contains("dev_path"))
+                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
+                    string[] lines = File.ReadAllLines(panaceaSettings);
+                    string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\n";
+                    foreach (string entry in lines)
                     {
-                        textToWrite += s;
-                        break;
+                        if (entry.Contains("dev_path"))
+                        {
+                            textToWrite += entry;
+                            break;
+                        }
                     }
+                    textToWrite += $"\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
+                        $"debug_log={_panaceaDebugLogEnabled}\r\nenable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
+                    File.WriteAllText(panaceaSettings, textToWrite);
                 }
-                textToWrite += $"\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
-                    $"debug_log={_panaceaDebugLogEnabled}\r\nenable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
-                File.WriteAllText(panaceaSettings, textToWrite);
+                else if (ConfigurationService.PcReleaseLocationKH3D != null)
+                {
+                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
+                    string[] lines = File.ReadAllLines(panaceaSettings);
+                    string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\n";
+                    foreach (string entry in lines)
+                    {
+                        if (entry.Contains("dev_path"))
+                        {
+                            textToWrite += entry;
+                            break;
+                        }
+                    }
+                    textToWrite += $"\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
+                        $"debug_log={_panaceaDebugLogEnabled}\r\nenable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
+                    File.WriteAllText(panaceaSettings, textToWrite);
+                }
             }
         }
 
