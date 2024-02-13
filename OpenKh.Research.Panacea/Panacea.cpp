@@ -720,6 +720,9 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
         || !_wcsicmp(ext, L".map")
         || !_wcsicmp(ext, L".mdlx"))
         GetBAROffsets(addr, 0, assetoffs);
+    else // unknown file type
+        for (int i = 0; i < entries.size(); ++i)
+            assetoffs.push_back(entries[i].origOffset);
     std::vector<Axa::RemasteredEntry> modfiles;
     ScanFolder(remasteredFolder, modfiles);
     if (modfiles.size() >= assetoffs.size())
@@ -963,14 +966,14 @@ long __cdecl Panacea::LoadFileWithSize(Axa::CFileMan* _this, const char* filenam
     else if (!TransformFilePath(path, sizeof(path), filename))
     {
         if (OpenKH::m_DebugLog)
-            fprintf(stdout, "LoadFile(\"%s\", %d)\n", filename, useHdAsset);
+            fprintf(stdout, "LoadFileWithSize(\"%s\", %d, %d)\n", filename, size, useHdAsset);
         auto ret = Hook_Axa_CFileMan_LoadFile->Unpatch()(_this, filename, addr, useHdAsset);
         Hook_Axa_CFileMan_LoadFile->Patch();
         return ret;
     }
 
     if (OpenKH::m_DebugLog)
-        fwprintf(stdout, L"LoadFile(\"%ls\", %d)\n", path, useHdAsset);
+        fwprintf(stdout, L"LoadFileWithSize(\"%ls\", %d, %d)\n", path, size, useHdAsset);
     auto fileinfo = Axa::PackageMan::GetFileInfo(filename, 0);
     FILE* file = _wfopen(path, L"rb");
     fseek(file, 0, SEEK_END);
