@@ -225,6 +225,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(BothPcReleaseSelected));
                 OnPropertyChanged(nameof(PcRelease1525Selected));
                 OnPropertyChanged(nameof(PcRelease28Selected));
+                OnPropertyChanged(nameof(InstallForPc1525));
             }
         }
 
@@ -287,6 +288,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(BothPcReleaseSelected));
                 OnPropertyChanged(nameof(PcRelease1525Selected));
                 OnPropertyChanged(nameof(PcRelease28Selected));
+                OnPropertyChanged(nameof(InstallForPc28));
             }
         }
         public bool IsEGSVersion
