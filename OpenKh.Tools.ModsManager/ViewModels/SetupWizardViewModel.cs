@@ -618,7 +618,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                 if (!itemFiles.Any())
                 {
-                    MessageBox.Show("No Game Install Locations Found\n Please Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                    MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
                     return;
                 }
 
