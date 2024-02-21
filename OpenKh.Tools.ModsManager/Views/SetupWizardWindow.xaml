@@ -87,6 +87,7 @@
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         Mod Manager supports both the 1.5+2.5 collection and KH3D from the 2.8 collection choose the filepath for at least one of the collections.
                     </TextBlock>
+                    <Button Margin="0 10 0 10" Command="{Binding DetectInstallsCommand}">Detect Installations</Button>
                     <TextBlock Margin="0 0 0 3">Folder location of the PC release of 1.5+2.5</TextBlock>
                     <Grid Margin="0 0 0 3">
                         <Grid.ColumnDefinitions>
@@ -109,7 +110,7 @@
                             <Image Source="{StaticResource FolderOpen_16x}"/>
                         </Button>
                     </Grid>
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">NOTE: Always be sure to use a supported version as updated might break the compatibility</TextBlock>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">NOTE: Always be sure to use a supported version or risk breaking compatibility</TextBlock>
                 </StackPanel>
             </StackPanel>
         </xctk:WizardPage>
