@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
-        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.0" />
+        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
         <PackageReference Include="System.Interactive" Version="6.0.1" />
         <PackageReference Include="SkiaSharp" Version="2.88.7" />
         <PackageReference Include="NLog" Version="5.2.8" />
