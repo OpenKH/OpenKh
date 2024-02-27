@@ -34,7 +34,7 @@ namespace OpenKh.AssimpUtils
 
                 // TEXTURE
                 Assimp.TextureSlot texture = new Assimp.TextureSlot();
-                texture.FilePath = "Texture" + i;
+                texture.FilePath = "Texture" + i + "." + System.Drawing.Imaging.ImageFormat.Png.ToString().ToLower(); /* Not planning to export them in another extension right. */
                 texture.TextureType = Assimp.TextureType.Diffuse;
 
                 // MATERIAL
