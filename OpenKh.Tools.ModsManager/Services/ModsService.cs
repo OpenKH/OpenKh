@@ -260,7 +260,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 var _yamlPath = Path.Combine(modPath + "/mod.yml");
 
-                File.WriteAllText(_yamlPath, _yamlGen.ToString());
+                File.WriteAllText(_yamlPath, _yamlGen.ToString().Replace("\r\nspecifications: 0\r\ndependencies: ", "").Replace("\r\n    method: \r\n    platform: \r\n    package: \r\n    multi: \r\n    source: \r\n    required: false\r\n    type: \r\n    motionsetType: Default\r\n    language: \r\n    isSwizzled: false\r\n    index: 0\r\n  required: false\r\n  type: \r\n  motionsetType: Default\r\n  language: \r\n  isSwizzled: false\r\n  index: 0", "").Replace("\r\n  multi: ", ""));
             }
         }
 
