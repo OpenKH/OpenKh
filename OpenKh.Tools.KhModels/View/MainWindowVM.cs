@@ -1,9 +1,11 @@
+using Assimp;
 using HelixToolkit.Wpf;
 using ModelingToolkit.AssimpModule;
 using ModelingToolkit.HelixModule;
 using ModelingToolkit.Objects;
 using OpenKh.AssimpUtils;
 using OpenKh.Bbs;
+using OpenKh.ColladaUtils;
 using OpenKh.Common;
 using OpenKh.Ddd;
 using OpenKh.Kh1;
@@ -12,6 +14,7 @@ using OpenKh.Tools.KhModels.BBS;
 using OpenKh.Tools.KhModels.DDD;
 using OpenKh.Tools.KhModels.KH1;
 using OpenKh.Tools.KhModels.KIH2;
+using OpenKh.Tools.KhModels.Usecases;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,6 +36,9 @@ namespace OpenKh.Tools.KhModels.View
         public bool ShowJoints { get; set; }
         public bool ShowBoundingBox { get; set; }
         public bool ShowOrigin { get; set; }
+
+        private readonly SaveDaeModelUsecase _saveDaeModelUsecase = new();
+        private readonly ConvertToDaeModelUsecase _convertToDaeModelUsecase = new();
 
         public MainWindowVM(HelixViewport3D viewport)
         {
@@ -68,7 +74,7 @@ namespace OpenKh.Tools.KhModels.View
 
         public void LoadFile()
         {
-            if(Filepath == null)
+            if (Filepath == null)
                 throw new Exception("File not set");
 
             string fileName = Path.GetFileNameWithoutExtension(Filepath);
@@ -200,9 +206,9 @@ namespace OpenKh.Tools.KhModels.View
                         MtModel model = PmoV4Processor.GetMtModel(pmoModel);
                         model.Name = "Model" + i.ToString("D4");
                         System.Numerics.Matrix4x4 modelTransformation = pmpModel.objectInfo[i].GetTransformationMatrix();
-                        foreach(MtMesh mesh in model.Meshes)
+                        foreach (MtMesh mesh in model.Meshes)
                         {
-                            foreach(MtVertex vertex in mesh.Vertices)
+                            foreach (MtVertex vertex in mesh.Vertices)
                             {
                                 vertex.AbsolutePosition = Vector3.Transform(vertex.AbsolutePosition.Value, modelTransformation);
                             }
@@ -244,7 +250,7 @@ namespace OpenKh.Tools.KhModels.View
                 string dirPath = Path.GetDirectoryName(sfd.FileName);
 
                 AssimpGeneric.ExportScene(scene, fileFormat, sfd.FileName);
-                foreach(MtModel model in VpService.Models)
+                foreach (MtModel model in VpService.Models)
                 {
                     foreach (MtMaterial material in model.Materials)
                     {
@@ -290,5 +296,37 @@ namespace OpenKh.Tools.KhModels.View
                 }
             }
         }
+
+        public void ExportModelBasicDae()
+        {
+            System.Windows.Forms.SaveFileDialog sfd;
+            sfd = new System.Windows.Forms.SaveFileDialog();
+            sfd.Title = "Export model";
+            sfd.FileName = (VpService.Models.Count == 1)
+                ? VpService.Models[0].Name + ".dae"
+                : "Map.dae";
+            sfd.ShowDialog();
+            if (sfd.FileName != "")
+            {
+                string dirPath = Path.GetDirectoryName(sfd.FileName) ?? ".";
+
+                var daeOutputPrefix = Path.GetFileNameWithoutExtension(sfd.FileName);
+
+                foreach (var sourceModel in VpService.Models)
+                {
+                    using var daeStream = File.Create(Path.Combine(dirPath, $"{daeOutputPrefix}_{sourceModel.Name}.dae"));
+
+                    _saveDaeModelUsecase.Save(
+                        model: _convertToDaeModelUsecase.Convert(
+                            sourceModel: sourceModel,
+                            savePngToDir: dirPath,
+                            filePrefix: $"{daeOutputPrefix}_{sourceModel.Name}"
+                        ),
+                        stream: daeStream
+                    );
+                }
+            }
+        }
+
     }
 }
