@@ -1,0 +1,24 @@
+<UserControl x:Class="OpenKh.Tools.Kh2FontImageEditor.UserControls.ImagerTablet"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2FontImageEditor.UserControls"
+             mc:Ignorable="d" 
+             x:Name="self"
+             d:DesignHeight="450" d:DesignWidth="450">
+    <DockPanel>
+        <Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="Gray" Margin="3">
+            <Label Background="White" Foreground="Black" Content="{Binding Caption,ElementName=self}" />
+        </Border>
+        <ToolBar DockPanel.Dock="Top">
+            <Button Content="Import" Command="{Binding ImportCommand,ElementName=self}" CommandParameter="{Binding ImportCommandParameter,ElementName=self}" />
+            <Button Content="Export" Command="{Binding ExportCommand,ElementName=self}" CommandParameter="{Binding ExportCommandParameter,ElementName=self}" />
+            <Separator />
+            <Button Content="EditSpacing" Command="{Binding EditSpacingCommand,ElementName=self}" CommandParameter="{Binding EditSpacingCommandParameter,ElementName=self}" />
+        </ToolBar>
+        <Border Background="Black">
+            <Image Source="{Binding Image,ElementName=self}" />
+        </Border>
+    </DockPanel>
+</UserControl>

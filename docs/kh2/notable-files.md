@@ -8,5 +8,7 @@
 | [03system.bin](file/type/03system.md)         | Various params                    |
 | [12soundinfo.bar](file/type/12soundinfo.md)  | Defines footstep/ambient sound effects per room in a world.|
 | [15jigsaw.bin](file/type/15jigsaw.md)         | Defines puzzle pieces (Final Mix) |
+| [fontimage.bar](file/type/fontimage.md)       | Font and icon sprite images       |
+| [fontinfo.bar](file/type/fontinfo.md)         | Font and icon spacing             |
 | [jiminy.bar](file/type/jiminy.md)             | Jiminy's journal info             |
 | [mixdata.bar](file/type/mixdata.md)           | Moogle shop info                  |

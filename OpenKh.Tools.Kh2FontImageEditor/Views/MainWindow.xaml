@@ -1,0 +1,126 @@
+<Window x:Class="OpenKh.Tools.Kh2FontImageEditor.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.Kh2FontImageEditor"
+        xmlns:UserControls="clr-namespace:OpenKh.Tools.Kh2FontImageEditor.UserControls"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="Kh2FontImageEditor" Height="499" Width="1011">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Load msg/*/fontimage.bar" Command="{Binding OpenFontImageCommand}"/>
+                <MenuItem Header="Load msg/*/fontinfo.bar" Command="{Binding OpenFontInfoCommand}"/>
+                <Separator/>
+                <MenuItem Header="Save fontimage.bar _as..." Command="{Binding SaveFontImageCommand}"/>
+                <MenuItem Header="Save fontinfo.bar _as..." Command="{Binding SaveFontInfoCommand}"/>
+                <Separator/>
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" Command="{Binding AboutCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <StatusBar Grid.Row="2">
+        </StatusBar>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <DockPanel Grid.Column="0" LastChildFill="True">
+                <StatusBar DockPanel.Dock="Bottom">
+                    <StatusBarItem>2bpp gray image</StatusBarItem>
+                </StatusBar>
+                <UserControls:ImagerTablet 
+                    Caption="{Binding System1.Caption}" 
+                    Image="{Binding System1.State.Image}" 
+                    ImportCommand="{Binding ImagerImportCommand}" 
+                    ExportCommand="{Binding ImagerExportCommand}" 
+                    EditSpacingCommand="{Binding ImagerEditSpacingCommand}" 
+                    ImportCommandParameter="{Binding System1}" 
+                    ExportCommandParameter="{Binding System1}" 
+                    EditSpacingCommandParameter="{Binding System1}" 
+                />
+            </DockPanel>
+
+            <DockPanel Grid.Column="1" LastChildFill="True">
+                <StatusBar DockPanel.Dock="Bottom">
+                    <StatusBarItem>2bpp gray image</StatusBarItem>
+                </StatusBar>
+                <UserControls:ImagerTablet 
+                    Caption="{Binding System2.Caption}" 
+                    Image="{Binding System2.State.Image}" 
+                    ImportCommand="{Binding ImagerImportCommand}" 
+                    ExportCommand="{Binding ImagerExportCommand}" 
+                    EditSpacingCommand="{Binding ImagerEditSpacingCommand}" 
+                    ImportCommandParameter="{Binding System2}" 
+                    ExportCommandParameter="{Binding System2}" 
+                    EditSpacingCommandParameter="{Binding System2}" 
+                />
+            </DockPanel>
+
+            <DockPanel Grid.Column="2" LastChildFill="True">
+                <StatusBar DockPanel.Dock="Bottom">
+                    <StatusBarItem>2bpp gray image</StatusBarItem>
+                </StatusBar>
+                <UserControls:ImagerTablet 
+                    Caption="{Binding Event1.Caption}" 
+                    Image="{Binding Event1.State.Image}" 
+                    ImportCommand="{Binding ImagerImportCommand}" 
+                    ExportCommand="{Binding ImagerExportCommand}" 
+                    EditSpacingCommand="{Binding ImagerEditSpacingCommand}" 
+                    ImportCommandParameter="{Binding Event1}" 
+                    ExportCommandParameter="{Binding Event1}" 
+                    EditSpacingCommandParameter="{Binding Event1}" 
+                />
+            </DockPanel>
+
+            <DockPanel Grid.Column="3" LastChildFill="True">
+                <StatusBar DockPanel.Dock="Bottom">
+                    <StatusBarItem>2bpp gray image</StatusBarItem>
+                </StatusBar>
+                <UserControls:ImagerTablet 
+                    Caption="{Binding Event2.Caption}" 
+                    Image="{Binding Event2.State.Image}" 
+                    ImportCommand="{Binding ImagerImportCommand}" 
+                    ExportCommand="{Binding ImagerExportCommand}" 
+                    EditSpacingCommand="{Binding ImagerEditSpacingCommand}" 
+                    ImportCommandParameter="{Binding Event2}" 
+                    ExportCommandParameter="{Binding Event2}" 
+                    EditSpacingCommandParameter="{Binding Event2}" 
+                />
+            </DockPanel>
+
+            <DockPanel Grid.Column="4" LastChildFill="True">
+                <StatusBar DockPanel.Dock="Bottom">
+                    <StatusBarItem>8bpp image + palette</StatusBarItem>
+                </StatusBar>
+                <UserControls:ImagerTablet 
+                    Caption="{Binding Icon1.Caption}" 
+                    Image="{Binding Icon1.State.Image}" 
+                    ImportCommand="{Binding ImagerImportCommand}" 
+                    ExportCommand="{Binding ImagerExportCommand}" 
+                    EditSpacingCommand="{Binding ImagerEditSpacingCommand}" 
+                    ImportCommandParameter="{Binding Icon1}" 
+                    ExportCommandParameter="{Binding Icon1}" 
+                    EditSpacingCommandParameter="{Binding Icon1}" 
+                />
+            </DockPanel>
+
+        </Grid>
+    </Grid>
+</Window>
