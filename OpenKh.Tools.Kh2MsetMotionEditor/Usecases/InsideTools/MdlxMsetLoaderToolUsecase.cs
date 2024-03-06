@@ -7,11 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Windows;
-using OpenKh.AssimpUtils;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
-using SharpDX.DXGI;
-using Assimp;
-using System.Collections.Generic;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.InsideTools
 {
@@ -234,129 +230,6 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.InsideTools
                         }
                         ImGui.SameLine();
                         ImGui.Text("motion");
-                        ImGui.SameLine();;
-                        if (ImGui.Button($"Export selected motion as FBX##selectMotion"))
-                        {
-                            if (_loadedModel.SelectedMotionIndex<0)
-                            {
-                                System.Windows.Forms.MessageBox.Show("No motion selected.", "No motion selected.", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation);
-                            }
-                            else
-                            {
-                                if (_loadedModel.MdlxRenderableList.Count>0&&
-                                _loadedModel.MdlxRenderableList[0].Model is Mdlx)
-                                {
-                                    OpenKh.Engine.Parsers.MdlxParser mParser = new OpenKh.Engine.Parsers.MdlxParser(_loadedModel.MdlxRenderableList[0].Model);
-                                    Assimp.Scene scene = Kh2MdlxAssimp.getAssimpScene(mParser);
-
-
-
-
-
-                                    System.Windows.Forms.SaveFileDialog sfd;
-                                    sfd = new System.Windows.Forms.SaveFileDialog();
-                                    sfd.Title = "Export model";
-                                    sfd.FileName = _loadedModel.MdlxFile + "-"+ selectedMotionName.Replace(" ","_")+"." + AssimpGeneric.GetFormatFileExtension(AssimpGeneric.FileFormat.fbx);
-                                    sfd.ShowDialog();
-                                    if (sfd.FileName != "")
-                                    {
-                                        string dirPath = Path.GetDirectoryName(sfd.FileName);
-
-                                        if (!Directory.Exists(dirPath))
-                                            return;
-                                        dirPath += "\\";
-
-
-                                        var motionData = _loadedModel.MotionData;
-
-                                        if (motionData != null)
-                                        {
-                                            Animation animation = new Animation();
-                                            animation.Name = selectedMotionName;
-                                            animation.TicksPerSecond = 24f;
-                                            animation.DurationInTicks = (double)(1 / animation.TicksPerSecond) * motionData.InterpolatedMotionHeader.FrameCount;
-
-                                            for (int b=0;b< mParser.Bones.Count;b++)
-                                            {
-                                                NodeAnimationChannel nodeAnimationChannel = new NodeAnimationChannel();
-                                                nodeAnimationChannel.NodeName = "Bone" + b;
-                                                animation.NodeAnimationChannels.Add(nodeAnimationChannel);
-                                            }
-                                            for (int f = 0; f < motionData.InterpolatedMotionHeader.FrameCount; f++)
-                                            {
-                                                float timeKey = (float)((1/ animation.TicksPerSecond) * f);
-
-                                                var fkIk = _loadedModel.PoseProvider?.Invoke((float)f);
-
-                                                List<Microsoft.Xna.Framework.Matrix> matrices = new List<Microsoft.Xna.Framework.Matrix>(0);
-                                                List<bool> dirtyMatrices = new List<bool>(0);
-
-                                                if (fkIk != null && _loadedModel.MotionData?.IKHelpers is System.Collections.Generic.List<Motion.IKHelper> ikHelperList)
-                                                {
-                                                    var numFk = fkIk.Fk.Length;
-                                                    var numIk = fkIk.Ik.Length;
-                                                    var length = fkIk.Fk.Length;
-
-                                                    for (int mIndex=0; mIndex < length; mIndex++)
-                                                    {
-                                                        matrices.Add(fkIk.Fk[mIndex].ToXnaMatrix());
-                                                        dirtyMatrices.Add(true);
-                                                    }
-                                                }
-
-                                                int dirtyCount;
-                                                do
-                                                {
-                                                    dirtyCount = mParser.Bones.Count;
-                                                    for (int b = 0; b < mParser.Bones.Count; b++)
-                                                    {
-                                                        if (dirtyMatrices[b])
-                                                        {
-                                                            int childrenDirtyCount = 0;
-                                                            for (int j = 0; j < mParser.Bones.Count; j++)
-                                                            {
-                                                                if (mParser.Bones[j].Parent == b && dirtyMatrices[j])
-                                                                    childrenDirtyCount++;
-                                                            }
-                                                            if (childrenDirtyCount == 0) /* Children's children are all calculated already. */
-                                                            {
-                                                                if (mParser.Bones[b].Parent >-1)
-                                                                {
-                                                                    matrices[b] *= Microsoft.Xna.Framework.Matrix.Invert(matrices[mParser.Bones[b].Parent]);
-                                                                }
-                                                                dirtyMatrices[b] = false;
-                                                                dirtyCount--;
-                                                            }
-                                                        }
-                                                        else
-                                                            dirtyCount--;
-                                                    }
-                                                }
-                                                while (dirtyCount > 0);
-
-                                                for (int b = 0; b < mParser.Bones.Count; b++)
-                                                {
-                                                    NodeAnimationChannel channel = animation.NodeAnimationChannels[b];
-                                                    Microsoft.Xna.Framework.Vector3 scale;
-                                                    Microsoft.Xna.Framework.Quaternion rotate;
-                                                    Microsoft.Xna.Framework.Vector3 translate;
-                                                    matrices[b].Decompose(out scale, out rotate, out translate);
-                                                    channel.ScalingKeys.Add(new VectorKey(timeKey, new Vector3D(scale.X, scale.Y, scale.Z)));
-                                                    channel.RotationKeys.Add(new QuaternionKey(timeKey, new Assimp.Quaternion(rotate.W, rotate.X, rotate.Y, rotate.Z)));
-                                                    channel.PositionKeys.Add(new VectorKey(timeKey, new Vector3D(translate.X, translate.Y, translate.Z)));
-                                                }
-                                            }
-
-                                            scene.Animations.Add(animation);
-                                        }
-
-                                        AssimpGeneric.ExportScene(scene, AssimpGeneric.FileFormat.fbx, sfd.FileName);
-                                        OpenKh.Tools.Kh2MdlxEditor.Views.Main_Window.exportTextures(_loadedModel.MdlxRenderableList[0].Textures, dirPath);
-                                        System.Windows.Forms.MessageBox.Show("Export complete.", "Complete", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
-                                    }
-                                }
-                            }
-                        }
 
                         if (ImGui.BeginPopupModal(selectMotionCaption, ref selectMotionVisible,
                             ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal))

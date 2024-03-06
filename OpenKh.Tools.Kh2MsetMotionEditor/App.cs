@@ -1,6 +1,8 @@
+using Assimp;
 using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using OpenKh.AssimpUtils;
 using OpenKh.Engine;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.CustomImGui;
@@ -85,7 +87,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
             ErrorMessages errorMessages,
             AskOpenFileNowUsecase askOpenFileNowUsecase,
             LoadedModel loadedModel,
-            Camera camera,
+            OpenKh.Engine.Camera camera,
             GlobalInfo globalInfo,
             NormalMessages normalMessages
         )
@@ -178,6 +180,8 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
                     ImGui.Separator();
                     ForMenuItem("Export current motion to Excel", ExportExcel);
                     ForMenuItem("Import current motion from Excel", ImportExcel);
+                    ForMenuItem("Export current motion to FBX", ExportFBX);
+                    ForMenuItem("Export current motion to COLLADA", ExportCOLLADA);
                     ImGui.Separator();
                     ForMenuItem("Exit", MenuFileExit);
                 });
@@ -320,6 +324,114 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
             );
         }
 
+        private void ExportFBXCOLLADA(AssimpGeneric.FileFormat fileFormat)
+        {
+            if (_loadedModel.SelectedMotionIndex < 0)
+                System.Windows.Forms.MessageBox.Show("No motion selected.", "No motion selected.", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation);
+            else
+            {
+                var selectedMotionName = _loadedModel.MotionList[_loadedModel.SelectedMotionIndex].Label;
+                FileDialog.OnSave(
+                    filename =>
+                    {
+                        try
+                        {
+
+                            if (_loadedModel.MdlxRenderableList.Count > 0 &&
+                            _loadedModel.MdlxRenderableList[0].Model is Mdlx)
+                            {
+                                OpenKh.Engine.Parsers.MdlxParser mParser = new OpenKh.Engine.Parsers.MdlxParser(_loadedModel.MdlxRenderableList[0].Model);
+                                Assimp.Scene scene = Kh2MdlxAssimp.getAssimpScene(mParser);
+
+                                if (filename != "")
+                                {
+                                    string dirPath = Path.GetDirectoryName(filename);
+
+                                    if (!Directory.Exists(dirPath))
+                                        return;
+                                    dirPath += "\\";
+
+                                    var motionData = _loadedModel.MotionData;
+                                    if (motionData != null)
+                                    {
+                                        Animation animation = new Animation();
+                                        animation.Name = selectedMotionName;
+                                        animation.TicksPerSecond = fileFormat == AssimpGeneric.FileFormat.fbx ? 24f : 30f;
+                                        animation.DurationInTicks = (double)(motionData.InterpolatedMotionHeader.FrameCount / animation.TicksPerSecond);
+
+                                        for (int b = 0; b < mParser.Bones.Count; b++)
+                                        {
+                                            NodeAnimationChannel nodeAnimationChannel = new NodeAnimationChannel();
+                                            nodeAnimationChannel.NodeName = "Bone" + b;
+                                            animation.NodeAnimationChannels.Add(nodeAnimationChannel);
+                                        }
+
+                                        for (int f = 0; f < motionData.InterpolatedMotionHeader.FrameCount; f++)
+                                        {
+                                            float timeKey = (float)((1 / animation.TicksPerSecond) * f);
+
+                                            var fkIk = _loadedModel.PoseProvider?.Invoke((float)f);
+
+                                            List<Microsoft.Xna.Framework.Matrix> matrices = new List<Microsoft.Xna.Framework.Matrix>(0);
+                                            List<bool> dirtyMatrices = new List<bool>(0);
+
+                                            if (fkIk != null && _loadedModel.MotionData?.IKHelpers is System.Collections.Generic.List<Motion.IKHelper> ikHelperList)
+                                            {
+                                                var numFk = fkIk.Fk.Length;
+                                                var numIk = fkIk.Ik.Length;
+                                                var length = fkIk.Fk.Length;
+
+                                                for (int mIndex = 0; mIndex < length; mIndex++)
+                                                {
+                                                    matrices.Add(fkIk.Fk[mIndex].ToXnaMatrix());
+                                                }
+                                            }
+                                            Kh2MdlxAssimp.ReverseMatrices(ref matrices, mParser);
+
+                                            for (int b = 0; b < mParser.Bones.Count; b++)
+                                            {
+                                                NodeAnimationChannel channel = animation.NodeAnimationChannels[b];
+                                                Microsoft.Xna.Framework.Vector3 scale;
+                                                Microsoft.Xna.Framework.Quaternion rotate;
+                                                Microsoft.Xna.Framework.Vector3 translate;
+                                                matrices[b].Decompose(out scale, out rotate, out translate);
+
+                                                channel.ScalingKeys.Add(new VectorKey(timeKey, new Vector3D(scale.X, scale.Y, scale.Z)));
+                                                channel.RotationKeys.Add(new QuaternionKey(timeKey, new Assimp.Quaternion(rotate.W, rotate.X, rotate.Y, rotate.Z)));
+                                                channel.PositionKeys.Add(new VectorKey(timeKey, new Vector3D(translate.X, translate.Y, translate.Z)));
+                                            }
+                                        }
+
+                                        scene.Animations.Add(animation);
+                                    }
+
+                                    AssimpGeneric.ExportScene(scene, fileFormat, filename);
+                                    OpenKh.Tools.Kh2MdlxEditor.Views.Main_Window.exportTextures(_loadedModel.MdlxRenderableList[0].Textures, dirPath);
+                                    System.Windows.Forms.MessageBox.Show("Export complete.", "Complete", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorMessages.Add(ex);
+                        }
+                    },
+                    FileDialogFilterComposer.Compose()
+                        .AddExtensions("Autodesk FBX ", "fbx"),
+                                _loadedModel.MdlxFile + "-" + selectedMotionName.Replace(" ", "_") + "." + AssimpGeneric.GetFormatFileExtension(fileFormat)
+                );
+            }
+        }
+
+        private void ExportFBX()
+        {
+            ExportFBXCOLLADA(AssimpGeneric.FileFormat.fbx);
+        }
+
+        private void ExportCOLLADA()
+        {
+            ExportFBXCOLLADA(AssimpGeneric.FileFormat.collada);
+        }
         private void ReloadKh2Presets()
         {
             try
