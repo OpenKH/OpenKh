@@ -1,0 +1,31 @@
+<Window x:Class="OpenKh.Tools.ModsManager.Views.NotepadWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance local:NotepadVM}"
+        WindowStartupLocation="CenterOwner"
+        Title="NotepadWindow" Height="450" Width="800">
+    <DockPanel LastChildFill="True">
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar>
+                <Button Command="{Binding CopyAllCommand}">
+                    <AccessText>_Copy all</AccessText>
+                </Button>
+                <Separator />
+                <Button Command="{Binding SaveAsCommand}">
+                    <AccessText>Save _as</AccessText>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <TextBox Text="{Binding Text}" AcceptsReturn="True" AcceptsTab="True"
+                 HorizontalScrollBarVisibility="Visible"
+                 VerticalScrollBarVisibility="Visible"
+                 Foreground="{Binding ColorTheme.TextColor}"
+                 Background="{Binding ColorTheme.BackgroundColor}"
+                 FontFamily="Lucida Console"
+                 />
+    </DockPanel>
+</Window>

@@ -1,0 +1,69 @@
+<Window x:Class="OpenKh.Tools.ModsManager.Views.YamlGeneratorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+        xmlns:userControls="clr-namespace:OpenKh.Tools.ModsManager.UserControls"
+        Background="{Binding ColorTheme.BackgroundColor}"
+        WindowStartupLocation="CenterOwner"
+        d:DataContext="{d:DesignInstance Type=local:YamlGeneratorVM}"
+        mc:Ignorable="d"
+        Title="YamlGeneratorWindow" Height="510" Width="426">
+    <DockPanel Margin="7">
+        <DockPanel.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="Padding" Value="3"/>
+                <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
+            </Style>
+            <Style TargetType="GroupBox">
+                <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
+            </Style>
+        </DockPanel.Resources>
+        <StackPanel Orientation="Vertical">
+            <TextBlock>Preferences</TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <ComboBox ItemsSource="{Binding Prefs}" VerticalAlignment="Center" IsEditable="True" Width="200"
+                          Text="{Binding PrefLabel,UpdateSourceTrigger=PropertyChanged}"
+                          SelectedItem="{Binding SelectedPref}"
+                          >
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Label}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <TextBlock />
+                <Button Content="Load from it" Command="{Binding LoadPrefCommand}" HorizontalAlignment="Left" Padding="7" />
+                <TextBlock />
+                <Button Content="Save to it" Command="{Binding SavePrefCommand}" HorizontalAlignment="Left" Padding="7" />
+            </StackPanel>
+            <TextBlock>mod.yml</TextBlock>
+            <userControls:SaveFileSelectorControl FilePath="{Binding ModYmlFilePath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                  Filter="mod.yml|mod.yml|*|*" />
+            <TextBlock>You can select a diff tool to see changes:</TextBlock>
+            <ComboBox ItemsSource="{Binding Tools}" SelectedItem="{Binding SelectedTool}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <GroupBox Header="Generator" Padding="7">
+                <StackPanel>
+                    <Button Content="Generate or update mod.yml" Command="{Binding GenerateCommand}" HorizontalAlignment="Left" Padding="7" />
+                    <userControls:TaskStatusObserverControl Padding="3" Task="{Binding GeneratingTask}" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Target files appender" Padding="7">
+                <StackPanel>
+                    <TextBlock>GameDataPath</TextBlock>
+                    <userControls:FolderSelectorControl FolderPath="{Binding GameDataPath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock />
+                    <Button Content="Begin" Command="{Binding AppenderCommand}" HorizontalAlignment="Left" Padding="7" />
+                    <userControls:TaskStatusObserverControl Padding="3" Task="{Binding AppenderTask}" />
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </DockPanel>
+</Window>

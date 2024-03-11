@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views" xmlns:my="clr-namespace:OpenKh.Tools.ModsManager.Services"
+        xmlns:vm="clr-namespace:OpenKh.Tools.ModsManager.ViewModels"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         mc:Ignorable="d"
         Title="{Binding Title}"
         Height="{my:SettingBinding Height}"
@@ -141,6 +143,9 @@
             <MenuItem Header="Presets" Command="{Binding OpenPresetMenuCommand}"/>
             <MenuItem Header="PC Version" Focusable="False" IsHitTestVisible="False" Visibility="{Binding isPC}"/>
             <MenuItem Header="Emulator" Focusable="False" IsHitTestVisible="False" Visibility="{Binding notPC}"/>
+            <MenuItem Header="_Creator">
+                <MenuItem Header="_YamlGenerator" Command="{Binding YamlGeneratorCommand}" />
+            </MenuItem>
         </Menu>
         <ComboBox SelectedIndex="{Binding GametoLaunch}" Visibility="{Binding isPC}" HorizontalAlignment="Right" Margin="0,0,10,0" MinWidth="144">
             <ComboBoxItem>Kingdom Hearts 2</ComboBoxItem>
