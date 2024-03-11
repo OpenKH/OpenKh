@@ -136,14 +136,15 @@ namespace OpenKh.Tools.LayoutEditor
 
         public bool Run()
         {
-            bool dummy = true;
-            if (ImGui.BeginPopupModal(SpriteEditDialogTitle, ref dummy,
+            bool canOpenSpriteEditDialog = true;
+            if (ImGui.BeginPopupModal(SpriteEditDialogTitle, ref canOpenSpriteEditDialog,
                 ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize))
             {
                 _spriteEditDialog.Run();
                 ImGui.EndPopup();
             }
-            if (ImGui.BeginPopupModal(SpriteGroupEditDialogTitle, ref dummy,
+            bool canOpenSpriteGroupEditDialog = true;
+            if (ImGui.BeginPopupModal(SpriteGroupEditDialogTitle, ref canOpenSpriteGroupEditDialog,
                 ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize))
             {
                 _spriteGroupEditDialog.Run();

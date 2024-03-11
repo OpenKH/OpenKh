@@ -129,6 +129,8 @@ public:
         if (!OpenKH::m_ExtractPath.empty())
             ScanFolder(OpenKH::m_ExtractPath);
         ScanFolder(OpenKH::m_ModPath);
+        if (!OpenKH::m_DevPath.empty())
+            ScanFolder(OpenKH::m_DevPath);
         std::wstring rawfol = OpenKH::m_ModPath + L"\\raw";
         ScanFolder(rawfol);
     }
@@ -245,6 +247,42 @@ std::vector<void(*)()> framefuncs;
 int bassinit;
 int basschan;
 
+void LoadDLLs(const std::wstring& folder)
+{
+    auto dllpath = CombinePaths(folder, L"dll\\");
+    
+    wchar_t search[MAX_PATH];
+    std::wcscpy(search, dllpath.c_str());
+    std::wcscat(search, L"*.dll");
+    std::vector<void(*)(const wchar_t*)> initfuncs;
+    WIN32_FIND_DATAW find;
+    HANDLE fh = FindFirstFileW(search, &find);
+    if (fh != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            wchar_t filepath[MAX_PATH];
+            std::wcscpy(filepath, dllpath.c_str());
+            std::wcscat(filepath, find.cFileName);
+            HMODULE dllhandle = LoadLibraryW(filepath);
+            if (dllhandle)
+            {
+                if (OpenKH::m_DebugLog)
+                    fprintf(stdout, "Loaded DLL \"%ls\".\n", find.cFileName);
+                void (*initfunc)(const wchar_t*) = (void(*)(const wchar_t*))GetProcAddress(dllhandle, "OnInit");
+                if (initfunc)
+                    initfuncs.push_back(initfunc);
+                void (*framefunc)() = (void(*)())GetProcAddress(dllhandle, "OnFrame");
+                if (framefunc)
+                    framefuncs.push_back(framefunc);
+            }
+        } while (FindNextFileW(fh, &find));
+        FindClose(fh);
+    }
+    for (auto f : initfuncs)
+        f(folder.c_str());
+}
+
 void Panacea::Initialize()
 {
     ULONG_PTR baseImage = (ULONG_PTR)GetModuleHandle(nullptr);
@@ -288,38 +326,9 @@ void Panacea::Initialize()
     //Hook_Bbs_File_load = NewHook(pfn_Bbs_File_load, Panacea::BbsFileLoad, "Bbs::File::Load");
     //Hook_CRsrcData_loadCallback = NewHook(pfn_Bbs_CRsrcData_loadCallback, Panacea::BbsCRsrcDataloadCallback, "Bbs::CRsrcData::loadCallback");
 
-    auto dllpath = CombinePaths(OpenKH::m_ModPath, L"dll\\");
-    
-    wchar_t search[MAX_PATH];
-    std::wcscpy(search, dllpath.c_str());
-    std::wcscat(search, L"*.dll");
-    std::vector<void(*)(const wchar_t*)> initfuncs;
-    WIN32_FIND_DATAW find;
-    HANDLE fh = FindFirstFileW(search, &find);
-    if (fh != INVALID_HANDLE_VALUE)
-    {
-        do
-        {
-            wchar_t filepath[MAX_PATH];
-            std::wcscpy(filepath, dllpath.c_str());
-            std::wcscat(filepath, find.cFileName);
-            HMODULE dllhandle = LoadLibraryW(filepath);
-            if (dllhandle)
-            {
-                if (OpenKH::m_DebugLog)
-                    fprintf(stdout, "Loaded DLL \"%ls\".\n", find.cFileName);
-                void (*initfunc)(const wchar_t*) = (void(*)(const wchar_t*))GetProcAddress(dllhandle, "OnInit");
-                if (initfunc)
-                    initfuncs.push_back(initfunc);
-                void (*framefunc)() = (void(*)())GetProcAddress(dllhandle, "OnFrame");
-                if (framefunc)
-                    framefuncs.push_back(framefunc);
-            }
-        } while (FindNextFileW(fh, &find));
-        FindClose(fh);
-    }
-    for (auto f : initfuncs)
-        f(OpenKH::m_ModPath.c_str());
+    if (!OpenKH::m_DevPath.empty())
+        LoadDLLs(OpenKH::m_DevPath);
+    LoadDLLs(OpenKH::m_ModPath);
 }
 
 int Panacea::FrameHook(__int64 a1)
@@ -366,6 +375,12 @@ bool Panacea::GetRawFile(wchar_t* strOutPath, int maxLength, const char* origina
 bool Panacea::TransformFilePath(wchar_t* strOutPath, int maxLength, const char* originalPath)
 {
     const char* actualFileName = originalPath + strlen(BasePath) + 1;
+    if (!OpenKH::m_DevPath.empty())
+    {
+        swprintf_s(strOutPath, maxLength, L"%ls\\%hs", OpenKH::m_DevPath.c_str(), actualFileName);
+        if (FileExists(strOutPath))
+            return true;
+    }
     swprintf_s(strOutPath, maxLength, L"%ls\\%hs", OpenKH::m_ModPath.c_str(), actualFileName);
     if (FileExists(strOutPath))
         return true;
@@ -675,75 +690,97 @@ bool sortRemasteredFiles(const Axa::RemasteredEntry& a, const Axa::RemasteredEnt
     return false;
 }
 
+void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remasteredFolder, std::vector<Axa::RemasteredEntry>& entries)
+{
+    std::vector<int> assetoffs{};
+    const wchar_t* ext = PathFindExtensionW(path);
+    if (ext[-2] == L'.' && ext[-1] == L'a')
+        ext -= 2;
+    if (!_wcsicmp(ext, L".imd"))
+        GetIMDOffsets(addr, 0, assetoffs);
+    else if (!_wcsicmp(ext, L".imz"))
+        GetIMZOffsets(addr, 0, assetoffs);
+    else if (!_wcsicmp(ext, L".tm2"))
+        GetTM2Offsets(addr, 0, assetoffs);
+    else if (!_wcsicmp(ext, L".pax"))
+        GetPAXOffsets(addr, 0, assetoffs);
+    else if (!_wcsicmp(ext, L".2dd")
+        || !_wcsicmp(ext, L".2ld")
+        || !_wcsicmp(ext, L".a.fm")
+        || !_wcsicmp(ext, L".a.fr")
+        || !_wcsicmp(ext, L".a.gr")
+        || !_wcsicmp(ext, L".a.it")
+        || !_wcsicmp(ext, L".a.sp")
+        || !_wcsicmp(ext, L".a.us")
+        || !_wcsicmp(ext, L".a.uk")
+        || !_wcsicmp(ext, L".a.jp")
+        || !_wcsicmp(ext, L".bar")
+        || !_wcsicmp(ext, L".bin")
+        || !_wcsicmp(ext, L".mag")
+        || !_wcsicmp(ext, L".map")
+        || !_wcsicmp(ext, L".mdlx"))
+        GetBAROffsets(addr, 0, assetoffs);
+    else // unknown file type
+        for (int i = 0; i < entries.size(); ++i)
+            assetoffs.push_back(entries[i].origOffset);
+    std::vector<Axa::RemasteredEntry> modfiles;
+    ScanFolder(remasteredFolder, modfiles);
+    if (modfiles.size() >= assetoffs.size())
+    {
+        std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
+        entries = modfiles;
+        entries.resize(assetoffs.size());
+        for (int i = 0; i < entries.size(); ++i)
+            entries[i].origOffset = assetoffs[i];
+    }
+    else
+    {
+        if (entries.size() > assetoffs.size())
+            entries.resize(assetoffs.size());
+        else
+            while (entries.size() < assetoffs.size())
+            {
+                Axa::RemasteredEntry ent{};
+                sprintf_s(ent.name, "-%d.dds", (int)entries.size());
+                entries.push_back(ent);
+            }
+        for (int i = 0; i < entries.size(); ++i)
+        {
+            entries[i].origOffset = assetoffs[i];
+            for (auto& modfile : modfiles)
+                if (!strcmp(entries[i].name, modfile.name))
+                {
+                    entries[i].decompressedSize = modfile.decompressedSize;
+                    entries[i].compressedSize = -2;
+                    break;
+                }
+        }
+    }
+}
+
 void GetRemasteredFiles(Axa::PackageFile* fileinfo, const wchar_t* path, void* addr)
 {
     if (!OpenKH::m_EnableCache || RemasteredData.find(fileinfo->CurrentFileName) == RemasteredData.cend())
     {
         wchar_t remasteredFolder[MAX_PATH];
-        swprintf_s(remasteredFolder, L"%ls\\remastered\\%ls", OpenKH::m_ModPath.c_str(), path + OpenKH::m_ModPath.length() + 1);
         std::vector<Axa::RemasteredEntry> entries(fileinfo->RemasteredData, fileinfo->RemasteredData + fileinfo->CurrentFileData.remasteredCount);
-        if (DirectoryExists(remasteredFolder))
+        swprintf_s(remasteredFolder, L"%ls\\remastered\\%ls", OpenKH::m_DevPath.c_str(), path + OpenKH::m_DevPath.length() + 1);
+        if (!OpenKH::m_DevPath.empty() && DirectoryExists(remasteredFolder))
         {
-            std::vector<int> assetoffs{};
-            const wchar_t* ext = PathFindExtensionW(path);
-            if (ext[-2] == L'.' && ext[-1] == L'a')
-                ext -= 2;
-            if (!_wcsicmp(ext, L".imd"))
-                GetIMDOffsets(addr, 0, assetoffs);
-            else if (!_wcsicmp(ext, L".imz"))
-                GetIMZOffsets(addr, 0, assetoffs);
-            else if (!_wcsicmp(ext, L".tm2"))
-                GetTM2Offsets(addr, 0, assetoffs);
-            else if (!_wcsicmp(ext, L".pax"))
-                GetPAXOffsets(addr, 0, assetoffs);
-            else if (!_wcsicmp(ext, L".2dd")
-                || !_wcsicmp(ext, L".2ld")
-                || !_wcsicmp(ext, L".a.fm")
-                || !_wcsicmp(ext, L".a.fr")
-                || !_wcsicmp(ext, L".a.gr")
-                || !_wcsicmp(ext, L".a.it")
-                || !_wcsicmp(ext, L".a.sp")
-                || !_wcsicmp(ext, L".a.us")
-                || !_wcsicmp(ext, L".a.uk")
-                || !_wcsicmp(ext, L".a.jp")
-                || !_wcsicmp(ext, L".bar")
-                || !_wcsicmp(ext, L".bin")
-                || !_wcsicmp(ext, L".mag")
-                || !_wcsicmp(ext, L".map")
-                || !_wcsicmp(ext, L".mdlx"))
-                GetBAROffsets(addr, 0, assetoffs);
-            std::vector<Axa::RemasteredEntry> modfiles;
-            ScanFolder(remasteredFolder, modfiles);
-            if (modfiles.size() >= assetoffs.size())
+            ScanRemasteredFolder(path, addr, remasteredFolder, entries);
+        }
+        else
+        {
+            swprintf_s(remasteredFolder, L"%ls\\remastered\\%ls", OpenKH::m_ModPath.c_str(), path + OpenKH::m_ModPath.length() + 1);
+            if (DirectoryExists(remasteredFolder))
             {
-                std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
-                entries = modfiles;
-                entries.resize(assetoffs.size());
-                for (int i = 0; i < entries.size(); ++i)
-                    entries[i].origOffset = assetoffs[i];
+                ScanRemasteredFolder(path, addr, remasteredFolder, entries);
             }
-            else
+            else if (!OpenKH::m_ExtractPath.empty())
             {
-                if (entries.size() > assetoffs.size())
-                    entries.resize(assetoffs.size());
-                else
-                    while (entries.size() < assetoffs.size())
-                    {
-                        Axa::RemasteredEntry ent{};
-                        sprintf_s(ent.name, "-%d.dds", (int)entries.size());
-                        entries.push_back(ent);
-                    }
-                for (int i = 0; i < entries.size(); ++i)
-                {
-                    entries[i].origOffset = assetoffs[i];
-                    for (auto& modfile : modfiles)
-                        if (!strcmp(entries[i].name, modfile.name))
-                        {
-                            entries[i].decompressedSize = modfile.decompressedSize;
-                            entries[i].compressedSize = -2;
-                            break;
-                        }
-                }
+                swprintf_s(remasteredFolder, L"%ls\\remastered\\%ls", OpenKH::m_ExtractPath.c_str(), path + OpenKH::m_ExtractPath.length() + 1);
+                if (DirectoryExists(remasteredFolder))
+                    ScanRemasteredFolder(path, addr, remasteredFolder, entries);
             }
         }
 #if 0
@@ -929,14 +966,14 @@ long __cdecl Panacea::LoadFileWithSize(Axa::CFileMan* _this, const char* filenam
     else if (!TransformFilePath(path, sizeof(path), filename))
     {
         if (OpenKH::m_DebugLog)
-            fprintf(stdout, "LoadFile(\"%s\", %d)\n", filename, useHdAsset);
+            fprintf(stdout, "LoadFileWithSize(\"%s\", %d, %d)\n", filename, size, useHdAsset);
         auto ret = Hook_Axa_CFileMan_LoadFile->Unpatch()(_this, filename, addr, useHdAsset);
         Hook_Axa_CFileMan_LoadFile->Patch();
         return ret;
     }
 
     if (OpenKH::m_DebugLog)
-        fwprintf(stdout, L"LoadFile(\"%ls\", %d)\n", path, useHdAsset);
+        fwprintf(stdout, L"LoadFileWithSize(\"%ls\", %d, %d)\n", path, size, useHdAsset);
     auto fileinfo = Axa::PackageMan::GetFileInfo(filename, 0);
     FILE* file = _wfopen(path, L"rb");
     fseek(file, 0, SEEK_END);
@@ -1208,7 +1245,13 @@ void* Panacea::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizeP
     }
     TransformFilePath(path, sizeof(path), a1->CurrentFileName);
     wchar_t remastered[MAX_PATH];
-    swprintf_s(remastered, L"%ls\\remastered\\%ls\\%hs", OpenKH::m_ModPath.c_str(), path + OpenKH::m_ModPath.length() + 1, entry->name);
+    swprintf_s(remastered, L"%ls\\remastered\\%ls\\%hs", OpenKH::m_DevPath.c_str(), path + OpenKH::m_DevPath.length() + 1, entry->name);
+    if (OpenKH::m_DevPath.empty() || GetFileAttributesW(remastered) == INVALID_FILE_ATTRIBUTES)
+    {
+        swprintf_s(remastered, L"%ls\\remastered\\%ls\\%hs", OpenKH::m_ModPath.c_str(), path + OpenKH::m_ModPath.length() + 1, entry->name);
+        if (!OpenKH::m_ExtractPath.empty() && GetFileAttributesW(remastered) == INVALID_FILE_ATTRIBUTES)
+            swprintf_s(remastered, L"%ls\\remastered\\%ls\\%hs", OpenKH::m_ExtractPath.c_str(), path + OpenKH::m_ExtractPath.length() + 1, entry->name);
+    }
     if (GetFileAttributesW(remastered) != INVALID_FILE_ATTRIBUTES)
     {
         FILE* file = _wfopen(remastered, L"rb");
@@ -1249,9 +1292,23 @@ void Panacea::VAG_STREAM::play(const char* fileName, int volume, int fadeVolume,
         return;
     if (!bassinit)
         bassinit = BASS_Init(-1, 44100, 0, nullptr, nullptr) ? 1 : -1;
+    if (bassinit == -1)
+    {
+        if (OpenKH::m_DebugLog)
+            fprintf(stdout, "VAG_STREAM::play(\"%s\", %d, %d, %d)\n", fileName, volume, fadeVolume, time);
+        Hook_VAG_STREAM_play->Unpatch()(fileName, volume, fadeVolume, time);
+        Hook_VAG_STREAM_play->Patch();
+        return;
+    }
     char path[MAX_PATH];
-    sprintf_s(path, "%ls\\%s", OpenKH::m_ModPath.c_str(), fileName);
-    if (bassinit == -1 || GetFileAttributesA(path) == INVALID_FILE_ATTRIBUTES)
+    sprintf_s(path, "%ls\\%s", OpenKH::m_DevPath.c_str(), fileName);
+    if (OpenKH::m_DevPath.empty() || GetFileAttributesA(path) == INVALID_FILE_ATTRIBUTES)
+    {
+        sprintf_s(path, "%ls\\%s", OpenKH::m_ModPath.c_str(), fileName);
+        if (!OpenKH::m_ExtractPath.empty() && GetFileAttributesA(path) == INVALID_FILE_ATTRIBUTES)
+            sprintf_s(path, "%ls\\%s", OpenKH::m_ExtractPath.c_str(), fileName);
+    }
+    if (GetFileAttributesA(path) == INVALID_FILE_ATTRIBUTES)
     {
         if (OpenKH::m_DebugLog)
             fprintf(stdout, "VAG_STREAM::play(\"%s\", %d, %d, %d)\n", fileName, volume, fadeVolume, time);

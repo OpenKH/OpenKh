@@ -35,21 +35,30 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                    string firstFile = files?.FirstOrDefault();
-
-                    if(firstFile.ToLower().EndsWith(".mdlx"))
+                    if (files?.FirstOrDefault() is string firstFile)
                     {
-                        loadFile(firstFile);
-                    }
-                    else if(firstFile.ToLower().EndsWith(".fbx") || firstFile.ToLower().EndsWith(".dae"))
-                    {
-                        mainVM.replaceModel(firstFile);
-                    }
+                        try
+                        {
+                            if (firstFile.ToLower().EndsWith(".mdlx"))
+                            {
+                                loadFile(firstFile);
+                            }
+                            else if (firstFile.ToLower().EndsWith(".fbx") || firstFile.ToLower().EndsWith(".dae"))
+                            {
+                                mainVM ??= new Main2_VM();
+                                mainVM.replaceModel(firstFile);
+                            }
 
-                    reloadModelControl();
+                            reloadModelControl();
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"There is an error while import file: {firstFile}\n\n{ex}");
+                        }
+                    }
                 }
             }
-            catch(Exception exc)
+            catch
             {
             }
         }

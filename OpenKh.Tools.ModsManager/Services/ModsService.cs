@@ -133,7 +133,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
             using var zipFile = ZipFile.OpenRead(fileName);
 
-            var isModPatch = fileName.Contains(".kh2pcpatch") || fileName.Contains(".kh1pcpatch") || fileName.Contains(".compcpatch") || fileName.Contains(".bbspcpatch") ? true : false;
+            var isModPatch = fileName.Contains(".kh2pcpatch") || fileName.Contains(".kh1pcpatch") || fileName.Contains(".compcpatch") || fileName.Contains(".bbspcpatch") || fileName.Contains(".dddpcpatch") ? true : false;
             var isValidMod = zipFile.GetEntry(ModMetadata) != null || isModPatch;
 
             if (!isValidMod)
@@ -220,6 +220,12 @@ namespace OpenKh.Tools.ModsManager.Services
                     _yamlGen.Title = modName + " (BBSPCPATCH)";
                     _yamlGen.Game = "bbs";
                     _yamlGen.Description = "This is an automatically generated metadata for this BBSPCPATCH Modification.";
+                }
+                else if (fileName.Contains(".dddpcpatch"))
+                {
+                    _yamlGen.Title = modName + " (DDDPCPATCH)";
+                    _yamlGen.Game = "kh3d";
+                    _yamlGen.Description = "This is an automatically generated metadata for this DDDPCPATCH Modification.";
                 }
                 _yamlGen.OriginalAuthor = "Unknown";
                 _yamlGen.Assets = new List<AssetFile>();

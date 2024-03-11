@@ -35,7 +35,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             }
             catch (Exception excep)
             {
-                throw new Exception("Error loading texture: " + filePath);
+                throw new Exception("Error loading texture: " + filePath, excep);
             }
         }
 

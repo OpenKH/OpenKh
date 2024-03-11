@@ -19,7 +19,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
         {
             materialToTexture = new Dictionary<int, int>();
 
-            string directoryPath = Path.GetDirectoryName(filePath);
+            string directoryPath = Path.GetDirectoryName(filePath) ?? throw new DirectoryNotFoundException(filePath);
 
             List<Imgd> imgdList = new List<Imgd>();
 
@@ -37,6 +37,12 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
                 {
                     throw new Exception("Texture is not PNG");
                 }
+
+                if (!File.Exists(texturePath))
+                {
+                    texturePath = Path.Combine(directoryPath, $"texture{i:000}.png");
+                }
+
                 if (materialPaths.Contains(texturePath))
                 {
                     materialToTexture.Add(i, materialPaths.IndexOf(texturePath));

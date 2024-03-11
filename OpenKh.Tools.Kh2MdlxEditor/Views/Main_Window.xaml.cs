@@ -153,15 +153,16 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                     dirPath += "\\";
 
                     AssimpGeneric.ExportScene(scene, fileFormat, sfd.FileName);
-                    exportTextures(dirPath);
+                    exportTextures(mainWiewModel.TextureFile.Images, dirPath);
                 }
             }
         }
-        public void exportTextures(string filePath)
+        /* Changed to static to be used in "MsetLoader's FBX exporter without duplicating the method. " */
+        public static void exportTextures(List<ModelTexture.Texture> textures, string filePath)
         {
-            for(int i = 0; i < mainWiewModel.TextureFile.Images.Count; i++)
+            for(int i = 0; i < textures.Count; i++)
             {
-                ModelTexture.Texture texture = mainWiewModel.TextureFile.Images[i];
+                ModelTexture.Texture texture = textures[i];
                 BitmapSource bitmapImage = texture.GetBimapSource();
 
                 string fullPath = filePath + "Texture" + i;
