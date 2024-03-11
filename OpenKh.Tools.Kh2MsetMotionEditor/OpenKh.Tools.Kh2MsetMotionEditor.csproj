@@ -34,6 +34,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\OpenKh.AssimpUtils\OpenKh.AssimpUtils.csproj" />
         <ProjectReference Include="..\OpenKh.Engine.MonoGame\OpenKh.Engine.MonoGame.csproj" />
         <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
         <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
@@ -41,6 +42,7 @@
         <ProjectReference Include="..\OpenKh.Tools.Common.WPF\OpenKh.Tools.Common.Wpf.csproj" />
         <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
         <ProjectReference Include="..\OpenKh.Kh2AnimEmu\OpenKh.Kh2AnimEmu.csproj" />
+        <ProjectReference Include="..\OpenKh.Tools.Kh2MdlxEditor\OpenKh.Tools.Kh2MdlxEditor.csproj" />
     </ItemGroup>
 
     <ItemGroup>

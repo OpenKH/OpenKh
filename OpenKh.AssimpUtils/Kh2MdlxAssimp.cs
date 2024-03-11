@@ -34,7 +34,7 @@ namespace OpenKh.AssimpUtils
 
                 // TEXTURE
                 Assimp.TextureSlot texture = new Assimp.TextureSlot();
-                texture.FilePath = "Texture" + i;
+                texture.FilePath = "Texture" + i + "." + System.Drawing.Imaging.ImageFormat.Png.ToString().ToLower(); /* Not planning to export them in another extension right. */
                 texture.TextureType = Assimp.TextureType.Diffuse;
 
                 // MATERIAL
@@ -96,6 +96,9 @@ namespace OpenKh.AssimpUtils
                 }
             }
 
+            List<Microsoft.Xna.Framework.Matrix> matricesToReverse = new List<Microsoft.Xna.Framework.Matrix>(0);
+            List<string> matricesToReverseNames = new List<string>(0);
+
             // BONES (Node hierarchy)
             foreach (Mdlx.Bone bone in mParser.Bones)
             {
@@ -115,53 +118,70 @@ namespace OpenKh.AssimpUtils
                 boneNode.Transform = AssimpGeneric.GetNodeTransformMatrix(new Vector3(bone.ScaleX, bone.ScaleY, bone.ScaleZ),
                                                                     new Vector3(bone.RotationX, bone.RotationY, bone.RotationZ),
                                                                     new Vector3(bone.TranslationX, bone.TranslationY, bone.TranslationZ));
+                
+                matricesToReverse.Add(AssimpGeneric.ToXna(boneNode.Transform));
+                matricesToReverseNames.Add(boneName);
 
                 parentNode.Children.Add(boneNode);
             }
 
-            // BONE OFFSET MATRIX - IMPORTANT NOTE: This is for DAE (Collada) FBX ignores the offset matrices
+            ComputeMatrices(ref matricesToReverse, mParser);
+
             foreach (Assimp.Mesh mesh in scene.Meshes)
             {
-                // THIS IS TESTING DATA - Haven't figured out how to make it work
-
                 foreach (Assimp.Bone bone in mesh.Bones)
                 {
-                    // Get hierarchy
-                    Assimp.Node iNode = scene.RootNode.FindNode(bone.Name);
-                    List<Assimp.Node> nodeHierarchy = new List<Assimp.Node>();
-                    nodeHierarchy.Add(iNode);
-                    while (iNode.Parent != null)
-                    {
-                        iNode = iNode.Parent;
-                        nodeHierarchy.Add(iNode);
-                    }
-
-                    Assimp.Matrix4x4? boneOffsetMatrix = null;
-                    // Calc matrix
-                    for (int i = nodeHierarchy.Count - 1; i >= 0; i--)
-                    {
-                        if (boneOffsetMatrix == null)
-                        {
-                            boneOffsetMatrix = nodeHierarchy[i].Transform;
-                        }
-                        else
-                        {
-                            boneOffsetMatrix *= nodeHierarchy[i].Transform;
-                        }
-                    }
-
-                    Matrix4x4 tempMat = AssimpGeneric.ToNumerics((Assimp.Matrix4x4)boneOffsetMatrix);
-                    Matrix4x4.Invert(tempMat, out tempMat);
-
-                    bone.OffsetMatrix = AssimpGeneric.ToAssimp(tempMat);
-
-                    //bone.OffsetMatrix = Assimp.Matrix4x4.Identity;
-
-                    //Assimp.Matrix4x4.inverse(boneOffsetMatrix, bone.OffsetMatrix);
+                    bone.OffsetMatrix = AssimpGeneric.ToAssimp(Microsoft.Xna.Framework.Matrix.Invert(matricesToReverse[matricesToReverseNames.IndexOf(bone.Name)]));
                 }
             }
 
             return scene;
+        }
+
+        public static void ReverseMatrices(ref List<Microsoft.Xna.Framework.Matrix> matrices, MdlxParser mParser)
+        {
+            bool[] treatedMatrices = new bool[mParser.Bones.Count];
+
+            int dirtyCount;
+            do
+            {
+                dirtyCount = mParser.Bones.Count;
+                for (int b = 0; b < mParser.Bones.Count; b++)
+                {
+                    if (treatedMatrices[b] == false)
+                    {
+                        int remainingToTreat = 0;
+                        for (int j = 0; j < mParser.Bones.Count; j++)
+                        {
+                            if (mParser.Bones[j].Parent == b && treatedMatrices[j] == false)
+                                remainingToTreat++;
+                        }
+                        if (remainingToTreat == 0) /* Children's children are all calculated. */
+                        {
+                            if (mParser.Bones[b].Parent > -1)
+                            {
+                                matrices[b] *= Microsoft.Xna.Framework.Matrix.Invert(matrices[mParser.Bones[b].Parent]);
+                            }
+                            treatedMatrices[b] = true;
+                            dirtyCount--;
+                        }
+                    }
+                    else
+                        dirtyCount--;
+                }
+            }
+            while (dirtyCount > 0);
+        }
+
+        public static void ComputeMatrices(ref List<Microsoft.Xna.Framework.Matrix> matrices, MdlxParser mParser)
+        {
+            for (int b = 0; b < mParser.Bones.Count; b++)
+            {
+                if (mParser.Bones[b].Parent > -1)
+                {
+                    matrices[b] *= matrices[mParser.Bones[b].Parent];
+                }
+            }
         }
 
         public static Assimp.Scene getAssimpScene(ModelSkeletal model)
