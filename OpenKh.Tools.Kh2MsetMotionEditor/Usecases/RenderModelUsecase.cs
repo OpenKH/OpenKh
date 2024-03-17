@@ -6,6 +6,7 @@ using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2MsetMotionEditor.Helpers;
+using OpenKh.Engine.Monogame.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

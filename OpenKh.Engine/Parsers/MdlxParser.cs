@@ -74,6 +74,7 @@ namespace OpenKh.Engine.Parsers
     public class MdlxParser : IModelMotion
     {
         private readonly Kkdf2MdlxParser _parsedModel;
+        public bool[] skinnedBones;
 
         public MdlxParser(Mdlx mdlx)
         {

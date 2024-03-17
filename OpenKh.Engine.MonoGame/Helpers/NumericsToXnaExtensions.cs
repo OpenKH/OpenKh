@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
 
-namespace OpenKh.Tools.Kh2MsetMotionEditor.Helpers
+namespace OpenKh.Engine.Monogame.Helpers
 {
-    internal static class NumericsToXnaExtensions
+    public static class NumericsToXnaExtensions
     {
         public static xna.Matrix ToXnaMatrix(this Matrix4x4 it) => new xna.Matrix(
             it.M11, it.M12, it.M13, it.M14,

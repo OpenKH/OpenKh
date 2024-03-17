@@ -3,6 +3,7 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Models;
 using OpenKh.Kh2.Models.VIF;
 using System.Numerics;
+using OpenKh.Engine.Monogame.Helpers;
 
 namespace OpenKh.AssimpUtils
 {
@@ -16,15 +17,7 @@ namespace OpenKh.AssimpUtils
             Assimp.Scene scene = AssimpGeneric.GetBaseScene();
 
             // Divide the model in a mesh per texture and each mesh in its meshDescriptors
-            Dictionary<int, List<MeshDescriptor>> dic_meshDescriptorsByMeshId = new Dictionary<int, List<MeshDescriptor>>();
-            foreach (MeshDescriptor meshDesc in mParser.MeshDescriptors)
-            {
-                if (!dic_meshDescriptorsByMeshId.ContainsKey(meshDesc.TextureIndex))
-                {
-                    dic_meshDescriptorsByMeshId.Add(meshDesc.TextureIndex, new List<MeshDescriptor>());
-                }
-                dic_meshDescriptorsByMeshId[meshDesc.TextureIndex].Add(meshDesc);
-            }
+            Dictionary<int, List<MeshDescriptor>> dic_meshDescriptorsByMeshId = Kh2MdlxAssimp.getMeshDescriptos(mParser);
 
             // MESHES AND THEIR DATA
             for (int i = 0; i < dic_meshDescriptorsByMeshId.Keys.Count; i++)
@@ -59,6 +52,7 @@ namespace OpenKh.AssimpUtils
                 scene.RootNode.Children.Add(iMeshNode);
             }
 
+            mParser.skinnedBones = new bool[mParser.Bones.Count];
             // VERTICES
             for (int i = 0; i < dic_meshDescriptorsByMeshId.Keys.Count; i++)
             {
@@ -76,6 +70,7 @@ namespace OpenKh.AssimpUtils
                         foreach (var boneAssign in boneAssigns)
                         {
                             Assimp.Bone bone = AssimpGeneric.FindBone(iMesh.Bones, "Bone" + boneAssign.MatrixIndex);
+                            mParser.skinnedBones[boneAssign.MatrixIndex] = true;
                             bone.VertexWeights.Add(new Assimp.VertexWeight(currentVertex, boneAssign.Weight));
                         }
 
@@ -125,7 +120,7 @@ namespace OpenKh.AssimpUtils
                 parentNode.Children.Add(boneNode);
             }
 
-            ComputeMatrices(ref matricesToReverse, mParser);
+            MatrixRecursivity.ComputeMatrices(ref matricesToReverse, mParser);
 
             foreach (Assimp.Mesh mesh in scene.Meshes)
             {
@@ -138,50 +133,18 @@ namespace OpenKh.AssimpUtils
             return scene;
         }
 
-        public static void ReverseMatrices(ref List<Microsoft.Xna.Framework.Matrix> matrices, MdlxParser mParser)
+        public static Dictionary<int, List<MeshDescriptor>> getMeshDescriptos(MdlxParser mParser)
         {
-            bool[] treatedMatrices = new bool[mParser.Bones.Count];
-
-            int dirtyCount;
-            do
+            var output = new Dictionary<int, List<MeshDescriptor>>();
+            foreach (MeshDescriptor meshDesc in mParser.MeshDescriptors)
             {
-                dirtyCount = mParser.Bones.Count;
-                for (int b = 0; b < mParser.Bones.Count; b++)
+                if (!output.ContainsKey(meshDesc.TextureIndex))
                 {
-                    if (treatedMatrices[b] == false)
-                    {
-                        int remainingToTreat = 0;
-                        for (int j = 0; j < mParser.Bones.Count; j++)
-                        {
-                            if (mParser.Bones[j].Parent == b && treatedMatrices[j] == false)
-                                remainingToTreat++;
-                        }
-                        if (remainingToTreat == 0) /* Children's children are all calculated. */
-                        {
-                            if (mParser.Bones[b].Parent > -1)
-                            {
-                                matrices[b] *= Microsoft.Xna.Framework.Matrix.Invert(matrices[mParser.Bones[b].Parent]);
-                            }
-                            treatedMatrices[b] = true;
-                            dirtyCount--;
-                        }
-                    }
-                    else
-                        dirtyCount--;
+                    output.Add(meshDesc.TextureIndex, new List<MeshDescriptor>());
                 }
+                output[meshDesc.TextureIndex].Add(meshDesc);
             }
-            while (dirtyCount > 0);
-        }
-
-        public static void ComputeMatrices(ref List<Microsoft.Xna.Framework.Matrix> matrices, MdlxParser mParser)
-        {
-            for (int b = 0; b < mParser.Bones.Count; b++)
-            {
-                if (mParser.Bones[b].Parent > -1)
-                {
-                    matrices[b] *= matrices[mParser.Bones[b].Parent];
-                }
-            }
+            return output;
         }
 
         public static Assimp.Scene getAssimpScene(ModelSkeletal model)
