@@ -10,6 +10,7 @@ using OpenKh.Tools.Kh2MsetMotionEditor.Helpers;
 using OpenKh.Tools.Kh2MsetMotionEditor.Interfaces;
 using OpenKh.Tools.Kh2MsetMotionEditor.Usecases;
 using OpenKh.Tools.Kh2MsetMotionEditor.Windows;
+using OpenKh.Engine.Monogame.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -354,6 +355,8 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
                                     var motionData = _loadedModel.MotionData;
                                     if (motionData != null)
                                     {
+                                        List<Microsoft.Xna.Framework.Matrix> allMatrices = new List<xna.Matrix>(0);
+                                        int offset = (int)((_loadedModel.FrameEnd * 2) - motionData.InterpolatedMotionHeader.FrameCount);
                                         Animation animation = new Animation();
                                         animation.Name = selectedMotionName;
                                         animation.TicksPerSecond = fileFormat == AssimpGeneric.FileFormat.fbx ? 24f : 30f;
@@ -366,11 +369,12 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
                                             animation.NodeAnimationChannels.Add(nodeAnimationChannel);
                                         }
 
+
                                         for (int f = 0; f < motionData.InterpolatedMotionHeader.FrameCount; f++)
                                         {
                                             float timeKey = (float)((1 / animation.TicksPerSecond) * f);
 
-                                            var fkIk = _loadedModel.PoseProvider?.Invoke((float)f);
+                                            var fkIk = _loadedModel.PoseProvider?.Invoke((float)(offset+f));
 
                                             List<Microsoft.Xna.Framework.Matrix> matrices = new List<Microsoft.Xna.Framework.Matrix>(0);
                                             List<bool> dirtyMatrices = new List<bool>(0);
@@ -386,7 +390,8 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
                                                     matrices.Add(fkIk.Fk[mIndex].ToXnaMatrix());
                                                 }
                                             }
-                                            Kh2MdlxAssimp.ReverseMatrices(ref matrices, mParser);
+                                            allMatrices.AddRange(matrices);
+                                            MatrixRecursivity.ReverseMatrices(ref matrices, mParser);
 
                                             for (int b = 0; b < mParser.Bones.Count; b++)
                                             {
@@ -403,11 +408,18 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
                                         }
 
                                         scene.Animations.Add(animation);
-                                    }
+                                        int loopFrame = MatrixRecursivity.LocateMostSimilarPose(allMatrices, _loadedModel.PoseProvider?.Invoke((float)(offset + motionData.InterpolatedMotionHeader.FrameCount)).Fk, mParser, 2f, true);
 
-                                    AssimpGeneric.ExportScene(scene, fileFormat, filename);
-                                    OpenKh.Tools.Kh2MdlxEditor.Views.Main_Window.exportTextures(_loadedModel.MdlxRenderableList[0].Textures, dirPath);
-                                    System.Windows.Forms.MessageBox.Show("Export complete.", "Complete", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+                                        string loopFrame_ = loopFrame.ToString();
+                                        if (loopFrame == 0)
+                                            loopFrame_ = "BEGIN";
+                                        else if(loopFrame == motionData.InterpolatedMotionHeader.FrameCount-1)
+                                            loopFrame_ = "END";
+
+                                        AssimpGeneric.ExportScene(scene, fileFormat, Path.GetDirectoryName(filename)+@"\" + Path.GetFileNameWithoutExtension(filename) +"_LoopAt("+ loopFrame_ + ")"+Path.GetExtension(filename));
+                                        OpenKh.Tools.Kh2MdlxEditor.Views.Main_Window.exportTextures(_loadedModel.MdlxRenderableList[0].Textures, dirPath);
+                                        System.Windows.Forms.MessageBox.Show("Export complete.", "Complete", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+                                    }
                                 }
                             }
                         }
@@ -418,7 +430,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor
                     },
                     FileDialogFilterComposer.Compose()
                         .AddExtensions("Autodesk FBX ", "fbx"),
-                                _loadedModel.MdlxFile + "-" + selectedMotionName.Replace(" ", "_") + "." + AssimpGeneric.GetFormatFileExtension(fileFormat)
+                                Path.GetFileNameWithoutExtension(_loadedModel.MdlxFile) + "-" + selectedMotionName.Replace(" ", "_") + "." + AssimpGeneric.GetFormatFileExtension(fileFormat)
                 );
             }
         }
