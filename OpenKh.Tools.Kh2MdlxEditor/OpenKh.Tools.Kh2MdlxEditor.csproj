@@ -21,7 +21,7 @@
     <ProjectReference Include="..\OpenKh.Command.Bar\OpenKh.Command.Bar.csproj" />
     <ProjectReference Include="..\OpenKh.Tools.ImageViewer\OpenKh.Tools.ImageViewer.csproj" />
     <ProjectReference Include="..\Simple3DViewport\Simple3DViewport\Simple3DViewport.csproj" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.2" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.3" />
   </ItemGroup>
 
   <ItemGroup>

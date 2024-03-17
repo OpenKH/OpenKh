@@ -1,0 +1,72 @@
+<Window x:Class="OpenKh.Tools.ModsManager.Views.CopySourceFilesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+        xmlns:userControls="clr-namespace:OpenKh.Tools.ModsManager.UserControls"
+        d:DataContext="{d:DesignInstance local:CopySourceFilesVM}"
+        Background="{Binding ColorTheme.BackgroundColor}"
+        WindowStartupLocation="CenterOwner"
+        mc:Ignorable="d"
+        Title="CopySourceFilesWindow" Height="543" Width="422">
+    <FrameworkElement.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
+        </Style>
+    </FrameworkElement.Resources>
+    <DockPanel LastChildFill="True">
+        <TextBlock Visibility="Collapsed" Foreground="{Binding ColorTheme.TextColor}" Name="_forTheme" />
+        <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Orientation="Horizontal">
+            <Button Content="Proceed" HorizontalAlignment="Left" Padding="7" Margin="7" Command="{Binding ProceedCommand}" />
+            <userControls:TaskStatusObserverControl VerticalAlignment="Center" Task="{Binding ProceedTask}" />
+        </StackPanel>
+        <TextBlock Text="Select primary one if applicable:" Padding="7" DockPanel.Dock="Top" />
+        <ComboBox DockPanel.Dock="Top" Margin="7" ItemsSource="{Binding PrimarySourceList}" SelectedItem="{Binding SelectedPrimarySource}"
+                  >
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Display}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Text="Tools:" Padding="7" DockPanel.Dock="Top" />
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Button Margin="7,7,0,7" Padding="3" Command="{Binding CheckAllCommand}" MinWidth="60">
+                <TextBlock TextAlignment="Center">Check<LineBreak />all</TextBlock>
+            </Button>
+            <Button Margin="7,7,0,7" Padding="3" Command="{Binding UncheckAllCommand}" MinWidth="60">
+                <TextBlock TextAlignment="Center">Uncheck<LineBreak />all</TextBlock>
+            </Button>
+        </StackPanel>
+        <TextBlock Text="Select actions for source:" Padding="7" DockPanel.Dock="Top" />
+        <Border Margin="7" BorderBrush="Gray" BorderThickness="1">
+            <ScrollViewer VerticalScrollBarVisibility="Visible">
+                <ItemsControl ItemsSource="{Binding CopySourceList}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel LastChildFill="True" VerticalAlignment="Top" Margin="3">
+                                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                                    <CheckBox Content="Exists" IsChecked="{Binding DestinationFileExists}" IsEnabled="False" VerticalAlignment="Center" Margin="3" 
+                                      Foreground="{Binding Foreground,ElementName=_forTheme}"
+                                      />
+                                    <CheckBox Content="{Binding ActionName}" IsChecked="{Binding DoAction}" VerticalAlignment="Center" Margin="3" 
+                                      Foreground="{Binding Foreground,ElementName=_forTheme}"
+                                      />
+                                </StackPanel>
+                                <TextBlock Text="{Binding Display}" Padding="3" TextTrimming="CharacterEllipsis"
+                                   Foreground="{Binding Foreground,ElementName=_forTheme}"
+                                   />
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+    </DockPanel>
+</Window>

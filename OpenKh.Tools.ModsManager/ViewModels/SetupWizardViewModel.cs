@@ -225,6 +225,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(BothPcReleaseSelected));
                 OnPropertyChanged(nameof(PcRelease1525Selected));
                 OnPropertyChanged(nameof(PcRelease28Selected));
+                OnPropertyChanged(nameof(InstallForPc1525));
             }
         }
 
@@ -287,6 +288,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(BothPcReleaseSelected));
                 OnPropertyChanged(nameof(PcRelease1525Selected));
                 OnPropertyChanged(nameof(PcRelease28Selected));
+                OnPropertyChanged(nameof(InstallForPc28));
             }
         }
         public bool IsEGSVersion
@@ -480,6 +482,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility LuaBackendFoundVisibility => IsLuaBackendInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility LuaBackendNotFoundVisibility => IsLuaBackendInstalled ? Visibility.Collapsed : Visibility.Visible;
         public RelayCommand InstallPanaceaCommand { get; }
+        public RelayCommand DetectInstallsCommand { get; }
         public RelayCommand RemovePanaceaCommand { get; }
         public bool PanaceaInstalled { get; set; }
         private string PanaceaSourceLocation => Path.Combine(AppContext.BaseDirectory, PanaceaDllName);
@@ -598,6 +601,88 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             goto BEGIN;
                             break;
                     }
+                }
+            });
+            DetectInstallsCommand = new RelayCommand(_ =>
+            {
+                // Get ProgramData Folder Location
+                string programDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                string directoryPath = Path.Combine(programDataFolder, "Epic\\EpicGamesLauncher\\Data\\Manifests");
+
+                if (!Directory.Exists(directoryPath))
+                {
+                    MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                    return;
+                }
+
+                // Get List of .item Files in C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests\
+                IEnumerable<string> itemFiles = Directory.EnumerateFiles(directoryPath, "*.item");
+
+                if (!itemFiles.Any())
+                {
+                    MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                    return;
+                }
+
+                bool installLocationFoundRemix = false;
+                bool installLocationFound3D = false;
+                foreach (string itemFile in itemFiles)
+                {
+                    // Read Each .item File and Locate Install Location For Games
+                    using StreamReader sr = new StreamReader(itemFile);
+                    string line;
+                    if (sr != null)
+                    {
+                        while ((line = sr.ReadLine()) is not null)
+                        {
+                            if (line.Contains("\"LaunchExecutable\": \"KINGDOM HEARTS HD 1.5+2.5 ReMIX.exe\","))
+                            {
+                                while ((line = sr.ReadLine()) is not null)
+                                {
+                                    if (line.Contains("\"InstallLocation\": \""))
+                                    {
+                                        installLocationFoundRemix = true;
+                                        int startIndex = line.IndexOf("\": \"") + 4;
+                                        int endIndex = line.IndexOf("\",");
+                                        string parsedText = line[startIndex..endIndex];
+                                        parsedText = parsedText.Replace("\\\\", "\\");
+                                        PcReleaseLocation = parsedText;
+                                    }
+                                }
+                            }
+                            else if (line.Contains("\"LaunchExecutable\": \"KINGDOM HEARTS HD 2.8 Final Chapter Prologue.exe\","))
+                            {
+                                while ((line = sr.ReadLine()) is not null)
+                                {
+                                    if (line.Contains("\"InstallLocation\": \""))
+                                    {
+                                        installLocationFound3D = true;
+                                        int startIndex = line.IndexOf("\": \"") + 4;
+                                        int endIndex = line.IndexOf("\",");
+                                        string parsedText = line[startIndex..endIndex];
+                                        parsedText = parsedText.Replace("\\\\", "\\");
+                                        PcReleaseLocationKH3D = parsedText;
+                                    }
+                                } 
+                            }
+                        }
+                    }
+                }
+                if (!installLocationFoundRemix && !installLocationFound3D)
+                {
+                    MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                }
+                else if (!installLocationFoundRemix && installLocationFound3D)
+                {
+                    MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                }
+                else if (installLocationFoundRemix && !installLocationFound3D)
+                {
+                    MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING", "Success", MessageBoxButton.OK);
+                }
+                else
+                {
+                    MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
                 }
             });
             InstallPanaceaCommand = new RelayCommand(AlternateName =>
