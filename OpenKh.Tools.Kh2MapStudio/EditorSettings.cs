@@ -101,5 +101,15 @@ namespace OpenKh.Tools.Kh2MapStudio
                 Settings.Default.Save();
             }
         }
+
+        public static bool ViewEventScript
+        {
+            get => Settings.Default.ViewEventScript;
+            set
+            {
+                Settings.Default.ViewEventScript = value;
+                Settings.Default.Save();
+            }
+        }
     }
 }
