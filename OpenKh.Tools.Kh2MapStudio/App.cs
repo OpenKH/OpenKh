@@ -198,7 +198,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                 if (EditorSettings.ViewSpawnScriptEvent)
                     SpawnScriptWindow.Run("evt", _mapRenderer.SpawnScriptEvent);
 
-                if (_mapRenderer.EventScripts != null)
+                if (EditorSettings.ViewEventScript && _mapRenderer.EventScripts != null)
                 {
                     foreach (var eventScript in _mapRenderer.EventScripts)
                     {
@@ -375,6 +375,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                     ForMenuCheck("Spawn script MAP", () => EditorSettings.ViewSpawnScriptMap, x => EditorSettings.ViewSpawnScriptMap = x);
                     ForMenuCheck("Spawn script BTL", () => EditorSettings.ViewSpawnScriptBattle, x => EditorSettings.ViewSpawnScriptBattle = x);
                     ForMenuCheck("Spawn script EVT", () => EditorSettings.ViewSpawnScriptEvent, x => EditorSettings.ViewSpawnScriptEvent = x);
+                    ForMenuCheck("Event script", () => EditorSettings.ViewEventScript, x => EditorSettings.ViewEventScript = x);
                 });
                 ForMenu("Help", () =>
                 {
