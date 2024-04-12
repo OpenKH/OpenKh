@@ -43,7 +43,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.InsideTools
 
                 var lastKeyTime = 60f / _loadedModel.FramePerSecond * _loadedModel.FrameEnd;
 
-                if (lastKeyTime < frame)
+                if (frame> lastKeyTime)
                 {
                     frame -= lastKeyTime - (60f / _loadedModel.FramePerSecond * _loadedModel.FrameLoop);
                 }
