@@ -103,5 +103,10 @@ namespace OpenKh.Common
 
             return name;
         }
+
+        public static string FormatSecondaryLinesWithIndent(string lines, string indent)
+        {
+            return lines.Replace("\n", "\n" + indent);
+        }
     }
 }

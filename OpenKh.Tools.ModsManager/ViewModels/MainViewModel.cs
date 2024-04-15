@@ -369,6 +369,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     catch (Exception ex)
                     {
+                        Log.Warn("Unable to install the mod `{0}`: {1}\n"
+                            , view.RepositoryName
+                            , Log.FormatSecondaryLinesWithIndent(ex.ToString(), "  ")
+                        );
                         Handle(ex);
                     }
                     finally
