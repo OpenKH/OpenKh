@@ -1,4 +1,5 @@
-﻿using System;
+using OpenKh.Common;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,5 +14,10 @@ namespace OpenKh.Tools.ModsManager
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnExit(ExitEventArgs e)
+        {
+            Log.Close();
+            base.OnExit(e);
+        }
     }
 }

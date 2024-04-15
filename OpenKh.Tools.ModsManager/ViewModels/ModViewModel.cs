@@ -1,3 +1,4 @@
+using OpenKh.Common;
 using OpenKh.Tools.ModsManager.Models;
 using OpenKh.Tools.ModsManager.Services;
 using OpenKh.Tools.ModsManager.Views;
@@ -86,6 +87,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    Log.Warn("Unable to update the mod `{0}`: {1}\n"
+                        , Source
+                        , Log.FormatSecondaryLinesWithIndent(ex.ToString(), "  ")
+                    );
                     Handle(ex);
                 }
                 finally
