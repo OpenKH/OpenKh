@@ -703,9 +703,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     else
                     {
+                        string filename = "";
+
                         try
                         {
-                            string filename;
                             if (!(_launchGame == "kh3d"))
                             {
                                 filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
@@ -717,15 +718,20 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             processStartInfo = new ProcessStartInfo
                             {
                                 FileName = filename,
-                                WorkingDirectory = ConfigurationService.PcReleaseLocation,
+                                WorkingDirectory = Path.GetDirectoryName(filename),
                                 UseShellExecute = false,
                             };
                             Process.Start(processStartInfo);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
-                        catch
+                        catch (Exception ex)
                         {
+                            Log.Warn("Unable to locate the game executable `{0}`: {1}\n"
+                                , filename
+                                , Log.FormatSecondaryLinesWithIndent(ex.ToString(), "  ")
+                            );
+
                             MessageBox.Show(
                            "Unable to locate game executable. Please make sure your Kingdom Hearts executable is correctly named and in the correct folder.",
                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -931,7 +937,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else if (ConfigurationService.PcReleaseLocationKH3D != null)
                         {
                             _pkgName = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "Image", ConfigurationService.PcReleaseLanguage, _pkgSoft + ".pkg");
-                            _backupDir = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "BackupImage");                           
+                            _backupDir = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "BackupImage");
                         }
                         else
                         {
