@@ -30,10 +30,9 @@ namespace OpenKh.Tools.ModsManager.Views
 
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            VM.OnSearchHitsSelected(
-                ((ListBox)sender).SelectedItems
-                    .OfType<SearchHit>()
-            );
+            VM.SearchHitSelectedList = ((ListBox)sender).SelectedItems
+                .OfType<SearchHit>()
+                .ToArray();
         }
     }
 }

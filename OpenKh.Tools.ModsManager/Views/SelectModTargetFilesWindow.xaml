@@ -10,7 +10,7 @@
         WindowStartupLocation="CenterOwner"
         d:DataContext="{d:DesignInstance Type=local:SelectModTargetFilesVM}"
         mc:Ignorable="d"
-        Title="SelectModTargetFilesWindow" Height="450" Width="800">
+        Title="SelectModTargetFilesWindow" Height="558" Width="800">
     <DockPanel LastChildFill="True">
         <DockPanel.Resources>
             <Style TargetType="TextBlock">
@@ -30,7 +30,7 @@
             <Button Margin="3" DockPanel.Dock="Right" Content="_Search" Padding="7" Command="{Binding SearchCommand}" IsDefault="True" />
             <TextBox Margin="3" VerticalAlignment="Center" Padding="3" Text="{Binding SearchKeywords,UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
-        <TextBlock Text="Search result:" Margin="3" DockPanel.Dock="Top" />
+        <TextBlock Text="Search result (one item represents one file)" Margin="3" DockPanel.Dock="Top" />
         <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Stretch">
             <TextBlock Text="Actions:" Margin="3" />
             <ItemsControl ItemsSource="{Binding Actions}">
@@ -41,6 +41,19 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </StackPanel>
+        <GroupBox Header="Help" DockPanel.Dock="Bottom"
+                  Foreground="{Binding ColorTheme.TextColor}">
+            <ItemsControl ItemsSource="{Binding Actions}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock TextWrapping="Wrap">
+                            <Underline><Run Text="{Binding Display}" /></Underline><LineBreak />
+                            <TextBlock Margin="7,0,0,0" Text="{Binding ToolTip}" TextWrapping="Wrap"></TextBlock>
+                        </TextBlock>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </GroupBox>
 
         <ListBox Margin="3" ItemsSource="{Binding SearchHits}" SelectionChanged="ListBox_SelectionChanged"
                  SelectionMode="Extended">

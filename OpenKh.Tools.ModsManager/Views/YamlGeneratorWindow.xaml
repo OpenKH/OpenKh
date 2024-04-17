@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterOwner"
         d:DataContext="{d:DesignInstance Type=local:YamlGeneratorVM}"
         mc:Ignorable="d"
-        Title="YamlGeneratorWindow" Height="510" Width="426">
+        Title="YamlGeneratorWindow" Height="694" Width="426">
     <DockPanel Margin="7">
         <DockPanel.Resources>
             <Style TargetType="TextBlock">
@@ -21,42 +21,59 @@
             </Style>
         </DockPanel.Resources>
         <StackPanel Orientation="Vertical">
-            <TextBlock>Preferences</TextBlock>
-            <StackPanel Orientation="Horizontal">
-                <ComboBox ItemsSource="{Binding Prefs}" VerticalAlignment="Center" IsEditable="True" Width="200"
+            <GroupBox Header="About">
+                <TextBlock TextWrapping="Wrap">YamlGenerator is an embedded tool. Provide a rapid crafting tools to satisfy mod.yml. This is a specialized utility for mod authors.</TextBlock>
+            </GroupBox>
+            <GroupBox Header="Preferences">
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap">Load and save the fields of: <Italic>mod.yml</Italic> and <Italic>GameDataPath</Italic></TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <ComboBox ItemsSource="{Binding Prefs}" VerticalAlignment="Center" IsEditable="True" Width="200"
                           Text="{Binding PrefLabel,UpdateSourceTrigger=PropertyChanged}"
                           SelectedItem="{Binding SelectedPref}"
                           >
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Label}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <TextBlock />
-                <Button Content="Load from it" Command="{Binding LoadPrefCommand}" HorizontalAlignment="Left" Padding="7" />
-                <TextBlock />
-                <Button Content="Save to it" Command="{Binding SavePrefCommand}" HorizontalAlignment="Left" Padding="7" />
-            </StackPanel>
-            <TextBlock>mod.yml</TextBlock>
-            <userControls:SaveFileSelectorControl FilePath="{Binding ModYmlFilePath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                                  Filter="mod.yml|mod.yml|*|*" />
-            <TextBlock>You can select a diff tool to see changes:</TextBlock>
-            <ComboBox ItemsSource="{Binding Tools}" SelectedItem="{Binding SelectedTool}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Label}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBlock />
+                        <Button Content="Load from it" Command="{Binding LoadPrefCommand}" HorizontalAlignment="Left" Padding="7" />
+                        <TextBlock />
+                        <Button Content="Save to it" Command="{Binding SavePrefCommand}" HorizontalAlignment="Left" Padding="7" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="mod.yml">
+                <StackPanel>
+                    <TextBlock >Enter the file path to <Italic>mod.yml</Italic></TextBlock>
+                    <userControls:SaveFileSelectorControl FilePath="{Binding ModYmlFilePath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                      Filter="mod.yml|mod.yml|*|*" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Diff tool selection">
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap">You can select a diff tool to see changes for <Italic>mod.yml</Italic></TextBlock>
+                    <ComboBox ItemsSource="{Binding Tools}" SelectedItem="{Binding SelectedTool}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </GroupBox>
             <GroupBox Header="Generator" Padding="7">
                 <StackPanel>
+                    <TextBlock TextWrapping="Wrap">This generator will construct an initial <Italic>mod.yml</Italic> for you.</TextBlock>
                     <Button Content="Generate or update mod.yml" Command="{Binding GenerateCommand}" HorizontalAlignment="Left" Padding="7" />
                     <userControls:TaskStatusObserverControl Padding="3" Task="{Binding GeneratingTask}" />
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Target files appender" Padding="7">
                 <StackPanel>
+                    <TextBlock TextWrapping="Wrap">This appender will copy the source files from <Italic>GameDataPath</Italic> into <Italic>mod.yml</Italic>. After copy process, you can edit the copied files for modding purpose.</TextBlock>
                     <TextBlock>GameDataPath</TextBlock>
                     <userControls:FolderSelectorControl FolderPath="{Binding GameDataPath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock />

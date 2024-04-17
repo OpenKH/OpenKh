@@ -15,7 +15,19 @@ namespace OpenKh.Tools.ModsManager.Views
     public class SelectModTargetFilesVM : BaseNotifyPropertyChanged
     {
         public ColorThemeService ColorTheme => ColorThemeService.Instance;
-        public ICommand SearchCommand { get; set; }
+
+        #region SearchCommand
+        private ICommand _searchCommand = null;
+        public ICommand SearchCommand
+        {
+            get => _searchCommand;
+            set
+            {
+                _searchCommand = value;
+                OnPropertyChanged(nameof(SearchCommand));
+            }
+        }
+        #endregion
 
         #region SearchKeywords
         private string _searchKeywords = "";
@@ -56,12 +68,31 @@ namespace OpenKh.Tools.ModsManager.Views
         }
         #endregion
 
-        public IEnumerable<ActionCommand> Actions { get; set; }
-
-        public Action<IEnumerable<SearchHit>> OnSearchHitsSelected { get; set; } = _ => { };
-
-        public SelectModTargetFilesVM()
+        #region Actions
+        private IEnumerable<ActionCommand> _actions = Array.Empty<ActionCommand>();
+        public IEnumerable<ActionCommand> Actions
         {
+            get => _actions;
+            set
+            {
+                _actions = value;
+                OnPropertyChanged(nameof(Actions));
+            }
         }
+        #endregion
+
+        #region SearchHitSelectedList
+        private IEnumerable<SearchHit> _searchHitSelectedList = Array.Empty<SearchHit>();
+        public IEnumerable<SearchHit> SearchHitSelectedList
+        {
+            get => _searchHitSelectedList;
+            set
+            {
+                _searchHitSelectedList = value;
+                OnPropertyChanged(nameof(SearchHitSelectedList));
+            }
+        }
+        #endregion
+
     }
 }
