@@ -617,7 +617,7 @@ namespace OpenKh.Patcher
                         var moddedAtkp = deserializer.Deserialize<List<Kh2.Battle.Atkp>>(sourceText);
                         foreach (var attack in moddedAtkp)
                         {
-                            var oldAtkp = atkpList.First(x => x.Id == attack.Id && x.SubId == attack.SubId);
+                            var oldAtkp = atkpList.First(x => x.Id == attack.Id && x.SubId == attack.SubId && x.Switch == attack.Switch);
                             atkpList[atkpList.IndexOf(oldAtkp)] = attack;
                         }
                         Kh2.Battle.Atkp.Write(stream.SetPosition(0), atkpList);
