@@ -85,12 +85,28 @@ namespace OpenKh.Tools.ModsManager.Services
         private async Task CreateBatchFileAsync(string tempBatFile, string copyFrom, string copyTo, string execAfter)
         {
             var bat = new StringWriter();
+            bat.WriteLine($"chcp 65001");
             bat.WriteLine($"taskkill /im OpenKh.Tools.ModsManager.exe");
-            bat.WriteLine($"xcopy /d /e \"{copyFrom}\" \"{copyTo}\" || pause");
+            bat.WriteLine($"robocopy  {EscapeRobocopyArg(copyFrom)} {EscapeRobocopyArg(copyTo)} /e");
+            bat.WriteLine($"if errorlevel 8 pause");
             bat.WriteLine($"{execAfter}");
             bat.WriteLine($"rd /s /q \"{copyFrom}\"");
             bat.WriteLine($"del %0");
-            await File.WriteAllTextAsync(tempBatFile, bat.ToString(), Encoding.Default);
+            await File.WriteAllTextAsync(tempBatFile, bat.ToString(), Encoding.UTF8);
+        }
+
+        private string EscapeRobocopyArg(string arg)
+        {
+            if (0 <= arg.IndexOfAny(new char[] { ' ', '"' }))
+            {
+                var escaped1 = arg.Replace("\"", "\"\"");
+                var escaped2 = escaped1.EndsWith('\\') ? $"{escaped1}\\" : escaped1;
+                return $"\"{escaped2}\"";
+            }
+            else
+            {
+                return arg;
+            }
         }
     }
 }
