@@ -1,20 +1,33 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Battle
 {
     public class Lvpm
     {
-        public ushort HpMultiplier { get; set; } // (Hp * HpMultiplier + 99) / 100
-        public ushort Strength { get; set; }
-        public ushort Defense { get; set; }
-        public ushort MaxStrength { get; set; }
-        public ushort MinStrength { get; set; }
-        public ushort Experience { get; set; }
+        [Data] public ushort HpMultiplier { get; set; } // (Hp * HpMultiplier + 99) / 100
+        [Data] public ushort Strength { get; set; }
+        [Data] public ushort Defense { get; set; }
+        [Data] public ushort MaxStrength { get; set; }
+        [Data] public ushort MinStrength { get; set; }
+        [Data] public ushort Experience { get; set; }
 
-        public static List<Lvpm> Read(Stream stream) => BaseTable<Lvpm>.Read(stream);
+        public static List<Lvpm> Read(Stream stream) => BaseList<Lvpm>.Read(stream, 99);
 
-        public static void Write(Stream stream, IEnumerable<Lvpm> items) =>
-            BaseTable<Lvpm>.Write(stream, 2, items);
+        public static void Write(Stream stream, IEnumerable<Lvpm> items) => BaseList<Lvpm>.Write(stream, items);
+
+        public Lvpm() { }
+
+        public Lvpm(ushort HP, ushort Str, ushort Def, ushort MaxStr, ushort MinStr, ushort Exp)
+        {
+            HpMultiplier = HP;
+            Strength = Str;
+            Defense = Def;
+            MaxStrength = MaxStr;
+            MinStrength = MinStr;
+            Experience = Exp;
+        }
     }
 }
