@@ -237,53 +237,27 @@ namespace OpenKh.Kh2.Models
 
             return boneHierarchy;
         }
-
         // Returns the absolute SRT matrix for each bone
         public static Matrix4x4[] GetBoneMatrices(List<Bone> boneList)
         {
-            Vector3[] absTranslationList = new Vector3[boneList.Count];
-            Quaternion[] absRotationList = new Quaternion[boneList.Count];
-
-            for (int i = 0; i < boneList.Count; i++)
-            {
-                Bone bone = boneList[i];
-                int parentIndex = bone.ParentIndex;
-                Quaternion absRotation;
-                Vector3 absTranslation;
-
-                if (parentIndex == -1)
-                {
-                    absRotation = Quaternion.Identity;
-                    absTranslation = Vector3.Zero;
-                }
-                else
-                {
-                    absRotation = absRotationList[parentIndex];
-                    absTranslation = absTranslationList[parentIndex];
-                }
-
-                Vector3 localTranslation = Vector3.Transform(new Vector3(bone.TranslationX, bone.TranslationY, bone.TranslationZ), Matrix4x4.CreateFromQuaternion(absRotation));
-                absTranslationList[i] = absTranslation + localTranslation;
-
-                var localRotation = Quaternion.Identity;
-                if (bone.RotationZ != 0)
-                    localRotation *= (Quaternion.CreateFromAxisAngle(Vector3.UnitZ, bone.RotationZ));
-                if (bone.RotationY != 0)
-                    localRotation *= (Quaternion.CreateFromAxisAngle(Vector3.UnitY, bone.RotationY));
-                if (bone.RotationX != 0)
-                    localRotation *= (Quaternion.CreateFromAxisAngle(Vector3.UnitX, bone.RotationX));
-                absRotationList[i] = absRotation * localRotation;
-            }
-
             Matrix4x4[] matrices = new Matrix4x4[boneList.Count];
+            /* We compute relative matrices */
             for (int i = 0; i < boneList.Count; i++)
             {
-                var absMatrix = Matrix4x4.Identity;
-                absMatrix *= Matrix4x4.CreateFromQuaternion(absRotationList[i]);
-                absMatrix *= Matrix4x4.CreateTranslation(absTranslationList[i]);
-                matrices[i] = absMatrix;
+                matrices[i] =
+                    Matrix4x4.CreateScale(boneList[i].ScaleX,boneList[i].ScaleY,boneList[i].ScaleZ) * 
+                    Matrix4x4.CreateRotationX(boneList[i].RotationX) *
+                    Matrix4x4.CreateRotationY(boneList[i].RotationY) * 
+                    Matrix4x4.CreateRotationZ(boneList[i].RotationZ) *
+                    Matrix4x4.CreateTranslation(boneList[i].TranslationX,boneList[i].TranslationY,boneList[i].TranslationZ);
             }
-
+            /* We compute absolute matrices */
+            for (int i = 0; i < boneList.Count; i++)
+            {
+                if (boneList[i].ParentIndex > -1)
+                matrices[i] *= matrices[boneList[i].ParentIndex];
+            }
+            /* Done. */
             return matrices;
         }
 
