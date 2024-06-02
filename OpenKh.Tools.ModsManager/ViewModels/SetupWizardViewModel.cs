@@ -38,9 +38,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         const int OpenKHGameEngine = 0;
         const int PCSX2 = 1;
-        const int EpicGames = 2;
+        const int PC = 2;
 
         private int _gameEdition;
+        private string _pcVersion;
         private string _isoLocation;
         private string _openKhGameEngineLocation;
         private string _pcsx2Location;
@@ -50,7 +51,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private int _gameCollection = 0;
         private string _pcReleaseLanguage;
         private string _gameDataLocation;
-        private bool _isEGSVersion;
         private List<string> LuaScriptPaths = new List<string>();
         private bool _overrideGameDataFound = false;
 
@@ -136,7 +136,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     OpenKHGameEngine => !string.IsNullOrEmpty(OpenKhGameEngineLocation) && File.Exists(OpenKhGameEngineLocation),
                     PCSX2 => !string.IsNullOrEmpty(Pcsx2Location) && File.Exists(Pcsx2Location),
-                    EpicGames => (!string.IsNullOrEmpty(PcReleaseLocation) &&
+                    PC => (!string.IsNullOrEmpty(PcReleaseLocation) &&
                         Directory.Exists(PcReleaseLocation) &&
                         File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")))|| 
                         (!string.IsNullOrEmpty(PcReleaseLocationKH3D) &&
@@ -157,14 +157,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     OpenKHGameEngine => LastPage,
                     PCSX2 => PageIsoSelection,
-                    EpicGames => PageEosInstall,
+                    PC => PageEosInstall,
                     _ => null,
                 };
                 WizardPageAfterGameData = GameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
                     PCSX2 => PageRegion,
-                    EpicGames => LastPage,
+                    PC => LastPage,
                     _ => null,
                 };
 
@@ -173,6 +173,34 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(OpenKhGameEngineConfigVisibility));
                 OnPropertyChanged(nameof(Pcsx2ConfigVisibility));
                 OnPropertyChanged(nameof(PcReleaseConfigVisibility));
+            }
+        }
+
+        public int LaunchOption
+        {
+            get
+            {
+                switch (ConfigurationService.PCVersion)
+                {
+                    case "Steam/Other":
+                        return 1;
+                    default:
+                        return 0;
+                }
+            }
+            set
+            {
+                switch (value)
+                {
+                    case 1:
+                        _pcVersion = "Steam/Other";
+                        ConfigurationService.PCVersion = "Steam/Other";
+                        break;
+                    default:
+                        _pcVersion = "EGS";
+                        ConfigurationService.PCVersion = "EGS";
+                        break;
+                }
             }
         }
         public RelayCommand SelectOpenKhGameEngineCommand { get; }
@@ -202,7 +230,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public RelayCommand SelectPcReleaseCommand { get; }
-        public Visibility PcReleaseConfigVisibility => GameEdition == EpicGames  ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PcReleaseConfigVisibility => GameEdition == PC  ? Visibility.Visible : Visibility.Collapsed;
         public Visibility BothPcReleaseSelected => PcReleaseSelections == "both" ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PcRelease1525Selected => PcReleaseSelections == "1.5+2.5" ? Visibility.Visible: Visibility.Collapsed;
         public Visibility PcRelease28Selected => PcReleaseSelections == "2.8" ? Visibility.Visible : Visibility.Collapsed;
@@ -289,14 +317,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PcRelease1525Selected));
                 OnPropertyChanged(nameof(PcRelease28Selected));
                 OnPropertyChanged(nameof(InstallForPc28));
-            }
-        }
-        public bool IsEGSVersion
-        {
-            get => _isEGSVersion;
-            set
-            {
-                _isEGSVersion = value;
             }
         }
         public bool Extractkh1
@@ -444,7 +464,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public bool IsNotExtracting { get; private set; }
         public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) || 
-            (GameEdition == EpicGames && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) || 
+            (GameEdition == PC && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) || 
             GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) || 
             Directory.Exists(Path.Combine(GameDataLocation, "bbs", "message")) ||
             Directory.Exists(Path.Combine(GameDataLocation, "Recom", "SYS"))))||
@@ -1192,7 +1212,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
                 break;
 
-                case EpicGames:
+                case PC:
                 {
                     IsNotExtracting = false;
                     ExtractionProgress = 0;

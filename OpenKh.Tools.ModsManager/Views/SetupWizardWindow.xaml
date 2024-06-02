@@ -356,12 +356,12 @@
             NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    OpenKH Mods Manager has the ability to launch Kingdom Hearts directly. Leave the box below checked to have Mods Manager launch the game via Epic Games.
+                    Select the launcher you use for the supported Kingdom Hearts games.
                 </TextBlock>
-                <CheckBox
-                    Margin="0 0 0 10"
-                    IsChecked="{Binding IsEGSVersion}"
-                    Content="Launch via Epic Games"/>
+                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding LaunchOption}">
+                    <ComboBoxItem>Epic Games Store</ComboBoxItem>
+                    <ComboBoxItem>Steam/Other</ComboBoxItem>
+                </ComboBox>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage

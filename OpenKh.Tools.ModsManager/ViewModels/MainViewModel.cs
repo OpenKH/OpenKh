@@ -465,7 +465,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigPcReleaseLanguage = ConfigurationService.PcReleaseLanguage,
                     ConfigRegionId = ConfigurationService.RegionId,
                     ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
-                    ConfigIsEGSVersion = ConfigurationService.IsEGSVersion,
                 };
                 if (dialog.ShowDialog() == true)
                 {
@@ -478,7 +477,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.PcReleaseLocationKH3D = dialog.ConfigPcReleaseLocationKH3D;
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
                     ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
-                    ConfigurationService.IsEGSVersion = dialog.ConfigIsEGSVersion;
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
 
                     const int EpicGamesPC = 2;
@@ -630,7 +628,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     isPcsx2 = true;
                     break;
                 case 2:
-                    if (ConfigurationService.IsEGSVersion && !(_launchGame == "kh3d"))
+                    if (ConfigurationService.PCVersion == "EGS" && !(_launchGame == "kh3d"))
                     {
                         if (ConfigurationService.PcReleaseLocation != null)
                         {
@@ -663,7 +661,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             return Task.CompletedTask;
                         }
                     }
-                    else if (ConfigurationService.IsEGSVersion && _launchGame == "kh3d")
+                    else if (ConfigurationService.PCVersion == "EGS" && _launchGame == "kh3d")
                     {
                         if (ConfigurationService.PcReleaseLocationKH3D != null)
                         {

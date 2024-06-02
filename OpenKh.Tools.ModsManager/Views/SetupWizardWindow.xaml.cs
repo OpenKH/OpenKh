@@ -38,7 +38,6 @@ namespace OpenKh.Tools.ModsManager.Views
         public string ConfigGameDataLocation { get => _vm.GameDataLocation; set => _vm.GameDataLocation = value; }
         public int ConfigRegionId { get => _vm.RegionId; set => _vm.RegionId = value; }
         public bool ConfigPanaceaInstalled { get => _vm.PanaceaInstalled; set => _vm.PanaceaInstalled = value; }
-        public bool ConfigIsEGSVersion { get => _vm.IsEGSVersion; set => _vm.IsEGSVersion = value; }
 
         private void Wizard_Finish(object sender, Xceed.Wpf.Toolkit.Core.CancelRoutedEventArgs e)
         {
