@@ -366,16 +366,17 @@ namespace OpenKh.Tools.Kh2MapStudio
                             pass.Apply();
 
                             var color = new xna.Color(1f, 0f, 0f, .5f);
+                            float opacity = 0.3f;
                             var vertices = new PositionColoredTextured[]
                             {
-                                new PositionColoredTextured(-1, -1, -1, 0, 0, 1f, 0f, 0f, 1f),
-                                new PositionColoredTextured(+1, -1, -1, 0, 0, 1f, 0f, 0f, 1f),
-                                new PositionColoredTextured(+1, +1, -1, 0, 0, 1f, 0f, 0f, 1f),
-                                new PositionColoredTextured(-1, +1, -1, 0, 0, 1f, 0f, 0f, 1f),
-                                new PositionColoredTextured(-1, -1, +1, 0, 0, 1f, 0f, 0f, 1f),
-                                new PositionColoredTextured(+1, -1, +1, 0, 0, 1f, 0f, 0f, 1f),
-                                new PositionColoredTextured(+1, +1, +1, 0, 0, 1f, 0f, 0f, 1f),
-                                new PositionColoredTextured(-1, +1, +1, 0, 0, 1f, 0f, 0f, 1f),
+                                new PositionColoredTextured(-1, -1, -1, 0, 0, 1f, 0f, 0f, opacity),
+                                new PositionColoredTextured(+1, -1, -1, 0, 0, 1f, 0f, 0f, opacity),
+                                new PositionColoredTextured(+1, +1, -1, 0, 0, 1f, 0f, 0f, opacity),
+                                new PositionColoredTextured(-1, +1, -1, 0, 0, 1f, 0f, 0f, opacity),
+                                new PositionColoredTextured(-1, -1, +1, 0, 0, 1f, 0f, 0f, opacity),
+                                new PositionColoredTextured(+1, -1, +1, 0, 0, 1f, 0f, 0f, opacity),
+                                new PositionColoredTextured(+1, +1, +1, 0, 0, 1f, 0f, 0f, opacity),
+                                new PositionColoredTextured(-1, +1, +1, 0, 0, 1f, 0f, 0f, opacity),
                             };
                             var indices = new int[]
                             {
