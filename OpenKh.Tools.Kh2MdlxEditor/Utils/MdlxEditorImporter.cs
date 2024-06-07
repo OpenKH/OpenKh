@@ -5,6 +5,7 @@ using OpenKh.Kh2.Models.VIF;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.Utils
 {
@@ -145,35 +146,69 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
                 }
             }
 
+            // List to calc joint flag
+            HashSet<int> bonesWithRig = new HashSet<int>();
+            foreach(var mesh in scene.Meshes)
+            {
+                for(int i = 0; i < mesh.Bones.Count; i++)
+                {
+                    if (mesh.Bones[i].HasVertexWeights)
+                        bonesWithRig.Add(i);
+                }
+            }
+
             for (int i = 0; i < assimpBones.Count; i++)
             {
                 Assimp.Node assimpBone = assimpBones[i];
-
                 ModelCommon.Bone bone = new ModelCommon.Bone();
                 bone.Index = (short)i;
                 bone.ParentIndex = (short)assimpBones.IndexOf(assimpBone.Parent);
 
-                assimpBones[i].Transform.Decompose(
-                    out Assimp.Vector3D scale, 
-                    out Assimp.Quaternion rotation, 
-                    out Assimp.Vector3D translation);
+                // Root
+                if (i == 0)
+                {
+                    bone.ParentIndex = -1;
+                    bone.ChildIndex = -1;
+                }
 
-                bone.ScaleX= scale.X;
-                bone.ScaleY= scale.Y;
-                bone.ScaleZ= scale.Z;
-                bone.TranslationX= translation.X;
-                bone.TranslationY= translation.Y;
-                bone.TranslationZ= translation.Z;
+                // Flags
+                if (!bonesWithRig.Contains(i))
+                {
+                    bone.Flags = 3;
+                }
+                //Else 0 or 1
 
-                System.Numerics.Quaternion numQuat = new System.Numerics.Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W);
+                Matrix4x4 transform = AssimpGeneric.ToNumerics(assimpBones[i].Transform);
 
-                System.Numerics.Vector3 rotationRadian = MathUtils.toRadian(MathUtils.ToEulerAngles(numQuat));
-                bone.RotationX = rotationRadian.X;
-                bone.RotationY = rotationRadian.Y;
-                bone.RotationZ = rotationRadian.Z;
+                DecomposeEuler(transform, out Vector3 scale, out Vector3 rotation, out Vector3 position);
+
+                bone.ScaleX = scale.X;
+                bone.ScaleY = scale.Y;
+                bone.ScaleZ = scale.Z;
+                bone.TranslationX = position.X;
+                bone.TranslationY = position.Y;
+                bone.TranslationZ = position.Z;
+                bone.RotationX = rotation.X;
+                bone.RotationY = rotation.Y;
+                bone.RotationZ = rotation.Z;
                 bone.RotationW = 0;
 
                 mdlxBones.Add(bone);
+            }
+
+            // Each bone has some kind of length in the Scale W value - it is unknown how it's derived except for the following
+            List<bool> lengthProcessed = new List<bool>();
+            for (int i = 0; i < mdlxBones.Count; i++) {
+                lengthProcessed.Add(false);
+            }
+            foreach (ModelCommon.Bone bone in mdlxBones)
+            {
+                if(bone.TranslationX != 0 && bone.TranslationY == 0 && bone.TranslationZ == 0 &&
+                    lengthProcessed[bone.ParentIndex] == false)
+                {
+                    mdlxBones[bone.ParentIndex].ScaleW = bone.TranslationX;
+                    lengthProcessed[bone.ParentIndex] = true;
+                }
             }
 
             return mdlxBones;
@@ -195,6 +230,59 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             }
 
             return children;
+        }
+
+
+        public static void DecomposeEuler(Matrix4x4 matrix, out Vector3 scale, out Vector3 rotation, out Vector3 position)
+        {
+            // Extract the translation
+            position = new Vector3(matrix.M41, matrix.M42, matrix.M43);
+
+            // Extract the scale
+            scale = new Vector3(
+                new Vector3(matrix.M11, matrix.M12, matrix.M13).Length(),
+                new Vector3(matrix.M21, matrix.M22, matrix.M23).Length(),
+                new Vector3(matrix.M31, matrix.M32, matrix.M33).Length()
+            );
+
+            // Remove scale from the matrix to isolate the rotation
+            Matrix4x4 rotationMatrix = new Matrix4x4(
+                matrix.M11 / scale.X, matrix.M12 / scale.X, matrix.M13 / scale.X, 0.0f,
+                matrix.M21 / scale.Y, matrix.M22 / scale.Y, matrix.M23 / scale.Y, 0.0f,
+                matrix.M31 / scale.Z, matrix.M32 / scale.Z, matrix.M33 / scale.Z, 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f
+            );
+
+            // Use a small epsilon to solve floating-point inaccuracies
+            const float epsilon = 1e-6f;
+
+            // Extract the rotation angles from the rotation matrix
+            rotation.Y = (float)Math.Asin(-rotationMatrix.M13); // Angle around Y
+
+            float cosY = (float)Math.Cos(rotation.Y);
+
+            if (Math.Abs(cosY) > epsilon)
+            {
+                // Finding angle around X
+                float tanX = rotationMatrix.M33 / cosY; // A
+                float tanY = rotationMatrix.M23 / cosY; // B
+                rotation.X = (float)Math.Atan2(tanY, tanX);
+
+                // Finding angle around Z
+                tanX = rotationMatrix.M11 / cosY; // E
+                tanY = rotationMatrix.M12 / cosY; // F
+                rotation.Z = (float)Math.Atan2(tanY, tanX);
+            }
+            else
+            {
+                // Y is fixed
+                rotation.X = 0;
+
+                // Finding angle around Z
+                float tanX = rotationMatrix.M22; // E
+                float tanY = -rotationMatrix.M21; // F
+                rotation.Z = (float)Math.Atan2(tanY, tanX);
+            }
         }
     }
 }
