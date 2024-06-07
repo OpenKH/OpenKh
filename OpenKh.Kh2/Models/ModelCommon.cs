@@ -142,12 +142,10 @@ namespace OpenKh.Kh2.Models
             [Data] public float TranslationZ { get; set; }
             [Data] public float TranslationW { get; set; }
 
-            /* Bone FLags:
-             * terminate
-             * below
-             * enableBias
-             * reserved [19]
-             * undefined [10]
+            /* Bone BitfLags:
+             * no_envelop
+             * not_joint > On when the bone has no rigged vertices
+             * The rest is unused
              */
 
             public override string ToString()
