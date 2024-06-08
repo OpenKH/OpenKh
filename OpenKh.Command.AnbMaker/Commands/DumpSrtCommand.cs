@@ -98,6 +98,7 @@ namespace OpenKh.Command.AnbMaker.Commands
             {
                 var keys = motionSource.Motion.FCurveKeys;
                 var keyValues = motionSource.Motion.KeyValues;
+                var keyTimes = motionSource.Motion.KeyTimes;
 
                 var perMotionList = new List<PerMotion>();
 
@@ -161,7 +162,7 @@ namespace OpenKh.Command.AnbMaker.Commands
                             var key = keys[baseIdx + idx];
 
                             setter(
-                                AllocatePerMotion(keyValues[key.Time]),
+                                AllocatePerMotion(keyTimes[key.Time]),
                                 keyValues[key.ValueId]
                             );
                         }
