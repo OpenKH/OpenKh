@@ -1,4 +1,6 @@
 using OpenKh.Kh2;
+using OpenKh.Tools.Kh2ObjectEditor.Services;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
@@ -11,6 +13,11 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
             InitializeComponent();
             AnimBinary = animationBinary;
             DataContext = AnimBinary;
+        }
+
+        private void Button_SaveTriggers(object sender, RoutedEventArgs e)
+        {
+            MsetService.Instance.SaveMotion();
         }
     }
 }

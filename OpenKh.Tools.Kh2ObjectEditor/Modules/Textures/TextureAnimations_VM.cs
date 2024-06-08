@@ -74,8 +74,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
             if (texAnim == null)
                 return;
 
-            MdlxService.Instance.TextureFile.TextureFooterData.TextureAnimationList[id] = texAnim;
-            MdlxService.Instance.TextureFile.TextureFooterData.UvscList.Clear();
+            MdlxService.Instance.TextureFile.TextureFooterData.TextureAnimationList[id].SpriteImage = texAnim.SpriteImage;
+
             loadAnims();
         }
 

@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.AssimpUtils\OpenKh.AssimpUtils.csproj" />
+    <ProjectReference Include="..\OpenKh.Command.AnbMaker\OpenKh.Command.AnbMaker.csproj" />
     <ProjectReference Include="..\OpenKh.Command.Bdxio\OpenKh.Command.Bdxio.csproj" />
     <ProjectReference Include="..\OpenKh.Command.TexFooter\OpenKh.Command.TexFooter.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />

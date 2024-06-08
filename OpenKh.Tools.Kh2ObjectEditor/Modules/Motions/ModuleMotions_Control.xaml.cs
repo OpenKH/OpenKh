@@ -1,8 +1,10 @@
+using Microsoft.Win32;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Classes;
 using OpenKh.Tools.Kh2ObjectEditor.Modules.Motions;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
 using OpenKh.Tools.Kh2ObjectEditor.ViewModel;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -61,6 +63,37 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             {
                 MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
                 ThisVM.Motion_Replace(item.Index);
+            }
+        }
+        public void Motion_Import(object sender, RoutedEventArgs e)
+        {
+            if (MotionList.SelectedItem != null)
+            {
+                Frame_Metadata.Content = new ContentControl();
+                Frame_Triggers.Content = new ContentControl();
+
+                MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
+
+                try
+                {
+                    OpenFileDialog openFileDialog = new OpenFileDialog();
+                    openFileDialog.Multiselect = false;
+                    if (openFileDialog.ShowDialog() == true && openFileDialog.FileNames != null && openFileDialog.FileNames.Length > 0)
+                    {
+                        string filePath = openFileDialog.FileNames[0];
+                        if (filePath.ToLower().EndsWith(".fbx"))
+                        {
+                            ThisVM.Motion_Import(item.Index, filePath);
+                        }
+                    }
+
+                    App_Context.Instance.loadMotion(item.Index);
+                    openMotionTabs(MsetService.Instance.LoadedMotion);
+                }
+                catch (Exception exception)
+                {
+                    // Nothing planned for now
+                }
             }
         }
     }
