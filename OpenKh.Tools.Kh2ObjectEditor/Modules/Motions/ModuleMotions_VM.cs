@@ -1,3 +1,7 @@
+using Assimp;
+using OpenKh.Command.AnbMaker.Utils.AssimpAnimSource;
+using OpenKh.Command.AnbMaker.Utils.Builder;
+using OpenKh.Command.AnbMaker.Utils.Builder.Models;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Classes;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
@@ -5,6 +9,8 @@ using OpenKh.Tools.Kh2ObjectEditor.Utils;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
 {
@@ -105,6 +111,104 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
         public void Motion_Rename(int index)
         {
             Bar.Entry item = MsetService.Instance.MsetBar[index];
+        }
+        public void Motion_Import(int index, string animationPath)
+        {
+            // Find rootNode
+            var assimp = new Assimp.AssimpContext();
+            var scene = assimp.ImportFile(animationPath, Assimp.PostProcessSteps.None);
+
+            string rootNodeName = getRootNodeName(scene.RootNode);
+
+            // Convert to interpolated motion
+            IEnumerable<BasicSourceMotion> parms;
+            parms = new UseAssimp(
+                    inputModel: animationPath,
+                    meshName: null,
+                    rootName: rootNodeName,
+                    animationName: null,
+                    nodeScaling: 1,
+                    positionScaling: 1
+            )
+                .Parameters;
+
+            List<BasicSourceMotion> parList = parms.ToList();
+            var builder = new InterpolatedMotionBuilder(parList[0]);
+            var ipm = builder.Ipm;
+
+            // Get as stream
+            var motionStream = (MemoryStream)ipm.toStream();
+
+            // Insert to mset
+            MsetService.Instance.MsetBar[index].Stream.Position = 0;
+            AnimationBinary msetEntry = new AnimationBinary(MsetService.Instance.MsetBar[index].Stream);
+            msetEntry.MotionFile = new Motion.InterpolatedMotion(motionStream);
+            MsetService.Instance.MsetBar[index].Stream = msetEntry.toStream();
+
+            loadMotions();
+        }
+
+        
+
+        // Finds the node that serves as root for the animation
+        private string getRootNodeName(Node rootNode)
+        {
+            string rootNodeName = "";
+            if (isRootName(rootNode.Name))
+            {
+                rootNodeName = rootNode.Name;
+            }
+            else
+            {
+                List<string> nodeNames = GetAllNames(rootNode);
+                foreach (string nodeName in nodeNames)
+                {
+                    if (isRootName(nodeName))
+                    {
+                        rootNodeName = nodeName;
+                        break;
+                    }
+                }
+            }
+            return rootNodeName;
+        }
+        private static List<string> GetAllNames(Node node)
+        {
+            List<string> names = new List<string>();
+            if (node != null)
+            {
+                Traverse(node, names);
+            }
+            return names;
+        }
+        private static void Traverse(Node node, List<string> names)
+        {
+            names.Add(node.Name);
+            foreach (Node child in node.Children)
+            {
+                Traverse(child, names);
+            }
+        }
+        // Returns true if the given string contains the word bone, contains numbers and all of its numbers are zeros
+        private bool isRootName(string nodeName)
+        {
+            if (nodeName.ToLower().Contains("bone"))
+            {
+                // Regex to find all numbers in the string
+                Regex numberPattern = new Regex(@"\d+");
+                MatchCollection matches = numberPattern.Matches(nodeName);
+
+                foreach (Match match in matches)
+                {
+                    string number = match.Value;
+                    if(number == "" || match.Value.Trim('0') != "") {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            return false;
         }
     }
 }

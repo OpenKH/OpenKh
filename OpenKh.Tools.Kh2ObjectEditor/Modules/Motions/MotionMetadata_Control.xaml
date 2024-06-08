@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Modules.Motions"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="Black">
+    <DockPanel Background="Black">
         <StackPanel DockPanel.Dock="Top" Margin="20">
 
             <StackPanel Orientation="Horizontal">
@@ -55,6 +55,7 @@
                 <Label Foreground="White" VerticalAlignment="Center">Bound MaxW:</Label>
                 <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMaxW}"></TextBox>
             </StackPanel>
+            <Button Margin="10,0,10,0" Padding="5,0,5,0" Height="40px" Width="100px" HorizontalAlignment="Left" Click="Button_SaveTriggers">Save Metadata</Button>
         </StackPanel>
-    </Grid>
+    </DockPanel>
 </UserControl>

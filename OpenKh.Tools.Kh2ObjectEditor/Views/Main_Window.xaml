@@ -18,7 +18,7 @@
                 <MenuItem Header="Attach mdlx" Click="Menu_AttachMdlx"/>
             </MenuItem>
             <MenuItem Header="File">
-                <MenuItem Header="Save">
+                <MenuItem Header="Save New">
                     <MenuItem Header="Save Mdlx" Click="Menu_Save_Mdlx"/>
                     <MenuItem Header="Save Mset" Click="Menu_Save_Mset"/>
                     <MenuItem Header="Save Apdx" Click="Menu_Save_Apdx"/>
