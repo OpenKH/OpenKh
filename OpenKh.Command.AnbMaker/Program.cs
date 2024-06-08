@@ -15,6 +15,7 @@ namespace OpenKh.Command.AnbMaker
     [Subcommand(typeof(ExportRawCommand))]
     [Subcommand(typeof(AnbExCommand))]
     [Subcommand(typeof(DumpNodeTreeCommand))]
+    [Subcommand(typeof(DumpSrtCommand))]
     [Subcommand(typeof(RenderNodeTreeCommand))]
     internal class Program
     {
