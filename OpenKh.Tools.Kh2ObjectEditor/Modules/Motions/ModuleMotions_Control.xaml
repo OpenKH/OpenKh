@@ -33,6 +33,9 @@
 
         <!-- MOTION LIST -->
         <DockPanel Background="White" Grid.Column="2">
+            <Grid DockPanel.Dock="Top" Background="PaleVioletRed">
+                <Button Width="100" HorizontalAlignment="Center" Click="Button_TEST" Margin="10">TEST</Button>
+            </Grid>
             <!-- Filters -->
             <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10">
                 <Label FontWeight="Bold">Filters</Label>
@@ -54,6 +57,7 @@
                         <MenuItem Header="Copy motion" Click="Motion_Copy"/>
                         <MenuItem Header="Replace with copied motion" Click="Motion_Replace"/>
                         <MenuItem Header="Replace with imported FBX animation" Click="Motion_Import"/>
+                        <MenuItem Header="Export RC as MSET" Click="RC_Export"/>
                     </ContextMenu>
                 </ListView.ContextMenu>
                 <ListView.ItemTemplate>

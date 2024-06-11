@@ -4,11 +4,9 @@ using OpenKh.Kh2.TextureFooter;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Windows.Documents;
 using System.Windows.Media.Imaging;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
@@ -85,7 +83,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
             sfd.ShowDialog();
             if (sfd.FileName != "")
             {
-                MemoryStream memStream = new MemoryStream();
                 AssimpGeneric.ExportBitmapSourceAsPng(bitmapImage, sfd.FileName);
             }
         }
