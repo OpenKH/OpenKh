@@ -17,6 +17,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             MdlxService checkMdlxService = MdlxService.Instance;
             MsetService checkMsetService = MsetService.Instance;
             ApdxService checkApdxService = ApdxService.Instance;
+            ClipboardService checkClipboardService = ClipboardService.Instance;
             // BREAKPOINT to check app context info
         }
         private void Menu_Test_RunCode(object sender, RoutedEventArgs e)
@@ -132,6 +133,28 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             }
         }
 
-        
+        private void Menu_OpenMdlx(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Mdlx file | *.mdlx";
+            bool? success = openFileDialog.ShowDialog();
+
+            if (success == true)
+            {
+                if (Directory.Exists(openFileDialog.FileName))
+                {
+                    return;
+                }
+                else if (File.Exists(openFileDialog.FileName))
+                {
+                    if (ObjectEditorUtils.isFilePathValid(openFileDialog.FileName, "mdlx"))
+                    {
+                        App_Context.Instance.loadMdlx(openFileDialog.FileName);
+                    }
+                }
+            }
+        }
+
+
     }
 }

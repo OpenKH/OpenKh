@@ -41,9 +41,14 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
             }
 
             string tempApdxPath = MdlxPath.ToLower().Replace(".mdlx", ".a.us");
+            string tempApdxPathFm = MdlxPath.ToLower().Replace(".mdlx", ".a.fm");
             if (ObjectEditorUtils.isFilePathValid(tempApdxPath, "a.us"))
             {
                 ApdxService.Instance.LoadFile(tempApdxPath);
+            }
+            else if (ObjectEditorUtils.isFilePathValid(tempApdxPathFm, "a.fm"))
+            {
+                ApdxService.Instance.LoadFile(tempApdxPathFm);
             }
 
             triggerObjectSelected();

@@ -70,18 +70,45 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
         public void applyFilters()
         {
             ObjectsView.Clear();
-            foreach (ObjectSelector_Wrapper iObject in Objects)
-            {
-                if (FilterName != null && FilterName != "" && !iObject.FileName.ToLower().Contains(FilterName.ToLower()))
-                {
-                    continue;
-                }
-                if (FilterHasMset && !iObject.HasMset)
-                {
-                    continue;
-                }
 
+            bool applyNameFilter = FilterName != null && FilterName != "" & !FilterName.StartsWith(">");
+            bool applyDescriptionFilter = FilterName != null && FilterName != "" & FilterName.StartsWith(">");
+            bool applyMsetFilter = FilterHasMset;
+
+            foreach(ObjectSelector_Wrapper iObject in Objects)
+            {
                 ObjectsView.Add(iObject);
+            }
+
+            for (int i = ObjectsView.Count - 1; i >= 0; i--)
+            {
+                ObjectSelector_Wrapper iObject = ObjectsView[i];
+                if (applyMsetFilter)
+                {
+                    if (!iObject.HasMset)
+                    {
+                        ObjectsView.RemoveAt(i);
+                        continue;
+                    }
+                }
+                if (applyNameFilter)
+                {
+                    if (!iObject.FileName.ToLower().Contains(FilterName.ToLower()))
+                    {
+                        ObjectsView.RemoveAt(i);
+                        continue;
+                    }
+                }
+                if (applyDescriptionFilter)
+                {
+                    string searchCriteria = FilterName.ToLower().Substring(1);
+                    string iObjectDescription = iObject.GetDescription();
+                    if (!iObjectDescription.ToLower().Contains(searchCriteria.ToLower()))
+                    {
+                        ObjectsView.RemoveAt(i);
+                        continue;
+                    }
+                }
             }
         }
 

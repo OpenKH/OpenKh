@@ -14,13 +14,13 @@
             <Label FontWeight="Bold">Filters</Label>
             <StackPanel Orientation="Horizontal">
                 <Label>Name:</Label>
-                <TextBox Text="{Binding FilterName}" Width="200" VerticalContentAlignment="Center"></TextBox>
+                <TextBox Text="{Binding FilterName}" Width="80" VerticalContentAlignment="Center"></TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label>Has Moveset:</Label>
                 <CheckBox IsChecked="{Binding FilterHasMset}" VerticalAlignment="Center"/>
             </StackPanel>
-            <Button Width="100" HorizontalAlignment="Right" Click="Button_ApplyFilters">Apply filters</Button>
+            <Button Width="100" HorizontalAlignment="Left" Click="Button_ApplyFilters">Apply filters</Button>
         </StackPanel>
 
         <!-- OBJECT LIST -->

@@ -6,11 +6,14 @@ using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Classes;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
+using OpenKh.Tools.Kh2ObjectEditor.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
 {
@@ -19,7 +22,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
         // MOTIONS
         public List<MotionSelector_Wrapper> Motions { get; set; }
         public ObservableCollection<MotionSelector_Wrapper> MotionsView { get; set; }
-        public Bar.Entry copiedMotion { get; set; }
 
         // FILTERS
         private string _filterName { get; set; }
@@ -87,26 +89,16 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
 
         public void Motion_Copy(int index)
         {
-            Bar.Entry item = MsetService.Instance.MsetBar[index];
-            copiedMotion = new Bar.Entry();
-            copiedMotion.Index = item.Index;
-            copiedMotion.Name = item.Name;
-            copiedMotion.Type = item.Type;
-            item.Stream.Position = 0;
-            copiedMotion.Stream = new MemoryStream();
-            item.Stream.CopyTo(copiedMotion.Stream);
-            item.Stream.Position = 0;
-            copiedMotion.Stream.Position = 0;
+            ClipboardService.Instance.StoreMotion(MsetService.Instance.MsetBar[index]);
         }
 
         public void Motion_Replace(int index)
         {
-            if (copiedMotion == null)
-                return;
+            MsetService.Instance.MsetBar[index].Stream = ClipboardService.Instance.FetchMotion();
 
-            MsetService.Instance.MsetBar[index] = copiedMotion;
             loadMotions();
             applyFilters();
+            App_Context.Instance.loadMotion(index);
         }
         public void Motion_Rename(int index)
         {
@@ -209,6 +201,75 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
                 return true;
             }
             return false;
+        }
+
+        // Tests the mset ingame. Writes the motion header and motion triggers.
+        // IMPORTANT: Triggers must be of the same length, be careful because there's no control of this.
+        public void TestMsetIngame()
+        {
+            string filename = Path.GetFileName(MsetService.Instance.MsetPath);
+
+            if (filename == "")
+                return;
+
+            long fileAddress;
+            try
+            {
+                fileAddress = ProcessService.getAddressOfFile(filename);
+            }
+            catch (Exception exc)
+            {
+                System.Windows.Forms.MessageBox.Show("Game is not running", "There was an error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            if (fileAddress == 0)
+            {
+                System.Windows.Forms.MessageBox.Show("Couldn't find file", "There was an error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            foreach (Bar.Entry barMotion in MsetService.Instance.MsetBar)
+            {
+                if (barMotion.Stream.Length == 0 || barMotion.Type != Bar.EntryType.Anb)
+                    continue;
+
+                int entryOffset = barMotion.Offset;
+
+                // Read Anb
+                barMotion.Stream.Position = 0;
+                AnimationBinary motionAnb = new AnimationBinary(barMotion.Stream);
+                barMotion.Stream.Position = 0;
+
+                // Get trigger file offset
+                Bar barMotionAsBar = Bar.Read(barMotion.Stream);
+                barMotion.Stream.Position = 0;
+                int motionOffset = barMotionAsBar[0].Offset;
+                int triggerOffset = barMotionAsBar[1].Offset;
+                int reservedLength = 144;
+
+                long motionFileOffset = fileAddress + entryOffset + motionOffset + reservedLength;
+                long triggerFileOffset = fileAddress + entryOffset + triggerOffset;
+
+                // Write to process memory
+                if (motionAnb.MotionFile != null && motionAnb.MotionFile.MotionHeader.Type == 0)
+                {
+                    MemoryStream motionStream = new MemoryStream();
+                    BinaryWriter writer = new BinaryWriter(motionStream);
+
+                    BinaryMapping.WriteObject(motionStream, motionAnb.MotionFile.MotionHeader);
+                    BinaryMapping.WriteObject(motionStream, motionAnb.MotionFile.InterpolatedMotionHeader);
+
+                    byte[] motionBytes = motionStream.ToArray();
+                    MemoryAccess.writeMemory(ProcessService.KH2Process, motionFileOffset, motionBytes, true);
+                }
+                if (motionAnb.MotionTriggerFile != null)
+                {
+                    MemoryStream triggerStream = (MemoryStream)motionAnb.MotionTriggerFile.toStream();
+                    byte[] triggerBytes = triggerStream.ToArray();
+                    MemoryAccess.writeMemory(ProcessService.KH2Process, triggerFileOffset, triggerBytes, true);
+                }
+            }
         }
     }
 }
