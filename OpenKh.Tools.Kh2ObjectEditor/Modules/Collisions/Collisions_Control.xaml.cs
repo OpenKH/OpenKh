@@ -53,5 +53,10 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Collisions
         {
             ThisVM.saveCollisions();
         }
+
+        private void Button_Test(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ThisVM.TestCollisionsIngame();
+        }
     }
 }
