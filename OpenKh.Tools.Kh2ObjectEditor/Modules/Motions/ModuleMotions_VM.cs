@@ -95,6 +95,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
         public void Motion_Replace(int index)
         {
             MsetService.Instance.MsetBar[index].Stream = ClipboardService.Instance.FetchMotion();
+            MsetService.Instance.MsetBar[index].Name = "COPY";
+            MsetService.Instance.MsetBar[index].Index = 0;
 
             loadMotions();
             applyFilters();
@@ -139,8 +141,21 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
 
             loadMotions();
         }
+        public void Motion_ImportRC(int index, string msetPath)
+        {
+            using FileStream streamMset = File.Open(msetPath, FileMode.Open);
+            if (!Bar.IsValid(streamMset))
+                throw new Exception("File is not a valid MSET: " + msetPath);
 
-        
+
+            MemoryStream msetStream = new MemoryStream();
+            streamMset.CopyTo(msetStream);
+
+            MsetService.Instance.MsetBar[index].Stream = msetStream;
+            MsetService.Instance.MsetBar[index].Type = Bar.EntryType.Motionset;
+        }
+
+
 
         // Finds the node that serves as root for the animation
         private string getRootNodeName(Node rootNode)

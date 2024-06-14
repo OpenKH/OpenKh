@@ -38,6 +38,10 @@ If you have never used the command line before or have used it very little, fear
 |[03system](../kh2/file/type/03system.md) | OpenKh.Tools.Kh2SystemEditor
 |[msg/*/place.bin](../kh2/file/type/place.md) | OpenKh.Tools.Kh2PlaceEditor
 
+| Tool | Purpose
+|------|-----------
+| [OpenKh.Tools.Kh2ObjectEditor](./GUI.Kh2ObjectEditor/index.md) | View and edit game Objects (Mdlx, Mset and Apdx files)
+
 ## Kingdom Hearts Birth By Sleep
 
 | File | Tool name

@@ -14,8 +14,9 @@
                 <Button Margin="5,0,5,0" Padding="5,0,5,0" Click="Button_ClipboardPaste">Paste</Button>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+                <Button Margin="10,0,50,0" Padding="5,0,5,0" Click="Button_Test" Width="50" Background="PaleVioletRed">Test</Button>
                 <Button Margin="10,0,10,0" Padding="5,0,5,0" Click="Button_DebugRead" Visibility="Collapsed">Debug Read</Button>
-                <Button Margin="10,0,10,0" Padding="5,0,5,0" Click="Button_Save">Save</Button>
+                <Button Margin="10,0,10,0" Padding="5,0,5,0" Click="Button_Save" Width="70">Save</Button>
             </StackPanel>
         </Grid>
         

@@ -14,7 +14,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
         public ObservableCollection<FrameTrigger> FrameTriggerList { get; set; }
 
         public static Dictionary<byte,string> RangeTriggerOptions { get; set; }
-        
         public static Dictionary<byte, string> FrameTriggerOptions { get; set; }
 
         public bool HasNoTriggers

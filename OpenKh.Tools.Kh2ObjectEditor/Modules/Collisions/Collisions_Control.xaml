@@ -8,9 +8,14 @@
              d:DesignHeight="450" d:DesignWidth="800">
     
     <DockPanel Background="#2d2d2d">
-        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="10" HorizontalAlignment="Right">
-            <Button Width="50" Click="Button_Save">Save</Button>
-        </StackPanel>
+        <Grid DockPanel.Dock="Bottom">
+            <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Left">
+                <Button Width="50" Click="Button_Test" Background="PaleVioletRed">Test</Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Right">
+                <Button Width="50" Click="Button_Save">Save</Button>
+            </StackPanel>
+        </Grid>
 
         <DataGrid Name="DataTable"
                 AutoGenerateColumns="False"
@@ -26,12 +31,49 @@
                     <MenuItem Header="Add copied collision group" Click="Collision_AddGroup"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
+
+            <DataGrid.Resources>
+                <local:CollisionTypeConverter x:Key="CollisionTypeConverter" />
+                <local:CollisionShapeConverter x:Key="CollisionShapeConverter" />
+            </DataGrid.Resources>
+
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Path=Group}" Header="Group" />
                 <DataGridTextColumn Binding="{Binding Path=Parts}" Header="Parts" />
                 <DataGridTextColumn Binding="{Binding Path=Argument}" Header="Argument" />
-                <DataGridTextColumn Binding="{Binding Path=Type}" Header="Type" />
-                <DataGridTextColumn Binding="{Binding Path=Shape}" Header="Shape" />
+
+                <DataGridTemplateColumn Header="Shape">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Shape, Converter={StaticResource CollisionShapeConverter}}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox SelectedValue="{Binding Shape}"
+                                      SelectedValuePath="Key"
+                                      DisplayMemberPath="Value"
+                                      ItemsSource="{Binding DataContext.CollisionShapeOptions, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn Header="Type">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Type, Converter={StaticResource CollisionTypeConverter}}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox SelectedValue="{Binding Type}"
+                                      SelectedValuePath="Key"
+                                      DisplayMemberPath="Value"
+                                      ItemsSource="{Binding DataContext.CollisionTypeOptions, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                
                 <DataGridTextColumn Binding="{Binding Path=Bone}" Header="Bone" />
                 <DataGridTextColumn Binding="{Binding Path=PositionX}" Header="PositionX" />
                 <DataGridTextColumn Binding="{Binding Path=PositionY}" Header="PositionY" />

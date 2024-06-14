@@ -1,8 +1,12 @@
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
+using OpenKh.Tools.Kh2ObjectEditor.Utils;
+using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 {
@@ -56,6 +60,13 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
                 }
             }
         }
+        private void Button_Test(object sender, RoutedEventArgs e)
+        {
+            if (ApdxService.Instance.PaxFile?.DpxPackage == null)
+                return;
+
+            TestEffectsIngame();
+        }
 
         private void importDpx(Dpx dpxFile)
         {
@@ -72,6 +83,74 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
                 effect.EffectNumber += (uint)effectCount;
                 ApdxService.Instance.PaxFile.DpxPackage.ParticleEffects.Add(effect);
             }
+        }
+
+
+        // Tests the Effects ingame. Writes the element/caster entries.
+        // IMPORTANT: elements must be of the same length, be careful because there's no control of this.
+        public void TestEffectsIngame()
+        {
+            string filename = Path.GetFileName(ApdxService.Instance.ApdxPath);
+
+            if (filename == "")
+                return;
+
+            long fileAddress;
+            try
+            {
+                fileAddress = ProcessService.getAddressOfFile(filename);
+            }
+            catch (Exception exc)
+            {
+                System.Windows.Forms.MessageBox.Show("Game is not running", "There was an error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            if (fileAddress == 0)
+            {
+                System.Windows.Forms.MessageBox.Show("Couldn't find file", "There was an error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            int entryOffset = -1;
+            foreach (Bar.Entry entry in ApdxService.Instance.ApdxBar)
+            {
+                if (entry.Type == Bar.EntryType.Pax)
+                {
+                    entryOffset = entry.Offset;
+                    break;
+                }
+            }
+            if (entryOffset == -1)
+            {
+                System.Windows.Forms.MessageBox.Show("AI file not found", "There was an error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            // ELEMENTS
+            int paxHeaderSize = 16;
+            long elementsAddress = fileAddress + entryOffset + paxHeaderSize;
+            MemoryStream elementsStream = new MemoryStream();
+            foreach (var elem in ApdxService.Instance.PaxFile.Elements)
+            {
+                BinaryMapping.WriteObject(elementsStream, elem);
+            }
+            byte[] elementsBytes = elementsStream.ToArray();
+            MemoryAccess.writeMemory(ProcessService.KH2Process, elementsAddress, elementsBytes, true);
+
+            // EFFECTS - Not as simple due to Ids being based on offsets
+            //int dpxHeaderSize = 16;
+            //int effectSize = 32;
+            //long effectsAddress = fileAddress + entryOffset + ApdxService.Instance.PaxFile.Header.DpxOffset + dpxHeaderSize;
+            //for (int i = 0; i < ApdxService.Instance.PaxFile.DpxPackage.ParticleEffects.Count; i++)
+            //{
+                //long effectAddress = effectsAddress + (effectSize * i) + 4; // First int is a dynamic offset
+                //var dpd = ApdxService.Instance.PaxFile.DpxPackage.ParticleEffects[i];
+                //MemoryStream effectsStream = new MemoryStream();
+                //BinaryMapping.WriteObject(effectsStream, dpd);
+                //byte[] effectsBytes = effectsStream.ToArray().Skip(4).ToArray();
+                //MemoryAccess.writeMemory(ProcessService.KH2Process, effectAddress, effectsBytes, true);
+            //}
         }
     }
 }

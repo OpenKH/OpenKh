@@ -74,6 +74,45 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             Frame_Metadata.Content = new MotionMetadata_Control(animBinary);
             Frame_Triggers.Content = new MotionTriggers_Control(animBinary);
         }
+        public void Motion_Rename(object sender, RoutedEventArgs e)
+        {
+            if (MotionList.SelectedItem != null)
+            {
+                MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
+                MotionRenameWindow newWindow = new MotionRenameWindow(item.Index, this);
+                newWindow.Show();
+            }
+        }
+        public void Motion_AddNew(object sender, RoutedEventArgs e)
+        {
+            if (MotionList.SelectedItem != null)
+            {
+
+                MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
+
+                Bar.Entry newMotionBar = new Bar.Entry();
+                newMotionBar.Name = "NDUM";
+                newMotionBar.Type = Bar.EntryType.Anb;
+                newMotionBar.Stream = new MemoryStream();
+
+                MsetService.Instance.MsetBar.Insert(item.Index + 1, newMotionBar);
+
+                ThisVM.loadMotions();
+                ThisVM.applyFilters();
+            }
+        }
+        public void Motion_Remove(object sender, RoutedEventArgs e)
+        {
+            if (MotionList.SelectedItem != null)
+            {
+                MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
+
+                MsetService.Instance.MsetBar.RemoveAt(item.Index);
+
+                ThisVM.loadMotions();
+                ThisVM.applyFilters();
+            }
+        }
         public void Motion_Copy(object sender, RoutedEventArgs e)
         {
             if (MotionList.SelectedItem != null)
@@ -92,65 +131,91 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         }
         public void Motion_Import(object sender, RoutedEventArgs e)
         {
-            if (MotionList.SelectedItem != null)
-            {
-                Frame_Metadata.Content = new ContentControl();
-                Frame_Triggers.Content = new ContentControl();
-
-                MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
-
-                try
-                {
-                    OpenFileDialog openFileDialog = new OpenFileDialog();
-                    openFileDialog.Multiselect = false;
-                    if (openFileDialog.ShowDialog() == true && openFileDialog.FileNames != null && openFileDialog.FileNames.Length > 0)
-                    {
-                        string filePath = openFileDialog.FileNames[0];
-                        if (filePath.ToLower().EndsWith(".fbx"))
-                        {
-                            ThisVM.Motion_Import(item.Index, filePath);
-                        }
-                    }
-
-                    App_Context.Instance.loadMotion(item.Index);
-                    openMotionTabs(MsetService.Instance.LoadedMotion);
-                }
-                catch (Exception exception)
-                {
-                    // Nothing planned for now
-                }
+            if (MotionList.SelectedItem == null) {
+                return;
             }
+
+            Frame_Metadata.Content = new ContentControl();
+            Frame_Triggers.Content = new ContentControl();
+
+            MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
+
+            try
+            {
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Multiselect = false;
+                if (openFileDialog.ShowDialog() == true && openFileDialog.FileNames != null && openFileDialog.FileNames.Length > 0)
+                {
+                    string filePath = openFileDialog.FileNames[0];
+                    if (filePath.ToLower().EndsWith(".fbx"))
+                    {
+                        ThisVM.Motion_Import(item.Index, filePath);
+                    }
+                }
+
+                App_Context.Instance.loadMotion(item.Index);
+                openMotionTabs(MsetService.Instance.LoadedMotion);
+            }
+            catch (Exception exception) { }
         }
         public void RC_Export(object sender, RoutedEventArgs e)
         {
-            if (MotionList.SelectedItem != null)
+            if (MotionList.SelectedItem == null) {
+                return;
+            }
+
+            MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
+
+            if(item.Entry.Type != Bar.EntryType.Motionset) {
+                System.Windows.Forms.MessageBox.Show("The selected entry is not a Moveset", "Can't export entry", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            try
             {
-                MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
-
-                if(item.Entry.Type != Bar.EntryType.Motionset) {
-                    System.Windows.Forms.MessageBox.Show("The selected entry is not a Moveset", "Can't export entry", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    return;
-                }
-
-                try
+                System.Windows.Forms.SaveFileDialog sfd;
+                sfd = new System.Windows.Forms.SaveFileDialog();
+                sfd.Title = "Export Reaction Command";
+                sfd.FileName = item.Entry.Name + ".mset";
+                sfd.ShowDialog();
+                if (sfd.FileName != "")
                 {
-                    System.Windows.Forms.SaveFileDialog sfd;
-                    sfd = new System.Windows.Forms.SaveFileDialog();
-                    sfd.Title = "Export Reaction Command";
-                    sfd.FileName = item.Entry.Name + ".mset";
-                    sfd.ShowDialog();
-                    if (sfd.FileName != "")
+                    MemoryStream memStream = (MemoryStream)item.Entry.Stream;
+                    memStream.Position = 0;
+                    File.WriteAllBytes(sfd.FileName, memStream.ToArray());
+                    item.Entry.Stream.Position = 0;
+                }
+            }
+            catch (Exception exc) { }
+
+            item.Entry.Stream.Position = 0;
+        }
+        public void RC_Replace(object sender, RoutedEventArgs e)
+        {
+            if (MotionList.SelectedItem == null) {
+                return;
+            }
+
+            MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
+
+            try
+            {
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Multiselect = false;
+                if (openFileDialog.ShowDialog() == true && openFileDialog.FileNames != null && openFileDialog.FileNames.Length > 0)
+                {
+                    string filePath = openFileDialog.FileNames[0];
+                    if (filePath.ToLower().EndsWith(".mset"))
                     {
-                        MemoryStream memStream = (MemoryStream)item.Entry.Stream;
-                        memStream.Position = 0;
-                        File.WriteAllBytes(sfd.FileName, memStream.ToArray());
-                        item.Entry.Stream.Position = 0;
+                        ThisVM.Motion_ImportRC(item.Index, filePath);
                     }
                 }
-                catch (Exception exc) { }
 
-                item.Entry.Stream.Position = 0;
+                openMotionTabs(MsetService.Instance.LoadedMotion);
             }
+            catch (Exception exception) { }
+
+            item.Entry.Stream.Position = 0;
         }
 
         private void Button_TEST(object sender, System.Windows.RoutedEventArgs e)

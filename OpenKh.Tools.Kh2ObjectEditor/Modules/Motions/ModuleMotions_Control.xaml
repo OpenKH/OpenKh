@@ -54,10 +54,16 @@
             <ListView Name="MotionList" ItemsSource="{Binding MotionsView}" SelectedItem="{Binding SelectedMotion}"  MouseDoubleClick="list_doubleCLick">
                 <ListView.ContextMenu>
                     <ContextMenu>
+                        <MenuItem Header="Rename" Click="Motion_Rename"/>
+                        <MenuItem Header="Add new dummy below" Click="Motion_AddNew"/>
+                        <MenuItem Header="Remove motion" Click="Motion_Remove"/>
+                        <Separator/>
                         <MenuItem Header="Copy motion" Click="Motion_Copy"/>
                         <MenuItem Header="Replace with copied motion" Click="Motion_Replace"/>
                         <MenuItem Header="Replace with imported FBX animation" Click="Motion_Import"/>
-                        <MenuItem Header="Export RC as MSET" Click="RC_Export"/>
+                        <Separator/>
+                        <MenuItem Header="Export RC as mset" Click="RC_Export"/>
+                        <MenuItem Header="Replace with imported RC mset" Click="RC_Replace"/>
                     </ContextMenu>
                 </ListView.ContextMenu>
                 <ListView.ItemTemplate>

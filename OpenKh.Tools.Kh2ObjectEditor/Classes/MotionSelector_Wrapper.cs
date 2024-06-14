@@ -13,7 +13,11 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Classes
         {
             Index = index;
             Entry = entry;
-            Name = "[" + Index + "] " + Entry.Name + " [" + (MotionSet.MotionName)(index / 4) + "]";
+            setName();
+        }
+        public void setName()
+        {
+            Name = "[" + Index + "] " + Entry.Name + " [" + (MotionSet.MotionName)(Index / 4) + "]";
             if (Entry.Type == Bar.EntryType.Motionset)
                 Name += "<RC>";
             if (Entry.Stream.Length == 0)

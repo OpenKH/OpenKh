@@ -32,5 +32,10 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         {
             ThisVM.clipboardPaste();
         }
+
+        private void Button_Test(object sender, RoutedEventArgs e)
+        {
+            ThisVM.TestAiIngame();
+        }
     }
 }
