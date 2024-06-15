@@ -54,6 +54,7 @@
                     <ComboBoxItem>OpenKH Game Engine</ComboBoxItem>
                     <ComboBoxItem>PlayStation 2 using PCSX2 emulator</ComboBoxItem>
                     <ComboBoxItem>PC Release via Epic Game Store</ComboBoxItem>
+                    <ComboBoxItem>PC Release via Steam</ComboBoxItem>
                 </ComboBox>
                 <StackPanel Visibility="{Binding OpenKhGameEngineConfigVisibility}">
                     <TextBlock Margin="0 0 0 3">Please select the location of OpenKH Game Engine</TextBlock>
@@ -107,6 +108,35 @@
                         </Grid.ColumnDefinitions>
                         <TextBox Grid.Column="0" Text="{Binding PcReleaseLocationKH3D, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseKH3DCommand}">
+                            <Image Source="{StaticResource FolderOpen_16x}"/>
+                        </Button>
+                    </Grid>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">NOTE: Always be sure to use a supported version or risk breaking compatibility</TextBlock>
+                </StackPanel>
+                <StackPanel Visibility="{Binding PcReleaseSteamConfigVisibility}">
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                        Mod Manager supports both the 1.5+2.5 collection and KH3D from the 2.8 collection choose the filepath for at least one of the collections.
+                    </TextBlock>
+                    <Button Margin="0 10 0 10" Command="{Binding DetectInstallsCommand}">Detect Installations</Button>
+                    <TextBlock Margin="0 0 0 3">Folder location of the PC release of 1.5+2.5</TextBlock>
+                    <Grid Margin="0 0 0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding PcReleaseSteamLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcSteamReleaseCommand}">
+                            <Image Source="{StaticResource FolderOpen_16x}"/>
+                        </Button>
+                    </Grid>
+                    <TextBlock Margin="0 0 0 3">Folder location of the PC release of 2.8</TextBlock>
+                    <Grid Margin="0 0 0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding PcReleaseSteamLocationKH3D, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcSteamReleaseKH3DCommand}">
                             <Image Source="{StaticResource FolderOpen_16x}"/>
                         </Button>
                     </Grid>
@@ -204,6 +234,14 @@
                     </TextBlock>
                 </StackPanel>
                 <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
+                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
+                        You do not have any extracted data from a supported game.
+                    </TextBlock>
+                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
+                        You already have extracted data from a supported game.
+                    </TextBlock>
+                </StackPanel>
+                <StackPanel Visibility="{Binding PcReleaseSteamConfigVisibility}">
                     <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
                         You do not have any extracted data from a supported game.
                     </TextBlock>

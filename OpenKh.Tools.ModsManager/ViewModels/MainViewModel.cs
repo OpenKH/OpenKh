@@ -69,6 +69,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
         private const string REMASTERED_FILES_FOLDER_NAME = "remastered";
 
+        const int EpicGamesPC = 2;
+        const int Steam = 3;
+
         public static bool overwriteMod = false;
         public string Title => ApplicationName;
         public string CurrentVersion => ApplicationVersion;
@@ -292,7 +295,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public MainViewModel()
         {
-            if (ConfigurationService.GameEdition == 2)
+            if (ConfigurationService.GameEdition == EpicGamesPC || ConfigurationService.GameEdition == Steam)
             {
                 PC = true;
                 PanaceaInstalled = ConfigurationService.PanaceaInstalled;
@@ -463,6 +466,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation,
                     ConfigPcReleaseLocationKH3D = ConfigurationService.PcReleaseLocationKH3D,
                     ConfigPcReleaseLanguage = ConfigurationService.PcReleaseLanguage,
+                    ConfigPcReleaseSteamLocation = ConfigurationService.PcReleaseSteamLocation,
+                    ConfigPcReleaseSteamLocationKH3D = ConfigurationService.PcReleaseSteamLocationKH3D,
+                    ConfigPcReleaseLanguageDT = ConfigurationService.PcReleaseLanguageDT,
                     ConfigRegionId = ConfigurationService.RegionId,
                     ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
                     ConfigIsEGSVersion = ConfigurationService.IsEGSVersion,
@@ -476,33 +482,46 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.Pcsx2Location = dialog.ConfigPcsx2Location;
                     ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
                     ConfigurationService.PcReleaseLocationKH3D = dialog.ConfigPcReleaseLocationKH3D;
+                    ConfigurationService.PcReleaseSteamLocation = dialog.ConfigPcReleaseSteamLocation;
+                    ConfigurationService.PcReleaseSteamLocationKH3D = dialog.ConfigPcReleaseSteamLocationKH3D;
+                    ConfigurationService.PcReleaseLanguageDT = dialog.ConfigPcReleaseLanguageDT;
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
                     ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
                     ConfigurationService.IsEGSVersion = dialog.ConfigIsEGSVersion;
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
 
-                    const int EpicGamesPC = 2;
-                    if (ConfigurationService.GameEdition == EpicGamesPC &&
-                        Directory.Exists(ConfigurationService.PcReleaseLocation))
+                    string path = (ConfigurationService.PcReleaseLocation ?? ConfigurationService.PcReleaseSteamLocation);
+                    string path3D = (ConfigurationService.PcReleaseLocationKH3D ?? ConfigurationService.PcReleaseSteamLocationKH3D);
+
+                    if (
+                        ConfigurationService.GameEdition == EpicGamesPC &&
+                        Directory.Exists(ConfigurationService.PcReleaseLocation) ||
+                        (ConfigurationService.GameEdition == Steam &&
+                        Directory.Exists(ConfigurationService.PcReleaseSteamLocation))
+                       )
                     {
-                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
+                        File.WriteAllLines(Path.Combine(path, "panacea_settings.txt"),
                             new string[]
                             {
                                 $"mod_path={ConfigurationService.GameModPath}",
                                 $"show_console={false}",
                             });
                     }
-                    if (ConfigurationService.GameEdition == EpicGamesPC &&
-                        Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                    if (
+                        (ConfigurationService.GameEdition == EpicGamesPC &&
+                        Directory.Exists(ConfigurationService.PcReleaseLocationKH3D)) ||
+                        (ConfigurationService.GameEdition == Steam &&
+                        Directory.Exists(ConfigurationService.PcReleaseSteamLocationKH3D))
+                       )
                     {
-                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
+                        File.WriteAllLines(Path.Combine(path3D, "panacea_settings.txt"),
                             new string[]
                             {
                                 $"mod_path={ConfigurationService.GameModPath}",
                                 $"show_console={false}",
                             });
                     }
-                    if (ConfigurationService.GameEdition == 2)
+                    if (ConfigurationService.GameEdition == EpicGamesPC || ConfigurationService.GameEdition == Steam)
                     {
                         PC = true;
                         PanaceaInstalled = ConfigurationService.PanaceaInstalled;
@@ -630,16 +649,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     isPcsx2 = true;
                     break;
                 case 2:
-                    if (ConfigurationService.IsEGSVersion && !(_launchGame == "kh3d"))
+                case 3:
+                    string path = (ConfigurationService.PcReleaseLocation ?? ConfigurationService.PcReleaseSteamLocation);
+                    string path3D = (ConfigurationService.PcReleaseLocationKH3D ?? ConfigurationService.PcReleaseSteamLocationKH3D);
+                    if ((ConfigurationService.IsEGSVersion) && !(_launchGame == "kh3d"))
                     {
-                        if (ConfigurationService.PcReleaseLocation != null)
+                        if (ConfigurationService.PcReleaseLocation != null || ConfigurationService.PcReleaseSteamLocation != null)
                         {
                             if (ConfigurationService.PanaceaInstalled)
                             {
-                                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
+                                string panaceaSettings = Path.Combine(path, "panacea_settings.txt");
                                 if (!File.Exists(panaceaSettings))
                                 {
-                                    File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
+                                    File.WriteAllLines(Path.Combine(path, "panacea_settings.txt"),
                                     new string[]
                                     {
                                 $"mod_path={ConfigurationService.GameModPath}",
@@ -648,11 +670,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
-                            processStartInfo = new ProcessStartInfo
+                            if(ConfigurationService.PcReleaseLocation != null)
                             {
-                                FileName = "com.epicgames.launcher://apps/4158b699dd70447a981fee752d970a3e%3A5aac304f0e8948268ddfd404334dbdc7%3A68c214c58f694ae88c2dab6f209b43e4?action=launch&silent=true",
-                                UseShellExecute = true,
-                            };
+                                processStartInfo = new ProcessStartInfo
+                                {
+                                    FileName = "com.epicgames.launcher://apps/4158b699dd70447a981fee752d970a3e%3A5aac304f0e8948268ddfd404334dbdc7%3A68c214c58f694ae88c2dab6f209b43e4?action=launch&silent=true",
+                                    UseShellExecute = true,
+                                };
+                            } else
+                            {
+                                processStartInfo = new ProcessStartInfo
+                                {
+                                    FileName = "steam://rungameid/2552430",
+                                    UseShellExecute = true,
+                                };
+
+                            }
                         }
                         else
                         {
@@ -665,16 +698,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     else if (ConfigurationService.IsEGSVersion && _launchGame == "kh3d")
                     {
-                        if (ConfigurationService.PcReleaseLocationKH3D != null)
+                        if (ConfigurationService.PcReleaseLocationKH3D != null || ConfigurationService.PcReleaseSteamLocationKH3D != null)
                         {
-                            string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
+                            string panaceaSettings = Path.Combine(path3D, "panacea_settings.txt");
                             if (ConfigurationService.PanaceaInstalled)
                             {
                                 if (!File.Exists(panaceaSettings))
                                 {
-                                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                                    if (Directory.Exists(path3D))
                                     {
-                                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
+                                        File.WriteAllLines(Path.Combine(path3D, "panacea_settings.txt"),
                                         new string[]
                                         {
                                     $"mod_path={ConfigurationService.GameModPath}",
@@ -686,11 +719,21 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
-                            processStartInfo = new ProcessStartInfo
+                            if(ConfigurationService.PcReleaseLocation != null)
                             {
-                                FileName = "com.epicgames.launcher://apps/c8ff067c1c984cd7ab1998e8a9afc8b6%3Aaa743b9f52e84930b0ba1b701951e927%3Ad1a8f7c478d4439b8c60a5808715dc05?action=launch&silent=true",
-                                UseShellExecute = true,
-                            };
+                                processStartInfo = new ProcessStartInfo
+                                {
+                                    FileName = "com.epicgames.launcher://apps/c8ff067c1c984cd7ab1998e8a9afc8b6%3Aaa743b9f52e84930b0ba1b701951e927%3Ad1a8f7c478d4439b8c60a5808715dc05?action=launch&silent=true",
+                                    UseShellExecute = true,
+                                };
+                            } else
+                            {
+                                processStartInfo = new ProcessStartInfo
+                                {
+                                    FileName = "steam://rungameid/2552440",
+                                    UseShellExecute = true,
+                                };
+                            }
                         }
                         else
                         {
@@ -709,11 +752,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             if (!(_launchGame == "kh3d"))
                             {
-                                filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
+                                filename = Path.Combine(path, executable[launchExecutable]);
                             }
                             else
                             {
-                                filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
+                                filename = Path.Combine(path3D, executable[launchExecutable]);
                             }
                             processStartInfo = new ProcessStartInfo
                             {
@@ -846,7 +889,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             await Task.Run(() =>
             {
-                if (ConfigurationService.GameEdition == 2)
+                if (ConfigurationService.GameEdition == EpicGamesPC || ConfigurationService.GameEdition == Steam)
                 {
                     // Use the package map file to rearrange the files in the structure needed by the patcher
                     var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, _launchGame, "patch-package-map.txt");
@@ -929,15 +972,23 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }
                         string _pkgName = null;
                         string _backupDir = null;
-                        if (_launchGame != "kh3d" && ConfigurationService.PcReleaseLocation != null)
+
+                        string path = (ConfigurationService.PcReleaseLocation ?? ConfigurationService.PcReleaseSteamLocation);
+                        string path3D = (ConfigurationService.PcReleaseLocationKH3D ?? ConfigurationService.PcReleaseSteamLocationKH3D);
+
+                        if (_launchGame != "kh3d" && (ConfigurationService.PcReleaseLocation != null || ConfigurationService.PcReleaseSteamLocation != null))
                         {
-                            _pkgName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", ConfigurationService.PcReleaseLanguage, _pkgSoft + ".pkg");
-                            _backupDir = Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage");
+                            string languagePath = Path.Combine(path, "Image", ConfigurationService.PcReleaseLanguage);
+                            string availableLanguage = Directory.Exists(languagePath) ? ConfigurationService.PcReleaseLanguage : ConfigurationService.PcReleaseLanguageDT;
+                            _pkgName = Path.Combine(path, "Image", availableLanguage, _pkgSoft + ".pkg");
+                            _backupDir = Path.Combine(path, "BackupImage");
                         }
-                        else if (ConfigurationService.PcReleaseLocationKH3D != null)
+                        else if (ConfigurationService.PcReleaseLocationKH3D != null || ConfigurationService.PcReleaseSteamLocationKH3D != null)
                         {
-                            _pkgName = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "Image", ConfigurationService.PcReleaseLanguage, _pkgSoft + ".pkg");
-                            _backupDir = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "BackupImage");
+                            string languagePath = Path.Combine(path3D, "Image", ConfigurationService.PcReleaseLanguage);
+                            string availableLanguage = Directory.Exists(languagePath) ? ConfigurationService.PcReleaseLanguage : ConfigurationService.PcReleaseLanguageDT;
+                            _pkgName = Path.Combine(path3D, "Image", availableLanguage, _pkgSoft + ".pkg");
+                            _backupDir = Path.Combine(path3D, "BackupImage");
                         }
                         else
                         {
@@ -1035,22 +1086,29 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             await Task.Run(() =>
             {
-                if (ConfigurationService.GameEdition == 2)
+                if (ConfigurationService.GameEdition == EpicGamesPC || ConfigurationService.GameEdition == Steam)
                 {
                     if (patched && _launchGame != "kh3d")
                     {
-                        if (ConfigurationService.PcReleaseLocation == null || !Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")))
+                        string path = (ConfigurationService.PcReleaseLocation ?? ConfigurationService.PcReleaseSteamLocation);
+                        string languagePath = Path.Combine(path, "Image", ConfigurationService.PcReleaseLanguage);
+                        string availableLanguage = Directory.Exists(languagePath) ? ConfigurationService.PcReleaseLanguage : ConfigurationService.PcReleaseLanguageDT;
+
+                        if (
+                            ConfigurationService.PcReleaseLocation == null || !Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")) ||
+                            ConfigurationService.PcReleaseSteamLocation == null || !Directory.Exists(Path.Combine(ConfigurationService.PcReleaseSteamLocation, "BackupImage"))
+                        )
                         {
                             Log.Warn("backup folder cannot be found! Cannot restore the game.");
                         }
                         else
                         {
-                            foreach (var file in Directory.GetFiles(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")).Where(x => x.Contains(".pkg") && (x.Contains(_launchGame))))
+                            foreach (var file in Directory.GetFiles(Path.Combine(path, "BackupImage")).Where(x => x.Contains(".pkg") && (x.Contains(_launchGame))))
                             {
                                 Log.Info($"Restoring Package File {file.Replace(".pkg", "")}");
 
                                 var _fileBare = Path.GetFileName(file);
-                                var _trueName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", ConfigurationService.PcReleaseLanguage, _fileBare);
+                                var _trueName = Path.Combine(path, "Image", availableLanguage, _fileBare);
 
                                 File.Delete(Path.ChangeExtension(_trueName, "hed"));
                                 File.Delete(_trueName);
@@ -1063,18 +1121,21 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     else if (patched)
                     {
+                        string path3D = (ConfigurationService.PcReleaseLocationKH3D ?? ConfigurationService.PcReleaseSteamLocationKH3D);
+                        string languagePath = Path.Combine(path3D, "Image", ConfigurationService.PcReleaseLanguage);
+                        string availableLanguage = Directory.Exists(languagePath) ? ConfigurationService.PcReleaseLanguage : ConfigurationService.PcReleaseLanguageDT;
                         if (ConfigurationService.PcReleaseLocationKH3D == null || !Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "BackupImage")))
                         {
                             Log.Warn("backup folder cannot be found! Cannot restore the game.");
                         }
                         else
                         {
-                            foreach (var file in Directory.GetFiles(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "BackupImage")).Where(x => x.Contains(".pkg") && (x.Contains(_launchGame))))
+                            foreach (var file in Directory.GetFiles(Path.Combine(path3D, "BackupImage")).Where(x => x.Contains(".pkg") && (x.Contains(_launchGame))))
                             {
                                 Log.Info($"Restoring Package File {file.Replace(".pkg", "")}");
 
                                 var _fileBare = Path.GetFileName(file);
-                                var _trueName = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "Image", ConfigurationService.PcReleaseLanguage, _fileBare);
+                                var _trueName = Path.Combine(path3D, "Image", availableLanguage, _fileBare);
 
                                 File.Delete(Path.ChangeExtension(_trueName, "hed"));
                                 File.Delete(_trueName);
@@ -1179,9 +1240,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             if (PanaceaInstalled)
             {
-                if (_launchGame != "kh3d" && ConfigurationService.PcReleaseLocation != null)
+                string path = (ConfigurationService.PcReleaseLocation ?? ConfigurationService.PcReleaseSteamLocation);
+                string path3D = (ConfigurationService.PcReleaseLocationKH3D ?? ConfigurationService.PcReleaseSteamLocationKH3D);
+                if (_launchGame != "kh3d" && ConfigurationService.PcReleaseLocation != null || _launchGame != "kh3d" && ConfigurationService.PcReleaseSteamLocation != null)
                 {
-                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
+                    string panaceaSettings = Path.Combine(path, "panacea_settings.txt");
                     string[] lines = File.ReadAllLines(panaceaSettings);
                     string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\n";
                     foreach (string entry in lines)
@@ -1196,9 +1259,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         $"debug_log={_panaceaDebugLogEnabled}\r\nenable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
                     File.WriteAllText(panaceaSettings, textToWrite);
                 }
-                else if (ConfigurationService.PcReleaseLocationKH3D != null)
+                else if (ConfigurationService.PcReleaseLocationKH3D != null || ConfigurationService.PcReleaseSteamLocationKH3D != null)
                 {
-                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
+                    string panaceaSettings = Path.Combine(path3D, "panacea_settings.txt");
                     string[] lines = File.ReadAllLines(panaceaSettings);
                     string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\n";
                     foreach (string entry in lines)
