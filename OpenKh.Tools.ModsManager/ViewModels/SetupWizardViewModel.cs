@@ -138,10 +138,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     PCSX2 => !string.IsNullOrEmpty(Pcsx2Location) && File.Exists(Pcsx2Location),
                     PC => (!string.IsNullOrEmpty(PcReleaseLocation) &&
                         Directory.Exists(PcReleaseLocation) &&
-                        File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")))|| 
+                        (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
+                        File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))))|| 
                         (!string.IsNullOrEmpty(PcReleaseLocationKH3D) &&
                         Directory.Exists(PcReleaseLocationKH3D) &&
-                        File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll"))),
+                        (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
+                        File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll")))),
                     _ => false,
                 };
             }
@@ -182,8 +184,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 switch (ConfigurationService.PCVersion)
                 {
-                    case "Steam/Other":
+                    case "Steam":
                         return 1;
+                    case "Other":
+                        return 2;
                     default:
                         return 0;
                 }
@@ -193,14 +197,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 switch (value)
                 {
                     case 1:
-                        _pcVersion = "Steam/Other";
-                        ConfigurationService.PCVersion = "Steam/Other";
+                        _pcVersion = "Steam";
+                        ConfigurationService.PCVersion = "Steam";
+                        break;
+                    case 2:
+                        _pcVersion = "Other";
+                        ConfigurationService.PCVersion = "Other";
                         break;
                     default:
                         _pcVersion = "EGS";
                         ConfigurationService.PCVersion = "EGS";
                         break;
                 }
+                OnPropertyChanged(nameof(EGSInstall));
             }
         }
         public RelayCommand SelectOpenKhGameEngineCommand { get; }
@@ -236,6 +245,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility PcRelease28Selected => PcReleaseSelections == "2.8" ? Visibility.Visible : Visibility.Collapsed;
         public Visibility InstallForPc1525 => GameCollection == 0 && (PcReleaseSelections == "both" || PcReleaseSelections == "1.5+2.5") ? Visibility.Visible : Visibility.Collapsed;
         public Visibility InstallForPc28 => GameCollection == 1 && (PcReleaseSelections == "both" || PcReleaseSelections == "2.8") ? Visibility.Visible :Visibility.Collapsed;
+        public Visibility EGSInstall => ConfigurationService.PCVersion == "EGS" ? Visibility.Visible : Visibility.Collapsed;
         public string PcReleaseLocation
         {
             get => _pcReleaseLocation;
@@ -261,17 +271,21 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             get
             {
-                if (Directory.Exists(PcReleaseLocation) && File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) &&
-                    Directory.Exists(PcReleaseLocationKH3D) && File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")))
+                if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) || 
+                    File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))) &&
+                    Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) || 
+                    File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))))
                 {
                     return _pcReleasesSelected = "both";
                 }
-                else if (Directory.Exists(PcReleaseLocation) && File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")))
+                else if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) || 
+                    File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))))
                 {
 
                     return _pcReleasesSelected = "1.5+2.5";
                 }
-                else if (Directory.Exists(PcReleaseLocationKH3D) && File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")))
+                else if (Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
+                    File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))))
                 {
 
                     return _pcReleasesSelected = "2.8";
@@ -1263,7 +1277,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             for (int i = 0; i < 5; i++)
                             {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"), System.IO.FileMode.Open);
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"), System.IO.FileMode.Open);
                                 var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                                 _totalFiles += _hedFile.Count();
                             }
@@ -1272,7 +1286,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             for (int i = 0; i < 6; i++)
                             {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"), System.IO.FileMode.Open);
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"), System.IO.FileMode.Open);
                                 var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                                 _totalFiles += _hedFile.Count();
                             }
@@ -1281,14 +1295,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             for (int i = 0; i < 4; i++)
                             {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".hed"), System.IO.FileMode.Open);
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".hed"), System.IO.FileMode.Open);
                                 var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                                 _totalFiles += _hedFile.Count();
                             }
                         }
                         if (ConfigurationService.Extractrecom)
                         {
-                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"), System.IO.FileMode.Open);
+                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "Recom.hed"), System.IO.FileMode.Open);
                             var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                             _totalFiles += _hedFile.Count();
                         }
@@ -1296,7 +1310,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             for (int i = 0; i < 4; i++)
                             {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocationKH3D, "Image", _pcReleaseLanguage, "kh3d_" + _nameListbbs[i] + ".hed"), System.IO.FileMode.Open);
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocationKH3D, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "kh3d_" + _nameListbbs[i] + ".hed"), System.IO.FileMode.Open);
                                 var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                                 _totalFiles += _hedFile.Count();
                             }
@@ -1307,8 +1321,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             for (int i = 0; i < 5; i++)
                             {
                                 var outputDir = Path.Combine(gameDataLocation, "kh1");
-                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"));
-                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".pkg"));
+                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"));
+                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".pkg"));
 
                                 foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
                                 {
@@ -1346,8 +1360,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             for (int i = 0; i < 6; i++)
                             {
                                 var outputDir = Path.Combine(gameDataLocation, "kh2");
-                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"));
-                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".pkg"));
+                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"));
+                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".pkg"));
 
                                 foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
                                 {
@@ -1385,8 +1399,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             for (int i = 0; i < 4; i++)
                             {
                                 var outputDir = Path.Combine(gameDataLocation, "bbs");
-                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".hed"));
-                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".pkg"));
+                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".hed"));
+                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".pkg"));
 
                                 foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
                                 {
@@ -1424,8 +1438,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             for (int i = 0; i < 1; i++)
                             {
                                 var outputDir = Path.Combine(gameDataLocation, "Recom");
-                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"));
-                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.pkg"));
+                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "Recom.hed"));
+                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "Recom.pkg"));
 
                                 foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
                                 {
@@ -1463,8 +1477,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             for (int i = 0; i < 4; i++)
                             {
                                 var outputDir = Path.Combine(gameDataLocation, "kh3d");
-                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocationKH3D, "Image", _pcReleaseLanguage, "kh3d_" + _nameListkh3d[i] + ".hed"));
-                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocationKH3D, "Image", _pcReleaseLanguage, "kh3d_" + _nameListkh3d[i] + ".pkg"));
+                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocationKH3D, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage, "kh3d_" + _nameListkh3d[i] + ".hed"));
+                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocationKH3D, "Image", ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en" ? "dt" : _pcReleaseLanguage , "kh3d_" + _nameListkh3d[i] + ".pkg"));
 
                                 foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
                                 {

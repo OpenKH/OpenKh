@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="{Binding Title}" d:Title="OpenKH Mods Manager set-up"
-        Height="480" Width="400" ResizeMode="NoResize">
+        Height="520" Width="400" ResizeMode="NoResize">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
@@ -83,11 +83,19 @@
                     </Grid>
                     <TextBlock Margin="0 0 0 3">NOTE: Only PCSX2 up to 1.6.0 and PCSX2-EX are supported.</TextBlock>
                 </StackPanel>
-                <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
+                <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">                    
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    Select the launcher you use for the supported Kingdom Hearts games.
+                    </TextBlock>
+                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding LaunchOption}">
+                        <ComboBoxItem>Epic Games Store</ComboBoxItem>
+                        <ComboBoxItem>Steam</ComboBoxItem>
+                        <ComboBoxItem>Other</ComboBoxItem>
+                    </ComboBox>                    
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         Mod Manager supports both the 1.5+2.5 collection and KH3D from the 2.8 collection choose the filepath for at least one of the collections.
                     </TextBlock>
-                    <Button Margin="0 10 0 10" Command="{Binding DetectInstallsCommand}">Detect Installations</Button>
+                    <Button Margin="0 10 0 10" Command="{Binding DetectInstallsCommand}" Visibility="{Binding EGSInstall}">Detect Installations</Button>
                     <TextBlock Margin="0 0 0 3">Folder location of the PC release of 1.5+2.5</TextBlock>
                     <Grid Margin="0 0 0 3">
                         <Grid.ColumnDefinitions>
@@ -317,7 +325,7 @@
             Title="Install Lua Backend"
             Description="Lua Backend allows you to use Lua Scripts with the PC version of Kingdom Hearts."
             PreviousPage="{Binding PageStack.Back}"
-            NextPage="{Binding ElementName=PCLaunchOption}">
+            NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
                 <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
@@ -345,23 +353,6 @@
                 If you wish to uninstall Lua Backend completely press the button below.
                 </TextBlock>
                 <Button Margin="0 0 0 6" Content="Uninstall Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveLuaBackendCommand}" Visibility="{Binding LuaBackendFoundVisibility}"/>
-            </StackPanel>
-        </xctk:WizardPage>
-        <xctk:WizardPage
-            x:Name="PCLaunchOption"
-            PageType="Interior"
-            Title="Launch Option"            
-            Description="Configure Mods Manager to launch Kingdom Hearts"
-            PreviousPage="{Binding PageStack.Back}"
-            NextPage="{Binding ElementName=PageGameData}">
-            <StackPanel>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    Select the launcher you use for the supported Kingdom Hearts games.
-                </TextBlock>
-                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding LaunchOption}">
-                    <ComboBoxItem>Epic Games Store</ComboBoxItem>
-                    <ComboBoxItem>Steam/Other</ComboBoxItem>
-                </ComboBox>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage

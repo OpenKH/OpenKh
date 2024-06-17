@@ -22,7 +22,6 @@ namespace OpenKh.Tools.ModsManager.Views
             _vm.PageIsoSelection = PageIsoSelection;
             _vm.PageEosInstall = PageEosInstall;
             _vm.PageRegion = PageRegion;
-            _vm.PCLaunchOption = PCLaunchOption;
             _vm.LastPage = LastPage;
 
             _vm.PageStack.OnPageChanged(wizard.CurrentPage);
