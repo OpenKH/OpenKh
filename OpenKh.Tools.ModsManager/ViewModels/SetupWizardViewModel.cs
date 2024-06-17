@@ -17,6 +17,7 @@ using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 using Ionic.Zip;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
 {
@@ -209,7 +210,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         ConfigurationService.PCVersion = "EGS";
                         break;
                 }
-                OnPropertyChanged(nameof(EGSInstall));
             }
         }
         public RelayCommand SelectOpenKhGameEngineCommand { get; }
@@ -245,7 +245,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility PcRelease28Selected => PcReleaseSelections == "2.8" ? Visibility.Visible : Visibility.Collapsed;
         public Visibility InstallForPc1525 => GameCollection == 0 && (PcReleaseSelections == "both" || PcReleaseSelections == "1.5+2.5") ? Visibility.Visible : Visibility.Collapsed;
         public Visibility InstallForPc28 => GameCollection == 1 && (PcReleaseSelections == "both" || PcReleaseSelections == "2.8") ? Visibility.Visible :Visibility.Collapsed;
-        public Visibility EGSInstall => ConfigurationService.PCVersion == "EGS" ? Visibility.Visible : Visibility.Collapsed;
         public string PcReleaseLocation
         {
             get => _pcReleaseLocation;
@@ -639,85 +638,162 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             });
             DetectInstallsCommand = new RelayCommand(_ =>
             {
-                // Get ProgramData Folder Location
-                string programDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                string directoryPath = Path.Combine(programDataFolder, "Epic\\EpicGamesLauncher\\Data\\Manifests");
-
-                if (!Directory.Exists(directoryPath))
+                if (ConfigurationService.PCVersion == "EGS")
                 {
-                    MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
-                    return;
-                }
+                    // Get ProgramData Folder Location
+                    string programDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                    string directoryPath = Path.Combine(programDataFolder, "Epic\\EpicGamesLauncher\\Data\\Manifests");
 
-                // Get List of .item Files in C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests\
-                IEnumerable<string> itemFiles = Directory.EnumerateFiles(directoryPath, "*.item");
-
-                if (!itemFiles.Any())
-                {
-                    MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
-                    return;
-                }
-
-                bool installLocationFoundRemix = false;
-                bool installLocationFound3D = false;
-                foreach (string itemFile in itemFiles)
-                {
-                    // Read Each .item File and Locate Install Location For Games
-                    using StreamReader sr = new StreamReader(itemFile);
-                    string line;
-                    if (sr != null)
+                    if (!Directory.Exists(directoryPath))
                     {
-                        while ((line = sr.ReadLine()) is not null)
+                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        return;
+                    }
+
+                    // Get List of .item Files in C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests\
+                    IEnumerable<string> itemFiles = Directory.EnumerateFiles(directoryPath, "*.item");
+
+                    if (!itemFiles.Any())
+                    {
+                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        return;
+                    }
+
+                    bool installLocationFoundRemix = false;
+                    bool installLocationFound3D = false;
+                    foreach (string itemFile in itemFiles)
+                    {
+                        // Read Each .item File and Locate Install Location For Games
+                        using StreamReader sr = new StreamReader(itemFile);
+                        string line;
+                        if (sr != null)
                         {
-                            if (line.Contains("\"LaunchExecutable\": \"KINGDOM HEARTS HD 1.5+2.5 ReMIX.exe\","))
+                            while ((line = sr.ReadLine()) is not null)
                             {
-                                while ((line = sr.ReadLine()) is not null)
+                                if (line.Contains("\"LaunchExecutable\": \"KINGDOM HEARTS HD 1.5+2.5 ReMIX.exe\","))
                                 {
-                                    if (line.Contains("\"InstallLocation\": \""))
+                                    while ((line = sr.ReadLine()) is not null)
                                     {
-                                        installLocationFoundRemix = true;
-                                        int startIndex = line.IndexOf("\": \"") + 4;
-                                        int endIndex = line.IndexOf("\",");
-                                        string parsedText = line[startIndex..endIndex];
-                                        parsedText = parsedText.Replace("\\\\", "\\");
-                                        PcReleaseLocation = parsedText;
+                                        if (line.Contains("\"InstallLocation\": \""))
+                                        {
+                                            installLocationFoundRemix = true;
+                                            int startIndex = line.IndexOf("\": \"") + 4;
+                                            int endIndex = line.IndexOf("\",");
+                                            string parsedText = line[startIndex..endIndex];
+                                            parsedText = parsedText.Replace("\\\\", "\\");
+                                            PcReleaseLocation = parsedText;
+                                        }
+                                    }
+                                }
+                                else if (line.Contains("\"LaunchExecutable\": \"KINGDOM HEARTS HD 2.8 Final Chapter Prologue.exe\","))
+                                {
+                                    while ((line = sr.ReadLine()) is not null)
+                                    {
+                                        if (line.Contains("\"InstallLocation\": \""))
+                                        {
+                                            installLocationFound3D = true;
+                                            int startIndex = line.IndexOf("\": \"") + 4;
+                                            int endIndex = line.IndexOf("\",");
+                                            string parsedText = line[startIndex..endIndex];
+                                            parsedText = parsedText.Replace("\\\\", "\\");
+                                            PcReleaseLocationKH3D = parsedText;
+                                        }
                                     }
                                 }
                             }
-                            else if (line.Contains("\"LaunchExecutable\": \"KINGDOM HEARTS HD 2.8 Final Chapter Prologue.exe\","))
+                        }
+                    }
+                    if (!installLocationFoundRemix && !installLocationFound3D)
+                    {
+                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                    }
+                    else if (!installLocationFoundRemix && installLocationFound3D)
+                    {
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                    }
+                    else if (installLocationFoundRemix && !installLocationFound3D)
+                    {
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING", "Success", MessageBoxButton.OK);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                    }
+                }
+                else if (ConfigurationService.PCVersion == "Steam")
+                {
+                    // Get ProgramFilesX86 Location
+                    string programDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+                    string directoryPath = Path.Combine(programDataFolder, "Steam\\steamapps");
+
+                    if (!Directory.Exists(directoryPath))
+                    {
+                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        return;
+                    }
+
+                    if (!Directory.Exists(directoryPath))
+                    {
+                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        return;
+                    }
+
+                    bool installLocationFoundRemix = false;
+                    bool installLocationFound3D = false;
+                    // Read the entire content of the VDF file
+                    string vdfContent = File.ReadAllText(Path.Combine(directoryPath, "libraryfolders.vdf"));
+                    // Define a regular expression to match "path" values
+                    Regex regex = new Regex(@"""path""\s*""([^""]*)""", RegexOptions.IgnoreCase);
+                    // MatchCollection to store all matches found
+                    MatchCollection matches = regex.Matches(vdfContent);
+                    // Iterate through matches and print out the "path" values
+                    if (Directory.Exists(directoryPath))
+                    {
+                        foreach (Match match in matches)
+                        {
+                            string pathValue = match.Groups[1].Value; // Group 1 is the path raw, without the key
+                            Console.WriteLine($"Path: {pathValue}");
+                            string parsedText = pathValue.Replace(@"\\", @"\");
+                            string commonGamesDirectory = Path.Combine(parsedText, "steamapps\\common");
+                            if (Directory.Exists(commonGamesDirectory))
                             {
-                                while ((line = sr.ReadLine()) is not null)
+                                string kH1525Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS -HD 1.5+2.5 ReMIX-");
+                                string kH28Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS HD 2.8 Final Chapter Prologue");
+                                if (Directory.Exists(kH1525Path))
                                 {
-                                    if (line.Contains("\"InstallLocation\": \""))
-                                    {
-                                        installLocationFound3D = true;
-                                        int startIndex = line.IndexOf("\": \"") + 4;
-                                        int endIndex = line.IndexOf("\",");
-                                        string parsedText = line[startIndex..endIndex];
-                                        parsedText = parsedText.Replace("\\\\", "\\");
-                                        PcReleaseLocationKH3D = parsedText;
-                                    }
-                                } 
+                                    installLocationFoundRemix = true;
+                                    PcReleaseLocation = kH1525Path;
+                                }
+                                if (Directory.Exists(kH28Path))
+                                {
+                                    installLocationFound3D = true;
+                                    PcReleaseLocationKH3D = kH28Path;
+                                }
                             }
                         }
                     }
-                }
-                if (!installLocationFoundRemix && !installLocationFound3D)
-                {
-                    MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
-                }
-                else if (!installLocationFoundRemix && installLocationFound3D)
-                {
-                    MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
-                }
-                else if (installLocationFoundRemix && !installLocationFound3D)
-                {
-                    MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING", "Success", MessageBoxButton.OK);
+                    if (!installLocationFoundRemix && !installLocationFound3D)
+                    {
+                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                    }
+                    else if (!installLocationFoundRemix && installLocationFound3D)
+                    {
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                    }
+                    else if (installLocationFoundRemix && !installLocationFound3D)
+                    {
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING", "Success", MessageBoxButton.OK);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                    MessageBox.Show("PCVersion Other does not support auto detect game installation. If you wish to use this feature select either EGS or Steam on the dropdown above", "Unsupported", MessageBoxButton.OK);
                 }
+                
             });
             InstallPanaceaCommand = new RelayCommand(AlternateName =>
             {
