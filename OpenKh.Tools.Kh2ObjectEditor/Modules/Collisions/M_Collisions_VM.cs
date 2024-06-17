@@ -1,7 +1,11 @@
 using OpenKh.Kh2;
+using OpenKh.Tools.Kh2ObjectEditor.Modules.Motions;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
+using OpenKh.Tools.Kh2ObjectEditor.Utils;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Collisions
 {
@@ -9,8 +13,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Collisions
     {
         public ObservableCollection<ObjectCollision> Collisions { get; set; }
 
+        public static Dictionary<byte, string> CollisionTypeOptions { get; set; }
+        public static Dictionary<byte, string> CollisionShapeOptions { get; set; }
+
         public M_Collisions_VM()
         {
+            loadOptions();
             Collisions = new ObservableCollection<ObjectCollision>();
             reloadCollisions();
         }
@@ -80,6 +88,60 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Collisions
         {
             MdlxService.Instance.CollisionFile.EntryList.RemoveAt(index);
             reloadCollisions();
+        }
+
+        private void loadOptions()
+        {
+            CollisionTypeOptions = CollisionTypeConverter.CollisionTypes;
+            CollisionShapeOptions = CollisionShapeConverter.CollisionShapes;
+        }
+
+        // Tests the collisions ingame.
+        // IMPORTANT: the Collisions must be of the same length, be careful because there's no control of this.
+        public void TestCollisionsIngame()
+        {
+            string filename = Path.GetFileName(MdlxService.Instance.MdlxPath);
+
+            if (filename == "")
+                return;
+
+            long fileAddress;
+            try
+            {
+                fileAddress = ProcessService.getAddressOfFile(filename);
+            }
+            catch (Exception exc)
+            {
+                System.Windows.Forms.MessageBox.Show("Game is not running", "There was an error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            if (fileAddress == 0)
+            {
+                System.Windows.Forms.MessageBox.Show("Couldn't find file", "There was an error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            int entryOffset = -1;
+            foreach (Bar.Entry entry in MdlxService.Instance.MdlxBar)
+            {
+                if (entry.Type == Bar.EntryType.ModelCollision)
+                {
+                    entryOffset = entry.Offset;
+                    break;
+                }
+            }
+            if (entryOffset == -1)
+            {
+                System.Windows.Forms.MessageBox.Show("AI file not found", "There was an error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            long collisionFileAddress = fileAddress + entryOffset;
+
+            MemoryStream collisionStream = (MemoryStream)MdlxService.Instance.CollisionFile.toStream();
+            byte[] streamBytes = collisionStream.ToArray();
+            MemoryAccess.writeMemory(ProcessService.KH2Process, collisionFileAddress, streamBytes, true);
         }
     }
 }

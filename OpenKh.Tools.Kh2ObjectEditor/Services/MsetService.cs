@@ -31,6 +31,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
                 throw new Exception("File is not a valid MSET: " + MsetPath);
 
             MsetBar = Bar.Read(streamMset);
+            streamMset.Position = 0;
         }
 
         public void LoadMotion(int motionIndex)

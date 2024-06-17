@@ -1,6 +1,7 @@
 using OpenKh.Tools.Kh2ObjectEditor.Modules.Collisions;
 using OpenKh.Tools.Kh2ObjectEditor.Modules.Effects;
 using OpenKh.Tools.Kh2ObjectEditor.Modules.Textures;
+using OpenKh.Tools.Kh2ObjectEditor.Modules.UI;
 using OpenKh.Tools.Kh2ObjectEditor.ViewModel;
 using System;
 using System.Windows.Controls;
@@ -23,6 +24,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         {
             TabModel.Visibility = ThisVM.TabModelEnabled;
             TabTextures.Visibility = ThisVM.TabTexturesEnabled;
+            TabUI.Visibility = ThisVM.TabUIEnabled;
             TabCollisions.Visibility = ThisVM.TabCollisionsEnabled;
             TabMotions.Visibility = ThisVM.TabMotionsEnabled;
             TabParticles.Visibility = ThisVM.TabParticlesEnabled;
@@ -47,7 +49,10 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         private void TabClick_Textures(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             contentFrame.Content = new ModuleTextures_Control();
-            //contentFrame.Content = new TextureAnimation_Control();
+        }
+        private void TabClick_UI(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            contentFrame.Content = new M_UI_Control();
         }
         private void TabClick_Collisions(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {

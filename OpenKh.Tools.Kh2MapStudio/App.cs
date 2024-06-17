@@ -523,6 +523,10 @@ namespace OpenKh.Tools.Kh2MapStudio
                 camera.CameraPosition += Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
             if (keyboard.IsKeyDown(Keys.E))
                 camera.CameraPosition -= Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.Space))
+                camera.CameraPosition += new Vector3(0, 1 * moveSpeed * 5, 0);
+            if (keyboard.IsKeyDown(Keys.LeftControl))
+                camera.CameraPosition += new Vector3(0, -1 * moveSpeed * 5, 0);
 
             if (keyboard.IsKeyDown(Keys.Up))
                 camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);

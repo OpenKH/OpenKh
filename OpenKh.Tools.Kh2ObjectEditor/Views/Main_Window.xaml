@@ -16,9 +16,10 @@
                 <MenuItem Header="Test Mdlxs" Click="Menu_Test_Mdlxs"/>
                 <MenuItem Header="Test Msets" Click="Menu_Test_Msets"/>
                 <MenuItem Header="Attach mdlx" Click="Menu_AttachMdlx"/>
+                <MenuItem Header="Open mdlx" Click="Menu_OpenMdlx"/>
             </MenuItem>
             <MenuItem Header="File">
-                <MenuItem Header="Save">
+                <MenuItem Header="Save New">
                     <MenuItem Header="Save Mdlx" Click="Menu_Save_Mdlx"/>
                     <MenuItem Header="Save Mset" Click="Menu_Save_Mset"/>
                     <MenuItem Header="Save Apdx" Click="Menu_Save_Apdx"/>
@@ -33,7 +34,7 @@
 
         <Grid AllowDrop="True" Drop="Window_Drop">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300" />
+                <ColumnDefinition Width="150" />
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />

@@ -1,7 +1,9 @@
 using Microsoft.Win32;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Services
@@ -116,6 +118,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         {
             int invalidFiles = 0;
             Dictionary<Bar.EntryType, int> barEntryCount = new Dictionary<Bar.EntryType, int>();
+            HashSet<int> param36 = new HashSet<int>();
+            HashSet<int> param37 = new HashSet<int>();
 
             foreach (string file in Directory.GetFiles(FolderPath))
             {
@@ -137,13 +141,38 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
 
                 foreach (Bar.Entry barEntry in fileBar)
                 {
-                    if (!barEntryCount.ContainsKey(barEntry.Type))
-                    {
-                        barEntryCount.Add(barEntry.Type, 0);
-                    }
+                    // Check count per type
+                    //if (!barEntryCount.ContainsKey(barEntry.Type))
+                    //{
+                    //    barEntryCount.Add(barEntry.Type, 0);
+                    //}
+                    //
+                    //barEntryCount.TryGetValue(barEntry.Type, out int count);
+                    //barEntryCount[barEntry.Type] = count + 1;
 
-                    barEntryCount.TryGetValue(barEntry.Type, out int count);
-                    barEntryCount[barEntry.Type] = count + 1;
+                    if (barEntry.Type != Bar.EntryType.Anb || barEntry.Stream.Length == 0)
+                        continue;
+
+                    // Check Pattern enable/disable
+                    try
+                    {
+                        AnimationBinary anbEntry = new AnimationBinary(barEntry.Stream);
+                        if (anbEntry.MotionTriggerFile != null)
+                        {
+                            foreach (var rangeTrigger in anbEntry.MotionTriggerFile.RangeTriggerList)
+                            {
+                                if (rangeTrigger.Trigger == 36)
+                                {
+                                    param36.Add(rangeTrigger.Param1);
+                                }
+                                else if (rangeTrigger.Trigger == 37)
+                                {
+                                    param37.Add(rangeTrigger.Param1);
+                                }
+                            }
+                        }
+                    }
+                    catch(Exception exc) { }
                 }
             }
         }

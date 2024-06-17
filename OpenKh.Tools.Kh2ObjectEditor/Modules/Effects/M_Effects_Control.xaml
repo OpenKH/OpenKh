@@ -7,10 +7,16 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
-        <StackPanel DockPanel.Dock="Bottom" MaxHeight="50" Orientation="Horizontal" Margin="20">
-            <Button Click="Button_ExportDpx">Export DPX</Button>
-            <Button Click="Button_ImportDpx">Import DPX</Button>
-        </StackPanel>
+        <Grid DockPanel.Dock="Bottom" MaxHeight="50">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
+                <Button Margin="5,0,5,0" Padding="5,0,5,0"  Click="Button_ExportDpx">Export DPX</Button>
+                <Button Margin="5,0,5,0" Padding="5,0,5,0"  Click="Button_ImportDpx">Import DPX</Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+                <Button Margin="5,0,5,0" Padding="5,0,5,0" Width="50" Background="PaleVioletRed" Click="Button_Test">TEST</Button>
+            </StackPanel>
+
+        </Grid>
         <TabControl TabStripPlacement="Right">
             <TabItem>
                 <TabItem.Header>
