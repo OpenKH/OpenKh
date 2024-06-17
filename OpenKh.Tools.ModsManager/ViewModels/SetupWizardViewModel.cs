@@ -791,7 +791,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
                 else
                 {
-                    MessageBox.Show("PCVersion Other does not support auto detect game installation. If you wish to use this feature select either EGS or Steam on the dropdown above", "Unsupported", MessageBoxButton.OK);
+                    MessageBox.Show("Launcher \"Other\" does not support auto detect game installation. If you wish to use this feature select either EGS or Steam on the dropdown above", "Unsupported", MessageBoxButton.OK);
                 }
                 
             });
