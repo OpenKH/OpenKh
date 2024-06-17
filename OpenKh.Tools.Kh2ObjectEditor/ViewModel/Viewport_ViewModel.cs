@@ -159,8 +159,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
             if (!ObjectEditorUtils.isFilePathValid(App_Context.Instance.MdlxPath, "mdlx") || !ObjectEditorUtils.isFilePathValid(MsetService.Instance.MsetPath, "mset") || MsetService.Instance.LoadedMotion == null)
                 return;
 
-            MsetService.Instance.MsetBar[MsetService.Instance.LoadedMotionId].Stream.Position = 0;
-            Bar anbBarFile = Bar.Read(MsetService.Instance.MsetBar[MsetService.Instance.LoadedMotionId].Stream);
+            Bar anbBarFile = Bar.Read(new MemoryStream(MsetService.Instance.MsetBinarc.Subfiles[MsetService.Instance.MsetBinarc.Entries[MsetService.Instance.LoadedMotionId].Link]));
 
             currentAnb = new AnbIndir(anbBarFile);
         }
@@ -272,14 +271,13 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
             Bar attach_AnbBarFile = new Bar();
             try // Some animations don't use the weapon
             {
-                attach_AnbBarFile = Bar.Read(AttachmentService.Instance.Attach_MsetEntries[MsetService.Instance.LoadedMotionId].Entry.Stream);
+                attach_AnbBarFile = Bar.Read(new MemoryStream(MsetService.Instance.MsetBinarc.Subfiles[MsetService.Instance.MsetBinarc.Entries[MsetService.Instance.LoadedMotionId].Link]));
             }
             catch (Exception ex)
             {
                 return new List<SimpleModel>();
             }
 
-            AttachmentService.Instance.Attach_MsetEntries[MsetService.Instance.LoadedMotionId].Entry.Stream.Position = 0;
             AnbIndir attach_Anb = new AnbIndir(attach_AnbBarFile);
 
             IAnimMatricesProvider attach_AnimMatricesProvider = attach_Anb.GetAnimProvider(temp_mdlxStream);

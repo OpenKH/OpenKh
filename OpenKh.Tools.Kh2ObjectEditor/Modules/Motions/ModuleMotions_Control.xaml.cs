@@ -32,13 +32,13 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
 
 
             // Reaction Command
-            if (item.Entry.Type == Bar.EntryType.Motionset)
+            if (item.Entry.Type == BinaryArchive.EntryType.Motionset)
             {
                 System.Windows.Forms.MessageBox.Show("This is a Reaction Command", "Motion couldn't be loaded", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
             }
             // No motion
-            else if(item.Entry.Type != Bar.EntryType.Anb)
+            else if(item.Entry.Type != BinaryArchive.EntryType.Anb)
             {
                 System.Windows.Forms.MessageBox.Show("This is not a Motion or Reaction Command", "Motion couldn't be loaded", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
@@ -50,7 +50,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
                 return;
             }
             // Unnamed dummy
-            if (item.Entry.Stream.Length == 0)
+            if (item.LinkedSubfile.Length == 0)
             {
                 System.Windows.Forms.MessageBox.Show("This motion is a dummy (No data)", "Motion couldn't be loaded", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
@@ -90,12 +90,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
 
                 MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
 
-                Bar.Entry newMotionBar = new Bar.Entry();
-                newMotionBar.Name = "NDUM";
-                newMotionBar.Type = Bar.EntryType.Anb;
-                newMotionBar.Stream = new MemoryStream();
+                BinaryArchive.Entry newMotionEntry = new BinaryArchive.Entry();
+                newMotionEntry.Name = "NDUM";
+                newMotionEntry.Type = BinaryArchive.EntryType.Anb;
+                newMotionEntry.Link = -1;
 
-                MsetService.Instance.MsetBar.Insert(item.Index + 1, newMotionBar);
+                MsetService.Instance.MsetBinarc.Entries.Insert(item.Index + 1, new BinaryArchive.Entry());
 
                 ThisVM.loadMotions();
                 ThisVM.applyFilters();
@@ -107,7 +107,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             {
                 MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
 
-                MsetService.Instance.MsetBar.RemoveAt(item.Index);
+                MsetService.Instance.MsetBinarc.Entries.RemoveAt(item.Index);
 
                 ThisVM.loadMotions();
                 ThisVM.applyFilters();
@@ -166,7 +166,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
 
             MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
 
-            if(item.Entry.Type != Bar.EntryType.Motionset) {
+            if(item.Entry.Type != BinaryArchive.EntryType.Motionset) {
                 System.Windows.Forms.MessageBox.Show("The selected entry is not a Moveset", "Can't export entry", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
             }
@@ -180,15 +180,10 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
                 sfd.ShowDialog();
                 if (sfd.FileName != "")
                 {
-                    MemoryStream memStream = (MemoryStream)item.Entry.Stream;
-                    memStream.Position = 0;
-                    File.WriteAllBytes(sfd.FileName, memStream.ToArray());
-                    item.Entry.Stream.Position = 0;
+                    File.WriteAllBytes(sfd.FileName, item.LinkedSubfile);
                 }
             }
             catch (Exception exc) { }
-
-            item.Entry.Stream.Position = 0;
         }
         public void RC_Replace(object sender, RoutedEventArgs e)
         {
@@ -214,8 +209,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
                 openMotionTabs(MsetService.Instance.LoadedMotion);
             }
             catch (Exception exception) { }
-
-            item.Entry.Stream.Position = 0;
         }
 
         private void Button_TEST(object sender, System.Windows.RoutedEventArgs e)

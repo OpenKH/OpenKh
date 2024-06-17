@@ -8,26 +8,17 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
     {
         // Note: Objects are copied as bytes or string in order to not copy the reference
 
-        private Stream _motion { get; set; }
-        public void StoreMotion(Bar.Entry motion)
+        private byte[] _motion { get; set; }
+        public void StoreMotion(byte[] motionFile)
         {
-            motion.Stream.Position = 0;
-            _motion = new MemoryStream();
-            motion.Stream.CopyTo(_motion);
-            _motion.Position = 0;
-            motion.Stream.Position = 0;
+            _motion = motionFile;
         }
-        public Stream FetchMotion()
+        public byte[] FetchMotion()
         {
             if (_motion == null)
                 return null;
 
-            Stream copy = new MemoryStream();
-            _motion.CopyTo(copy);
-            copy.Position = 0;
-            _motion.Position = 0;
-
-            return copy;
+            return _motion;
         }
 
         private Stream _dpd { get; set; }

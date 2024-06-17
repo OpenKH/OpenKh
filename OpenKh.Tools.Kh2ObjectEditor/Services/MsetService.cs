@@ -10,7 +10,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
     {
         // Apdx File
         public string MsetPath { get; set; }
-        public Bar MsetBar { get; set; }
+        //public Bar MsetBar { get; set; }
+        public BinaryArchive MsetBinarc { get; set; }
         //public List<AnimationBinary> Motions { get; set; }
         //public List<Bar> MotionSets { get; set; } // Reaction Commands
         // public List<Motion> OtherMotions  { get; set; } // Some msets have 0x09 entries
@@ -27,11 +28,10 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             MsetPath = msetPath;
 
             using var streamMset = File.Open(MsetPath, FileMode.Open);
-            if (!Bar.IsValid(streamMset))
+            if (!BinaryArchive.IsValid(streamMset))
                 throw new Exception("File is not a valid MSET: " + MsetPath);
 
-            MsetBar = Bar.Read(streamMset);
-            streamMset.Position = 0;
+            MsetBinarc = BinaryArchive.Read(streamMset);
         }
 
         public void LoadMotion(int motionIndex)
@@ -41,14 +41,16 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         }
         public void LoadCurrentMotion()
         {
-            MsetBar[LoadedMotionId].Stream.Position = 0;
-            LoadedMotion = new AnimationBinary(MsetBar[LoadedMotionId].Stream);
-            MsetBar[LoadedMotionId].Stream.Position = 0;
+            BinaryArchive.Entry motionEntry = MsetBinarc.Entries[LoadedMotionId];
+            using MemoryStream fileStream = new MemoryStream(MsetBinarc.Subfiles[motionEntry.Link]);
+            LoadedMotion = new AnimationBinary(fileStream);
         }
 
         public void SaveMotion()
         {
-            MsetBar[LoadedMotionId].Stream = LoadedMotion.toStream();
+            BinaryArchive.Entry motionEntry = MsetBinarc.Entries[LoadedMotionId];
+            MemoryStream motionStream = (MemoryStream)LoadedMotion.toStream();
+            MsetBinarc.Subfiles[motionEntry.Link] = motionStream.ToArray();
         }
 
         public void SaveFile()
@@ -60,9 +62,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             sfd.ShowDialog();
             if (sfd.FileName != "")
             {
-                MemoryStream memStream = new MemoryStream();
-                Bar.Write(memStream, MsetBar);
-                File.WriteAllBytes(sfd.FileName, memStream.ToArray());
+                File.WriteAllBytes(sfd.FileName, MsetBinarc.getAsByteArray());
             }
         }
 
@@ -71,9 +71,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             if (MsetPath == null)
                 return;
 
-            MemoryStream memStream = new MemoryStream();
-            Bar.Write(memStream, MsetBar);
-            File.WriteAllBytes(MsetPath, memStream.ToArray());
+            File.WriteAllBytes(MsetPath, MsetBinarc.getAsByteArray());
         }
 
         // SINGLETON
