@@ -384,13 +384,13 @@ namespace OpenKh.Tools.ModsManager.Services
                     switch (_lineLead)
                     {
                         case "LUAGUI_NAME":
-                            modName = _lineGib;
+                            modName = "\"" + _lineGib + "\"";
                             break;
                         case "LUAGUI_AUTH":
-                            modAuthor = _lineGib;
+                            modAuthor = "\"" + _lineGib + "\"";
                             break;
                         case "LUAGUI_DESC":
-                            modDescription = _lineGib;
+                            modDescription = "\"" + _lineGib + "\"";
                             break;
                     }
 

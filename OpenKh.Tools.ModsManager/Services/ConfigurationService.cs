@@ -35,10 +35,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public string Pcsx2Location { get; internal set; }
             public string PcReleaseLocation { get; internal set; }
             public string PcReleaseLocationKH3D { get; internal set; }
-            public string PcReleaseSteamLocation { get; internal set; }
-            public string PcReleaseSteamLocationKH3D { get; internal set; }
             public string PcReleaseLanguage { get; internal set; } = "en";
-            public string PcReleaseLanguageDT { get; internal set; } = "dt";
             public int RegionId { get; internal set; }
             public bool PanaceaInstalled { get; internal set; }
             public bool ShowConsole { get; internal set; } = false;
@@ -47,7 +44,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool QuickMenu { get; internal set; } = false;
             public bool DevView { get; internal set; } = false;
             public bool AutoUpdateMods { get; internal set; }
-            public bool isEGSVersion { get; internal set; } = true;
+            public string pcVersion { get; internal set; } = "EGS";
             public List<string> GamesToExtract { get; internal set; } = new List<string> { "kh2" };
             public string LaunchGame { get; internal set; } = "kh2";
             public bool DarkMode { get; internal set; } = true;
@@ -270,24 +267,6 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
-        public static string PcReleaseSteamLocation
-        {
-            get => _config.PcReleaseSteamLocation;
-            set
-            {
-                _config.PcReleaseSteamLocation = value;
-                _config.Save(ConfigPath);
-            }
-        }
-        public static string PcReleaseSteamLocationKH3D
-        {
-            get => _config.PcReleaseSteamLocationKH3D;
-            set
-            {
-                _config.PcReleaseSteamLocationKH3D = value;
-                _config.Save(ConfigPath);
-            }
-        }
 
         public static string PcReleaseLanguage
         {
@@ -295,15 +274,6 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.PcReleaseLanguage = value;
-                _config.Save(ConfigPath);
-            }
-        }
-        public static string PcReleaseLanguageDT
-        {
-            get => _config.PcReleaseLanguageDT;
-            set
-            {
-                _config.PcReleaseLanguageDT = value;
                 _config.Save(ConfigPath);
             }
         }
@@ -381,12 +351,12 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
-        public static bool IsEGSVersion
+        public static string PCVersion
         {
-            get => _config.isEGSVersion;
+            get => _config.pcVersion;
             set
             {
-                _config.isEGSVersion = value;
+                _config.pcVersion = value;
                 _config.Save(ConfigPath);
             }
         }
