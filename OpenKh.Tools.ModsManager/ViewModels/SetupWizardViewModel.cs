@@ -143,7 +143,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     PC => (!string.IsNullOrEmpty(PcReleaseLocation) &&
                         Directory.Exists(PcReleaseLocation) &&
                         (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
-                        File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))))|| 
+                        File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))))||
                         (!string.IsNullOrEmpty(PcReleaseLocationKH3D) &&
                         Directory.Exists(PcReleaseLocationKH3D) &&
                         (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
@@ -273,14 +273,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             get
             {
-                if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) || 
+                if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
                     File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))) &&
-                    Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) || 
+                    Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
                     File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))))
                 {
                     return _pcReleasesSelected = "both";
                 }
-                else if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) || 
+                else if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
                     File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))))
                 {
 
@@ -446,7 +446,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(GameDataNotFoundVisibility));
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
             }
-              
+
         }
         public string PcReleaseLanguage
         {
@@ -479,9 +479,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public bool IsNotExtracting { get; private set; }
-        public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) || 
-            (GameEdition == PC && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) || 
-            GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) || 
+        public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) ||
+            (GameEdition == PC && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) ||
+            GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) ||
             Directory.Exists(Path.Combine(GameDataLocation, "bbs", "message")) ||
             Directory.Exists(Path.Combine(GameDataLocation, "Recom", "SYS"))))||
             Directory.Exists(Path.Combine(GameDataLocation, "kh3d","setdata"))||
@@ -548,7 +548,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     // DLL into the right place. So don't bother.
                     PanaceaInstalled = true;
                     return true;
-                }                  
+                }
 
                 byte[] CalculateChecksum(string fileName) =>
                     System.Security.Cryptography.MD5.Create().Using(md5 =>
@@ -592,10 +592,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 else if (File.Exists(PanaceaDestinationLocation) && File.Exists(PanaceaAlternateLocation))
                 {
                     return IsEqual(CalculateChecksum(PanaceaSourceLocation),
-                        CalculateChecksum(PanaceaDestinationLocation)) || 
+                        CalculateChecksum(PanaceaDestinationLocation)) ||
                         IsEqual(CalculateChecksum(PanaceaSourceLocation),
                         CalculateChecksum(PanaceaAlternateLocation));
-                }                
+                }
                 else
                 {
                     PanaceaInstalled = false;
@@ -619,8 +619,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 FileDialog.OnFolder(path => PcReleaseLocationKH3D = path));
             SelectGameDataLocationCommand = new RelayCommand(_ =>
                 FileDialog.OnFolder(path => GameDataLocation = path));
-            ExtractGameDataCommand = new RelayCommand(async _ => 
-            { 
+            ExtractGameDataCommand = new RelayCommand(async _ =>
+            {
                 BEGIN:
                 try
                 {
@@ -807,7 +807,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     MessageBox.Show("Launcher \"Other\" does not support auto detect game installation. If you wish to use this feature select either EGS or Steam on the dropdown above", "Unsupported", MessageBoxButton.OK);
                 }
-                
+
             });
             InstallPanaceaCommand = new RelayCommand(AlternateName =>
             {
@@ -896,7 +896,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                     OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                     OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
-                    PanaceaInstalled = true;                    
+                    PanaceaInstalled = true;
                 }
             });
             RemovePanaceaCommand = new RelayCommand(_ =>
@@ -915,7 +915,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     PanaceaDestinationLocation = Path.Combine(PcReleaseLocationKH3D, "DBGHELP.dll");
                     PanaceaAlternateLocation = Path.Combine(PcReleaseLocationKH3D, "version.dll");
                     PanaceaDependenciesLocation = Path.Combine(PcReleaseLocationKH3D, "dependencies");
-                }                
+                }
                 else if (PanaceaDestinationLocation == null || PanaceaAlternateLocation == null || PanaceaDestinationLocation == null)
                 {
                     MessageBox.Show(
@@ -946,7 +946,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
-                PanaceaInstalled = false;                
+                PanaceaInstalled = false;
             });
             InstallLuaBackendCommand = new RelayCommand(installed =>
             {
@@ -969,7 +969,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         MessageBox.Show(
                                 $"Unable to extract \"{Path.GetFileName(DownPath)}\" as it is not a zip file. You may have to install it manually.",
-                                "Run error", MessageBoxButton.OK, MessageBoxImage.Error);                        
+                                "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                         File.Delete(DownPath);
                         File.Delete(TempExtractionLocation);
                         return;
@@ -982,7 +982,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     else
                     {
                         DestinationCollection = PcReleaseLocationKH3D;
-                    }                    
+                    }
                     if (DestinationCollection == null)
                     {
                         MessageBox.Show(
@@ -1203,12 +1203,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             OnPropertyChanged(nameof(LuaBackendFoundVisibility));
                             OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
                         }
-                    }                                                    
+                    }
                 }
             });
             RemoveLuaBackendCommand = new RelayCommand(_ =>
             {
-                
+
                 if (GameCollection == 0 && PcReleaseLocation == null || GameCollection == 1 && PcReleaseLocationKH3D == null)
                 {
                     MessageBox.Show(
@@ -1324,7 +1324,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         var langFolder = (ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en") ? "dt" : _pcReleaseLanguage;
 
                         await _gameDataExtractionService.ExtractKhPcEditionAsync(
-                            gameDataLocation: @"H:\Tmp\ModsManagerPcExtractionRoot",
+                            gameDataLocation: gameDataLocation,
                             onProgress: CreateOnProgressProcessor(),
                             getKhFilePath: fileName
                                 => Path.Combine(
