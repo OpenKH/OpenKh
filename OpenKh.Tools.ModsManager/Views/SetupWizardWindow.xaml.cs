@@ -25,6 +25,8 @@ namespace OpenKh.Tools.ModsManager.Views
             _vm.LastPage = LastPage;
 
             _vm.PageStack.OnPageChanged(wizard.CurrentPage);
+
+            Closed += (sender, e) => _vm.SetAborted();
         }
 
         public string ConfigIsoLocation { get => _vm.IsoLocation; set => _vm.IsoLocation = value; }
