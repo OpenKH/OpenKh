@@ -10,7 +10,7 @@
     <ItemGroup>
         <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
         <PackageReference Include="NLog" Version="5.3.2" />
-        <PackageReference Include="YamlDotNet" Version="15.1.6" />
+        <PackageReference Include="YamlDotNet" Version="15.3.0" />
         <PackageReference Include="Xe.BinaryMapper" Version="1.5.2" />
         <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
 
