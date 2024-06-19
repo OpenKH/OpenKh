@@ -59,13 +59,13 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
         {
             Motions.Clear();
 
-            if (MsetService.Instance.MsetBar == null)
+            if (MsetService.Instance.MsetBinarc == null)
                 return;
 
             Motions = new List<MotionSelector_Wrapper>();
-            for (int i = 0; i < MsetService.Instance.MsetBar.Count; i++)
+            for (int i = 0; i < MsetService.Instance.MsetBinarc.Entries.Count; i++)
             {
-                Motions.Add(new MotionSelector_Wrapper(i, MsetService.Instance.MsetBar[i]));
+                Motions.Add(new MotionSelector_Wrapper(i, MsetService.Instance.MsetBinarc.Entries[i]));
             }
         }
 
@@ -89,14 +89,14 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
 
         public void Motion_Copy(int index)
         {
-            ClipboardService.Instance.StoreMotion(MsetService.Instance.MsetBar[index]);
+            ClipboardService.Instance.StoreMotion(MsetService.Instance.MsetBinarc.Subfiles[MsetService.Instance.MsetBinarc.Entries[index].Link]);
         }
 
         public void Motion_Replace(int index)
         {
-            MsetService.Instance.MsetBar[index].Stream = ClipboardService.Instance.FetchMotion();
-            MsetService.Instance.MsetBar[index].Name = "COPY";
-            MsetService.Instance.MsetBar[index].Index = 0;
+            MsetService.Instance.MsetBinarc.Subfiles.Add(ClipboardService.Instance.FetchMotion());
+            MsetService.Instance.MsetBinarc.Entries[index].Name = "COPY";
+            MsetService.Instance.MsetBinarc.Entries[index].Link = MsetService.Instance.MsetBinarc.Subfiles.Count - 1;
 
             loadMotions();
             applyFilters();
@@ -104,7 +104,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
         }
         public void Motion_Rename(int index)
         {
-            Bar.Entry item = MsetService.Instance.MsetBar[index];
+            //Bar.Entry item = MsetService.Instance.MsetBar[index];
         }
         public void Motion_Import(int index, string animationPath)
         {
@@ -131,13 +131,14 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
             var ipm = builder.Ipm;
 
             // Get as stream
-            var motionStream = (MemoryStream)ipm.toStream();
+            MemoryStream motionStream = (MemoryStream)ipm.toStream();
 
             // Insert to mset
-            MsetService.Instance.MsetBar[index].Stream.Position = 0;
-            AnimationBinary msetEntry = new AnimationBinary(MsetService.Instance.MsetBar[index].Stream);
+            int subfileIndex = MsetService.Instance.MsetBinarc.Entries[index].Link;
+            MemoryStream replaceMotionStream = new MemoryStream(MsetService.Instance.MsetBinarc.Subfiles[subfileIndex]);
+            AnimationBinary msetEntry = new AnimationBinary(replaceMotionStream);
             msetEntry.MotionFile = new Motion.InterpolatedMotion(motionStream);
-            MsetService.Instance.MsetBar[index].Stream = msetEntry.toStream();
+            MsetService.Instance.MsetBinarc.Subfiles[subfileIndex] = ((MemoryStream)msetEntry.toStream()).ToArray();
 
             loadMotions();
         }
@@ -151,8 +152,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
             MemoryStream msetStream = new MemoryStream();
             streamMset.CopyTo(msetStream);
 
-            MsetService.Instance.MsetBar[index].Stream = msetStream;
-            MsetService.Instance.MsetBar[index].Type = Bar.EntryType.Motionset;
+            MsetService.Instance.MsetBinarc.Subfiles[MsetService.Instance.MsetBinarc.Entries[index].Link] = msetStream.ToArray();
+            MsetService.Instance.MsetBinarc.Entries[index].Type = BinaryArchive.EntryType.Motionset;
         }
 
 
@@ -244,7 +245,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
                 return;
             }
 
-            foreach (Bar.Entry barMotion in MsetService.Instance.MsetBar)
+            byte[] msetBytes = MsetService.Instance.MsetBinarc.getAsByteArray();
+            Bar msetBar = Bar.Read(new MemoryStream(msetBytes));
+            foreach (Bar.Entry barMotion in msetBar)
             {
                 if (barMotion.Stream.Length == 0 || barMotion.Type != Bar.EntryType.Anb)
                     continue;
