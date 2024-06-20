@@ -1321,7 +1321,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                     case PC:
                     {
-                        var langFolder = (ConfigurationService.PCVersion == "Steam" && _pcReleaseLanguage == "en") ? "dt" : _pcReleaseLanguage;
+                        var langFolder = ConfigurationService.PCVersion == "Steam" ? "dt" : _pcReleaseLanguage == "jp" ? "jp" : "en";
 
                         await _gameDataExtractionService.ExtractKhPcEditionAsync(
                             gameDataLocation: gameDataLocation,
