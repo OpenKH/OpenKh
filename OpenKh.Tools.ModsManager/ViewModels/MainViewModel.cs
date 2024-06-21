@@ -651,6 +651,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 FileName = "com.epicgames.launcher://apps/4158b699dd70447a981fee752d970a3e%3A5aac304f0e8948268ddfd404334dbdc7%3A68c214c58f694ae88c2dab6f209b43e4?action=launch&silent=true",
                                 UseShellExecute = true,
                             };
+                            Process.Start(processStartInfo);
+                            CloseAllWindows();
+                            return Task.CompletedTask;
                         }
                         else
                         {
@@ -689,6 +692,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 FileName = "com.epicgames.launcher://apps/c8ff067c1c984cd7ab1998e8a9afc8b6%3Aaa743b9f52e84930b0ba1b701951e927%3Ad1a8f7c478d4439b8c60a5808715dc05?action=launch&silent=true",
                                 UseShellExecute = true,
                             };
+                            Process.Start(processStartInfo);
+                            CloseAllWindows();
+                            return Task.CompletedTask;
                         }
                         else
                         {
@@ -722,6 +728,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 FileName = "steam://rungameid/2552430",
                                 UseShellExecute = true,
                             };
+                            Process.Start(processStartInfo);
+                            CloseAllWindows();
+                            return Task.CompletedTask;
                         }
                         else
                         {
@@ -732,7 +741,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             return Task.CompletedTask;
                         }
                     }
-                    else if (ConfigurationService.PCVersion == "EGS" && _launchGame == "kh3d")
+                    else if (ConfigurationService.PCVersion == "Steam" && _launchGame == "kh3d")
                     {
                         if (ConfigurationService.PcReleaseLocationKH3D != null)
                         {
@@ -760,6 +769,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 FileName = "steam://rungameid/2552440",
                                 UseShellExecute = true,
                             };
+                            Process.Start(processStartInfo);
+                            CloseAllWindows();
+                            return Task.CompletedTask;
                         }
                         else
                         {
@@ -808,9 +820,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             return Task.CompletedTask;
                         }
                     }
-                    Process.Start(processStartInfo);
-                    CloseAllWindows();
-                    return Task.CompletedTask;
                 default:
                     return Task.CompletedTask;
             }
