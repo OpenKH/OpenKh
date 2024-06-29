@@ -1,4 +1,5 @@
 using Microsoft.Win32;
+using OpenKh.AssimpUtils;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Classes;
 using OpenKh.Tools.Kh2ObjectEditor.Modules.Motions;
@@ -127,6 +128,49 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             {
                 MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
                 ThisVM.Motion_Replace(item.Index);
+            }
+        }
+        public void Motion_Export(object sender, RoutedEventArgs e)
+        {
+            if (MotionList.SelectedItem == null || MdlxService.Instance.ModelFile == null)
+            {
+                return;
+            }
+
+            MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
+            AnimationBinary animation;
+            using (MemoryStream memStream = new MemoryStream(item.LinkedSubfile))
+            {
+                animation = new AnimationBinary(memStream);
+            }
+
+            Kh2.Models.ModelSkeletal model = null;
+            foreach(Bar.Entry barEntry in MdlxService.Instance.MdlxBar)
+            {
+                if(barEntry.Type == Bar.EntryType.Model)
+                {
+                    model = Kh2.Models.ModelSkeletal.Read(barEntry.Stream);
+                    barEntry.Stream.Position = 0;
+                }
+            }
+            Assimp.Scene scene = Kh2MdlxAssimp.getAssimpScene(model);
+            Kh2MdlxAssimp.AddAnimation(scene, MdlxService.Instance.MdlxBar, animation);
+
+            System.Windows.Forms.SaveFileDialog sfd;
+            sfd = new System.Windows.Forms.SaveFileDialog();
+            sfd.Title = "Export animated model";
+            sfd.FileName = MdlxService.Instance.MdlxPath + "." + AssimpGeneric.GetFormatFileExtension(AssimpGeneric.FileFormat.fbx);
+            sfd.ShowDialog();
+            if (sfd.FileName != "")
+            {
+                string dirPath = Path.GetDirectoryName(sfd.FileName);
+
+                if (!Directory.Exists(dirPath))
+                    return;
+
+                dirPath += "\\";
+
+                AssimpGeneric.ExportScene(scene, AssimpGeneric.FileFormat.fbx, sfd.FileName);
             }
         }
         public void Motion_Import(object sender, RoutedEventArgs e)
