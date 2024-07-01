@@ -95,6 +95,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
         public void Motion_Replace(int index)
         {
             MsetService.Instance.MsetBinarc.Subfiles.Add(ClipboardService.Instance.FetchMotion());
+            MsetService.Instance.MsetBinarc.Entries[index].Type = BinaryArchive.EntryType.Anb;
             MsetService.Instance.MsetBinarc.Entries[index].Name = "COPY";
             MsetService.Instance.MsetBinarc.Entries[index].Link = MsetService.Instance.MsetBinarc.Subfiles.Count - 1;
 
@@ -132,14 +133,14 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
 
             // Get as stream
             MemoryStream motionStream = (MemoryStream)ipm.toStream();
-
+            
             // Insert to mset
             int subfileIndex = MsetService.Instance.MsetBinarc.Entries[index].Link;
             MemoryStream replaceMotionStream = new MemoryStream(MsetService.Instance.MsetBinarc.Subfiles[subfileIndex]);
             AnimationBinary msetEntry = new AnimationBinary(replaceMotionStream);
             msetEntry.MotionFile = new Motion.InterpolatedMotion(motionStream);
             MsetService.Instance.MsetBinarc.Subfiles[subfileIndex] = ((MemoryStream)msetEntry.toStream()).ToArray();
-
+            
             loadMotions();
         }
         public void Motion_ImportRC(int index, string msetPath)

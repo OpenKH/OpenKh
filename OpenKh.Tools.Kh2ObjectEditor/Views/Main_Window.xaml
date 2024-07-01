@@ -30,6 +30,7 @@
                     <MenuItem Header="Overwrite Apdx" Click="Menu_Overwrite_Apdx"/>
                 </MenuItem>
             </MenuItem>
+            <MenuItem Header="Export Model" Click="Menu_ExportModel"/>
         </Menu>
 
         <Grid AllowDrop="True" Drop="Window_Drop">

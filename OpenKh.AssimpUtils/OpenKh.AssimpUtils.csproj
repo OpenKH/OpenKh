@@ -15,6 +15,7 @@
     <ProjectReference Include="..\OpenKh.Engine.MonoGame\OpenKh.Engine.MonoGame.csproj" />
     <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
     <ProjectReference Include="..\OpenKh.Kh1\OpenKh.Kh1.csproj" />
+    <ProjectReference Include="..\OpenKh.Kh2AnimEmu\OpenKh.Kh2AnimEmu.csproj" />
   </ItemGroup>
 
     <ItemGroup>

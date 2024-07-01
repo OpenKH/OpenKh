@@ -2,8 +2,9 @@ using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Models;
 using OpenKh.Kh2.Models.VIF;
+using OpenKh.Kh2Anim.Mset;
+using OpenKh.Kh2Anim.Mset.Interfaces;
 using System.Numerics;
-using OpenKh.Engine.Monogame.Helpers;
 
 namespace OpenKh.AssimpUtils
 {
@@ -120,7 +121,7 @@ namespace OpenKh.AssimpUtils
                 parentNode.Children.Add(boneNode);
             }
 
-            MatrixRecursivity.ComputeMatrices(ref matricesToReverse, mParser);
+            OpenKh.Engine.Monogame.Helpers.MatrixRecursivity.ComputeMatrices(ref matricesToReverse, mParser);
 
             foreach (Assimp.Mesh mesh in scene.Meshes)
             {
@@ -242,6 +243,8 @@ namespace OpenKh.AssimpUtils
             }
 
             // BONES (Node hierarchy)
+            //Assimp.Node armatureNode = new Assimp.Node("Armature");
+            //scene.RootNode.Children.Add(armatureNode);
             foreach (ModelCommon.Bone bone in model.Bones)
             {
                 string boneName = "Bone" + bone.Index.ToString("D4");
@@ -250,6 +253,7 @@ namespace OpenKh.AssimpUtils
                 Assimp.Node parentNode;
                 if (bone.ParentIndex == -1)
                 {
+                    //parentNode = armatureNode;
                     parentNode = scene.RootNode;
                 }
                 else
@@ -363,10 +367,158 @@ namespace OpenKh.AssimpUtils
             return vifMesh;
         }
 
+        public static void AddAnimation(Assimp.Scene assimpScene, Bar mdlxBar, AnimationBinary animation)
+        {
+            // Set basic data
+            Assimp.Animation assimpAnimation = new Assimp.Animation();
+            assimpAnimation.Name = "EXPORT";
+            assimpAnimation.DurationInTicks = animation.MotionFile.InterpolatedMotionHeader.FrameCount;
+            assimpAnimation.TicksPerSecond = animation.MotionFile.InterpolatedMotionHeader.FrameData.FramesPerSecond;
+            assimpScene.Animations.Add(assimpAnimation);
+
+            HashSet<float> keyframeTimes = animation.MotionFile.KeyTimes.ToHashSet();
+
+            // Get absolute transformation matrices of the bones
+            Dictionary<float, Matrix4x4[]> frameMatrices = getMatricesForKeyFrames(mdlxBar, animation, keyframeTimes);
+
+            // Prepare channels per bone
+            Dictionary<int, Assimp.NodeAnimationChannel> animationChannelsPerBone = new Dictionary<int, Assimp.NodeAnimationChannel>();
+            for (int i = 0; i < animation.MotionFile.InterpolatedMotionHeader.BoneCount; i++)
+            {
+                Assimp.NodeAnimationChannel nodeAnimChannel = new Assimp.NodeAnimationChannel();
+                nodeAnimChannel.NodeName = "Bone" + i.ToString("D4");
+                animationChannelsPerBone.Add(i, nodeAnimChannel);
+                assimpAnimation.NodeAnimationChannels.Add(nodeAnimChannel);
+            }
+
+            // Get bone data
+            List<ModelCommon.Bone> modelBones = new List<ModelCommon.Bone>();
+            foreach (Bar.Entry barEntry in mdlxBar)
+            {
+                if(barEntry.Type == Bar.EntryType.Model)
+                {
+                    ModelSkeletal modelFile = ModelSkeletal.Read(barEntry.Stream);
+                    modelBones = modelFile.Bones;
+                    break;
+                }
+            }
+
+            // Set channels
+            foreach (float keyTime in frameMatrices.Keys) // Frame
+            {
+                for (int j = 0; j < frameMatrices[keyTime].Length; j++) // Bone
+                {
+                    Assimp.NodeAnimationChannel channel = animationChannelsPerBone[j];
+
+                    Matrix4x4 currentFrameBoneMatrix = frameMatrices[keyTime][j];
+
+                    // Transform to local
+                    if (modelBones[j].ParentIndex != -1)
+                    {
+                        Matrix4x4.Invert(frameMatrices[keyTime][modelBones[j].ParentIndex], out Matrix4x4 invertedParent);
+                        currentFrameBoneMatrix *= invertedParent;
+                    }
+
+                    Assimp.Matrix4x4 assimpMatrix = AssimpGeneric.ToAssimp(currentFrameBoneMatrix);
+                    assimpMatrix.Decompose(out Assimp.Vector3D scaling, out Assimp.Quaternion rotation, out Assimp.Vector3D translation);
+
+                    Assimp.VectorKey positionKey = new Assimp.VectorKey(keyTime / assimpAnimation.TicksPerSecond, translation);
+                    Assimp.VectorKey scalingKey = new Assimp.VectorKey(keyTime / assimpAnimation.TicksPerSecond, new Assimp.Vector3D(RoundFloat(scaling.X), RoundFloat(scaling.Y), RoundFloat(scaling.Z)));
+                    //Assimp.VectorKey scalingKey = new Assimp.VectorKey(keyTime / assimpAnimation.TicksPerSecond, scaling);
+                    Assimp.QuaternionKey rotationKey = new Assimp.QuaternionKey(keyTime / assimpAnimation.TicksPerSecond, rotation);
+
+                    // Ignore duplicates
+                    if(channel.PositionKeys.Count > 0)
+                    {
+                        Assimp.VectorKey previousPositionKey = channel.PositionKeys[channel.PositionKeys.Count - 1];
+                        Assimp.VectorKey previousScalingKey = channel.ScalingKeys[channel.ScalingKeys.Count - 1];
+                        Assimp.QuaternionKey previousRotationKey = channel.RotationKeys[channel.RotationKeys.Count - 1];
+
+                        if (!positionKey.Equals(previousPositionKey))
+                        {
+                            channel.PositionKeys.Add(positionKey);
+                        }
+                        if (!scalingKey.Equals(previousScalingKey))
+                        {
+                            channel.ScalingKeys.Add(scalingKey);
+                        }
+                        if (!rotationKey.Equals(previousRotationKey))
+                        {
+                            channel.RotationKeys.Add(rotationKey);
+                        }
+                    }
+                    else
+                    {
+                        channel.PositionKeys.Add(positionKey);
+                        channel.ScalingKeys.Add(scalingKey);
+                        channel.RotationKeys.Add(rotationKey);
+                    }
+                }
+            }
+
+            if(assimpScene.RootNode.FindNode("Armature") != null)
+            {
+                assimpAnimation.NodeAnimationChannels.Add(getArmatureChannel(keyframeTimes.ToArray()[0] / assimpAnimation.TicksPerSecond, assimpAnimation.DurationInTicks, animation.MotionFile.InterpolatedMotionHeader.FrameData.FramesPerSecond));
+            }
+        }
+
         /****************
          * UTILITIES
          ****************/
 
         private static Vector3 ToVector3(Vector4 pos) => new Vector3(pos.X, pos.Y, pos.Z);
+        private static float RoundFloat(float value)
+        {
+            float reminder = value % 1;
+            if (reminder > 0.999999 && reminder < 0.999999999999)
+            {
+              return value - reminder + 1;
+            }
+            else if (reminder > 0 && reminder < 0.00001)
+            {
+              return value - reminder;
+            }
+            return value;
+        }
+
+        private static Assimp.NodeAnimationChannel getArmatureChannel(double startFrame, double endFrame, double framesPerSecond)
+        {
+            Assimp.NodeAnimationChannel armatureChannel = new Assimp.NodeAnimationChannel();
+            armatureChannel.NodeName = "Armature";
+
+            armatureChannel.PositionKeys.Add(new Assimp.VectorKey(startFrame / framesPerSecond, new Assimp.Vector3D(0,0,0)));
+            armatureChannel.ScalingKeys.Add(new Assimp.VectorKey(startFrame / framesPerSecond, new Assimp.Vector3D(1, 1, 1)));
+            armatureChannel.RotationKeys.Add(new Assimp.QuaternionKey(startFrame / framesPerSecond, new Assimp.Quaternion(1, 0, 0, 0)));
+
+            armatureChannel.PositionKeys.Add(new Assimp.VectorKey(endFrame / framesPerSecond, new Assimp.Vector3D(0, 0, 0)));
+            armatureChannel.ScalingKeys.Add(new Assimp.VectorKey(endFrame / framesPerSecond, new Assimp.Vector3D(1, 1, 1)));
+            armatureChannel.RotationKeys.Add(new Assimp.QuaternionKey(endFrame / framesPerSecond, new Assimp.Quaternion(1, 0, 0, 0)));
+
+            return armatureChannel;
+        }
+
+        // Generates the absolute transformation matrices for each bone for the given frames
+        // Makes use of IAnimMatricesProvider to generate the matrices
+        private static Dictionary<float, Matrix4x4[]> getMatricesForKeyFrames (Bar mdlxBar, AnimationBinary animation, HashSet<float> keyframeTimes)
+        {
+            // Mdlx as stream is required
+            MemoryStream modelStream = new MemoryStream();
+            Bar.Write(modelStream, mdlxBar);
+            modelStream.Position = 0;
+
+            // Calculate matrices
+            Dictionary<float, Matrix4x4[]> frameMatrices = new Dictionary<float, Matrix4x4[]>();
+            Bar anbBarFile = Bar.Read(animation.toStream());
+            foreach (float keyTime in keyframeTimes)
+            {
+                // I have no idea why this needs to be done for every frame but otherwise it won't work properly
+                AnbIndir currentAnb = new AnbIndir(anbBarFile);
+                IAnimMatricesProvider AnimMatricesProvider = currentAnb.GetAnimProvider(modelStream);
+                frameMatrices.Add(keyTime, AnimMatricesProvider.ProvideMatrices(keyTime));
+                modelStream.Position = 0;
+            }
+
+            return frameMatrices;
+        }
     }
 }
