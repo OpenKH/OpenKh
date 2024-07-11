@@ -313,59 +313,61 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
         public void loadCollisions(Matrix4x4[] matrices)
         {
-            if (MdlxService.Instance.CollisionFile != null)
-            {
-                List<short> collisionGroupsToLoad = new List<short>();
-
-                if (MsetService.Instance.LoadedMotion.MotionTriggerFile?.RangeTriggerList == null)
-                {
-                    return;
-                }
-
-                foreach (MotionTrigger.RangeTrigger trigger in MsetService.Instance.LoadedMotion.MotionTriggerFile.RangeTriggerList)
-                {
-                    if ((trigger.StartFrame <= CurrentFrame || trigger.StartFrame == -1) && (trigger.EndFrame >= CurrentFrame || trigger.EndFrame == -1))
-                    {
-                        // Attack 1 hitbox
-                        if (trigger.Trigger == 10)
-                        {
-                            // Param 1 is atkp entry
-                            short hitbox1 = (short)(trigger.Param2);
-                            if (!collisionGroupsToLoad.Contains(hitbox1))
-                                collisionGroupsToLoad.Add(hitbox1);
-                        }
-                        // Attack 2 hitboxes
-                        if (trigger.Trigger == 33)
-                        {
-                            // Param 1 is atkp entry
-                            short hitbox1 = (short)(trigger.Param2);
-                            short hitbox2 = (short)(trigger.Param3);
-                            if (!collisionGroupsToLoad.Contains(hitbox1))
-                                collisionGroupsToLoad.Add(hitbox1);
-                            if (!collisionGroupsToLoad.Contains(hitbox2))
-                                collisionGroupsToLoad.Add(hitbox2);
-                        }
-                        // Reaction collision
-                        if (trigger.Trigger == 4)
-                        {
-                            short hitbox1 = (short)(trigger.Param1);
-                            if (!collisionGroupsToLoad.Contains(hitbox1))
-                                collisionGroupsToLoad.Add(hitbox1);
-                        }
-                    }
-                }
-
-                List<Collision_Wrapper> attackCollisions = new List<Collision_Wrapper>();
-                for (int i = 0; i < MdlxService.Instance.CollisionFile.EntryList.Count; i++)
-                {
-                    ObjectCollision collision = MdlxService.Instance.CollisionFile.EntryList[i];
-                    if (collisionGroupsToLoad.Contains(collision.Group))
-                    {
-                        attackCollisions.Add(new Collision_Wrapper("COLLISION_" + i, collision));
-                    }
-                }
-                loadAttackCollisions(attackCollisions, matrices);
+            if (MdlxService.Instance.CollisionFile == null ||
+                MsetService.Instance.LoadedMotion.MotionTriggerFile?.RangeTriggerList == null) {
+                return;
             }
+
+            List<short> collisionGroupsToLoad = new List<short>();
+
+            foreach (MotionTrigger.RangeTrigger trigger in MsetService.Instance.LoadedMotion.MotionTriggerFile.RangeTriggerList)
+            {
+                if ((trigger.StartFrame <= CurrentFrame || trigger.StartFrame == -1) && (trigger.EndFrame >= CurrentFrame || trigger.EndFrame == -1))
+                {
+                    // Attack 1 hitbox
+                    if (trigger.Trigger == 10)
+                    {
+                        // Param 1 is atkp entry
+                        short hitbox1 = (short)(trigger.Param2);
+                        if (!collisionGroupsToLoad.Contains(hitbox1))
+                            collisionGroupsToLoad.Add(hitbox1);
+                    }
+                    // Attack 2 hitboxes
+                    if (trigger.Trigger == 33)
+                    {
+                        // Param 1 is atkp entry
+                        short hitbox1 = (short)(trigger.Param2);
+                        if (!collisionGroupsToLoad.Contains(hitbox1))
+                            collisionGroupsToLoad.Add(hitbox1);
+                    }
+                    // Reaction collision
+                    if (trigger.Trigger == 4)
+                    {
+                        short hitbox1 = (short)(trigger.Param1);
+                        if (!collisionGroupsToLoad.Contains(hitbox1))
+                            collisionGroupsToLoad.Add(hitbox1);
+                    }
+                    // Reaction collision - self
+                    if (trigger.Trigger == 20 ||
+                        trigger.Trigger == 6)
+                    {
+                        short hitbox1 = (short)(trigger.Param2);
+                        if (!collisionGroupsToLoad.Contains(hitbox1))
+                            collisionGroupsToLoad.Add(hitbox1);
+                    }
+                }
+            }
+
+            List<Collision_Wrapper> attackCollisions = new List<Collision_Wrapper>();
+            for (int i = 0; i < MdlxService.Instance.CollisionFile.EntryList.Count; i++)
+            {
+                ObjectCollision collision = MdlxService.Instance.CollisionFile.EntryList[i];
+                if (collisionGroupsToLoad.Contains(collision.Group))
+                {
+                    attackCollisions.Add(new Collision_Wrapper("COLLISION_" + i, collision));
+                }
+            }
+            loadAttackCollisions(attackCollisions, matrices);
         }
 
         public void subscribe_ObjectSelected()
@@ -488,6 +490,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
                         basePosition = Vector3.Transform(new Vector3(collision.PositionX, collision.PositionY, collision.PositionZ), boneMatrices[collision.Bone]);
                     }
 
+                    if(collision.Bone == 16384) {
+                        basePosition = Vector3.Transform(new Vector3(collision.PositionX, collision.PositionY, collision.PositionZ), boneMatrices[0]);
+                    }
 
                     Color color = new Color();
                     if (collision.Type == (byte)ObjectCollision.TypeEnum.HIT)
