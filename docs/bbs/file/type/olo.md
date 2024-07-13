@@ -12,9 +12,9 @@ This file controls what objects and how they're spawned in levels within [Kingdo
 | 0x8     | uint32     | Number of Objects to spawn.
 | 0xC     | uint32     | Offset to the [Object Name](###Object-Name) section.
 | 0x10    | uint32     | Number of file path addresses.
-| 0x14    | uint32     | Offset to a list of [Path Name](###Path-Name) for **files**.
+| 0x14    | uint32     | Offset to a list of [Path Name](###Path-Name) for **Files**.
 | 0x18    | uint32     | Number of Script name
-| 0x1C    | uint32     | Offset to a list of [Path Name](###Path-Name) for **Scripts**.32
+| 0x1C    | uint32     | Offset to a list of [Path Name](###Path-Name) for **Scripts**.
 | 0x20    | uint32     | Number of Mission labels.
 | 0x24    | uint32     | Offset to the [Mission Name](###Mission-Name) definitions.
 | 0x28    | uint32     | Number of Triggers.
