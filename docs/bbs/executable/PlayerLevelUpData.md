@@ -1,6 +1,6 @@
-# PLAYER DATA
+# PLAYER LEVEL UP DATA
 
-This isn't a file, but a memory region in the executable.
+This isn't a file, but data specification that appears instantiated in memory.
 
 ## Stats
 
@@ -20,5 +20,3 @@ Level up Rewards consist of a triplet of uint32, one for each character in this 
 | 0x1    | uint8 | Magic Increase
 | 0x2    | uint8 | Defense Increase
 | 0x3    | uint8 | Padding
-
-0x5B 0x74

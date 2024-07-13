@@ -4,7 +4,7 @@ CmdCharge stands for *Command Charge*.
 
 This file stores the list for all commands melds.
 
-The reason why it's called **CHARGE** is because that's how command melding is named in japanese.
+The reason why it's called **CHARGE** is because that's how command melding is named in japanese, Command Charge.
 
 This file is contained within `Menu/Camp.arc`
 
