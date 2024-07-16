@@ -21,5 +21,10 @@ namespace OpenKh.Tools.ModsManager.Views
             WinSettings.Default.Save();
             base.OnClosed(e);
         }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
