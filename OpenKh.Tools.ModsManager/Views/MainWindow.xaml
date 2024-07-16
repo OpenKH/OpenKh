@@ -108,6 +108,13 @@
                     </MenuItem.Header>
                 </MenuItem>
                 <Separator/>
+                <MenuItem Header="Frequently Asked Questions" Command="{Binding OpenLinkCommand}"
+                    CommandParameter="https://openkh.dev/tool/GUI.ModsManager/FAQ">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource WebURL_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
                 <MenuItem Header="Download _latest version" Command="{Binding OpenLinkCommand}"
                     CommandParameter="https://github.com/OpenKH/OpenKh/releases">
                     <MenuItem.Icon>
