@@ -2,6 +2,8 @@
 
 This document will focus on teaching you how to utilize the OpenKH Mod Manager as necessary for both the PC ports of all [legacy class](#legacy-class-kh-games) KH games, as well as the PS2 versions of Kingdom Hearts (& Final Mix) and Kingdom Hearts II (& Final Mix).
 
+> If you are having trouble with the mod manager and need help, try looking at our [Frequently Asked Questions](./FAQ.md).
+
 > If you are looking for a guide on creating mods, refer to the sister guide to this one [here](./creatingMods.md).
 >> It includes both a simple and advanced set of mod generation instructions. **Use the table of contents!**
 
