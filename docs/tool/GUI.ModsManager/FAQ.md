@@ -23,13 +23,16 @@
 
 > **A:** For the best user experience, yes. We understand it takes up a lot of storage, but it allows you to retain your unmodified game files through a dynamic file replacement system instead of relying on a slow and tedious patching method. Some tips to reduce the storage used by game extraction are:
 > * Only extract the game(s) you are actively playing/modding.
-> * Enable `Dev View` by going to `Info > Dev View` inside the mod manager. This will allow you to patch your game(s) instead.
+> * Skip the game extraction portion of the initial setup wizard. Alternatively, you may enable `Dev View` by going to `Info > Dev View` inside the mod manager. This will allow you to patch your game(s) instead.
     >   * **WARNING:** This **<ins>will</ins>** make helping debug problems with your game more difficult, and mod making far more arduous. 
     >   * To revert your game to a completely vanilla slate, you may attempt to use the `Full Restore` options under `Patching > Full Restore`, but we cannot guarantee it will work if you have not properly kept a backup of your `.pkg` and `.hed` files. If this is the case, you may need to delete the respective game's `.pkg` and `.hed` files and verify the integrity of your game through Steam or EGS.
+>
+> The one exception is that Lua mods will work fine with the mod manager, so long as you have installed both Panacea and Lua Backend. Mods that alter or add files to the game will, in fact, require the extracted data, unless patching.
 ---
 ### Q: Lua mods aren't working!
 
 > **A:** Did you download and place either `Lua Backend` or `Lua Frontend` where your games are installed? If not, OpenKH can do this for you through the mod manager initialization wizard. If you need to configure `Lua Backend`, go to `Settings > Run wizard` until you reach the point where you can install `Lua Backend`. Select your games and click the button to configure it.
+>> **Note:** Panacea must also be installed for this method to work. If you have not enabled it, you should, as there is no negative effect to the game by Panacea simply being present, regardless of how you apply your mods.
 > 
 > ![alt text](image-12.png)
 ---
