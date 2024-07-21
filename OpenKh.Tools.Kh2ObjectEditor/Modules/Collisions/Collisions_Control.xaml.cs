@@ -1,6 +1,9 @@
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
+using System.Collections.Generic;
+using System.Data;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Collisions
 {
@@ -57,6 +60,20 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Collisions
         private void Button_Test(object sender, System.Windows.RoutedEventArgs e)
         {
             ThisVM.TestCollisionsIngame();
+        }
+
+        private void DataGridRow_MouseLeftButtonUp(object sender, MouseEventArgs e)
+        {
+            List<int> selectedIndices = new List<int>();
+            foreach (var selectedItem in DataTable.SelectedItems)
+            {
+                int index = DataTable.Items.IndexOf(selectedItem);
+                if (index >= 0)
+                {
+                    selectedIndices.Add(index);
+                }
+            }
+            ViewerService.Instance.ShowCollisions(selectedIndices);
         }
     }
 }

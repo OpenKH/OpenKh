@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using static OpenKh.Ddd.PmoV4;
 
@@ -24,7 +25,7 @@ namespace OpenKh.Tools.KhModels.View
 {
     public class MainWindowVM
     {
-        public ViewportService VpService { get; set; }
+        public ViewportController VpController { get; set; }
         public string Filepath { get; set; }
         // Options
         public bool ShowMesh { get; set; }
@@ -36,7 +37,7 @@ namespace OpenKh.Tools.KhModels.View
 
         public MainWindowVM(HelixViewport3D viewport)
         {
-            VpService = new ViewportService(viewport);
+            VpController = new ViewportController(viewport);
             SetDefaultOptions();
         }
 
@@ -50,14 +51,15 @@ namespace OpenKh.Tools.KhModels.View
             ShowOrigin = false;
             SetOptions();
         }
+
         public void SetOptions()
         {
-            VpService.ShowMesh = ShowMesh;
-            VpService.ShowWireframe = ShowWireframe;
-            VpService.ShowSkeleton = ShowSkeleton;
-            VpService.ShowJoints = ShowJoints;
-            VpService.ShowBoundingBox = ShowBoundingBox;
-            VpService.ShowOrigin = ShowOrigin;
+            VpController.SetVisibilityMesh(ShowMesh);
+            VpController.SetVisibilityWireframe(ShowWireframe);
+            VpController.SetVisibilitySkeleton(ShowSkeleton);
+            VpController.SetVisibilityJoint(ShowJoints);
+            VpController.SetVisibilityBoundingBox(ShowBoundingBox);
+            VpController.SetVisibilityOrigin(ShowOrigin);
         }
 
         public void LoadFilepath(string filepath)
@@ -222,7 +224,12 @@ namespace OpenKh.Tools.KhModels.View
 
             if (mtModels.Count > 0)
             {
-                VpService.LoadNewModels(mtModels);
+                VpController.ClearModels();
+                foreach(MtModel model in mtModels)
+                {
+                    VpController.AddModel(model, loadWireframe: false, loadBoundingBox: false);
+                }
+                VpController.Render();
             }
             Debug.WriteLine("PMP RENDERED: " + sw.ElapsedMilliseconds);
         }
@@ -232,25 +239,25 @@ namespace OpenKh.Tools.KhModels.View
             //MtModel model = VpService.Models[0];
             //Assimp.Scene scene = AssimpExporter.ExportScene(model);
 
-            Assimp.Scene scene = AssimpExporter.ExportScene(VpService.Models);
+            Assimp.Scene scene = AssimpExporter.ExportScene(VpController.ModelVisuals.Keys.ToList());
 
             System.Windows.Forms.SaveFileDialog sfd;
             sfd = new System.Windows.Forms.SaveFileDialog();
             sfd.Title = "Export model";
-            sfd.FileName = (VpService.Models.Count == 1) ? VpService.Models[0].Name + "." + AssimpGeneric.GetFormatFileExtension(fileFormat) : "Map." + AssimpGeneric.GetFormatFileExtension(fileFormat);
+            sfd.FileName = (VpController.ModelVisuals.Keys.Count == 1) ? VpController.ModelVisuals.Keys.ToArray()[0].Name + "." + AssimpGeneric.GetFormatFileExtension(fileFormat) : "Map." + AssimpGeneric.GetFormatFileExtension(fileFormat);
             sfd.ShowDialog();
             if (sfd.FileName != "")
             {
                 string dirPath = Path.GetDirectoryName(sfd.FileName);
 
                 AssimpGeneric.ExportScene(scene, fileFormat, sfd.FileName);
-                foreach(MtModel model in VpService.Models)
+                foreach(MtModel model in VpController.ModelVisuals.Keys.ToArray())
                 {
                     foreach (MtMaterial material in model.Materials)
                     {
                         if (material.DiffuseTextureBitmap != null)
                         {
-                            string textureName = (VpService.Models.Count == 1) ? Path.Combine(dirPath, material.Name + ".png") : Path.Combine(dirPath, model.Name + "." + material.Name + ".png");
+                            string textureName = (VpController.ModelVisuals.Keys.ToArray().Length == 1) ? Path.Combine(dirPath, material.Name + ".png") : Path.Combine(dirPath, model.Name + "." + material.Name + ".png");
                             material.ExportAsPng(textureName);
                         }
                     }

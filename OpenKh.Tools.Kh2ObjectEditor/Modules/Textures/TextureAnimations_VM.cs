@@ -1,11 +1,8 @@
-using OpenKh.AssimpUtils;
+using ModelingToolkit.Objects;
 using OpenKh.Kh2.TextureFooter;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
@@ -35,19 +32,16 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
         }
         public void exportImage(int id)
         {
-            List<Bitmap> bitmaps = ImageUtils.footerToImages(MdlxService.Instance.TextureFile);
-            //BitmapSource bitmapImage = ImageUtils.BitmapToImageSource(bitmaps[id]);
+            MtMaterial mat = GetMaterial(id);
 
             System.Windows.Forms.SaveFileDialog sfd;
             sfd = new System.Windows.Forms.SaveFileDialog();
             sfd.Title = "Export image as PNG";
-            sfd.FileName = "Animation.png";
+            sfd.FileName = Path.GetFileNameWithoutExtension(MdlxService.Instance.MdlxPath) + "_Animation_" +id+".png";
             sfd.ShowDialog();
             if (sfd.FileName != "")
             {
-                bitmaps[id].Save(sfd.FileName, ImageFormat.Png);
-                //MemoryStream memStream = new MemoryStream();
-                //AssimpGeneric.ExportBitmapSourceAsPng(bitmapImage, sfd.FileName);
+                mat.ExportAsPng(sfd.FileName);
             }
         }
         public void removeImage(int id)
@@ -77,6 +71,20 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
             MdlxService.Instance.TextureFile.TextureFooterData.TextureAnimationList[id].SpriteImage = texAnim.SpriteImage;
 
             loadAnims();
+        }
+        public MtMaterial GetMaterial(int index)
+        {
+            Kh2.TextureFooter.TextureAnimation texAnim = MdlxService.Instance.TextureFile.TextureFooterData.TextureAnimationList[index];
+            MtMaterial mat = new MtMaterial();
+            mat.Data = texAnim.SpriteImage;
+            mat.Clut = MdlxService.Instance.TextureFile.Images[texAnim.TextureIndex].GetClut();
+            mat.Width = texAnim.SpriteWidth;
+            mat.Height = texAnim.SpriteImage.Length / texAnim.SpriteWidth;
+            mat.ColorSize = 1;
+            mat.PixelHasAlpha = true;
+            mat.GenerateBitmap();
+
+            return mat;
         }
 
         public class TexAnimWrapper

@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Views
 {
@@ -258,6 +259,15 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         private void Button_TEST(object sender, System.Windows.RoutedEventArgs e)
         {
             ThisVM.TestMsetIngame();
+        }
+
+        private void FilterName_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                ThisVM.FilterName = FilterName.Text;
+                ThisVM.applyFilters();
+            }
         }
     }
 }

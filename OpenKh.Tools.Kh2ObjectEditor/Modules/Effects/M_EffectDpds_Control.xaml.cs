@@ -38,5 +38,16 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
                 ThisVM.Dpd_Replace(List_Dpds.SelectedIndex);
             }
         }
+        public void Dpd_Export(object sender, RoutedEventArgs e)
+        {
+            if (List_Dpds.SelectedIndex != null)
+            {
+                ThisVM.Dpd_Export(List_Dpds.SelectedIndex);
+            }
+        }
+        public void Dpd_Import(object sender, RoutedEventArgs e)
+        {
+            ThisVM.Dpd_Import();
+        }
     }
 }

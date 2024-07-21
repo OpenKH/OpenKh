@@ -29,6 +29,7 @@
                 <Label Foreground="White" VerticalAlignment="Center">Frame return:</Label>
                 <TextBox MinWidth="30" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.FrameData.FrameReturn}"></TextBox>
             </StackPanel>
+            <Label Foreground="White">Note: These 3 values above are halved</Label>
             <Separator Height="20"/>
             <Label Foreground="White">BOUNDING BOX</Label>
             <StackPanel Orientation="Horizontal">

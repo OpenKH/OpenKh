@@ -31,6 +31,12 @@
         <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
 
         <ListView Grid.Column="2" x:Name="List_Textures" ItemsSource="{Binding TextureWrappers}" SelectedItem="{Binding SelectedTexture}" MouseDoubleClick="List_Textures_MouseDoubleClick">
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Export as PNG" Click="EffectImage_Export"/>
+                    <MenuItem Header="Replace with PNG" Click="EffectImage_Replace"/>
+                </ContextMenu>
+            </ListView.ContextMenu>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Vertical">

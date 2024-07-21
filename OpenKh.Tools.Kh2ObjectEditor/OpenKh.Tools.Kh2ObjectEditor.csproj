@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ModelingToolkit\ModelingToolkit\ModelingToolkit.csproj" />
     <ProjectReference Include="..\OpenKh.AssimpUtils\OpenKh.AssimpUtils.csproj" />
     <ProjectReference Include="..\OpenKh.Command.AnbMaker\OpenKh.Command.AnbMaker.csproj" />
     <ProjectReference Include="..\OpenKh.Command.Bdxio\OpenKh.Command.Bdxio.csproj" />

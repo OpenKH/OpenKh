@@ -41,7 +41,7 @@
                 <Label FontWeight="Bold">Filters</Label>
                 <StackPanel Orientation="Horizontal">
                     <Label>Name:</Label>
-                    <TextBox Text="{Binding FilterName}" Width="100" VerticalContentAlignment="Center"></TextBox>
+                    <TextBox Name="FilterName" Text="{Binding FilterName}" Width="100" VerticalContentAlignment="Center" PreviewKeyDown="FilterName_PreviewKeyDown"></TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label>Hide Dummies:</Label>
