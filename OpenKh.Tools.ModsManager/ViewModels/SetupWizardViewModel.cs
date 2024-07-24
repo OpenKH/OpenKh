@@ -360,6 +360,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             get => ConfigurationService.Extractkh3d;
             set => ConfigurationService.Extractkh3d = value;
         }
+        public bool SkipRemastered
+        {
+            get => ConfigurationService.SkipRemastered;
+            set => ConfigurationService.SkipRemastered = value;
+        }
         public bool LuaConfigkh1
         {
             get => LuaScriptPaths.Contains("kh1");

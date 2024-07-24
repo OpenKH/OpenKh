@@ -81,11 +81,11 @@ namespace OpenKh.Patcher
 
         public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null)
         {
-            
+
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
             try
             {
-                
+
                 if (metadata.Assets == null)
                     throw new Exception("No assets found.");
                 if (metadata.Game != null && GamesList.Contains(metadata.Game.ToLower()) && metadata.Game.ToLower() != LaunchGame.ToLower())
@@ -182,15 +182,17 @@ namespace OpenKh.Patcher
 
                         try
                         {
-                            context.CopyOriginalFile(name, dstFile);
+                            if (((assetFile.Type == "internal" || assetFile.Source[0].Type ==  "internal") && File.Exists(context.GetOriginalAssetPath(assetFile.Source[0].Name))) || assetFile.Type != "internal" && assetFile.Source[0].Type != "internal")
+                            {
+                                context.CopyOriginalFile(name, dstFile);
 
-                            using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                            PatchFile(context, assetFile, _stream);
+                                using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                                PatchFile(context, assetFile, _stream);
 
-                            _stream.Close();
-                            _stream.Dispose();
+                                _stream.Close();
+                                _stream.Dispose();
+                            }
                         }
-
                         catch (IOException) { }
                     }
                 });
@@ -259,7 +261,7 @@ namespace OpenKh.Patcher
             if (assetFile.Source == null || assetFile.Source.Count == 0)
                 throw new Exception($"File '{assetFile.Name}' does not contain any source");
 
-            string srcFile; 
+            string srcFile;
 
             if (assetFile.Source[0].Type == "internal")
             {
@@ -429,7 +431,7 @@ namespace OpenKh.Patcher
             if (!File.Exists(srcFile))
                 throw new FileNotFoundException($"The mod does not contain the file {scriptName}", srcFile);
 
- 
+
             var programsInput = File.ReadAllText(context.GetSourceModAssetPath(scriptName));
             var ascii = BdxAsciiModel.ParseText(programsInput);
             var decoder = new BdxEncoder(
@@ -463,7 +465,7 @@ namespace OpenKh.Patcher
         }
 
         private static readonly Dictionary<string, byte> characterMap = new Dictionary<string, byte>(){
-            { "Sora", 1 }, { "Donald", 2 }, { "Goofy", 3 },  { "Mickey", 4 },  { "Auron", 5 }, { "PingMulan",6 }, { "Aladdin", 7 },  { "Sparrow", 8 }, { "Beast", 9 },  { "Jack", 10 },  { "Simba", 11 }, { "Tron", 12 }, { "Riku", 13 }, { "Roxas", 14}, {"Ping", 15} 
+            { "Sora", 1 }, { "Donald", 2 }, { "Goofy", 3 },  { "Mickey", 4 },  { "Auron", 5 }, { "PingMulan",6 }, { "Aladdin", 7 },  { "Sparrow", 8 }, { "Beast", 9 },  { "Jack", 10 },  { "Simba", 11 }, { "Tron", 12 }, { "Riku", 13 }, { "Roxas", 14}, {"Ping", 15}
         };
 
         private static readonly IDeserializer deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
@@ -652,9 +654,9 @@ namespace OpenKh.Patcher
                         break;
 
                     case "cmd":
-                        var cmdList = Kh2.SystemData.Cmd.Read(stream); 
-                        var moddedCmd = deserializer.Deserialize<List<Kh2.SystemData.Cmd>>(sourceText); 
-                        foreach (var commands in moddedCmd) 
+                        var cmdList = Kh2.SystemData.Cmd.Read(stream);
+                        var moddedCmd = deserializer.Deserialize<List<Kh2.SystemData.Cmd>>(sourceText);
+                        foreach (var commands in moddedCmd)
                         {
                             var oldCommands = cmdList.First(x => x.Id == commands.Id && x.Id == commands.Id);
                             cmdList[cmdList.IndexOf(oldCommands)] = commands;
@@ -682,7 +684,7 @@ namespace OpenKh.Patcher
                         }
                         Kh2.SystemData.Sklt.Write(stream.SetPosition(0), skltList);
                         break;
-                       
+
                     case "przt":
                         var prztList = Kh2.Battle.Przt.Read(stream);
                         var moddedPrzt = deserializer.Deserialize<List<Kh2.Battle.Przt>>(sourceText);
@@ -695,8 +697,8 @@ namespace OpenKh.Patcher
                         break;
 
                     case "magc":
-                        var magcList = Kh2.Battle.Magc.Read(stream); 
-                        var moddedMagc = deserializer.Deserialize<List<Kh2.Battle.Magc>>(sourceText); 
+                        var magcList = Kh2.Battle.Magc.Read(stream);
+                        var moddedMagc = deserializer.Deserialize<List<Kh2.Battle.Magc>>(sourceText);
                         foreach (var magc in moddedMagc)
                         {
                             var oldMagc = magcList.First(x => x.Id == magc.Id && x.Level == magc.Level);

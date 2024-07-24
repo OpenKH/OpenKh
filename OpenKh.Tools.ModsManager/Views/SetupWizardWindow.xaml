@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="{Binding Title}" d:Title="OpenKH Mods Manager set-up"
-        Height="520" Width="400" ResizeMode="NoResize">
+        Height="590" Width="400" ResizeMode="NoResize">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
@@ -33,7 +33,7 @@
         Finish="Wizard_Finish" Background="{Binding ColorTheme.BackgroundColor}">
 
         <xctk:WizardPage
-            x:Name="IntroPage" 
+            x:Name="IntroPage"
             Title="Welcome to OpenKH Mods Manager"
             PageType="Exterior"
             Description="This set-up will guide you through the basic configuration of this tool, allowing you to install and play mods from the best modders in the Kingdom Hearts community."
@@ -83,7 +83,7 @@
                     </Grid>
                     <TextBlock Margin="0 0 0 3">NOTE: Only PCSX2 up to 1.6.0 and PCSX2-EX are supported.</TextBlock>
                 </StackPanel>
-                <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">                    
+                <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                     Select the launcher you use for the supported Kingdom Hearts games.
                     </TextBlock>
@@ -91,7 +91,7 @@
                         <ComboBoxItem>Epic Games Store</ComboBoxItem>
                         <ComboBoxItem>Steam</ComboBoxItem>
                         <ComboBoxItem>Other</ComboBoxItem>
-                    </ComboBox>                    
+                    </ComboBox>
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         Mod Manager supports both the 1.5+2.5 collection and KH3D from the 2.8 collection choose the filepath for at least one of the collections.
                     </TextBlock>
@@ -227,7 +227,12 @@
                 <TextBlock Margin="0 0 0 3" Visibility="{Binding ExtractionCompleteVisibility}">
                     The extraction of the game's data succeded!
                 </TextBlock>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">               
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">
+                    <Run Foreground="Red">WARNING</Run>
+                    If you do not have the space to extract the remastered files for each game (which are about 75% of the sizes listed above) you can check the box below to skip extracting them. Very few mods may have visual issues because of this but for those with limited storage space on their computer this should help alleviate that issue.
+                </TextBlock>
+                <CheckBox Visibility="{Binding PcReleaseConfigVisibility}" IsChecked="{Binding SkipRemastered}" Content="Skip Extracting Remastered Files"/>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">
                         <Run Foreground="Red">WARNING</Run>
                         If you do not extract a games data only Lua Scripts will function properly. Only check the box below if you will only be installing Lua Scripts in Mods Manager.
                 </TextBlock>

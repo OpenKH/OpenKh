@@ -46,6 +46,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool AutoUpdateMods { get; internal set; }
             public string pcVersion { get; internal set; } = "EGS";
             public List<string> GamesToExtract { get; internal set; } = new List<string> { "kh2" };
+            public bool SkipRemastered { get; internal set; } = false;
             public string LaunchGame { get; internal set; } = "kh2";
             public bool DarkMode { get; internal set; } = true;
             public List<YamlGenPref> YamlGenPrefs { get; internal set; } = new List<YamlGenPref>();
@@ -437,6 +438,15 @@ namespace OpenKh.Tools.ModsManager.Services
                 {
                     _config.GamesToExtract.Remove("kh3d");
                 }
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool SkipRemastered
+        {
+            get => _config.SkipRemastered;
+            set
+            {
+                _config.SkipRemastered = value;
                 _config.Save(ConfigPath);
             }
         }
