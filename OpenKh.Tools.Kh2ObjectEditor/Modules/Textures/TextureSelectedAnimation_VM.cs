@@ -1,3 +1,4 @@
+using ModelingToolkit.Objects;
 using OpenKh.Kh2.TextureFooter;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
@@ -107,6 +108,20 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
             }
 
             return null;
+        }
+        public MtMaterial GetMaterial(int index)
+        {
+            Kh2.TextureFooter.TextureAnimation texAnim = MdlxService.Instance.TextureFile.TextureFooterData.TextureAnimationList[index];
+            MtMaterial mat = new MtMaterial();
+            mat.Data = texAnim.SpriteImage;
+            mat.Clut = MdlxService.Instance.TextureFile.Images[texAnim.TextureIndex].GetClut();
+            mat.Width = texAnim.SpriteWidth;
+            mat.Height = texAnim.SpriteImage.Length / texAnim.SpriteWidth;
+            mat.ColorSize = 1;
+            mat.PixelHasAlpha = true;
+            mat.GenerateBitmap();
+
+            return mat;
         }
 
         public class ScriptWrapper

@@ -378,6 +378,18 @@ namespace OpenKh.AssimpUtils
 
             HashSet<float> keyframeTimes = animation.MotionFile.KeyTimes.ToHashSet();
 
+            // Get real duration
+            float minTime = 0;
+            float maxTime = 0;
+            foreach (var keyTime in keyframeTimes)
+            {
+                if(keyTime < minTime)
+                    minTime = keyTime;
+                if(keyTime > maxTime)
+                    maxTime = keyTime;
+            }
+            assimpAnimation.DurationInTicks = maxTime - minTime;
+
             // Get absolute transformation matrices of the bones
             Dictionary<float, Matrix4x4[]> frameMatrices = getMatricesForKeyFrames(mdlxBar, animation, keyframeTimes);
 

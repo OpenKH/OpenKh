@@ -38,6 +38,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         {
             LoadedMotionId = motionIndex;
             LoadCurrentMotion();
+            ViewerService.Instance.LoadMotion();
         }
         public void LoadCurrentMotion()
         {

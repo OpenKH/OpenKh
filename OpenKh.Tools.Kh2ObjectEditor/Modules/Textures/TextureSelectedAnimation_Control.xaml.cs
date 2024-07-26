@@ -1,9 +1,5 @@
-using OpenKh.Tools.Kh2ObjectEditor.Services;
-using OpenKh.Tools.Kh2ObjectEditor.Utils;
-using System.Collections.Generic;
-using System.Drawing;
+using ModelingToolkit.Objects;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using static OpenKh.Tools.Kh2ObjectEditor.Modules.Textures.TextureSelectedAnimation_VM;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
@@ -21,9 +17,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
 
         public void loadImage(int index)
         {
-            List<Bitmap> bitmaps = ImageUtils.footerToImages(MdlxService.Instance.TextureFile);
-            BitmapSource BitmapImage = ImageUtils.BitmapToImageSource(bitmaps[index]);
-            ImageFrame.Source = BitmapImage;
+            MtMaterial mat = ThisVM.GetMaterial(index);
+            ImageFrame.Source = mat.GetAsBitmapImage();
+            TexAnimCanvas.Height = mat.Height;
         }
 
         private void Script_Export(object sender, System.Windows.RoutedEventArgs e)

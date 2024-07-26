@@ -14,7 +14,7 @@
             <Label FontWeight="Bold">Filters</Label>
             <StackPanel Orientation="Horizontal">
                 <Label>Name:</Label>
-                <TextBox Text="{Binding FilterName}" Width="80" VerticalContentAlignment="Center"></TextBox>
+                <TextBox Name="FilterName" Text="{Binding FilterName}" Width="80" VerticalContentAlignment="Center" PreviewKeyDown="FilterName_PreviewKeyDown"></TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label>Has Moveset:</Label>
