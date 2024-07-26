@@ -1,4 +1,3 @@
-using Microsoft.VisualBasic.CompilerServices;
 using OpenKh.Common;
 using OpenKh.Common.Utils;
 using OpenKh.Imaging;
