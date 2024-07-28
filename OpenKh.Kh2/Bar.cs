@@ -157,6 +157,18 @@ namespace OpenKh.Kh2
                 .Where(x => predicate(x.Name, x.Type))
                 .Select(x =>
                 {
+                    if(x.Offset == -1)
+                    {
+                        return new Entry
+                        {
+                            Type = x.Type,
+                            Index = x.Index,
+                            Name = x.Name.Split('\0').FirstOrDefault(),
+                            Offset = x.Offset,
+                            Stream = new MemoryStream()
+                        };
+                    }
+
                     reader.BaseStream.Position = x.Offset;
                     var data = reader.ReadBytes(x.Size);
 

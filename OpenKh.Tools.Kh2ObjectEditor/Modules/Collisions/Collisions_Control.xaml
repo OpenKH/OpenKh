@@ -35,6 +35,11 @@
             <DataGrid.Resources>
                 <local:CollisionTypeConverter x:Key="CollisionTypeConverter" />
                 <local:CollisionShapeConverter x:Key="CollisionShapeConverter" />
+
+                <Style TargetType="DataGridRow">
+                    <EventSetter Event="MouseLeftButtonUp" Handler="DataGridRow_MouseLeftButtonUp"/>
+                </Style>
+
             </DataGrid.Resources>
 
             <DataGrid.Columns>

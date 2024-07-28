@@ -23,6 +23,8 @@
                     <MenuItem Header="Copy DPD" Click="Dpd_Copy"/>
                     <MenuItem Header="Add copied DPD" Click="Dpd_AddCopied"/>
                     <MenuItem Header="Replace DPD with copied" Click="Dpd_Replace"/>
+                    <MenuItem Header="Export DPD" Click="Dpd_Export"/>
+                    <MenuItem Header="Import DPD" Click="Dpd_Import"/>
                 </ContextMenu>
             </ListView.ContextMenu>
             <ListView.ItemTemplate>
