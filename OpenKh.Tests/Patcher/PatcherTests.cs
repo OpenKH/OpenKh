@@ -108,7 +108,7 @@ namespace OpenKh.Tests.Patcher
                 x.WriteByte(3);
             });
 
-            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, tests: true);
 
             AssertFileExists(ModOutputDir, patch.Assets[0].Name);
             AssertBarFile("abcd", entry =>
@@ -233,7 +233,7 @@ namespace OpenKh.Tests.Patcher
 
             File.Copy("Imaging/res/png/32.png", Path.Combine(ModInputDir, "sample.png"));
 
-            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, tests: true);
 
             AssertFileExists(ModOutputDir, patch.Assets[0].Name);
             AssertBarFile("test", entry =>
@@ -434,7 +434,7 @@ namespace OpenKh.Tests.Patcher
                 writer.Flush();
             });
 
-            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir , tests:true);
 
             AssertFileExists(ModOutputDir, "msg/jp/sys.msg");
             File.OpenRead(Path.Combine(ModOutputDir, "msg/jp/sys.msg")).Using(stream =>
@@ -556,7 +556,7 @@ namespace OpenKh.Tests.Patcher
                 writer.WriteLine(" ret");
                 writer.Flush();
             });
-            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, tests:true);
 
             AssertFileExists(ModOutputDir, "aaa");
 
@@ -616,15 +616,15 @@ namespace OpenKh.Tests.Patcher
 
             Assert.Equal(2, scripts[0].Type);
             Assert.Equal(1, scripts[0].Flag);
-           
+
         }
 
-        
+
         public void ListPatchTrsrTest()
         {
             var patcher = new PatcherProcessor();
             var serializer = new Serializer();
-            var patch = new Metadata() { 
+            var patch = new Metadata() {
                 Assets = new List<AssetFile>()
                 {
                     new AssetFile()
@@ -694,13 +694,13 @@ namespace OpenKh.Tests.Patcher
              });
 
         }
-        
+
         [Fact]
         public void ListPatchCmdTest()
         {
             var patcher = new PatcherProcessor();
             var serializer = new Serializer();
-            var patch = new Metadata() { 
+            var patch = new Metadata() {
                 Assets = new List<AssetFile>()
                 {
                     new AssetFile()
@@ -777,7 +777,7 @@ namespace OpenKh.Tests.Patcher
              });
 
         }
-        
+
         [Fact]
         public void ListPatchItemTest()
         {
@@ -834,7 +834,7 @@ namespace OpenKh.Tests.Patcher
                                 Ability = 15
                             }
                         }
-                        
+
                     }
                     };
                 using var itemStream = new MemoryStream();
@@ -1684,7 +1684,7 @@ namespace OpenKh.Tests.Patcher
                         Ap = 200,
                         Items = new List<ushort>(32),
                         Padding = new byte[52]
-                    } 
+                    }
                 };
                 writer.Write(serializer.Serialize(moddedPlrp));
                 writer.Flush();
@@ -1813,7 +1813,7 @@ namespace OpenKh.Tests.Patcher
                 Assert.Equal(1, enmp[0].Level);
             });
         }
-        
+
         [Fact]
         public void ListPatchMagcTest()
         {
@@ -2029,7 +2029,7 @@ namespace OpenKh.Tests.Patcher
 
             File.Copy("Imaging/res/png/32.png", Path.Combine(ModInputDir, "sample.png"));
 
-            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, tests: true);
 
             AssertFileExists(ModOutputDir, patch.Assets[0].Name);
             AssertBarFile("test", entry =>

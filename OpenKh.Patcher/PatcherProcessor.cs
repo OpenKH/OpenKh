@@ -79,7 +79,7 @@ namespace OpenKh.Patcher
             "Recom",
         };
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null)
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null, bool tests = false)
         {
 
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
@@ -182,7 +182,7 @@ namespace OpenKh.Patcher
 
                         try
                         {
-                            if (File.Exists(context.GetOriginalAssetPath(assetFile.Name)) || (assetFile.Method == "copy" && assetFile.Source[0].Type != "internal"))
+                            if (File.Exists(context.GetOriginalAssetPath(assetFile.Name)) || (assetFile.Method == "copy" && assetFile.Source[0].Type != "internal") || tests)
                             {
                                 context.CopyOriginalFile(name, dstFile);
 
