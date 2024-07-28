@@ -182,7 +182,7 @@ namespace OpenKh.Patcher
 
                         try
                         {
-                            if (((assetFile.Type == "internal" || assetFile.Source[0].Type ==  "internal") && File.Exists(context.GetOriginalAssetPath(assetFile.Source[0].Name))) || assetFile.Type != "internal" && assetFile.Source[0].Type != "internal")
+                            if (File.Exists(context.GetOriginalAssetPath(assetFile.Name)) || (assetFile.Method == "copy" && assetFile.Source[0].Type != "internal"))
                             {
                                 context.CopyOriginalFile(name, dstFile);
 
