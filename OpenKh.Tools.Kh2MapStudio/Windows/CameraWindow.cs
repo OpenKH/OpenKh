@@ -16,4 +16,15 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                     -x.X, camera.CameraRotationYawPitchRoll.Y, -x.Y));
         });
     }
+    static class SeparateWindow
+    {
+        public static bool Run(Camera camera) => ForWindow("Camera", () =>
+        {
+            ForEdit3("Position", () => camera.CameraPosition, x => camera.CameraPosition = x);
+            ForEdit2("Rotation",
+                () => new Vector2(-camera.CameraRotationYawPitchRoll.X, -camera.CameraRotationYawPitchRoll.Z),
+                x => camera.CameraRotationYawPitchRoll = new Vector3(
+                    -x.X, camera.CameraRotationYawPitchRoll.Y, -x.Y));
+        });
+    }
 }
