@@ -182,7 +182,14 @@ namespace OpenKh.Patcher
 
                         try
                         {
-                            if (File.Exists(context.GetOriginalAssetPath(assetFile.Name)) || (assetFile.Method == "copy" && assetFile.Source[0].Type != "internal") || tests)
+                            //If editing supfiles (not Method: copy)  make sure the original file exists OR
+                            //If copying a file from the mod (NOT Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
+                            //If copying a file from the users extraction (Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
+                            //Ignore if its from a test
+                            if ((assetFile.Method != "copy" && File.Exists(context.GetOriginalAssetPath(assetFile.Name))) ||
+                            (assetFile.Method == "copy" && assetFile.Source[0].Type != "internal" && File.Exists(context.GetSourceModAssetPath(assetFile.Source[0].Name))) ||
+                            (assetFile.Method == "copy" && assetFile.Source[0].Type == "internal" && File.Exists(context.GetOriginalAssetPath(assetFile.Source[0].Name)))  ||
+                            tests)
                             {
                                 context.CopyOriginalFile(name, dstFile);
 
