@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization;
+using OpenKh.Kh2.Battle;
 
 namespace OpenKh.Patcher
 {
@@ -621,6 +622,19 @@ namespace OpenKh.Patcher
                             atkpList[atkpList.IndexOf(oldAtkp)] = attack;
                         }
                         Kh2.Battle.Atkp.Write(stream.SetPosition(0), atkpList);
+                        break;
+
+                    case "lvpm":
+                        var lvpmList = Kh2.Battle.Lvpm.Read(stream);
+                        var moddedLvpm = deserializer.Deserialize<List<Kh2.Battle.LvpmHelper>>(sourceText);
+                        var helperList = LvpmHelper.ConvertLvpmListToHelper(lvpmList);
+                        
+                        foreach (var level in moddedLvpm)
+                        {
+                            var oldLvpm = helperList.First(x => x.Level == level.Level);
+                            lvpmList[helperList.IndexOf(oldLvpm)] = LvpmHelper.ConvertLvpmHelperToLvpm(level);
+                        }
+                        Kh2.Battle.Lvpm.Write(stream.SetPosition(0), lvpmList);
                         break;
 
                     case "objentry":
