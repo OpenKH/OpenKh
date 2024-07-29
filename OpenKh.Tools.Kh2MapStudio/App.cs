@@ -310,7 +310,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                 var ret = ImGui.Begin("Map List", //List of all the maps, the left-side bar.
                     //ImGuiWindowFlags.NoDecoration | //Removes the scroll-bar
                     ImGuiWindowFlags.NoCollapse | //Prevents it from being collapsible
-                    ImGuiWindowFlags.AlwaysAutoResize | //NEW: Resizes the window to accomodate the "Please select a map" text.
+                    ImGuiWindowFlags.AlwaysAutoResize | //NEW: Resizes the window to accomodate maps of various name lengths.
                     ImGuiWindowFlags.NoMove); //Prevents it from being moved around
                 ImGui.SetWindowPos(nextPos);
                 ImGui.SetWindowSize(new Vector2(64, 0));
