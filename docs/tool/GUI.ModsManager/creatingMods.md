@@ -27,6 +27,7 @@ This document will focus on teaching you how to create mods using the OpenKH Mod
       * [przt](#przt-source-example)
       * [magc](#magc-source-example)
       * [objentry](#objentry-source-example)
+  * [bbsarc](#bbsarc-bbs)
   * [Example of a Fully Complete `mod.yml` File](#an-example-of-a-fully-complete-modyml-can-be-seen-below-and-the-full-source-of-the-mod-can-be-seen-here)
 * [Generating a Simple `mod.yml` for New Mod Authors](#generating-a-simple-modyml-for-new-mod-authors)
 * [Publishing a Mod on GitHub](#publishing-a-mod-on-github)
@@ -537,6 +538,21 @@ Sora:
   SpawnObject2: 0
   SpawnObject3: 0
   SpawnObject4: 0
+```
+
+### `bbsarc` (BBS)
+Allows you to add/patch files inside a bbs `.arc` container without having to `copy` the entire arc file into your mod. You can use any method to patch those files, although at time of writing the only one that works for BBS files (other than `bbsarc`) is `copy`.
+
+Asset example:
+
+```
+- name: arc/map/SW10.arc
+  method: bbsarc
+  source:
+  - name: sw_10.pvd
+    method: copy
+    source:
+    - name: sw_10.pvd
 ```
 
 ### An example of a fully complete mod.yml can be seen below, and the full source of the mod can be seen [here](https://github.com/OpenKH/mod-template)
