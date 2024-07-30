@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization;
+using OpenKh.Bbs;
 
 namespace OpenKh.Patcher
 {
@@ -313,17 +314,18 @@ namespace OpenKh.Patcher
 
         private static void PatchBBSArc(Context context, AssetFile assetFile, Stream stream)
         {
-            var entryList = OpenKh.Bbs.Arc.Read(stream).ToList();
+            var entryList = Arc.IsValid(stream) ? Arc.Read(stream).ToList() : new List<Arc.Entry>();
             foreach (var file in assetFile.Source)
             {
                 var entry = entryList.FirstOrDefault(e => e.Name == file.Name);
 
                 if (entry == null)
                 {
-                    entryList.Add(new Bbs.Arc.Entry()
+                    entry = new Arc.Entry()
                     {
                         Name = file.Name
-                    });
+                    };
+                    entryList.Add(entry);
                 }
                 else if (entry.IsLink)
                 {
