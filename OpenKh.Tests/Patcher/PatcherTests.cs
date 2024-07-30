@@ -1997,31 +1997,31 @@ namespace OpenKh.Tests.Patcher
             var patcher = new PatcherProcessor();
             var patch = new Metadata
             {
-                Assets = [
+                Assets = new List<AssetFile> {
                     new AssetFile
                     {
                         Name = "somedir/somearc.arc",
                         Method = "bbsarc",
-                        Source = [
+                        Source = new List<AssetFile> {
                             new AssetFile
                             {
                                 Name = "newfile",
                                 Method = "copy",
-                                Source = [
+                                Source = new List<AssetFile> {
                                     new AssetFile
                                     {
                                         Name = "somedir/somearc/newfile.bin"
                                     }
-                                ]
+                                }
                             }
-                        ]
+                        }
                     }
-                ]
+                }
             };
 
             CreateFile(ModInputDir, "somedir/somearc/newfile.bin").Using(x =>
             {
-                x.Write([4, 5, 6, 7]);
+                x.Write(new byte[] { 4, 5, 6, 7 });
             });
 
             patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
@@ -2030,7 +2030,7 @@ namespace OpenKh.Tests.Patcher
             AssertArcFile("newfile", entry =>
             {
                 Assert.Equal(4, entry.Data.Length);
-                Assert.Equal([4, 5, 6, 7], entry.Data);
+                Assert.Equal(new byte[] { 4, 5, 6, 7 }, entry.Data);
             }, ModOutputDir, patch.Assets[0].Name);
         }
 
@@ -2040,26 +2040,26 @@ namespace OpenKh.Tests.Patcher
             var patcher = new PatcherProcessor();
             var patch = new Metadata
             {
-                Assets = [
+                Assets = new List<AssetFile> {
                     new AssetFile
                     {
                         Name = "somedir/somearc.arc",
                         Method = "bbsarc",
-                        Source = [
+                        Source = new List<AssetFile> {
                             new AssetFile
                             {
                                 Name = "newfile",
                                 Method = "copy",
-                                Source = [
+                                Source = new List<AssetFile> {
                                     new AssetFile
                                     {
                                         Name = "somedir/somearc/newfile.bin"
                                     }
-                                ]
+                                }
                             }
-                        ]
+                        }
                     }
-                ]
+                }
             };
 
             CreateFile(AssetsInputDir, "somedir/somearc.arc").Using(x =>
@@ -2069,14 +2069,14 @@ namespace OpenKh.Tests.Patcher
                     new Arc.Entry
                     {
                         Name = "abcd",
-                        Data = [0, 1, 2, 3]
+                        Data = new byte[] {0, 1, 2, 3 }
                     }
                 }, x);
             });
 
             CreateFile(ModInputDir, "somedir/somearc/newfile.bin").Using(x =>
             {
-                x.Write([4, 5, 6, 7]);
+                x.Write(new byte[] { 4, 5, 6, 7 });
             });
 
             patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
@@ -2085,12 +2085,12 @@ namespace OpenKh.Tests.Patcher
             AssertArcFile("abcd", entry =>
             {
                 Assert.Equal(4, entry.Data.Length);
-                Assert.Equal([0, 1, 2, 3], entry.Data);
+                Assert.Equal(new byte[] { 0, 1, 2, 3 }, entry.Data);
             }, ModOutputDir, patch.Assets[0].Name);
             AssertArcFile("newfile", entry =>
             {
                 Assert.Equal(4, entry.Data.Length);
-                Assert.Equal([4, 5, 6, 7], entry.Data);
+                Assert.Equal(new byte[] { 4, 5, 6, 7 }, entry.Data);
             }, ModOutputDir, patch.Assets[0].Name);
         }
 
@@ -2100,26 +2100,26 @@ namespace OpenKh.Tests.Patcher
             var patcher = new PatcherProcessor();
             var patch = new Metadata
             {
-                Assets = [
+                Assets = new List<AssetFile> {
                     new AssetFile
                     {
                         Name = "somedir/somearc.arc",
                         Method = "bbsarc",
-                        Source = [
+                        Source = new List<AssetFile> {
                             new AssetFile
                             {
                                 Name = "abcd",
                                 Method = "copy",
-                                Source = [
+                                Source = new List<AssetFile> {
                                     new AssetFile
                                     {
                                         Name = "somedir/somearc/abcd.bin"
                                     }
-                                ]
+                                }
                             }
-                        ]
+                        }
                     }
-                ]
+                }
             };
 
             CreateFile(AssetsInputDir, "somedir/somearc.arc").Using(x =>
@@ -2129,14 +2129,14 @@ namespace OpenKh.Tests.Patcher
                     new Arc.Entry
                     {
                         Name = "abcd",
-                        Data = [0, 1, 2, 3]
+                        Data = new byte[] {0, 1, 2, 3}
                     }
                 }, x);
             });
 
             CreateFile(ModInputDir, "somedir/somearc/abcd.bin").Using(x =>
             {
-                x.Write([4, 5, 6, 7]);
+                x.Write(new byte[] { 4, 5, 6, 7 });
             });
 
             patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
@@ -2145,7 +2145,7 @@ namespace OpenKh.Tests.Patcher
             AssertArcFile("abcd", entry =>
             {
                 Assert.Equal(4, entry.Data.Length);
-                Assert.Equal([4, 5, 6, 7], entry.Data);
+                Assert.Equal(new byte[] { 4, 5, 6, 7 }, entry.Data);
             }, ModOutputDir, patch.Assets[0].Name);
         }
 
