@@ -184,24 +184,23 @@ Asset Example
 ```
 
 * `listpatch` (KH2) - Can modify the following different types of list binaries found within KH2.
-* Fields marked with 'merge' will allow other mods to edit the differing fields of the same item, and merge the change together.
-* Example: Mod A changes the Kingdom Key to be 6 strength, leaving the ability field blank. Mod B changes the ability of the Kingdom Key to be Combo Master, leaving the strength field blank.
-* When building with both mods, the changes will be merged to have a Kingdom Key with 6 strength and Combo Master.
 
  * `trsr`
- * `cmd`  (merge)
- * `item` (merge)
+ * `cmd`
+ * `item`
  * `sklt`
  * 'arif'
  * 'memt'
  * `enmp`
- * `fmlv` (merge)
- * `lvup` (merge)
+ * `fmlv`
+ * `lvup`
  * `bons`
- * `atkp` (merge)
- * `przt` (merge)
+ * `atkp`
+ * `przt`
  * `magc`
  * 'limt'
+ * 'vtbl'
+ * 'btlv'
  * `objentry`
  * 'libretto'
  * 'localset'
@@ -523,6 +522,50 @@ Sora:
   Command: 100
   Limit: 0
   World: 00
+  Padding: []
+```
+
+`vtbl` Source Example
+```
+- Id: 26
+  CharacterId: 1
+  Priority: 01
+  Voices:
+    - VsbIndex: 5
+      Weight: 100
+    - VsbIndex: -1
+      Weight: 0
+    - VsbIndex: -1
+      Weight: 0
+    - VsbIndex: -1
+      Weight: 0
+    - VsbIndex: 6
+      Weight: 5
+  Reserved: 0
+```
+
+`btlv` Source Example
+```
+- Id: 0
+  ProgressFlag: 0x1099
+  WorldZZ: 1
+  WorldOfDarkness: 1
+  TwilightTown: 1
+  DestinyIslands: 1
+  HollowBastion: 1
+  BeastCastle: 1
+  OlympusColiseum: 1
+  Agrabah: 1
+  LandOfDragons: 1
+  HundredAcreWoods: 1
+  PrideLands: 1
+  Atlantica: 1
+  DisneyCastle: 1
+  TimelessRiver: 1
+  HalloweenTown: 1
+  PortRoyal: 1
+  SpaceParanoids: 1
+  TheWorldThatNeverWas: 1
   Padding: []
 ```
 
