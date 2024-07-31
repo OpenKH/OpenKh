@@ -1,3 +1,4 @@
+using Antlr4.Runtime;
 using OpenKh.Command.Bdxio.Utils;
 using OpenKh.Common;
 using OpenKh.Imaging;
@@ -956,6 +957,324 @@ namespace OpenKh.Tests.Patcher
             });
         }
 
+        [Fact] //Fixed, needed to initialize the BGMSet & Reserved bytes.
+        public void ListPatchArifTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+        {
+            new AssetFile()
+            {
+                Name = "03system.bin",
+                Method = "binarc",
+                Source = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "arif",
+                        Method = "listpatch",
+                        Type = "List",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "ArifList.yml",
+                                Type = "arif"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+            };
+
+            using (var stream = File.Create(Path.Combine(AssetsInputDir, "03system.bin")))
+            {
+                var arifEntry = new Kh2.SystemData.Arif
+                {
+                    Flags = Kh2.SystemData.Arif.ArifFlags.IsKnownArea,
+                    Reverb = 0,
+                    SoundEffectBank1 = 13,
+                    SoundEffectBank2 = 0,
+                    Bgms = Enumerable.Range(0, 8).Select(_ => new Kh2.SystemData.BgmSet { BgmField = 0, BgmBattle = 0 }).ToArray(),
+                    Voice = 0,
+                    NavigationMapItem = 0,
+                    Command = 0,
+                    Reserved = new byte[11]
+                };
+
+                using (var arifStream = new MemoryStream())
+                {
+                    Kh2.SystemData.Arif.Write(arifStream, new List<List<Kh2.SystemData.Arif>> { new List<Kh2.SystemData.Arif> { arifEntry } });
+                    Bar.Write(stream, new Bar
+            {
+                new Bar.Entry()
+                {
+                    Name = "arif",
+                    Type = Bar.EntryType.List,
+                    Stream = arifStream
+                }
+            });
+                }
+            }
+
+            File.Create(Path.Combine(ModInputDir, "ArifList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("EndOfSea:");
+                writer.WriteLine("  1:");
+                writer.WriteLine("    SoundEffectBank1: 13");
+                writer.WriteLine("    Voice: 0");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "03system.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "03system.bin")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var arifList = Kh2.SystemData.Arif.Read(binarc[0].Stream);
+                var arifEntry = arifList[0][0];
+                Assert.Equal(13, arifEntry.SoundEffectBank1);
+                Assert.Equal(0, arifEntry.Voice);
+            });
+        }
+
+        [Fact]
+        public void ListPatchMemtTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+        {
+            new AssetFile()
+            {
+                Name = "03system.bar",
+                Method = "binarc",
+                Source = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "memt",
+                        Method = "listpatch",
+                        Type = "List",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "MemtList.yml",
+                                Type = "memt"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+            };
+
+            // Create the 03system.bar file with initial data
+            File.Create(Path.Combine(AssetsInputDir, "03system.bar")).Using(stream =>
+            {
+                var memtEntries = new List<Kh2.SystemData.Memt.EntryFinalMix>()
+        {
+            new Kh2.SystemData.Memt.EntryFinalMix
+            {
+                WorldId = 1,
+                CheckStoryFlag = 1,
+                CheckStoryFlagNegation = 0,
+                Unk06 = 0,
+                Unk08 = 0,
+                Unk0A = 0,
+                Unk0C = 0,
+                Unk0E = 0,
+                Members = new short[18]
+            }
+        };
+
+                var memberIndices = new Kh2.SystemData.Memt.MemberIndices[7]; // Ensure there are 7 MemberIndices
+                for (int i = 0; i < memberIndices.Length; i++)
+                {
+                    memberIndices[i] = new Kh2.SystemData.Memt.MemberIndices
+                    {
+                        Player = 0,
+                        Friend1 = 0,
+                        Friend2 = 0,
+                        FriendWorld = 0
+                    };
+                }
+
+                using var memtStream = new MemoryStream();
+                var memt = new Kh2.SystemData.Memt();
+                memt.Entries.AddRange(memtEntries.Cast<Kh2.SystemData.Memt.IEntry>());
+
+                Kh2.SystemData.Memt.Write(memtStream, memt);
+                memtStream.Seek(0, SeekOrigin.Begin);
+
+                Bar.Write(stream, new Bar()
+        {
+            new Bar.Entry()
+            {
+                Name = "memt",
+                Type = Bar.EntryType.List,
+                Stream = memtStream
+            }
+        });
+            });
+
+            // Create the MemtList.yml patch file
+            File.Create(Path.Combine(ModInputDir, "MemtList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("MemtEntries:");
+                writer.WriteLine("  - Index: 0");
+                writer.WriteLine("    WorldId: 2");
+                writer.WriteLine("    CheckStoryFlag: 3");
+                writer.WriteLine("    CheckStoryFlagNegation: 4");
+                writer.WriteLine("    Unk06: 5");
+                writer.WriteLine("    Unk08: 6");
+                writer.WriteLine("    Unk0A: 7");
+                writer.WriteLine("    Unk0C: 8");
+                writer.WriteLine("    Unk0E: 9");
+                writer.WriteLine("    Members: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]");
+                writer.WriteLine("MemberIndices:");
+                writer.WriteLine("  - Index: 0");
+                writer.WriteLine("    Player: 0");
+                writer.WriteLine("    Friend1: 0");
+                writer.WriteLine("    Friend2: 0");
+                writer.WriteLine("    FriendWorld: 0");
+                writer.Flush();
+            });
+
+            // Apply the patch
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            // Verify the patched data
+            AssertFileExists(ModOutputDir, "03system.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "03system.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var memtStream = binarc[0].Stream;
+                memtStream.Seek(0, SeekOrigin.Begin);
+
+                var memt = Kh2.SystemData.Memt.Read(memtStream);
+
+                var memtEntry = memt.Entries.Cast<Kh2.SystemData.Memt.EntryFinalMix>().First();
+                Assert.Equal((short)2, memtEntry.WorldId);
+                Assert.Equal((short)3, memtEntry.CheckStoryFlag);
+                Assert.Equal((short)4, memtEntry.CheckStoryFlagNegation);
+                Assert.Equal((short)5, memtEntry.Unk06);
+                Assert.Equal((short)6, memtEntry.Unk08);
+                Assert.Equal((short)7, memtEntry.Unk0A);
+                Assert.Equal((short)8, memtEntry.Unk0C);
+                Assert.Equal((short)9, memtEntry.Unk0E);
+                Assert.Equal(new short[] { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27 }, memtEntry.Members);
+
+                // Check MemberIndices deserialization
+                var memberIndices = memt.MemberIndexCollection.First();
+                Assert.Equal((byte)0, memberIndices.Player);
+                Assert.Equal((byte)0, memberIndices.Friend1);
+                Assert.Equal((byte)0, memberIndices.Friend2);
+                Assert.Equal((byte)0, memberIndices.FriendWorld);
+            });
+        }
+
+
+
+        [Fact]
+        public void ListPatchFmabTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "03system.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "pref",
+                                Method = "binarc",
+                                Type = "Binary",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "fmab",
+                                        Method = "listpatch",
+                                        Type = "list",
+                                        Source = new List<AssetFile>()
+                                        {
+                                            new AssetFile()
+                                            {
+                                                Name = "FmabList.yml",
+                                                Type = "fmab"
+                                            }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "03system.bar")).Using(stream =>
+            {
+                var FmabEntry = new List<Kh2.SystemData.Fmab>()
+                {
+                    new Kh2.SystemData.Fmab
+                    {
+                        HighJumpHeight = 178,
+                        AirDodgeHeight = 86
+                    }
+                };
+
+                using var fmabStream = new MemoryStream();
+                Kh2.SystemData.Fmab.Write(fmabStream, FmabEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "fmab",
+                        Type = Bar.EntryType.List,
+                        Stream = fmabStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "FmabList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- HighJumpHeight: 178");
+                writer.WriteLine("  AirDodgeHeight: 86");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "03system.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "03system.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var fmabStream = Kh2.SystemData.Fmab.Read(binarc[0].Stream);
+                Assert.Equal(178, fmabStream[0].HighJumpHeight);
+                Assert.Equal(86, fmabStream[0].AirDodgeHeight);
+            });
+        }
+
         [Fact]
         public void ListPatchFmlvTest()
         {
@@ -1379,6 +1698,7 @@ namespace OpenKh.Tests.Patcher
 
         }
 
+        [Fact]
         void ListPatchAtkpTest()
         {
             var patcher = new PatcherProcessor();
@@ -1904,7 +2224,124 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
-        public void ListPatchPrztTest()
+        public void ListPatchLimtTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+        {
+            new AssetFile()
+            {
+                Name = "00battle.bar",
+                Method = "binarc",
+                Source = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "Limt",
+                        Method = "listpatch",
+                        Type = "List",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "LimtList.yml",
+                                Type = "limt"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+            };
+
+            // Create the initial 00battle.bar file with Limt entry
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            {
+                var limtEntry = new List<Kh2.Battle.Limt>()
+        {
+            new Kh2.Battle.Limt
+            {
+                Id = 0,
+                Character = Kh2.Battle.Limt.Characters.Auron,
+                Summon = Kh2.Battle.Limt.Characters.Sora,
+                Group = 0,
+                FileName = "auron.bar",
+                SpawnId = 0,
+                Command = 82,
+                Limit = 204,
+                World = 0,
+                Padding = new byte[18]
+            }
+        };
+
+                using var limtStream = new MemoryStream();
+                Kh2.Battle.Limt.Write(limtStream, limtEntry);
+                limtStream.Position = 0; // Ensure stream position is reset before writing to Bar
+                Bar.Write(stream, new Bar() {
+            new Bar.Entry()
+            {
+                Name = "Limt",
+                Type = Bar.EntryType.List,
+                Stream = limtStream
+            }
+        });
+            });
+
+            // Create the LimtList.yml file using the serializer
+            File.Create(Path.Combine(ModInputDir, "LimtList.yml")).Using(stream =>
+            {
+                using var writer = new StreamWriter(stream);
+                var moddedLimt = new List<Kh2.Battle.Limt>
+        {
+            new Kh2.Battle.Limt
+            {
+                Id = 0,
+                Character = Kh2.Battle.Limt.Characters.Auron,
+                Summon = Kh2.Battle.Limt.Characters.Sora,
+                Group = 0,
+                FileName = "auron.bar",
+                SpawnId = 0,
+                Command = 82,
+                Limit = 204,
+                World = 0,
+                Padding = new byte[18]
+            }
+        };
+                writer.Write(serializer.Serialize(moddedLimt));
+                writer.Flush();
+            });
+
+            // Apply the patch
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            // Verify the output file exists
+            AssertFileExists(ModOutputDir, "00battle.bar");
+
+            // Read and validate the output file
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var limt = Kh2.Battle.Limt.Read(binarc[0].Stream);
+
+                Assert.Equal(0, limt[0].Id);
+                Assert.Equal(Kh2.Battle.Limt.Characters.Auron, limt[0].Character);
+                Assert.Equal(Kh2.Battle.Limt.Characters.Sora, limt[0].Summon);
+                Assert.Equal(0, limt[0].Group);
+                Assert.Equal("auron.bar", limt[0].FileName.Trim());
+                Assert.Equal(0u, limt[0].SpawnId);
+                Assert.Equal(82, limt[0].Command);
+                Assert.Equal(204, limt[0].Limit);
+                Assert.Equal(0, limt[0].World);
+                Assert.Equal(new byte[18], limt[0].Padding);
+            });
+        }
+
+
+        [Fact]
+        public void ListPatchBtlvTest()
         {
             var patcher = new PatcherProcessor();
             var serializer = new Serializer();
@@ -1920,15 +2357,15 @@ namespace OpenKh.Tests.Patcher
                         {
                             new AssetFile()
                             {
-                                Name = "przt",
+                                Name = "btlv",
                                 Method = "listpatch",
                                 Type = "List",
                                 Source = new List<AssetFile>()
                                 {
                                     new AssetFile()
                                     {
-                                        Name = "PrztList.yml",
-                                        Type = "przt"
+                                        Name = "BtlvList.yml",
+                                        Type = "btlv"
                                     }
                                 }
                             }
@@ -1939,41 +2376,44 @@ namespace OpenKh.Tests.Patcher
 
             File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
             {
-                var prztEntry = new List<Kh2.Battle.Przt>()
+                var btlvEntry = new List<Kh2.Battle.Btlv>()
                 {
-                    new Kh2.Battle.Przt
+                    new Kh2.Battle.Btlv
                     {
-                        Id = 1,
-                        SmallHpOrbs = 0,
-                        BigHpOrbs = 1
+                        Id = 0,
+                        ProgressFlag = 3,
+                        WorldZZ = 1,
+                        Padding = new byte[5],
                     }
                 };
 
-                using var prztStream = new MemoryStream();
-                Kh2.Battle.Przt.Write(prztStream, prztEntry);
+                using var btlvStream = new MemoryStream();
+                Kh2.Battle.Btlv.Write(btlvStream, btlvEntry);
                 Bar.Write(stream, new Bar() {
                     new Bar.Entry()
                     {
-                        Name = "przt",
+                        Name = "btlv",
                         Type = Bar.EntryType.List,
-                        Stream = prztStream
+                        Stream = btlvStream
                     }
                 });
             });
 
-            File.Create(Path.Combine(ModInputDir, "PrztList.yml")).Using(stream =>
+            File.Create(Path.Combine(ModInputDir, "BtlvList.yml")).Using(stream =>
             {
                 var writer = new StreamWriter(stream);
                 var serializer = new Serializer();
-                var moddedPrzt = new List<Kh2.Battle.Przt>{
-                    new Kh2.Battle.Przt
+                var moddedBtlv = new List<Kh2.Battle.Btlv>{
+                    new Kh2.Battle.Btlv
                     {
-                        Id = 1,
-                        SmallHpOrbs = 0,
-                        BigHpOrbs = 1
+                        Id = 0,
+                        ProgressFlag = 3,
+                        WorldZZ = 1,
+                        Padding = new byte[5],
+
                     }
                 };
-                writer.Write(serializer.Serialize(moddedPrzt));
+                writer.Write(serializer.Serialize(moddedBtlv));
                 writer.Flush();
             });
 
@@ -1984,11 +2424,764 @@ namespace OpenKh.Tests.Patcher
             File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
             {
                 var binarc = Bar.Read(stream);
-                var przt = Kh2.Battle.Przt.Read(binarc[0].Stream);
+                var btlv = Kh2.Battle.Btlv.Read(binarc[0].Stream);
 
-                Assert.Equal(1, przt[0].BigHpOrbs);
+                Assert.Equal(3, btlv[0].ProgressFlag);
             });
         }
+
+        [Fact]
+        public void ListPatchVtblTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+        {
+            new AssetFile()
+            {
+                Name = "00battle.bar",
+                Method = "binarc",
+                Source = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "vtbl",
+                        Method = "listpatch",
+                        Type = "List",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "VtblList.yml",
+                                Type = "vtbl"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            {
+                var vtblEntry = new List<Kh2.Battle.Vtbl>()
+        {
+            new Kh2.Battle.Vtbl
+            {
+                Id = 0,
+                CharacterId = 1,
+                Priority = 1,
+                Reserved = 0,
+                Voices = new List<Kh2.Battle.Vtbl.Voice>
+                {
+                    new Kh2.Battle.Vtbl.Voice { VsbIndex = 0, Weight = 0 }
+                }
+            }
+        };
+
+                using var vtblStream = new MemoryStream();
+                Kh2.Battle.Vtbl.Write(vtblStream, vtblEntry);
+                Bar.Write(stream, new Bar() {
+            new Bar.Entry()
+            {
+                Name = "vtbl",
+                Type = Bar.EntryType.List,
+                Stream = vtblStream
+            }
+        });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "VtblList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                var moddedVtbl = new List<Kh2.Battle.Vtbl>{
+            new Kh2.Battle.Vtbl
+            {
+                Id = 0,
+                CharacterId = 1,
+                Priority = 1,
+                Reserved = 0,
+                Voices = new List<Kh2.Battle.Vtbl.Voice>
+                {
+                    new Kh2.Battle.Vtbl.Voice { VsbIndex = 0, Weight = 0 }
+                }
+            }
+        };
+                writer.Write(serializer.Serialize(moddedVtbl));
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00battle.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var vtbl = Kh2.Battle.Vtbl.Read(binarc[0].Stream);
+
+                Assert.Equal(1, vtbl[0].Priority);
+            });
+        }
+
+
+
+        [Fact] //Libretto test.
+        public void ListPatchLibrettoTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+        {
+            new AssetFile()
+            {
+                Name = "libretto-ca.bar",
+                Method = "binarc",
+                Source = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "ca",
+                        Method = "listpatch",
+                        Type = "List",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "LibrettoList.yml",
+                                Type = "libretto"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+            };
+
+            using (var stream = File.Create(Path.Combine(AssetsInputDir, "libretto-ca.bar")))
+            {
+                var librettoEntry = new Kh2.Libretto
+                {
+                    MagicCode = 0x03, // "LIBR" in ASCII
+                    Count = 1,
+                    Definitions = new List<Kh2.Libretto.TalkMessageDefinition>
+            {
+                new Kh2.Libretto.TalkMessageDefinition
+                {
+                    TalkMessageId = 1,
+                    Unknown = 0,
+                    ContentPointer = 8 + 8 // MagicCode (4 bytes) + Count (4 bytes) + Definitions (8 bytes each)
+                }
+            },
+                    Contents = new List<List<Kh2.Libretto.TalkMessageContent>>
+            {
+                new List<Kh2.Libretto.TalkMessageContent>
+                {
+                    new Kh2.Libretto.TalkMessageContent { Unknown1 = 0x02000200, TextId = 2500 }
+                }
+            }
+                };
+
+                using (var librettoStream = new MemoryStream())
+                {
+                    Kh2.Libretto.Write(librettoStream, librettoEntry);
+                    Bar.Write(stream, new Bar
+            {
+                new Bar.Entry()
+                {
+                    Name = "libretto",
+                    Type = Bar.EntryType.List,
+                    Stream = librettoStream
+                }
+            });
+                }
+            }
+
+            File.Create(Path.Combine(ModInputDir, "LibrettoList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- TalkMessageId: 1");
+                writer.WriteLine("  Unknown: 0");
+                writer.WriteLine("  Contents:");
+                writer.WriteLine("    - Unknown1: 0x02000200");
+                writer.WriteLine("      TextId: 2500");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "libretto-ca.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "libretto-ca.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var librettoList = Kh2.Libretto.Read(binarc[0].Stream);
+                var librettoEntry = librettoList.Contents[0][0];
+                Assert.Equal(0x02000200u, librettoEntry.Unknown1);
+                Assert.Equal(2500u, librettoEntry.TextId);
+            });
+        }
+
+        [Fact]
+        public void ListPatchLocalsetTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "07localset.bin",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "loca",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "LocalsetList.yml",
+                                        Type = "localset"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "07localset.bin")).Using(stream =>
+            {
+                var localEntry = new List<Kh2.Localset>()
+                {
+                    new Kh2.Localset
+                    {
+                        ProgramId = 1300,
+                        MapNumber = 6,
+                    }
+                };
+
+                using var localStream = new MemoryStream();
+                Kh2.Localset.Write(localStream, localEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "loca",
+                        Type = Bar.EntryType.List,
+                        Stream = localStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "LocalsetList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- ProgramId: 1300");
+                writer.WriteLine("  MapNumber: 6");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "07localset.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "07localset.bin")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var localStream = Kh2.Localset.Read(binarc[0].Stream);
+                Assert.Equal(1300u, localStream[0].ProgramId);
+                Assert.Equal(6u, localStream[0].MapNumber);
+            });
+        }
+
+        [Fact]
+        public void ListPatchJigsawTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "15jigsaw.bin",
+                        Method = "listpatch",
+                        Type = "List",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "JigsawList.yml",
+                                Type = "jigsaw",
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "15jigsaw.bin")).Using(stream =>
+            {
+                var jigsawEntry = new List<Kh2.Jigsaw>()
+                {
+                    new Kh2.Jigsaw
+                    {
+                        Picture = Kh2.Jigsaw.PictureName.Duality,
+                        Part = 2,
+                        Text = 1500
+                    }
+                    };
+                Kh2.Jigsaw.Write(stream, jigsawEntry);
+            });
+
+            File.Create(Path.Combine(ModInputDir, "JigsawList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- Picture: Duality");
+                writer.WriteLine("  Part: 2");
+                writer.WriteLine("  Text: 1500");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "15jigsaw.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "15jigsaw.bin")).Using(stream =>
+            {
+                var jigsawStream = Kh2.Jigsaw.Read(stream);
+                Assert.Equal(2, jigsawStream[0].Part);
+            });
+
+        }
+
+        [Fact]
+        public void ListPatchPlacesTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "place.bin",
+                        Method = "listpatch",
+                        Type = "List",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "PlaceList.yml",
+                                Type = "place",
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "place.bin")).Using(stream =>
+            {
+                var placeEntry = new List<Kh2.Places>()
+                {
+                    new Kh2.Places
+                    {
+                        MessageId = 100,
+                        Padding = 0,
+                    }
+                    };
+                Kh2.Places.Write(stream, placeEntry);
+            });
+
+            File.Create(Path.Combine(ModInputDir, "PlaceList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- MessageId: 100");
+                writer.WriteLine("  Padding: 0");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "place.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "place.bin")).Using(stream =>
+            {
+                var placesStream = Kh2.Places.Read(stream);
+                Assert.Equal(100, placesStream[0].MessageId);
+            });
+
+        }
+
+        [Fact]
+        public void ListPatchSoundInfoTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "12soundinfo.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "zz",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "SoundInfoList.yml",
+                                        Type = "soundinfo"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            File.Create(Path.Combine(AssetsInputDir, "12soundinfo.bar")).Using(stream =>
+            {
+                var soundinfoEntry = new List<Kh2.Soundinfo>()
+                {
+                    new Kh2.Soundinfo
+                    {
+                        Reverb = -1,
+                        Rate = 1,
+                    }
+                    };
+                Kh2.Soundinfo.Write(stream, soundinfoEntry);
+            });
+
+            File.Create(Path.Combine(ModInputDir, "SoundInfoList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- Reverb: -1");
+                writer.WriteLine("  Rate: 1");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "12soundinfo.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "12soundinfo.bar")).Using(stream =>
+            {
+                var soundinfoStream = Kh2.Soundinfo.Read(stream);
+                Assert.Equal(1, soundinfoStream[0].Rate);
+            });
+
+        }
+
+        [Fact]
+        public void ListPatchMixdataReciTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "mixdata.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "reci",
+                                Method = "synthpatch",
+                                Type = "Synthesis",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "ReciList.yml",
+                                        Type = "recipe"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "mixdata.bar")).Using(stream =>
+            {
+                var recipeEntry = new List<Kh2.Mixdata.ReciLP>()
+                {
+                    new Kh2.Mixdata.ReciLP
+                    {
+                        Id = 1,
+                        Unlock = 0,
+                        Rank = 0,
+                    }
+                    };
+                using var recipeStream = new MemoryStream();
+                Kh2.Mixdata.ReciLP.Write(recipeStream, recipeEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "reci",
+                        Type = Bar.EntryType.List,
+                        Stream = recipeStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "ReciList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- Id: 1");
+                writer.WriteLine("  Rank: 0");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "mixdata.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "mixdata.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var recipeStream = Kh2.Mixdata.ReciLP.Read(binarc[0].Stream);
+                Assert.Equal(1, recipeStream[0].Id);
+                Assert.Equal(0, recipeStream[0].Rank);
+            });
+
+        }
+
+        [Fact]
+        public void ListPatchMixdataLeveLPTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+        {
+            new AssetFile()
+            {
+                Name = "mixdata.bar",
+                Method = "binarc",
+                Source = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "leve",
+                        Method = "synthpatch",
+                        Type = "Synthesis",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "LeveList.yml",
+                                Type = "level"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+            };
+
+            // Create the initial mixdata.bar file with LeveLP entry
+            File.Create(Path.Combine(AssetsInputDir, "mixdata.bar")).Using(stream =>
+            {
+                var leveEntry = new List<Kh2.Mixdata.LeveLP>()
+        {
+            new Kh2.Mixdata.LeveLP
+            {
+                Title = 1,
+                Stat = 2,
+                Enable = 1,
+                Padding = 0,
+                Exp = 100
+            }
+        };
+
+                using var leveStream = new MemoryStream();
+                Kh2.Mixdata.LeveLP.Write(leveStream, leveEntry);
+                leveStream.Position = 0; // Ensure stream position is reset before writing to Bar
+                Bar.Write(stream, new Bar() {
+            new Bar.Entry()
+            {
+                Name = "leve",
+                Type = Bar.EntryType.List,
+                Stream = leveStream
+            }
+        });
+            });
+
+            // Create the LeveList.yml file using the serializer
+            File.Create(Path.Combine(ModInputDir, "LeveList.yml")).Using(stream =>
+            {
+                using var writer = new StreamWriter(stream);
+                var moddedLeve = new List<Kh2.Mixdata.LeveLP>
+        {
+            new Kh2.Mixdata.LeveLP
+            {
+                Title = 1,
+                Stat = 2,
+                Enable = 1,
+                Padding = 0,
+                Exp = 100
+            }
+        };
+                writer.Write(serializer.Serialize(moddedLeve));
+                writer.Flush();
+            });
+
+            // Apply the patch
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            // Verify the output file exists
+            AssertFileExists(ModOutputDir, "mixdata.bar");
+
+            // Read and validate the output file
+            File.OpenRead(Path.Combine(ModOutputDir, "mixdata.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var leveStream = Kh2.Mixdata.LeveLP.Read(binarc[0].Stream);
+
+                Assert.Equal(1, leveStream[0].Title);
+                Assert.Equal(2, leveStream[0].Stat);
+                Assert.Equal(1, leveStream[0].Enable);
+                Assert.Equal(0, leveStream[0].Padding);
+                Assert.Equal(100, leveStream[0].Exp);
+            });
+        }
+
+        [Fact]
+        public void ListPatchMixdataCondLPTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+        {
+            new AssetFile()
+            {
+                Name = "mixdata.bar",
+                Method = "binarc",
+                Source = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "cond",
+                        Method = "synthpatch",
+                        Type = "Synthesis",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "CondList.yml",
+                                Type = "condition"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+            };
+
+            // Create the initial mixdata.bar file with CondLP entry
+            File.Create(Path.Combine(AssetsInputDir, "mixdata.bar")).Using(stream =>
+            {
+                var condEntry = new List<Kh2.Mixdata.CondLP>()
+        {
+            new Kh2.Mixdata.CondLP
+            {
+                TextId = 1,
+                Reward = 100,
+                Type = Kh2.Mixdata.CondLP.RewardType.Item,
+                MaterialType = 0,
+                MaterialRank = 1,
+                ItemCollect = Kh2.Mixdata.CondLP.CollectionType.Stack,
+                Count = 10,
+                ShopUnlock = 5
+            }
+        };
+
+                using var condStream = new MemoryStream();
+                Kh2.Mixdata.CondLP.Write(condStream, condEntry);
+                condStream.Position = 0; // Ensure stream position is reset before writing to Bar
+                Bar.Write(stream, new Bar() {
+            new Bar.Entry()
+            {
+                Name = "cond",
+                Type = Bar.EntryType.List,
+                Stream = condStream
+            }
+        });
+            });
+
+            // Create the CondList.yml file using the serializer
+            File.Create(Path.Combine(ModInputDir, "CondList.yml")).Using(stream =>
+            {
+                using var writer = new StreamWriter(stream);
+                var moddedCond = new List<Kh2.Mixdata.CondLP>
+        {
+            new Kh2.Mixdata.CondLP
+            {
+                TextId = 1,
+                Reward = 100,
+                Type = Kh2.Mixdata.CondLP.RewardType.Item,
+                MaterialType = 0,
+                MaterialRank = 1,
+                ItemCollect = Kh2.Mixdata.CondLP.CollectionType.Stack,
+                Count = 10,
+                ShopUnlock = 5
+            }
+        };
+                writer.Write(serializer.Serialize(moddedCond));
+                writer.Flush();
+            });
+
+            // Apply the patch
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            // Verify the output file exists
+            AssertFileExists(ModOutputDir, "mixdata.bar");
+
+            // Read and validate the output file
+            File.OpenRead(Path.Combine(ModOutputDir, "mixdata.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var condStream = Kh2.Mixdata.CondLP.Read(binarc[0].Stream);
+
+                Assert.Equal(1, condStream[0].TextId);
+                Assert.Equal(100, condStream[0].Reward);
+                Assert.Equal(Kh2.Mixdata.CondLP.RewardType.Item, condStream[0].Type);
+                Assert.Equal(0, condStream[0].MaterialType);
+                Assert.Equal(1, condStream[0].MaterialRank);
+                Assert.Equal(Kh2.Mixdata.CondLP.CollectionType.Stack, condStream[0].ItemCollect);
+                Assert.Equal(10, condStream[0].Count);
+                Assert.Equal(5, condStream[0].ShopUnlock);
+            });
+        }
+
+
+
 
         [Fact]
         public void ProcessMultipleTest()
