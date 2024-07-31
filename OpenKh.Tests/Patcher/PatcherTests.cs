@@ -1,3 +1,4 @@
+using OpenKh.Bbs;
 using OpenKh.Command.Bdxio.Utils;
 using OpenKh.Common;
 using OpenKh.Imaging;
@@ -1991,6 +1992,164 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
+        public void BbsArcCreateArcTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile> {
+                    new AssetFile
+                    {
+                        Name = "somedir/somearc.arc",
+                        Method = "bbsarc",
+                        Source = new List<AssetFile> {
+                            new AssetFile
+                            {
+                                Name = "newfile",
+                                Method = "copy",
+                                Source = new List<AssetFile> {
+                                    new AssetFile
+                                    {
+                                        Name = "somedir/somearc/newfile.bin"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            CreateFile(ModInputDir, "somedir/somearc/newfile.bin").Using(x =>
+            {
+                x.Write(new byte[] { 4, 5, 6, 7 });
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, patch.Assets[0].Name);
+            AssertArcFile("newfile", entry =>
+            {
+                Assert.Equal(4, entry.Data.Length);
+                Assert.Equal(new byte[] { 4, 5, 6, 7 }, entry.Data);
+            }, ModOutputDir, patch.Assets[0].Name);
+        }
+
+        [Fact]
+        public void BbsArcAddToArcTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile> {
+                    new AssetFile
+                    {
+                        Name = "somedir/somearc.arc",
+                        Method = "bbsarc",
+                        Source = new List<AssetFile> {
+                            new AssetFile
+                            {
+                                Name = "newfile",
+                                Method = "copy",
+                                Source = new List<AssetFile> {
+                                    new AssetFile
+                                    {
+                                        Name = "somedir/somearc/newfile.bin"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            CreateFile(AssetsInputDir, "somedir/somearc.arc").Using(x =>
+            {
+                Arc.Write(new List<Arc.Entry>
+                {
+                    new Arc.Entry
+                    {
+                        Name = "abcd",
+                        Data = new byte[] {0, 1, 2, 3 }
+                    }
+                }, x);
+            });
+
+            CreateFile(ModInputDir, "somedir/somearc/newfile.bin").Using(x =>
+            {
+                x.Write(new byte[] { 4, 5, 6, 7 });
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, patch.Assets[0].Name);
+            AssertArcFile("abcd", entry =>
+            {
+                Assert.Equal(4, entry.Data.Length);
+                Assert.Equal(new byte[] { 0, 1, 2, 3 }, entry.Data);
+            }, ModOutputDir, patch.Assets[0].Name);
+            AssertArcFile("newfile", entry =>
+            {
+                Assert.Equal(4, entry.Data.Length);
+                Assert.Equal(new byte[] { 4, 5, 6, 7 }, entry.Data);
+            }, ModOutputDir, patch.Assets[0].Name);
+        }
+
+        [Fact]
+        public void BbsArcReplaceInArcTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile> {
+                    new AssetFile
+                    {
+                        Name = "somedir/somearc.arc",
+                        Method = "bbsarc",
+                        Source = new List<AssetFile> {
+                            new AssetFile
+                            {
+                                Name = "abcd",
+                                Method = "copy",
+                                Source = new List<AssetFile> {
+                                    new AssetFile
+                                    {
+                                        Name = "somedir/somearc/abcd.bin"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            CreateFile(AssetsInputDir, "somedir/somearc.arc").Using(x =>
+            {
+                Arc.Write(new List<Arc.Entry>
+                {
+                    new Arc.Entry
+                    {
+                        Name = "abcd",
+                        Data = new byte[] {0, 1, 2, 3}
+                    }
+                }, x);
+            });
+
+            CreateFile(ModInputDir, "somedir/somearc/abcd.bin").Using(x =>
+            {
+                x.Write(new byte[] { 4, 5, 6, 7 });
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, patch.Assets[0].Name);
+            AssertArcFile("abcd", entry =>
+            {
+                Assert.Equal(4, entry.Data.Length);
+                Assert.Equal(new byte[] { 4, 5, 6, 7 }, entry.Data);
+            }, ModOutputDir, patch.Assets[0].Name);
+        }
+
+        [Fact]
         public void ProcessMultipleTest()
         {
             var patcher = new PatcherProcessor();
@@ -2065,6 +2224,23 @@ namespace OpenKh.Tests.Patcher
             var entry = entries.SingleOrDefault(x => x.Name == name);
             if (entry == null)
                 throw new XunitException($"Entry '{name}' not found");
+
+            assertion(entry);
+        }
+
+        private static void AssertArcFile(string name, Action<Arc.Entry> assertion, params string[] paths)
+        {
+            var filePath = Path.Join(paths);
+            var entries = File.OpenRead(filePath).Using(x =>
+            {
+                if (!Arc.IsValid(x))
+                    Assert.Fail($"Not a valid Arc");
+                return Arc.Read(x);
+            });
+
+            var entry = entries.SingleOrDefault(x => x.Name == name);
+            if (entry == null)
+                throw new XunitException($"Arc Entry '{name}' not found");
 
             assertion(entry);
         }
