@@ -14,7 +14,6 @@ using YamlDotNet.Serialization;
 using Xe.BinaryMapper;
 using System.Collections;
 using Antlr4.Runtime.Dfa;
-using OpenKh.Kh2.Mixdata;
 using System.Diagnostics;
 
 
@@ -504,18 +503,7 @@ namespace OpenKh.Patcher
         private static readonly Dictionary<string, byte> characterMap = new Dictionary<string, byte>(){
             { "Sora", 1 }, { "Donald", 2 }, { "Goofy", 3 },  { "Mickey", 4 },  { "Auron", 5 }, { "PingMulan",6 }, { "Aladdin", 7 },  { "Sparrow", 8 }, { "Beast", 9 },  { "Jack", 10 },  { "Simba", 11 }, { "Tron", 12 }, { "Riku", 13 }, { "Roxas", 14}, {"Ping", 15}
         };
-
-        private static readonly Dictionary<string, int> weaponCharacterMap = new Dictionary<string, int>(){
-    { "Sora", 0 }, { "SoraNM", 1 }, { "Donald", 2 },  { "DonaldNM", 3 },  { "Goofy", 4 }, { "Goofy2",5 }, { "GoofyNM", 6 },  { "Aladdin", 7 }, { "Auron", 8 },  { "MulanPing", 9 },  { "Tron", 10 }, { "Mickey", 11 }, { "Beast", 12 }, { "Jack", 13}, {"Simba", 14}, { "Sparrow", 15 }, { "Riku", 16 }, { "SparrowHU", 17 }, { "SoraTR", 18}, {"SoraWI", 19}, { "DonaldTR", 20 }, { "DonaldWI", 21 }, { "GoofyTR", 22}, {"GoofyWI", 23}
-};
-
-
-
-        private static readonly Dictionary<int, string> worldIndexMapSB = new Dictionary<int, string>() {
-            { 0, "ZZ" }, { 1, "End Of Sea" }, { 2, "TwilightTown" }, { 3, "DestinyIsland" }, { 4, "HollowBastion" }, { 5, "BeastsCastle" }, { 6, "OlympusColiseum" }, { 7, "Agrabah" }, { 8, "TheLandOfDragons" }, { 9, "100AcreWood" }, { 10, "PrideLand" }, { 11, "Atlantica" }, { 12, "DisneyCastle" }, { 13, "TimelessRiver" }, { 14, "HalloweenTown" }, { 15, "WorldMap" }, { 16, "PortRoyal" }, { 17, "SpaceParanoids" }, { 18, "TheWorldThatNeverWas" }
-        };
-
-
+        
         private static readonly Dictionary<string, byte> worldIndexMap = new Dictionary<string, byte>(StringComparer.OrdinalIgnoreCase){
     { "worldzz", 0 }, { "endofsea", 1 }, { "twilighttown", 2 },  { "destinyisland", 3 },  { "hollowbastion", 4 }, { "beastscastle", 5 }, { "olympuscoliseum", 6 },  { "agrabah", 7 }, { "thelandofdragons", 8 },  { "100acrewood", 9 },  { "prideland", 10 }, { "atlantica", 11 }, { "disneycastle", 12 }, { "timelessriver", 13}, {"halloweentown", 14}, { "worldmap", 15 }, { "portroyal", 16 }, { "spaceparanoids", 17 }, { "theworldthatneverwas", 18 }
     };
@@ -558,7 +546,6 @@ namespace OpenKh.Patcher
                         Kh2.SystemData.Trsr.Write(stream.SetPosition(0), trsrList.Values);
                         break;
 
-                    //Updated. Now merges fields. Likely better ways of doing this that don't bloat the code.
                     case "item":
                         var itemList = Kh2.SystemData.Item.Read(stream);
                         var moddedItem = deserializer.Deserialize<Kh2.SystemData.Item>(sourceText);
@@ -1044,7 +1031,6 @@ namespace OpenKh.Patcher
                             }
                         }
 
-                        // Write the updated list back to the stream
                         Kh2.Places.Write(stream.SetPosition(0), originalPlace);
                         break;
 
@@ -1091,10 +1077,6 @@ namespace OpenKh.Patcher
                         Kh2.Soundinfo.Write(stream.SetPosition(0), originalSoundInfo);
                         break;
 
-
-                    //Ok. Will need to figure this out. 
-                    //FIRST GOAL: Simpify as many redundancies as possible in the code; useless if/else statements, etc.
-                    //More traditional version, without any weird string/conversion stuff.
                     case "libretto":
                         var originalLibretto = Kh2.Libretto.Read(stream);
 
@@ -1144,7 +1126,6 @@ namespace OpenKh.Patcher
                             }
                         }
 
-                        // Write the modified data back to the stream
                         stream.Position = 0;
                         Kh2.Libretto.Write(stream, originalLibretto);
                         break;
@@ -1227,49 +1208,9 @@ namespace OpenKh.Patcher
                             }
                         }
 
-                        stream.SetLength(0); // Clear the stream before writing
+                        stream.SetLength(0);
                         Kh2.SystemData.Fmab.Write(stream, fmabList);
                         break;
-
-                    case "prty":
-                        var moddedPrty = deserializer.Deserialize<Dictionary<string, Kh2.SystemData.Prty>>(sourceText);
-
-                        var (prtyList, originalOffsets) = Kh2.SystemData.Prty.Read(stream);
-
-                        foreach (var patch in moddedPrty)
-                        {
-                            if (Kh2.SystemData.Prty.CharacterMap.TryGetValue(patch.Key, out var index))
-                            {
-                                if (index >= 0 && index < prtyList.Count)
-                                {
-                                    prtyList[index] = patch.Value;
-                                }
-                            }
-                        }
-
-                        stream.SetLength(0); // Clear the stream before writing
-                        Kh2.SystemData.Prty.Write(stream, prtyList, originalOffsets);
-
-                        break;
-
-
-                    case "sstm":
-                        var sstmList = Kh2.SystemData.Sstm.Read(stream);
-                        var moddedSstm = deserializer.Deserialize<List<Kh2.SystemData.Sstm>>(sourceText);
-
-                        foreach (var sstm in moddedSstm)
-                        {
-                            var existingSstm = sstmList.FirstOrDefault(x => x.CeilingStop == sstm.CeilingStop);
-
-                            if (existingSstm != null)
-                            {
-                                //existingSstm = MergeHelper.Merge(existingSstm, sstm);
-                                sstmList[sstmList.IndexOf(existingSstm)] = sstm;
-                            }
-                        }
-                        Kh2.SystemData.Sstm.Write(stream.SetPosition(0), sstmList);
-                        break;
-
 
                     default:
                         break;
