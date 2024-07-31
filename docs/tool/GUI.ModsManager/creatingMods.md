@@ -1,114 +1,31 @@
 # [OpenKh Tool Documentation](../index.md) - KH2 Mods Manager
 
-This document will focus on teaching you how to create mods using the OpenKH Mod Manager.
+This document will focus on teaching you how to create mods using the OpenKH Mods Manager
 
-# [Table of Contents]()
-* [Creating a Mod for Use With OpenKH](#creating-a-mod-for-use-with-openkh)
-* [Asset Types](#asset-types)
-* [Asset Methods](#asset-methods)
-  * [copy](#copy-any-game---performs-a-direct-copy-to-overwrite-a-file-works-on-any-file-type)
-  * [binarc (KH2)](#binarc-kh2---specifies-a-modification-to-a-subfile-within-a-binarc-using-one-of-the-available-methods-see-binarc-methods-for-details-on-implementing-a-specific-method)
-    * [copy](#copy-kh2---performs-a-copy-on-a-supfile-within-a-bar-must-be-one-of-the-following-types)
-    * [imgd](#imgd-kh2---replaces-a-single-imgd-found-within-a-binarc)
-    * [imgz / fac](#imgz--fac-kh2---replaces-multiple-imgds-found-within-a-binarc)
-    * [kh2msg](#kh2msg-kh2---replaces-text-found-within-a-kh2-messages-file-uses-a-yaml-file-as-an-source)
-    * [areadatascript](#areadatascript-kh2---modifies-a-series-programs-found-within-a-kh2-spawnscript-subfile-located-within-ard-files-using-the-text-format-created-by-openkhcommandspawnscript-you-can-only-provide-a-subset-of-the-programs-found-within-the-spawnscript-the-others-will-be-taken-from-the-original-file)
-    * [areadataspawn](#areadataspawn-kh2---modifies-a-kh2-spawnpoint-subfile-located-within-ard-files-using-an-yaml-file-created-using-openkhcommandspawnscript)
-    * [listpatch](#listpatch-kh2---can-modify-the-following-different-types-of-list-binaries-found-within-kh2)
-      * [trsr](#trsr-source-example)
-      * [cmd](#cmd-source-example)
-      * [item](#item-source-example)
-      * [sklt](#sklt-source-example)
-      * [enmp](#enmp-source-example)
-      * [fmlv](#fmlv-source-example)
-      * [lvup](#lvup-source-example)
-      * [bons](#bons-source-example)
-      * [atkp](#atkp-source-example)
-      * [przt](#przt-source-example)
-      * [magc](#magc-source-example)
-      * [objentry](#objentry-source-example)
-  * [Example of a Fully Complete `mod.yml` File](#an-example-of-a-fully-complete-modyml-can-be-seen-below-and-the-full-source-of-the-mod-can-be-seen-here)
-* [Generating a Simple `mod.yml` for New Mod Authors](#generating-a-simple-modyml-for-new-mod-authors)
-* [Publishing a Mod on GitHub](#publishing-a-mod-on-github)
-
-## Creating a Mod for Use With OpenKH
+## Creating a mod
 
 A well produced mod should contain the following
 
-* `mod.yml` - The format of which is explained below 
-* `icon.png` - A 128x128 image which will be seen in the mods list
-* `preview.png` - A image of maximum size 512 px wide by 288 px tall, which will be shown in the mod description on the right
-* Other files - whatever files are needed for the mod, as defined by the `mod.yml`
+* mod.yml - The format of which is explained below 
+* icon.png - A 128x128 image which will be seen in the mods list
+* preview.png - A image of maximum size 512 px wide by 288 px tall, which will be shown in the mod description on the right
+* Other files - whatever files are needed for the mod, as defined by the mod.yml
 
-The mod.yml file is a YAML format specification for your mod. It will contain the following fields:
+The mod.yml file is a YAML format specification for your mod. It will contain the following fields
 
 * `title` - The title of your mod, as displayed in the mods manager
 * `description` - A description of what your mod does
-* `originalAuthor` - The name of the original author who created this mod. If you just ported this mod to the modsmanager for someone else, include the original author's name. If you do not, this is considered plagiarism, and people tend to not like that.
+* `originalAuthor` - The name of the original author who created this mod. If you just ported this mod to the modsmanager for someone else, include the original authors name.
 * `logo` - The path to the icon.png
-* `assets` - A list of assets that will be modified when the mod runs. 
-  * See [`asset types`](#asset-types), for details on creating an asset. Some asset types will work on any game, while others are game specific.
+* `assets` - A list of assets that will be modified when the mod runs. See `asset types`, for details on creating an asset. Some asset types will work on any game, while others are game specific.
 
-While you are developing a mod you can create a folder inside the `mods` directory of the mod manager release. I.e.:
+While you are developing a mod you can create a folder inside the "mods" directory of the mods manager release, IE
 
-`openkh/mods/<authorname>/<modname>`
+`<modsmanager release>/mods/<authorname>/<modname>`
 
-## Asset Types
+## Asset Methods
 
-The truth of the matter is there are seemingly innumerable "asset types" in these games. Each game has several that are exclusive to itself, with little to none shared between any two or more. Some (but not all!) examples of the types of assets you may work with as a mod author are as follows:
-
-* Models
-  * .mdls
-  * .mdlx
-  * .cvbl
-  * .wpn
-  * .pmo
-  * .mdl
-* Binary archives
-  * .bar
-  * .arc
-  * .ard
-  * .bin
-* Sound archives
-  * .wd
-  * .seb
-  * .scd
-  * .snd
-* Texture formats
-  * .img
-  * .imd / .imgd
-  * .imz / .imgz
-  * .dds / .png (PC only)
-  * .tm2
-* Movesets & animation
-  * .mset
-  * .anb
-  * .arc
-* Menu & UI layouts
-  * .seqd
-  * .lad
-  * .l2d
-  * .2ld
-  * .2dd
-* Maps & scripting
-  * .map
-  * .bar
-  * .arc
-  * .ard
-* Many, many, many more...
-
-However, there is a point to knowing the many asset types the games have on offer. With enough know-how, custom events can be made, called, and integrated into their respective games. Not all of the formats above are from any one single game either; some are shared, some are specific to only one game. Some formats are not even the same between two games, despite having the same file extension. ~~I'm looking at you, `.arc`, `.ard`, and `.pmo`.~~
-
-There are many tools at your disposal to edit a vast array of these formats, thanks to the large contributions over the years to the OpenKH project. We're far from finished yet, though, and would love more help looking into formats and making even more tools!
-
-Additionally, the type of format you are working with will work better with certain [asset methods](#asset-methods) as shown below. Many of the games' files are just archive formats with many other files inside. For example, KH2's `title.2ld` UI layout file for the title screen is an archive that contains a `.imz`, which is another archive with multiple images inside. It also contains `layout data` (primarily called `sequence data` in KH2) in the form of `.seqd` files, which help manage the intro logos and title screen assets contained within the aforementioned `.imz` image archive.
-
-In that example, if you were to simply replace one image of the title screen, you would only need to look as far as one of the several images within, which would best utilize the [`imgz`](#imgz--fac-kh2---replaces-multiple-imgds-found-within-a-binarc) asset method shown below.
-
-
-# Asset Methods
-
-## `copy` (any game) - Performs a direct copy to overwrite a file. Works on any file type.
+* `copy` (any game) - Performs a direct copy to overwrite a file. Works on any file type.
 
 Asset Example: 
 
@@ -119,7 +36,7 @@ Asset Example:
   - name: files/modified_msn.bar
 ```
 
-## `binarc` (KH2) - Specifies a modification to a subfile within a binarc, using one of the available methods. See `binarc methods` for details on implementing a specific method.
+* `binarc` (KH2) - Specifies a modification to a subfile within a binarc, using one of the available methods. See `binarc methods` for details on implementing a specific method.
 
 Asset Example
 
@@ -134,9 +51,9 @@ Asset Example
     type: AreaDataSpawn
 ```
 
-### Binarc Methods
+## Binarc Methods
 
-## `copy` (KH2) - Performs a copy on a supfile within a Bar. Must be one of the [following](https://github.com/Xeeynamo/OpenKh/blob/master/OpenKh.Tools.BarEditor/Helpers.cs#L14) types
+* `copy` (KH2) - Performs a copy on a supfile within a Bar. Must be one of the [following](https://github.com/Xeeynamo/OpenKh/blob/master/OpenKh.Tools.BarEditor/Helpers.cs#L14) types
 
 Asset Example
 
@@ -151,7 +68,7 @@ Asset Example
     type: Bdx
 ```
 
-## `imgd` (KH2) - Replaces a single imgd found within a binarc
+* `imgd` (KH2) - Replaces a single imgd found within a binarc
 
 Asset Example
 
@@ -170,7 +87,7 @@ Asset Example
             highdef: title/title1_hd.png
 ```
 
-## `imgz` // `fac` (KH2) - Replaces multiple imgd's found within a binarc. 
+* // `imgz` // `fac` (KH2) - Replaces multiple imgd's found within a binarc. 
 
 Asset Example
 
@@ -196,7 +113,7 @@ Asset Example
             index: 1
 ```
 
-## `kh2msg` (KH2) - Replaces text found within a kh2 messages file. Uses a yaml file as an source.
+* `kh2msg` (KH2) - Replaces text found within a kh2 messages file. Uses a yaml file as an source.
 
 Asset Example
 
@@ -224,7 +141,7 @@ Yaml Source Example
   jp: OPENKHすばらしい!
 ```
 
-## `areadatascript` (KH2) - Modifies a series programs found within a KH2 Spawnscript subfile (located within ard files), using the text format created by OpenKh.Command.SpawnScript. You can only provide a subset of the programs found within the spawnscript, the others will be taken from the original file.
+* `areadatascript` (KH2) - Modifies a series programs found within a KH2 Spawnscript subfile (located within ard files), using the text format created by OpenKh.Command.SpawnScript. You can only provide a subset of the programs found within the spawnscript, the others will be taken from the original file.
 
 Asset Example
 ```
@@ -251,7 +168,7 @@ AreaSettings 0 -1
 	SetPartyMenu 0
 ```
 
-## `areadataspawn` (KH2) - Modifies a KH2 Spawnpoint subfile (located within ard files), using an yaml file created using OpenKh.Command.SpawnScript.
+* `areadataspawn` (KH2) - Modifies a KH2 Spawnpoint subfile (located within ard files), using an yaml file created using OpenKh.Command.SpawnScript.
 
 Asset Example
 
@@ -266,19 +183,32 @@ Asset Example
     type: AreaDataSpawn
 ```
 
-## `listpatch` (KH2) - Can modify the following different types of list binaries found within KH2:
+* `listpatch` (KH2) - Can modify the following different types of list binaries found within KH2.
+* Fields marked with 'merge' will allow other mods to edit the differing fields of the same item, and merge the change together.
+* Example: Mod A changes the Kingdom Key to be 6 strength, leaving the ability field blank. Mod B changes the ability of the Kingdom Key to be Combo Master, leaving the strength field blank.
+* When building with both mods, the changes will be merged to have a Kingdom Key with 6 strength and Combo Master.
+
  * `trsr`
- * `cmd`
- * `item`
+ * `cmd`  (merge)
+ * `item` (merge)
  * `sklt`
+ * 'arif'
+ * 'memt'
  * `enmp`
- * `fmlv`
- * `lvup`
+ * `fmlv` (merge)
+ * `lvup` (merge)
  * `bons`
- * `atkp`
- * `przt`
+ * `atkp` (merge)
+ * `przt` (merge)
  * `magc`
+ * 'limt'
  * `objentry`
+ * 'libretto'
+ * 'localset'
+ * 'soundinfo'
+ * 'place'
+ * 'jigsaw'
+ 
 
 Asset Example
 ```
@@ -293,12 +223,12 @@ Asset Example
         type: fmlv
 ```
 
-### `trsr` Source Example
+`trsr` Source Example
 ```
 2:
   ItemId: 347
 ```
-### `cmd` Source Example
+`cmd` Source Example
 ```
 - Id: 1
   Execute: 3
@@ -325,7 +255,7 @@ Asset Example
   Group: 2
   Reserve: 0
 ```
-### `item` Source Example
+`item` Source Example
 ```
 Stats:
 - Ability: 412
@@ -359,14 +289,74 @@ Items:
   Icon1: 9
   Icon2: 0
 ```
-### `sklt` Source Example
+`sklt` Source Example
 ```
 - CharacterId: 1
   Bone1: 178
   Bone2: 86
 ```
+`arif` Source Example
+```
+End of Sea: #End of Sea. Names are taken from worlds.md
+  2:
+    Flags: IsKnownArea, IndoorArea, Monochrome #Other acceptable flags are NoShadow and HasGlow.
+    Reverb: 10
+    SoundEffectBank1: 20
+    SoundEffectBank2: 30
+    Bgms:
+      - BgmField: 2000
+        BgmBattle: 2000
+      - BgmField: 600
+        BgmBattle: 600
+      - BgmField: 1200
+        BgmBattle: 1200
+      - BgmField: 1200
+        BgmBattle: 1200
+      - BgmField: 1000
+        BgmBattle: 1000
+      - BgmField: 1000
+        BgmBattle: 1000
+      - BgmField: 1500
+        BgmBattle: 1500
+      - BgmField: 1500
+        BgmBattle: 1500
+    Voice: 40
+    NavigationMapItem: 50
+    Command: 60
+    Reserved: []
+```
+`memt` Source Example
+```
+MemtEntries: 
+  - Index: 0 #Specify a memt index to edit. Use a new index to create a new MemtEntry.
+    WorldId: 2
+    CheckStoryFlag: 3
+    CheckStoryFlagNegation: 4
+    Unk06: 5
+    Unk08: 6
+    Unk0A: 7
+    Unk0C: 8
+    Unk0E: 9
+    Members: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+  - Index: 37
+    WorldId: 2
+    CheckStoryFlag: 3
+    CheckStoryFlagNegation: 4
+    Unk06: 5
+    Unk08: 6
+    Unk0A: 7
+    Unk0C: 8
+    Unk0E: 9
+    Members: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
 
-### `enmp` Source Example
+MemberIndices:
+  - Index: 0
+    Player: 15
+    Friend1: 20
+    Friend2: 32
+    FriendWorld: 42
+```
+`enmp` Source Example
 ```
 - Id: 0
   Level: 1
@@ -392,7 +382,7 @@ Items:
   BonusLevel: 1  
 ```
 
-### `fmlv` Source Example
+`fmlv` Source Example
 ```
 Final:
 - Ability: 578
@@ -402,7 +392,7 @@ Final:
   GrowthAbilityLevel: 1
 ```
 
-### `lvup` Source Example
+`lvup` Source Example
 ```
 Sora:
   2:
@@ -419,7 +409,7 @@ Sora:
     SwordAbility: 577
 ```
 
-### `bons` Source Example
+`bons` Source Example
 ```
 2:
   Sora:
@@ -437,7 +427,7 @@ Sora:
     Unknown0c: 0
 ```
 
-### `atkp` Source Example
+`atkp` Source Example
 ```
 - Id: 0 #Hitbox 0
   SubId: 3
@@ -474,7 +464,7 @@ Sora:
   HpDrain: 15
 ```
 
-### `przt` Source Example
+`przt` Source Example
 ```
 - Id: 1
   SmallHpOrbs: 0
@@ -494,7 +484,7 @@ Sora:
   Item3Percentage: 0
 ```
 
-### `magc` Source Example
+`magc` Source Example
 ```
 - Id: 0 
   Level: 3
@@ -512,8 +502,31 @@ Sora:
   VoiceFinisher: 11
   VoiceSelf: -1
 ```
+`limt` Source Example
+```
+- Id: 1
+  Character: Sora
+  Summon: None
+  Group: 0
+  FileName: TESTLIMIT
+  SpawnId: 0
+  Command: 100
+  Limit: 0
+  World: 00
+  Padding: []
+- Id: 30
+  Character: Donald
+  Summon: Goofy
+  Group: 0
+  FileName: TESTLIMIT
+  SpawnId: 0
+  Command: 100
+  Limit: 0
+  World: 00
+  Padding: []
+```
 
-### `objentry` Source Example
+`objentry` Source Example
 ```
 4:
   ObjectId: 4
@@ -539,7 +552,118 @@ Sora:
   SpawnObject4: 0
 ```
 
-### An example of a fully complete mod.yml can be seen below, and the full source of the mod can be seen [here](https://github.com/OpenKH/mod-template)
+`libretto` Source Example
+```
+- TalkMessageId: 752 #Id to update.
+  Unknown: 3 #Unknown to update.
+  Contents: #Contents to update. Will insert additional Contents as necessary. When no additional are detected, terminates w/ 0.
+    - Unknown1: 0x00010001
+      TextId: 0x3DEB
+    - Unknown1: 0x00010001
+      TextId: 0x183C
+```
+`localset` Source Example
+```
+- ProgramId: 999
+  MapNumber: 25
+```
+`soundinfo` Source Example
+```
+- Index: 0			#Specify an index to modify; otherwise if the index doesn't exist it will be created.
+  Reverb: -1
+  Rate: 1
+  EnvironmentWAV: 99
+  EnvironmentSEB: 99
+  EnvironmentNUMBER: 99
+  FootstepWAV: 99
+  FootstepSORA: 99
+  FootstepDONALD: 99
+  FootstepGOOFY: 99
+  FootstepWORLDFRIEND: 99
+  FootstepOTHER: 99
+```
+`place` Source Example
+```
+- Index: 0			#Index should match the ID of the room in the world; i.e, Index 0 = al00 if you were modifying Agrabah.
+  MessageId: 1234
+  Padding: 0
+```
+`jigsaw` Source Example
+```
+- Picture: 2
+  Part: 4
+  Text: 1500
+  World: 2
+  Room: 1
+  JigsawIdWorld: 99
+  Unk07: 0
+  Unk08: 0
+```
+
+* `synthpatch` (KH2) - Modifies Mixdata.bar, a file used for various properties related to synthesis in KH2. 
+
+ * `recipe`
+ * `level`
+ * `condition`
+
+
+Asset Example
+
+```
+- name: menu/us/mixdata.bar
+  method: binarc
+  source:
+  - name: reci
+    method: synthpatch
+    type: Synthesis
+    source:
+      - name: ReciList.yml
+        type: recipe
+```
+
+`recipe` Source Example
+```
+- Id: 1
+  Unlock: 0
+  Rank: 5
+  Item: 100
+  UpgradedItem: 101
+  Ingredient1: 200
+  Ingredient1Amount: 1
+  Ingredient2: 201
+  Ingredient2Amount: 2
+  Ingredient3: 202
+  Ingredient3Amount: 3
+  Ingredient4: 203
+  Ingredient4Amount: 4
+  Ingredient5: 204
+  Ingredient5Amount: 5
+  Ingredient6: 205
+  Ingredient6Amount: 6
+```
+
+`level` Source Example
+```
+- Title: 48338 #TextID to use for Moogle Level "Title", pulls from Sys.Bar.
+  Stat: 48740
+  Enable: -1
+  Padding: 0
+  Exp: 0
+```
+
+`condition` Source Example
+```
+- TextId: 151
+  RewardId: 0
+  Type: 5
+  MaterialType: 100
+  MaterialRank: 101
+  ItemCollect: 200
+  Count: 1
+  ShopUnlock: 201
+```
+
+An example of a fully complete mod.yml can be seen below, and the full source of the mod can be seen [here](https://github.com/OpenKH/mod-template)
 
 ```
 title: OpenKH mod template
@@ -594,61 +718,13 @@ assets:
             language: it
 ```
 
-## Generating a Simple `mod.yml` for New Mod Authors
+## Publishing a mod
 
-This method is recommended exclusively for mod authors, as the YAML Generator built into the Mod Manager is considered fully functional, yet lacks all of the aforementioned [asset methods](#asset-methods), with the exception of a couple. Those being:
-* [`copy`](#copy-any-game---performs-a-direct-copy-to-overwrite-a-file-works-on-any-file-type) (game agnostic)
-* [`binarc`](#binarc-kh2---specifies-a-modification-to-a-subfile-within-a-binarc-using-one-of-the-available-methods-see-binarc-methods-for-details-on-implementing-a-specific-method) (KH2 only so far)
+Mods should be published to a public github repository, so that users an install the mod just by providing the repository name.
 
-To start, here are the steps:
 
-1. Create an isolated folder where you will be working on your mod. Ideally, to make it easy for testing in-game, this would be in `openkh/mods/Your Name/Your Mod Name`.
-2. To keep things simple, recreate the game's folder structure. I.e., if you were to edit KH2's title screen, Sora's HUD sprites, and replacing the font in KH2 with something goofy like Comic Sans, you would have a file tree that looks like this:
-```
-├───menu
-│   └───us
-│       └───title.2ld
-│
-└───remastered
-    └───msg
-    │   └───us
-    │       └───fontimage.bar
-    └───obj
-        └───P_EX100.a.us
-            └─── ~8.dds
-```
+It is recommended to apply the following tags to the repository, in order to make it easily found by searching GitHub for mods manager mods.
 
-3. Open the `Creator` menu on the top of Mod Manager, and select `YamlGenerator`.
-4. Make the path to your `mod.yml` where your root mod folder is (i.e., where the example file structure would be located at).
-5. Click `Generate or update mod.yml`.
-6. Make the `GameDataPath` the same folder as where your new `mod.yml` has been generated.
-7. Click `Begin`.
-8. Click `Search` in the upper right.
-9. Select all your files (**not** `mod.yml`).
-10. Click `Copy each`.
-11. Make sure the `[ ]Exists` box is checked. If it's not, you did something wrong. Retrace your steps.
-12. Click `Proceed` at the bottom.
-13. Answer yes, you would like to commit the change to the `mod.yml` file.
-14. Close the creator and edit your `mod.yml` file with a text editor to change the following fields as necessary:
-  * `title`
-  * `originalAuthor`
-  * `description`
-15. Save your changes and upload the entirety of this folder, including the `mod.yml` file to a new GitHub repository.
-16. (Optional) Archive everything into a `.zip` archive and upload to Nexusmods under the appropriate game section.
-17. 
-18. Profit!
+`openkh-mods`
 
-## Publishing a Mod on GitHub
-
-Mods should be published to a public GitHUb repository, so that users can install the mod just by providing the repository name.
-
-It is recommended to apply the following tags to the repository, in order to make it easily found by searching GitHub for mods manager mods:
-
-* `openkh-mods`
-
-* `<Your game's abbreviation>`
-  * `kh1`
-  * `kh2`
-  * `bbs`
-  * `ddd`
-  * `recom`
+`<your games abbreviation>` (ie `kh2` or `bbs`)
