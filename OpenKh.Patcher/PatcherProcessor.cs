@@ -15,6 +15,7 @@ using Xe.BinaryMapper;
 using System.Collections;
 using Antlr4.Runtime.Dfa;
 using System.Diagnostics;
+using OpenKh.Bbs;
 
 
 namespace OpenKh.Patcher
@@ -226,6 +227,9 @@ namespace OpenKh.Patcher
                 case "binarc":
                     PatchBinarc(context, assetFile, stream);
                     break;
+                case "bbsarc":
+                    PatchBBSArc(context, assetFile, stream);
+                    break;
                 case "imd":
                 case "imgd":
                     CreateImageImd(context, assetFile.Source[0]).Write(stream);
@@ -337,6 +341,38 @@ namespace OpenKh.Patcher
                 entry.Stream?.Dispose();
         }
 
+        private static void PatchBBSArc(Context context, AssetFile assetFile, Stream stream)
+        {
+            var entryList = Arc.IsValid(stream) ? Arc.Read(stream).ToList() : new List<Arc.Entry>();
+            foreach (var file in assetFile.Source)
+            {
+                var entry = entryList.FirstOrDefault(e => e.Name == file.Name);
+
+                if (entry == null)
+                {
+                    entry = new Arc.Entry()
+                    {
+                        Name = file.Name
+                    };
+                    entryList.Add(entry);
+                }
+                else if (entry.IsLink)
+                {
+                    throw new Exception("Cannot patch an arc link!");
+                }
+
+                MemoryStream data = new MemoryStream();
+                if (entry.Data != null)
+                {
+                    data.Write(entry.Data);
+                    data.SetPosition(0);
+                }
+                PatchFile(context, file, data);
+                entry.Data = data.ToArray();
+            }
+
+            OpenKh.Bbs.Arc.Write(entryList, stream.SetPosition(0));
+        }
 
         private static Imgd CreateImageImd(Context context, AssetFile source)
         {
