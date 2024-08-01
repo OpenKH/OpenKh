@@ -314,12 +314,12 @@ Asset Example
         type: fmlv
 ```
 
-`trsr` Source Example
+### `trsr` Source Example
 ```
 2:
   ItemId: 347
 ```
-`cmd` Source Example
+### `cmd` Source Example
 ```
 - Id: 1
   Execute: 3
@@ -346,7 +346,7 @@ Asset Example
   Group: 2
   Reserve: 0
 ```
-`item` Source Example
+### `item` Source Example
 ```
 Stats:
 - Ability: 412
@@ -380,13 +380,13 @@ Items:
   Icon1: 9
   Icon2: 0
 ```
-`sklt` Source Example
+### `sklt` Source Example
 ```
 - CharacterId: 1
   Bone1: 178
   Bone2: 86
 ```
-`arif` Source Example
+### `arif` Source Example
 ```
 End of Sea: #End of Sea. Names are taken from worlds.md
   2:
@@ -416,7 +416,7 @@ End of Sea: #End of Sea. Names are taken from worlds.md
     Command: 60
     Reserved: []
 ```
-`memt` Source Example
+### `memt` Source Example
 ```
 MemtEntries: 
   - Index: 0 #Specify a memt index to edit. Use a new index to create a new MemtEntry.
@@ -447,7 +447,7 @@ MemberIndices:
     Friend2: 32
     FriendWorld: 42
 ```
-`enmp` Source Example
+### `enmp` Source Example
 ```
 - Id: 0
   Level: 1
@@ -473,7 +473,7 @@ MemberIndices:
   BonusLevel: 1  
 ```
 
-`fmlv` Source Example
+### `fmlv` Source Example
 ```
 Final:
 - Ability: 578
@@ -483,7 +483,7 @@ Final:
   GrowthAbilityLevel: 1
 ```
 
-`lvup` Source Example
+### `lvup` Source Example
 ```
 Sora:
   2:
@@ -500,7 +500,7 @@ Sora:
     SwordAbility: 577
 ```
 
-`bons` Source Example
+### `bons` Source Example
 ```
 2:
   Sora:
@@ -518,7 +518,7 @@ Sora:
     Unknown0c: 0
 ```
 
-`atkp` Source Example
+### `atkp` Source Example
 ```
 - Id: 0 #Hitbox 0
   SubId: 3
@@ -555,7 +555,7 @@ Sora:
   HpDrain: 15
 ```
 
-`przt` Source Example
+### `przt` Source Example
 ```
 - Id: 1
   SmallHpOrbs: 0
@@ -575,7 +575,7 @@ Sora:
   Item3Percentage: 0
 ```
 
-`magc` Source Example
+### `magc` Source Example
 ```
 - Id: 0 
   Level: 3
@@ -593,7 +593,7 @@ Sora:
   VoiceFinisher: 11
   VoiceSelf: -1
 ```
-`limt` Source Example
+### `limt` Source Example
 ```
 - Id: 1
   Character: Sora
@@ -617,7 +617,7 @@ Sora:
   Padding: []
 ```
 
-`vtbl` Source Example
+### `vtbl` Source Example
 ```
 - Id: 26
   CharacterId: 1
@@ -636,7 +636,7 @@ Sora:
   Reserved: 0
 ```
 
-`btlv` Source Example
+### `btlv` Source Example
 ```
 - Id: 0
   ProgressFlag: 0x1099
@@ -661,7 +661,7 @@ Sora:
   Padding: []
 ```
 
-`objentry` Source Example
+### `objentry` Source Example
 ```
 4:
   ObjectId: 4
@@ -687,7 +687,7 @@ Sora:
   SpawnObject4: 0
 ```
 
-`libretto` Source Example
+### `libretto` Source Example
 ```
 - TalkMessageId: 752 #Id to update.
   Unknown: 3 #Unknown to update.
@@ -697,12 +697,12 @@ Sora:
     - Unknown1: 0x00010001
       TextId: 0x183C
 ```
-`localset` Source Example
+### `localset` Source Example
 ```
 - ProgramId: 999
   MapNumber: 25
 ```
-`soundinfo` Source Example
+### `soundinfo` Source Example
 ```
 - Index: 0			#Specify an index to modify; otherwise if the index doesn't exist it will be created.
   Reverb: -1
@@ -717,13 +717,13 @@ Sora:
   FootstepWORLDFRIEND: 99
   FootstepOTHER: 99
 ```
-`place` Source Example
+### `place` Source Example
 ```
 - Index: 0			#Index should match the ID of the room in the world; i.e, Index 0 = al00 if you were modifying Agrabah.
   MessageId: 1234
   Padding: 0
 ```
-`jigsaw` Source Example
+### `jigsaw` Source Example
 ```
 - Picture: 2
   Part: 4
@@ -756,7 +756,7 @@ Asset Example
         type: recipe
 ```
 
-`recipe` Source Example
+### `recipe` Source Example
 ```
 - Id: 1
   Unlock: 0
@@ -777,7 +777,7 @@ Asset Example
   Ingredient6Amount: 6
 ```
 
-`level` Source Example
+### `level` Source Example
 ```
 - Title: 48338 #TextID to use for Moogle Level "Title", pulls from Sys.Bar.
   Stat: 48740
@@ -786,7 +786,7 @@ Asset Example
   Exp: 0
 ```
 
-`condition` Source Example
+### `condition` Source Example
 ```
 - TextId: 151
   RewardId: 0
