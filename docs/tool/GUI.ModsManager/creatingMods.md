@@ -282,8 +282,8 @@ Asset Example
  * `cmd`
  * `item`
  * `sklt`
- * 'arif'
- * 'memt'
+ * `arif`
+ * `memt`
  * `enmp`
  * `fmlv`
  * `lvup`
@@ -291,15 +291,15 @@ Asset Example
  * `atkp`
  * `przt`
  * `magc`
- * 'limt'
- * 'vtbl'
- * 'btlv'
+ * `limt`
+ * `vtbl`
+ * `btlv`
  * `objentry`
- * 'libretto'
- * 'localset'
- * 'soundinfo'
- * 'place'
- * 'jigsaw'
+ * `libretto`
+ * `localset`
+ * `soundinfo`
+ * `place`
+ * `jigsaw`
 
 Asset Example
 ```
