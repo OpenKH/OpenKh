@@ -33,6 +33,8 @@ namespace OpenKh.Kh2
         }
     }
 
+
+
     public class BaseShortTable<T>
         where T : class
     {
@@ -53,6 +55,34 @@ namespace OpenKh.Kh2
             BinaryMapping.WriteObject(stream, new BaseShortTable<T>
             {
                 Id = (short)id,
+                Count = (short)itemList.Count,
+            });
+
+            foreach (var item in itemList)
+                BinaryMapping.WriteObject(stream, item);
+        }
+    }
+
+
+    //Tables that only have a Count of entries; like soundinfo, etc.
+    public class BaseTableCountOnly<T>
+    where T : class
+    {
+        [Data] public int Count { get; set; }
+
+        public static List<T> Read(Stream stream)
+        {
+            var header = BinaryMapping.ReadObject<BaseTableCountOnly<T>>(stream);
+            return Enumerable.Range(0, header.Count)
+                .Select(_ => BinaryMapping.ReadObject<T>(stream))
+                .ToList();
+        }
+
+        public static void Write(Stream stream, IEnumerable<T> items)
+        {
+            var itemList = items as IList<T> ?? items.ToList();
+            BinaryMapping.WriteObject(stream, new BaseTableCountOnly<T>
+            {
                 Count = (short)itemList.Count,
             });
 
