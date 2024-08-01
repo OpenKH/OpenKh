@@ -133,11 +133,11 @@ namespace OpenKh.Game.Field
                 if (area >= 0 && area < worldInfos.Count)
                 {
                     var areaInfo = worldInfos[area];
-                    var isKnown = (areaInfo.Flags & 1) != 0;
-                    var isInDoor = (areaInfo.Flags & 2) != 0;
-                    var isMonochrome = (areaInfo.Flags & 4) != 0;
-                    var hasNoShadow = (areaInfo.Flags & 8) != 0;
-                    var hasGlow = (areaInfo.Flags & 16) != 0;
+                    var isKnown = areaInfo.Flags.HasFlag(Kh2.SystemData.Arif.ArifFlags.IsKnownArea);
+                    var isInDoor = areaInfo.Flags.HasFlag(Kh2.SystemData.Arif.ArifFlags.IndoorArea);
+                    var isMonochrome = areaInfo.Flags.HasFlag(Kh2.SystemData.Arif.ArifFlags.Monochrome);
+                    var hasNoShadow = areaInfo.Flags.HasFlag(Kh2.SystemData.Arif.ArifFlags.NoShadow);
+                    var hasGlow = areaInfo.Flags.HasFlag(Kh2.SystemData.Arif.ArifFlags.HasGlow);
 
                     _targetCamera.Type = isInDoor ? 1 : 0;
                 }
