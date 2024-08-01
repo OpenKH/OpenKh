@@ -798,6 +798,7 @@ Asset Example
   ShopUnlock: 201
 ```
 
+=======
 ### `bbsarc` (BBS)
 Allows you to add/patch files inside a bbs `.arc` container without having to `copy` the entire arc file into your mod. You can use any method to patch those files, although at time of writing the only one that works for BBS files (other than `bbsarc`) is `copy`.
 
