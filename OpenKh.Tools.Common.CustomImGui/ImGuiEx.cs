@@ -310,5 +310,22 @@ namespace OpenKh.Tools.Common.CustomImGui
             if (ImGui.Combo(name, ref value, items, items.Length))
                 setter(value);
         }
+
+        //Used for custom color/opacity in kh2mapstudio/eventactivators
+        public static void ForEdit5(string name, Func<float> getter, Action<float> setter, float speed = 0.01f)
+        {
+            var value = getter();
+            if (ImGui.DragFloat(name, ref value, speed))
+                setter(value);
+        }
+
+        public static bool ForEdit(string label, Func<Vector3> get, Action<Vector3> set)
+        {
+            var value = get();
+            var modified = ImGui.InputFloat3(label, ref value);
+            if (modified)
+                set(value);
+            return modified;
+        }
     }
 }

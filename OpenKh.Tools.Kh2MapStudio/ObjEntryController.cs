@@ -51,7 +51,16 @@ namespace OpenKh.Tools.Kh2MapStudio
             _meshGroups.Clear();
         }
 
-        public string GetName(int objectId) => _objEntryLookupReversed[objectId];
+        //Below: First tries to get the name from the specified index.
+        //If that fails, fall back to warning the user with the name.
+        public string GetName(int objectId)
+        {
+            if (_objEntryLookupReversed.TryGetValue(objectId, out var objEntryName))
+            {
+                return objEntryName;
+            }
+            return "ENTITY ID NOT PRESENT IN OBJENTRY";
+        }
 
         public MeshGroup this[int objId]
         {
@@ -60,41 +69,71 @@ namespace OpenKh.Tools.Kh2MapStudio
                 if (_meshGroups.TryGetValue(objId, out var meshGroup))
                     return meshGroup;
 
-                var objEntryName = _objEntryLookupReversed[objId];
-
-                var modelPath = Path.Combine(_objPath, objEntryName);
-                var modelFileName = modelPath + ".mdlx";
-                if (File.Exists(modelFileName))
+                // Fix OBJIds being out of range by falling back onto a value of 1.
+                if (!_objEntryLookupReversed.ContainsKey(objId))
                 {
-                    var mdlxEntries = File.OpenRead(modelFileName).Using(Bar.Read);
-                    var modelEntry = mdlxEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Model);
-                    if (modelEntry != null)
-                    {
-                        var model = Mdlx.Read(modelEntry.Stream);
-                        ModelTexture textures = null;
-
-                        var textureEntry = mdlxEntries.FirstOrDefault(x => x.Type == Bar.EntryType.ModelTexture);
-                        if (textureEntry != null)
-                            textures = ModelTexture.Read(textureEntry.Stream);
-
-                        var modelMotion = MeshLoader.FromKH2(model);
-                        modelMotion.ApplyMotion(modelMotion.InitialPose);
-                        meshGroup = new MeshGroup
-                        {
-                            MeshDescriptors = modelMotion.MeshDescriptors,
-                            Textures = textures == null ? new IKingdomTexture[0] : textures.LoadTextures(_graphics).ToArray()
-                        };
-                    }
-                    else
-                        meshGroup = EmptyMeshGroup;
+                    objId = 1; // Default to 1 if out of range
                 }
-                else
-                    meshGroup = EmptyMeshGroup;
+
+                var objEntryName = _objEntryLookupReversed[objId];
+                var baseModelPath = Path.Combine(_objPath, objEntryName);
+                var moddedFolderPath = Path.Combine(_objPath, "..", "mapstudio");  // Move up one level and then to 'mapstudio'
+                var moddedModelPath = Path.Combine(moddedFolderPath, objEntryName);
+                var baseModelFileName = baseModelPath + ".mdlx";
+                var moddedModelFileName = moddedModelPath + ".mdlx";
+
+                // Determine the correct file path to load from, prioritizing modded path
+                var modelFileName = File.Exists(moddedModelFileName) ? moddedModelFileName : baseModelFileName;
+
+                MeshGroup LoadMeshGroup(string fileName)
+                {
+                    if (!File.Exists(fileName))
+                        return EmptyMeshGroup;
+
+                    var mdlxEntries = File.OpenRead(fileName).Using(Bar.Read);
+                    var modelEntry = mdlxEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Model);
+                    if (modelEntry == null)
+                        return EmptyMeshGroup;
+
+                    var model = Mdlx.Read(modelEntry.Stream);
+                    ModelTexture textures = null;
+
+                    var textureEntry = mdlxEntries.FirstOrDefault(x => x.Type == Bar.EntryType.ModelTexture);
+                    if (textureEntry != null)
+                        textures = ModelTexture.Read(textureEntry.Stream);
+
+                    var modelMotion = MeshLoader.FromKH2(model);
+                    modelMotion.ApplyMotion(modelMotion.InitialPose);
+                    return new MeshGroup
+                    {
+                        MeshDescriptors = modelMotion.MeshDescriptors,
+                        Textures = textures == null ? new IKingdomTexture[0] : textures.LoadTextures(_graphics).ToArray()
+                    };
+                }
+
+                meshGroup = LoadMeshGroup(modelFileName);
+
+                // Check if model or texture is missing and load from fallback if necessary. Loads a simple pyramid model.
+                if (meshGroup == EmptyMeshGroup || meshGroup.Textures.Length == 0)
+                {
+                    var fallbackModelFileName = Path.Combine(_objPath, "F_HB700.mdlx");
+                    var fallbackMeshGroup = LoadMeshGroup(fallbackModelFileName);
+
+                    if (meshGroup == EmptyMeshGroup)
+                    {
+                        meshGroup = fallbackMeshGroup;
+                    }
+                    else if (meshGroup.Textures.Length == 0)
+                    {
+                        meshGroup.Textures = fallbackMeshGroup.Textures;
+                    }
+                }
 
                 _meshGroups[objId] = meshGroup;
                 return meshGroup;
             }
         }
+
 
         public MeshGroup this[string objName] => this[_objEntryLookup[objName]];
     }
