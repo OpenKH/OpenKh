@@ -1870,6 +1870,94 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
+        public void ListPatchPrztTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00battle.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "przt",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "PrztList.yml",
+                                        Type = "przt"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            {
+                var prztEntry = new List<Kh2.Battle.Przt>()
+                {
+                    new Kh2.Battle.Przt
+                    {
+                        Id = 1,
+                        SmallHpOrbs = 0,
+                        BigHpOrbs = 1
+                    }
+                };
+
+                using var prztStream = new MemoryStream();
+                Kh2.Battle.Przt.Write(prztStream, prztEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "przt",
+                        Type = Bar.EntryType.List,
+                        Stream = prztStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "PrztList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                var serializer = new Serializer();
+                var moddedPrzt = new List<Kh2.Battle.Przt>{
+                    new Kh2.Battle.Przt
+                    {
+                        Id = 1,
+                        SmallHpOrbs = 0,
+                        BigHpOrbs = 1
+                    }
+                };
+                writer.Write(serializer.Serialize(moddedPrzt));
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00battle.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var przt = Kh2.Battle.Przt.Read(binarc[0].Stream);
+
+                Assert.Equal(1, przt[0].BigHpOrbs);
+            });
+        }
+
+
+        [Fact]
         public void ListPatchObjEntryTest()
         {
             var patcher = new PatcherProcessor();
