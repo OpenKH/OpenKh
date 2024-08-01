@@ -21,6 +21,7 @@ This document will focus on teaching you how to create mods using the OpenKH Mod
       * [sklt](#sklt-source-example)
       * [arif](#arif-source-example)
       * [memt](#memt-source-example)
+      * [fmab](#fmab-source-example)
       * [enmp](#enmp-source-example)
       * [fmlv](#fmlv-source-example)
       * [lvup](#lvup-source-example)
@@ -284,6 +285,7 @@ Asset Example
  * `sklt`
  * `arif`
  * `memt`
+ * `fmab`
  * `enmp`
  * `fmlv`
  * `lvup`
@@ -447,6 +449,48 @@ MemberIndices:
     Friend2: 32
     FriendWorld: 42
 ```
+
+### `fmab` Source Example
+```
+Entries:
+  1: #This is "Growth Ability Level"; so this edits the second entry in the list, or, LV 2.
+    HighJumpHeight: 999
+    AirDodgeHeight: 999
+    AirDodgeSpeed: 3.0
+    AirSlideTime: 1.0
+    AirSlideSpeed: 2.0
+    AirSlideBrake: 1.0
+    AirSlideStopBrake: 1.0
+    AirSlideInvulnerableFrames: 0.5
+    GlideSpeed: 2.0
+    GlideFallRatio: 0.8
+    GlideFallHeight: 1.2
+    GlideFallMax: 1.5
+    GlideAcceleration: 2.5
+    GlideStartHeight: 1.0
+    GlideEndHeight: 0.8
+    GlideTurnSpeed: 1.5
+    DodgeRollInvulnerableFrames: 0.7
+  2:
+    HighJumpHeight: 9999
+    AirDodgeHeight: 999
+    AirDodgeSpeed: 3.0
+    AirSlideTime: 1.0
+    AirSlideSpeed: 2.0
+    AirSlideBrake: 1.0
+    AirSlideStopBrake: 1.0
+    AirSlideInvulnerableFrames: 0.5
+    GlideSpeed: 2.0
+    GlideFallRatio: 0.8
+    GlideFallHeight: 1.2
+    GlideFallMax: 1.5
+    GlideAcceleration: 2.5
+    GlideStartHeight: 1.0
+    GlideEndHeight: 0.8
+    GlideTurnSpeed: 1.5
+    DodgeRollInvulnerableFrames: 0.7
+```
+
 ### `enmp` Source Example
 ```
 - Id: 0
