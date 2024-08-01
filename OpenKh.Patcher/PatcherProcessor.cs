@@ -80,7 +80,7 @@ namespace OpenKh.Patcher
             "Recom",
         };
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null)
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null, bool Tests = false)
         {
 
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
@@ -184,7 +184,14 @@ namespace OpenKh.Patcher
                         //Update: Prevent from copying a blank file should it not exist.
                         try
                         {
-                            if (((assetFile.Type == "internal" || assetFile.Source[0].Type == "internal") && File.Exists(context.GetOriginalAssetPath(assetFile.Source[0].Name))) || assetFile.Type != "internal" && assetFile.Source[0].Type != "internal")
+                            //If editing supfiles (not Method: copy)  make sure the original file exists OR
+                            //If copying a file from the mod (NOT Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
+                            //If copying a file from the users extraction (Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
+                            //Ignore if its from a test
+                            if ((assetFile.Method != "copy" && File.Exists(context.GetOriginalAssetPath(assetFile.Name))) ||
+                            (assetFile.Method == "copy" && assetFile.Source[0].Type != "internal" && File.Exists(context.GetSourceModAssetPath(assetFile.Source[0].Name))) ||
+                            (assetFile.Method == "copy" && assetFile.Source[0].Type == "internal" && File.Exists(context.GetOriginalAssetPath(assetFile.Source[0].Name))) ||
+                            Tests)
                             {
                                 context.CopyOriginalFile(name, dstFile);
 
