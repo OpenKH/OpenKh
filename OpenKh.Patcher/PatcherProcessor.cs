@@ -266,10 +266,6 @@ namespace OpenKh.Patcher
 
 
 
-        //New goal for this: Prevent it from stopping the mod application completely.
-        //Instead, just write an error to the Log with Log.Warn, AND ensure it copies nothing.
-
-        //Below: Reverted CopyFile back to Vanilla. Seems to have caused some issues.
         private static void CopyFile(Context context, AssetFile assetFile, Stream stream)
         {
             if (assetFile.Source == null || assetFile.Source.Count == 0)
@@ -280,10 +276,6 @@ namespace OpenKh.Patcher
             if (assetFile.Source[0].Type == "internal")
             {
                 srcFile = context.GetOriginalAssetPath(assetFile.Source[0].Name);
-            }
-            if (assetFile.Source[0].Type == "external")
-            {
-               srcFile = context.GetDestinationPath(assetFile.Source[0].Name);
             }
             else
             {
