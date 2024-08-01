@@ -1243,8 +1243,8 @@ namespace OpenKh.Patcher
                         break;
 
                     case "condition":
-                        var conditionList = Kh2.Mixdata.CondLP.Read(stream); // Read existing Reci list
-                        var moddedConditions = deserializer.Deserialize<List<Kh2.Mixdata.CondLP>>(sourceText); // Deserialize modded recipes
+                        var conditionList = Kh2.Mixdata.CondLP.Read(stream);
+                        var moddedConditions = deserializer.Deserialize<List<Kh2.Mixdata.CondLP>>(sourceText); 
 
                         foreach (var moddedCondition in moddedConditions)
                         {
@@ -1252,25 +1252,21 @@ namespace OpenKh.Patcher
 
                             if (existingCondition != null)
                             {
-                                // Update existing recipe in the list
                                 conditionList[conditionList.IndexOf(existingCondition)] = moddedCondition;
 
-                                // Update other properties as needed
                             }
                             else
                             {
-                                // Add new recipe to the list
                                 conditionList.Add(moddedCondition);
                             }
                         }
 
-                        // Write the updated recipe list back to the stream
                         Kh2.Mixdata.CondLP.Write(stream, conditionList); // Pass IEnumerable<Reci>
                         break;
 
                     case "level":
-                        var levelList = Kh2.Mixdata.LeveLP.Read(stream); // Read existing Reci list
-                        var moddedLevels = deserializer.Deserialize<List<Kh2.Mixdata.LeveLP>>(sourceText); // Deserialize modded recipes
+                        var levelList = Kh2.Mixdata.LeveLP.Read(stream); 
+                        var moddedLevels = deserializer.Deserialize<List<Kh2.Mixdata.LeveLP>>(sourceText); 
 
                         foreach (var moddedLevel in moddedLevels)
                         {
@@ -1278,20 +1274,15 @@ namespace OpenKh.Patcher
 
                             if (existingLevel != null)
                             {
-                                // Update existing recipe in the list
                                 levelList[levelList.IndexOf(existingLevel)] = moddedLevel;
-
-                                // Update other properties as needed
                             }
                             else
                             {
-                                // Add new recipe to the list
                                 levelList.Add(moddedLevel);
                             }
                         }
 
-                        // Write the updated recipe list back to the stream
-                        Kh2.Mixdata.LeveLP.Write(stream, levelList); // Pass IEnumerable<Reci>
+                        Kh2.Mixdata.LeveLP.Write(stream, levelList);
                         break;
                 }
             }
