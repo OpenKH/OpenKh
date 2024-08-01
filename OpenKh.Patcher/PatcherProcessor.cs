@@ -80,7 +80,7 @@ namespace OpenKh.Patcher
             "Recom",
         };
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null, bool tests = false)
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null)
         {
 
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
