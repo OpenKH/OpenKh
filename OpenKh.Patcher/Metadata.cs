@@ -32,14 +32,10 @@ namespace OpenKh.Patcher
             .Build();
         private static readonly ISerializer serializer =
             new SerializerBuilder()
-            //.JsonCompatible() //Experimental. May allow mod.ymls/listpatches to be in json formatting, and mod manager will accept it?
             .IgnoreFields()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .Build();
 
-        //Old Metadata Read. Two lines but isn't comprehensive enough.
-        //        public static Metadata Read(Stream stream) =>
-        //            deserializer.Deserialize<Metadata>(new StreamReader(stream));
 
         public static Metadata Read(Stream stream)
         {
@@ -48,22 +44,6 @@ namespace OpenKh.Patcher
                 return deserializer.Deserialize<Metadata>(new StreamReader(stream)); //Simplifed way of doing this. Cuts out the "deserializer" redundancies and variable for StreamReader(stream))
             }
 
-            //OLD TRY METHOD: Seems to use a lot of redundant code.
-            //try
-            //{
-            //    var deserializer = new DeserializerBuilder()
-            //        .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            //        .Build();
-
-            //                using (var reader = new StreamReader(stream))
-            //                {
-            //                    var metadata = deserializer.Deserialize<Metadata>(reader);
-            //                    return metadata;
-            //                }
-            //            }
-
-
-            //Use this to handle YML errors. Prevents crashing upon immediate startup.
             catch (YamlDotNet.Core.YamlException ex)
             {
                 // Handle YAML parsing errors
