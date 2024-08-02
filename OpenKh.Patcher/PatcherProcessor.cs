@@ -80,7 +80,7 @@ namespace OpenKh.Patcher
             "Recom",
         };
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null, bool Tests = false)
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null, string Language = "en", bool Tests = false)
         {
 
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
@@ -216,11 +216,31 @@ namespace OpenKh.Patcher
                                 {
                                     if (assetFile.Method != "copy" && assetFile.Method != "imd")
                                     {
-                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                        if (platform == 2)
+                                        {
+                                            if (Language == "jp" && (context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") || context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/")))
+                                            {
+                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                        }
                                     }
                                     else if (assetFile.Source[0].Type == "internal")
                                     {
+                                        if (platform == 2)
+                                        {
+                                            if (Language == "jp" && (context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") || context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/")))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                    else
+                                    {
                                         Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                    }
                                     }
                                     else
                                     {
@@ -350,7 +370,7 @@ namespace OpenKh.Patcher
                     entry = binarc[file.Index];
                 }
 
-                // If entry is not found by name or index, create a new one
+                //If entry is not found by name or index, create a new one
                 if (entry == null)
                 {
                     entry = new Bar.Entry
