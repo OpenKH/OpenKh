@@ -218,9 +218,19 @@ namespace OpenKh.Patcher
                                     {
                                         if (platform == 2)
                                         {
-                                            if (Language == "jp" && (context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") || context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/")))
+                                            if (Language != "jp")
                                             {
-                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                                if (!context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
+                                                {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") || context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
+                                                {
+                                                    Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                                }
                                             }
                                         }
                                         else
@@ -232,15 +242,25 @@ namespace OpenKh.Patcher
                                     {
                                         if (platform == 2)
                                         {
-                                            if (Language == "jp" && (context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") || context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/")))
+                                            if (Language != "jp")
                                             {
-                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                                if (!context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
+                                                {
+                                                    Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") || context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
+                                                {
+                                                    Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                                }
                                             }
                                         }
-                                    else
-                                    {
-                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
-                                    }
+                                        else
+                                        {
+                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                        }
                                     }
                                     else
                                     {

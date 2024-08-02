@@ -184,6 +184,31 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PcRelease28Selected));
             }
         }
+        public int PCReleaseLanguage
+        {
+            get
+            {
+                switch (ConfigurationService.PcReleaseLanguage)
+                {
+                    case "jp":
+                        return 1;
+                    default:
+                        return 0;
+                }
+            }
+            set
+            {
+                switch (value)
+                {
+                    case 1:
+                        ConfigurationService.PcReleaseLanguage = "jp";
+                        break;
+                    default:
+                        ConfigurationService.PcReleaseLanguage = "en";
+                        break;
+                }
+            }
+        }
 
         public int LaunchOption
         {

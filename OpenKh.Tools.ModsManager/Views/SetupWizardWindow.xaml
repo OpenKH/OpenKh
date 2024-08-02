@@ -48,79 +48,88 @@
             Description="Selected the preferred edition to launch the game"
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding WizardPageAfterIntro}">
-            <StackPanel>
-                <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
-                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
-                    <ComboBoxItem>OpenKH Game Engine</ComboBoxItem>
-                    <ComboBoxItem>PlayStation 2 using PCSX2 emulator</ComboBoxItem>
-                    <ComboBoxItem>PC Release</ComboBoxItem>
-                </ComboBox>
-                <StackPanel Visibility="{Binding OpenKhGameEngineConfigVisibility}">
-                    <TextBlock Margin="0 0 0 3">Please select the location of OpenKH Game Engine</TextBlock>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding OpenKhGameEngineLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectOpenKhGameEngineCommand}">
-                            <Image Source="{StaticResource FolderOpen_16x}"/>
-                        </Button>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3">NOTE: The engine is work in progress and might show inaccuracy.</TextBlock>
-                </StackPanel>
-                <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
-                    <TextBlock Margin="0 0 0 3">Please select the location of PCSX2 emulator</TextBlock>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding Pcsx2Location, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcsx2Command}">
-                            <Image Source="{StaticResource FolderOpen_16x}"/>
-                        </Button>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3">NOTE: Only PCSX2 up to 1.6.0 and PCSX2-EX are supported.</TextBlock>
-                </StackPanel>
-                <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    Select the launcher you use for the supported Kingdom Hearts games.
-                    </TextBlock>
-                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding LaunchOption}">
-                        <ComboBoxItem>Epic Games Store</ComboBoxItem>
-                        <ComboBoxItem>Steam</ComboBoxItem>
-                        <ComboBoxItem>Other</ComboBoxItem>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
+                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
+                        <ComboBoxItem>OpenKH Game Engine</ComboBoxItem>
+                        <ComboBoxItem>PlayStation 2 using PCSX2 emulator</ComboBoxItem>
+                        <ComboBoxItem>PC Release</ComboBoxItem>
                     </ComboBox>
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    <StackPanel Visibility="{Binding OpenKhGameEngineConfigVisibility}">
+                        <TextBlock Margin="0 0 0 3">Please select the location of OpenKH Game Engine</TextBlock>
+                        <Grid Margin="0 0 0 3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding OpenKhGameEngineLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectOpenKhGameEngineCommand}">
+                                <Image Source="{StaticResource FolderOpen_16x}"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0 0 0 3">NOTE: The engine is work in progress and might show inaccuracy.</TextBlock>
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
+                        <TextBlock Margin="0 0 0 3">Please select the location of PCSX2 emulator</TextBlock>
+                        <Grid Margin="0 0 0 3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding Pcsx2Location, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcsx2Command}">
+                                <Image Source="{StaticResource FolderOpen_16x}"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0 0 0 3">NOTE: Only PCSX2 up to 1.6.0 and PCSX2-EX are supported.</TextBlock>
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    Select if you have the Japanese version or the Global version.
+                        </TextBlock>
+                        <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding PCReleaseLanguage}">
+                            <ComboBoxItem>Global</ComboBoxItem>
+                            <ComboBoxItem>Japanese</ComboBoxItem>
+                        </ComboBox>
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    Select the launcher you use for the supported Kingdom Hearts games.
+                        </TextBlock>
+                        <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding LaunchOption}">
+                            <ComboBoxItem>Epic Games Store</ComboBoxItem>
+                            <ComboBoxItem>Steam</ComboBoxItem>
+                            <ComboBoxItem>Other</ComboBoxItem>
+                        </ComboBox>
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         Mod Manager supports both the 1.5+2.5 collection and KH3D from the 2.8 collection choose the filepath for at least one of the collections.
-                    </TextBlock>
-                    <Button Margin="0 10 0 10" Command="{Binding DetectInstallsCommand}">Detect Installations</Button>
-                    <TextBlock Margin="0 0 0 3">Folder location of the PC release of 1.5+2.5</TextBlock>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding PcReleaseLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseCommand}">
-                            <Image Source="{StaticResource FolderOpen_16x}"/>
-                        </Button>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3">Folder location of the PC release of 2.8</TextBlock>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding PcReleaseLocationKH3D, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseKH3DCommand}">
-                            <Image Source="{StaticResource FolderOpen_16x}"/>
-                        </Button>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">NOTE: Always be sure to use a supported version or risk breaking compatibility</TextBlock>
+                        </TextBlock>
+                        <Button Margin="0 10 0 10" Command="{Binding DetectInstallsCommand}">Detect Installations</Button>
+                        <TextBlock Margin="0 0 0 3">Folder location of the PC release of 1.5+2.5</TextBlock>
+                        <Grid Margin="0 0 0 3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding PcReleaseLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseCommand}">
+                                <Image Source="{StaticResource FolderOpen_16x}"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0 0 0 3">Folder location of the PC release of 2.8</TextBlock>
+                        <Grid Margin="0 0 0 3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding PcReleaseLocationKH3D, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseKH3DCommand}">
+                                <Image Source="{StaticResource FolderOpen_16x}"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">NOTE: Always be sure to use a supported version or risk breaking compatibility</TextBlock>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="PageIsoSelection"
