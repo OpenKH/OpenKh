@@ -184,89 +184,90 @@ namespace OpenKh.Patcher
                         //Update: Prevent from copying a blank file should it not exist.
                         try
                         {
-                                bool multi = false;
-                                if (assetFile.Multi != null)
+                            bool multi = false;
+                            if (assetFile.Multi != null)
+                            {
+                                foreach (var entry in assetFile.Multi)
                                 {
-                                    foreach (var entry in assetFile.Multi)
+                                    if (File.Exists(context.GetOriginalAssetPath(entry.Name)))
                                     {
-                                        if (File.Exists(context.GetOriginalAssetPath(entry.Name)))
-                                        {
-                                            multi = true;
-                                        }
+                                        multi = true;
                                     }
                                 }
-                                //If editing supfiles (not Method: copy and not Method: imd)  make sure the original file exists OR
-                                //If copying a file from the mod (NOT Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
-                                //If copying a file from the users extraction (Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
-                                //Ignore if its from a test
-                                if ((assetFile.Method != "copy" && assetFile.Method != "imd" && (File.Exists(context.GetOriginalAssetPath(assetFile.Name)) || multi)) ||
-                                ((assetFile.Method == "copy" || assetFile.Method == "imd") && assetFile.Source[0].Type != "internal" && File.Exists(context.GetSourceModAssetPath(assetFile.Source[0].Name))) ||
-                                ((assetFile.Method == "copy" || assetFile.Method == "imd") && assetFile.Source[0].Type == "internal" && (File.Exists(context.GetOriginalAssetPath(assetFile.Source[0].Name)) || multi)) ||
-                                Tests)
-                                {
-                                    context.CopyOriginalFile(name, dstFile);
+                            }
+                            //If editing supfiles (not Method: copy and not Method: imd)  make sure the original file exists OR
+                            //If copying a file from the mod (NOT Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
+                            //If copying a file from the users extraction (Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
+                            //Ignore if its from a test
+                            if ((assetFile.Method != "copy" && assetFile.Method != "imd" && (File.Exists(context.GetOriginalAssetPath(assetFile.Name)) || multi)) ||
+                            ((assetFile.Method == "copy" || assetFile.Method == "imd") && assetFile.Source[0].Type != "internal" && File.Exists(context.GetSourceModAssetPath(assetFile.Source[0].Name))) ||
+                            ((assetFile.Method == "copy" || assetFile.Method == "imd") && assetFile.Source[0].Type == "internal" && (File.Exists(context.GetOriginalAssetPath(assetFile.Source[0].Name)) || multi)) ||
+                            Tests)
+                            {
+                                context.CopyOriginalFile(name, dstFile);
 
-                                    using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                                    PatchFile(context, assetFile, _stream);
+                                using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                                PatchFile(context, assetFile, _stream);
 
-                                    _stream.Close();
-                                    _stream.Dispose();
-                                }
-                                else
+                                _stream.Close();
+                                _stream.Dispose();
+                            }
+                            else
+                            {
+                                List<string> globalFilePaths = new List<string> { ".a.fr", ".a.gr", ".a.it", ".a.sp", ".a.us", "/fr/", "/gr/", "/it/", "/sp/", "/us/" };
+                                if (assetFile.Method != "copy" && assetFile.Method != "imd")
                                 {
-                                    if (assetFile.Method != "copy" && assetFile.Method != "imd")
+                                    if (platform == 2)
                                     {
-                                        if (platform == 2)
+                                        if (Language != "jp")
                                         {
-                                            if (Language != "jp")
+                                            if (!context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
                                             {
-                                                if (!context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
-                                                {
+                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (!globalFilePaths.Any(x=>context.GetOriginalAssetPath(assetFile.Name).Contains(x)))
+                                            {
                                                 Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
-                                                }
                                             }
-                                            else
-                                            {
-                                                if (context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") || context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
-                                                {
-                                                    Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
-                                        }
-                                    }
-                                    else if (assetFile.Source[0].Type == "internal")
-                                    {
-                                        if (platform == 2)
-                                        {
-                                            if (Language != "jp")
-                                            {
-                                                if (!context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
-                                                {
-                                                    Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") || context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
-                                                {
-                                                    Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
                                         }
                                     }
                                     else
                                     {
-                                        Log.Warn("File not found: " + context.GetSourceModAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your mod install of: " + metadata.Title);
+                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
                                     }
                                 }
+                                else if (assetFile.Source[0].Type == "internal")
+                                {
+                                    if (platform == 2)
+                                    {
+                                        if (Language != "jp")
+                                        {
+                                            if (!context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (!globalFilePaths.Any(x => context.GetOriginalAssetPath(assetFile.Name).Contains(x)))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                    }
+                                }
+                                else
+                                {
+                                    Log.Warn("File not found: " + context.GetSourceModAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your mod install of: " + metadata.Title);
+                                }
+                            }
                         }
                         catch (IOException) { }
                         //This is here so the user does not have to close Mod Manager to see what the warnings were if any. Helpful especially on PC since the build window closes after build unlike emulator where it stays open during mod injection.
