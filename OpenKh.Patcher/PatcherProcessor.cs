@@ -195,7 +195,7 @@ namespace OpenKh.Patcher
                                     }
                                 }
                             }
-                            //If editing supfiles (not Method: copy and not Method: imd)  make sure the original file exists OR
+                            //If editing subfiles (not Method: copy and not Method: imd)  make sure the original file exists OR
                             //If copying a file from the mod (NOT Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
                             //If copying a file from the users extraction (Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
                             //Ignore if its from a test
