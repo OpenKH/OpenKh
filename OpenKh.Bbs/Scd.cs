@@ -43,7 +43,7 @@ namespace OpenKh.Bbs
             [Data] public uint StreamSize { get; set; }
             [Data] public uint ChannelCount { get; set; }
             [Data] public uint SampleRate { get; set; }
-            [Data] public uint Codec { get; set; }
+            [Data] public uint Codec { get; set; } //6 = .ogg, everything else is msadpcm
             [Data] public uint LoopStart { get; set; }
             [Data] public uint LoopEnd { get; set; }
             [Data] public uint ExtraDataSize { get; set; }
@@ -63,32 +63,67 @@ namespace OpenKh.Bbs
             [Data(Count = 16)] public string Name { get; set; }
         }
 
-        public static Header header = new Header();
-        public static TableOffsetHeader tableOffsetHeader = new TableOffsetHeader();
-        public static List<byte[]> StreamFiles = new List<byte[]>();
+        public Header header = new();
+        public TableOffsetHeader tableOffsetHeader = new();
+        public List<StreamHeader> StreamHeaders = [];
+        public List<byte[]> StreamFiles = [];
+        public List<byte[]> MediaFiles = [];
 
         public static Scd Read(Stream stream)
         {
-            Scd scd = new Scd();
+            var scd = new Scd
+            {
+                header = BinaryMapping.ReadObject<Header>(stream),
+                tableOffsetHeader = BinaryMapping.ReadObject<TableOffsetHeader>(stream),
+            };
 
-            header = BinaryMapping.ReadObject<Header>(stream);
-            tableOffsetHeader = BinaryMapping.ReadObject<TableOffsetHeader>(stream);
+            stream.Seek(scd.tableOffsetHeader.Table1Offset, SeekOrigin.Begin);
 
-            stream.Seek(tableOffsetHeader.Table1Offset, SeekOrigin.Begin);
-
-            List<uint> SoundOffsets = new List<uint>();
-            for (int i = 0; i < tableOffsetHeader.Table1ElementCount; i++)
+            var SoundOffsets = new List<uint>();
+            for (var i = 0; i < scd.tableOffsetHeader.Table1ElementCount; i++)
             {
                 SoundOffsets.Add(stream.ReadUInt32());
             }
 
-            foreach(uint off in SoundOffsets)
+            for (var index = 0; index < SoundOffsets.Count; index++)
             {
+                var off = SoundOffsets[index];
+                var next = (int)((index == SoundOffsets.Count - 1 ? stream.Length : SoundOffsets[index + 1]) - off);
                 stream.Seek(off, SeekOrigin.Begin);
                 var streamInfo = BinaryMapping.ReadObject<StreamHeader>(stream);
+                scd.StreamHeaders.Add(streamInfo);
 
-                byte[] st = stream.ReadBytes((int)streamInfo.StreamSize);
-                StreamFiles.Add(st);
+                var st = stream.ReadBytes(next - 0x20);
+                scd.StreamFiles.Add(st);
+
+                //https://github.com/Leinxad/KHPCSoundTools/blob/main/SCDInfo/Program.cs#L109
+                if (streamInfo.Codec == 6)
+                {
+                    var extradataOffset = 0u;
+                    if (streamInfo.AuxChunkCount > 0) extradataOffset += BitConverter.ToUInt32(st.Skip((int)extradataOffset).Take(4).ToArray(), 0);
+
+                    var encryptionKey = st[extradataOffset + 0x02];
+                    var seekTableSize = BitConverter.ToUInt32(st.Skip((int)extradataOffset + 0x10).Take(4).ToArray(), 0);
+                    var vorbHeaderSize = BitConverter.ToUInt32(st.Skip((int)extradataOffset + 0x14).Take(4).ToArray(), 0);
+                
+                    var startOffset = extradataOffset + 0x20 + seekTableSize;
+
+                    var decryptedFile = st.ToArray();
+
+                    var endPosition = startOffset + vorbHeaderSize;
+                
+                    for (var i = startOffset; i < endPosition; i++)
+                    {
+                        decryptedFile[i] = (byte)(decryptedFile[i]^encryptionKey);
+                    }
+                    
+                    var oggSize = vorbHeaderSize + streamInfo.StreamSize;
+                    
+                    scd.MediaFiles.Add(decryptedFile.Skip((int)startOffset).Take((int)oggSize).ToArray());
+                }
+                else scd.MediaFiles.Add(Array.Empty<byte>());
+                
+
 
                 // Convert to VAG Streams.
                 /*VAGHeader vagHeader = new VAGHeader();
@@ -98,7 +133,6 @@ namespace OpenKh.Bbs
                 vagHeader.Magic = 0x70474156;
                 vagHeader.Name = p.ToString();*/
             }
-
 
 
             return scd;
