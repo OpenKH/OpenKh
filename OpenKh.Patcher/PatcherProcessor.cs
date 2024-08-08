@@ -13,7 +13,6 @@ using System.Linq;
 using YamlDotNet.Serialization;
 using OpenKh.Bbs;
 
-
 namespace OpenKh.Patcher
 {
     public class PatcherProcessor
@@ -81,7 +80,7 @@ namespace OpenKh.Patcher
             "Recom",
         };
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null)
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null, string Language = "en", bool Tests = false)
         {
 
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
@@ -185,7 +184,25 @@ namespace OpenKh.Patcher
                         //Update: Prevent from copying a blank file should it not exist.
                         try
                         {
-                            if (((assetFile.Type == "internal" || assetFile.Source[0].Type == "internal") && File.Exists(context.GetOriginalAssetPath(assetFile.Source[0].Name))) || assetFile.Type != "internal" && assetFile.Source[0].Type != "internal")
+                            bool multi = false;
+                            if (assetFile.Multi != null)
+                            {
+                                foreach (var entry in assetFile.Multi)
+                                {
+                                    if (File.Exists(context.GetOriginalAssetPath(entry.Name)))
+                                    {
+                                        multi = true;
+                                    }
+                                }
+                            }
+                            //If editing subfiles (not Method: copy and not Method: imd)  make sure the original file exists OR
+                            //If copying a file from the mod (NOT Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
+                            //If copying a file from the users extraction (Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
+                            //Ignore if its from a test
+                            if ((assetFile.Method != "copy" && assetFile.Method != "imd" && (File.Exists(context.GetOriginalAssetPath(assetFile.Name)) || multi)) ||
+                            ((assetFile.Method == "copy" || assetFile.Method == "imd") && assetFile.Source[0].Type != "internal" && File.Exists(context.GetSourceModAssetPath(assetFile.Source[0].Name))) ||
+                            ((assetFile.Method == "copy" || assetFile.Method == "imd") && assetFile.Source[0].Type == "internal" && (File.Exists(context.GetOriginalAssetPath(assetFile.Source[0].Name)) || multi)) ||
+                            Tests)
                             {
                                 context.CopyOriginalFile(name, dstFile);
 
@@ -195,9 +212,66 @@ namespace OpenKh.Patcher
                                 _stream.Close();
                                 _stream.Dispose();
                             }
+                            else
+                            {
+                                List<string> globalFilePaths = new List<string> { ".a.fr", ".a.gr", ".a.it", ".a.sp", ".a.us", "/fr/", "/gr/", "/it/", "/sp/", "/us/" };
+                                if (assetFile.Method != "copy" && assetFile.Method != "imd")
+                                {
+                                    if (platform == 2)
+                                    {
+                                        if (Language != "jp")
+                                        {
+                                            if (!context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
+                                            {
+                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (!globalFilePaths.Any(x=>context.GetOriginalAssetPath(assetFile.Name).Contains(x)))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                    }
+                                }
+                                else if (assetFile.Source[0].Type == "internal")
+                                {
+                                    if (platform == 2)
+                                    {
+                                        if (Language != "jp")
+                                        {
+                                            if (!context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (!globalFilePaths.Any(x => context.GetOriginalAssetPath(assetFile.Name).Contains(x)))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                    }
+                                }
+                                else
+                                {
+                                    Log.Warn("File not found: " + context.GetSourceModAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your mod install of: " + metadata.Title);
+                                }
+                            }
                         }
-
                         catch (IOException) { }
+                        //This is here so the user does not have to close Mod Manager to see what the warnings were if any. Helpful especially on PC since the build window closes after build unlike emulator where it stays open during mod injection.
+                        Log.Flush();
                     }
                 });
             }
@@ -317,7 +391,7 @@ namespace OpenKh.Patcher
                     entry = binarc[file.Index];
                 }
 
-                // If entry is not found by name or index, create a new one
+                //If entry is not found by name or index, create a new one
                 if (entry == null)
                 {
                     entry = new Bar.Entry
@@ -527,14 +601,10 @@ namespace OpenKh.Patcher
         private static readonly Dictionary<string, byte> characterMap = new Dictionary<string, byte>(){
             { "Sora", 1 }, { "Donald", 2 }, { "Goofy", 3 },  { "Mickey", 4 },  { "Auron", 5 }, { "PingMulan",6 }, { "Aladdin", 7 },  { "Sparrow", 8 }, { "Beast", 9 },  { "Jack", 10 },  { "Simba", 11 }, { "Tron", 12 }, { "Riku", 13 }, { "Roxas", 14}, {"Ping", 15}
         };
-        
+
         private static readonly Dictionary<string, byte> worldIndexMap = new Dictionary<string, byte>(StringComparer.OrdinalIgnoreCase){
     { "worldzz", 0 }, { "endofsea", 1 }, { "twilighttown", 2 },  { "destinyisland", 3 },  { "hollowbastion", 4 }, { "beastscastle", 5 }, { "olympuscoliseum", 6 },  { "agrabah", 7 }, { "thelandofdragons", 8 },  { "100acrewood", 9 },  { "prideland", 10 }, { "atlantica", 11 }, { "disneycastle", 12 }, { "timelessriver", 13}, {"halloweentown", 14}, { "worldmap", 15 }, { "portroyal", 16 }, { "spaceparanoids", 17 }, { "theworldthatneverwas", 18 }
     };
-
-
-
-
 
         private static readonly IDeserializer deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
 
@@ -605,7 +675,6 @@ namespace OpenKh.Patcher
                         }
                         itemList.Write(stream.SetPosition(0));
                         break;
-
 
                     case "fmlv":
                         var formRaw = Kh2.Battle.Fmlv.Read(stream).ToList();
@@ -928,7 +997,7 @@ namespace OpenKh.Patcher
                             if (existingVtbl != null)
                             {
                                 vtblList[vtblList.IndexOf(existingVtbl)] = vtbl;
-                                
+
                             }
                             else
                             {
@@ -1003,7 +1072,7 @@ namespace OpenKh.Patcher
                                     {
                                         var areaData = worldData[areaIndex];
                                         //Below: Compares each field to see if it's specified in the YML.
-                                        //If yes, update w/ YML value. 
+                                        //If yes, update w/ YML value.
                                         //If no, retain original value.
                                         areaData.Flags = patch.Flags != 0 ? patch.Flags : areaData.Flags;
                                         areaData.Reverb = patch.Reverb != 0 ? patch.Reverb : areaData.Reverb;
@@ -1276,7 +1345,7 @@ namespace OpenKh.Patcher
 
                     case "condition":
                         var conditionList = Kh2.Mixdata.CondLP.Read(stream);
-                        var moddedConditions = deserializer.Deserialize<List<Kh2.Mixdata.CondLP>>(sourceText); 
+                        var moddedConditions = deserializer.Deserialize<List<Kh2.Mixdata.CondLP>>(sourceText);
 
                         foreach (var moddedCondition in moddedConditions)
                         {
@@ -1297,8 +1366,8 @@ namespace OpenKh.Patcher
                         break;
 
                     case "level":
-                        var levelList = Kh2.Mixdata.LeveLP.Read(stream); 
-                        var moddedLevels = deserializer.Deserialize<List<Kh2.Mixdata.LeveLP>>(sourceText); 
+                        var levelList = Kh2.Mixdata.LeveLP.Read(stream);
+                        var moddedLevels = deserializer.Deserialize<List<Kh2.Mixdata.LeveLP>>(sourceText);
 
                         foreach (var moddedLevel in moddedLevels)
                         {

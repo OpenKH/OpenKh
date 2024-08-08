@@ -200,14 +200,18 @@ namespace OpenKh.Tools.ModsManager.Services
 
                             outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
 
-                            foreach (var asset in hdAsset.Assets)
+                            if (!ConfigurationService.SkipRemastered)
                             {
-                                var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
 
-                                OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
+                                foreach (var asset in hdAsset.Assets)
+                                {
+                                    var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
 
-                                var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
-                                File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
+                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
+
+                                    var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
+                                    File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
+                                }
                             }
                         }
                         catch (Exception ex)
