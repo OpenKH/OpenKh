@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="{Binding Title}" d:Title="OpenKH Mods Manager set-up"
-        Height="520" Width="400" ResizeMode="NoResize">
+        Height="500" Width="400" ResizeMode="NoResize">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
@@ -33,7 +33,7 @@
         Finish="Wizard_Finish" Background="{Binding ColorTheme.BackgroundColor}">
 
         <xctk:WizardPage
-            x:Name="IntroPage" 
+            x:Name="IntroPage"
             Title="Welcome to OpenKH Mods Manager"
             PageType="Exterior"
             Description="This set-up will guide you through the basic configuration of this tool, allowing you to install and play mods from the best modders in the Kingdom Hearts community."
@@ -48,79 +48,88 @@
             Description="Selected the preferred edition to launch the game"
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding WizardPageAfterIntro}">
-            <StackPanel>
-                <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
-                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
-                    <ComboBoxItem>OpenKH Game Engine</ComboBoxItem>
-                    <ComboBoxItem>PlayStation 2 using PCSX2 emulator</ComboBoxItem>
-                    <ComboBoxItem>PC Release</ComboBoxItem>
-                </ComboBox>
-                <StackPanel Visibility="{Binding OpenKhGameEngineConfigVisibility}">
-                    <TextBlock Margin="0 0 0 3">Please select the location of OpenKH Game Engine</TextBlock>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding OpenKhGameEngineLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectOpenKhGameEngineCommand}">
-                            <Image Source="{StaticResource FolderOpen_16x}"/>
-                        </Button>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3">NOTE: The engine is work in progress and might show inaccuracy.</TextBlock>
-                </StackPanel>
-                <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
-                    <TextBlock Margin="0 0 0 3">Please select the location of PCSX2 emulator</TextBlock>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding Pcsx2Location, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcsx2Command}">
-                            <Image Source="{StaticResource FolderOpen_16x}"/>
-                        </Button>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3">NOTE: Only PCSX2 up to 1.6.0 and PCSX2-EX are supported.</TextBlock>
-                </StackPanel>
-                <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">                    
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
+                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
+                        <ComboBoxItem>OpenKH Game Engine</ComboBoxItem>
+                        <ComboBoxItem>PlayStation 2 using PCSX2 emulator</ComboBoxItem>
+                        <ComboBoxItem>PC Release</ComboBoxItem>
+                    </ComboBox>
+                    <StackPanel Visibility="{Binding OpenKhGameEngineConfigVisibility}">
+                        <TextBlock Margin="0 0 0 3">Please select the location of OpenKH Game Engine</TextBlock>
+                        <Grid Margin="0 0 0 3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding OpenKhGameEngineLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectOpenKhGameEngineCommand}">
+                                <Image Source="{StaticResource FolderOpen_16x}"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0 0 0 3">NOTE: The engine is work in progress and might show inaccuracy.</TextBlock>
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
+                        <TextBlock Margin="0 0 0 3">Please select the location of PCSX2 emulator</TextBlock>
+                        <Grid Margin="0 0 0 3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding Pcsx2Location, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcsx2Command}">
+                                <Image Source="{StaticResource FolderOpen_16x}"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0 0 0 3">NOTE: Only PCSX2 up to 1.6.0 and PCSX2-EX are supported.</TextBlock>
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    Select if you have the Japanese version or the Global version.
+                        </TextBlock>
+                        <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding PCReleaseLanguage}">
+                            <ComboBoxItem>Global</ComboBoxItem>
+                            <ComboBoxItem>Japanese</ComboBoxItem>
+                        </ComboBox>
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                     Select the launcher you use for the supported Kingdom Hearts games.
-                    </TextBlock>
-                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding LaunchOption}">
-                        <ComboBoxItem>Epic Games Store</ComboBoxItem>
-                        <ComboBoxItem>Steam</ComboBoxItem>
-                        <ComboBoxItem>Other</ComboBoxItem>
-                    </ComboBox>                    
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                        </TextBlock>
+                        <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding LaunchOption}">
+                            <ComboBoxItem>Epic Games Store</ComboBoxItem>
+                            <ComboBoxItem>Steam</ComboBoxItem>
+                            <ComboBoxItem>Other</ComboBoxItem>
+                        </ComboBox>
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         Mod Manager supports both the 1.5+2.5 collection and KH3D from the 2.8 collection choose the filepath for at least one of the collections.
-                    </TextBlock>
-                    <Button Margin="0 10 0 10" Command="{Binding DetectInstallsCommand}">Detect Installations</Button>
-                    <TextBlock Margin="0 0 0 3">Folder location of the PC release of 1.5+2.5</TextBlock>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding PcReleaseLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseCommand}">
-                            <Image Source="{StaticResource FolderOpen_16x}"/>
-                        </Button>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3">Folder location of the PC release of 2.8</TextBlock>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding PcReleaseLocationKH3D, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseKH3DCommand}">
-                            <Image Source="{StaticResource FolderOpen_16x}"/>
-                        </Button>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">NOTE: Always be sure to use a supported version or risk breaking compatibility</TextBlock>
+                        </TextBlock>
+                        <Button Margin="0 10 0 10" Command="{Binding DetectInstallsCommand}">Detect Installations</Button>
+                        <TextBlock Margin="0 0 0 3">Folder location of the PC release of 1.5+2.5</TextBlock>
+                        <Grid Margin="0 0 0 3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding PcReleaseLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseCommand}">
+                                <Image Source="{StaticResource FolderOpen_16x}"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0 0 0 3">Folder location of the PC release of 2.8</TextBlock>
+                        <Grid Margin="0 0 0 3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding PcReleaseLocationKH3D, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseKH3DCommand}">
+                                <Image Source="{StaticResource FolderOpen_16x}"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">NOTE: Always be sure to use a supported version or risk breaking compatibility</TextBlock>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="PageIsoSelection"
@@ -166,73 +175,80 @@
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding WizardPageAfterGameData}"
             IsEnabled="{Binding IsNotExtracting}">
-            <StackPanel>
-                <TextBlock Margin="0,0,0,3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">
-                        OpenKH can extract all games in the 1.5 + 2.5 collection and KH3D from the 2.8 collection. Check the games below you wish to extract.
-                        If you do not see the game you want to use Mod Manager for please go back to the Game Edition page and make sure you selected the correct filepath.
-                        Size values are rounded up.
-                </TextBlock>
-                <StackPanel Visibility="{Binding BothPcReleaseSelected}">
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding Extractkh1}" Content="KH1-23GB" Margin="0 0 10 4"/>
-                        <CheckBox IsChecked="{Binding Extractkh2}" Content="KH2-43GB" Margin="0 0 10 4"/>
-                        <CheckBox IsChecked="{Binding Extractbbs}" Content="BBS-19GB" Margin="0 0 10 4"/>
-                        <CheckBox IsChecked="{Binding Extractrecom}" Content="ReCoM-14GB" Margin="0 0 10 4"/>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Margin="0,0,0,3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">
+                            OpenKH can extract all games in the 1.5 + 2.5 collection and KH3D from the 2.8 collection. Check the games below you wish to extract.
+                            If you do not see the game you want to use Mod Manager for please go back to the Game Edition page and make sure you selected the correct filepath.
+                            Size values are rounded up.
+                    </TextBlock>
+                    <StackPanel Visibility="{Binding BothPcReleaseSelected}">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Extractkh1}" Content="KH1-23GB" Margin="0 0 6 4"/>
+                            <CheckBox IsChecked="{Binding Extractkh2}" Content="KH2-43GB" Margin="0 0 6 4"/>
+                            <CheckBox IsChecked="{Binding Extractbbs}" Content="BBS-19GB" Margin="0 0 6 4"/>
+                            <CheckBox IsChecked="{Binding Extractrecom}" Content="ReCoM-14GB" Margin="0 0 6 4"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Extractkh3d}" Content="KH3D-51GB" Margin="0 0 6 4"/>
+                        </StackPanel>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding Extractkh3d}" Content="KH3D-51GB" Margin="0 0 10 4"/>
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding PcRelease1525Selected}">
+                        <CheckBox IsChecked="{Binding Extractkh1}" Content="KH1-23GB" Margin="0 0 6 4"/>
+                        <CheckBox IsChecked="{Binding Extractkh2}" Content="KH2-43GB" Margin="0 0 6 4"/>
+                        <CheckBox IsChecked="{Binding Extractbbs}" Content="BBS-19GB" Margin="0 0 6 4"/>
+                        <CheckBox IsChecked="{Binding Extractrecom}" Content="ReCoM-14GB" Margin="0 0 6 4"/>
                     </StackPanel>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Visibility="{Binding PcRelease1525Selected}">
-                    <CheckBox IsChecked="{Binding Extractkh1}" Content="KH1-23GB" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding Extractkh2}" Content="KH2-43GB" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding Extractbbs}" Content="BBS-19GB" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding Extractrecom}" Content="ReCoM-14GB" Margin="0 0 10 4"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Visibility="{Binding PcRelease28Selected}">
-                    <CheckBox IsChecked="{Binding Extractkh3d}" Content="KH3D-51GB" Margin="0 0 10 4"/>
-                </StackPanel>
-                <TextBlock Margin="0 0 0 3">Extraction folder location:</TextBlock>
-                <Grid Margin="0 0 0 3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="20"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{Binding GameDataLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectGameDataLocationCommand}">
-                        <Image Source="{StaticResource FolderOpen_16x}"/>
-                    </Button>
-                </Grid>
-                <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
-                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
-                    It seems you do not have your Kingdom Hearts II copy extracted.
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding PcRelease28Selected}">
+                        <CheckBox IsChecked="{Binding Extractkh3d}" Content="KH3D-51GB" Margin="0 0 6 4"/>
+                    </StackPanel>
+                    <TextBlock Margin="0 0 0 3">Extraction folder location:</TextBlock>
+                    <Grid Margin="0 0 0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding GameDataLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectGameDataLocationCommand}">
+                            <Image Source="{StaticResource FolderOpen_16x}"/>
+                        </Button>
+                    </Grid>
+                    <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
+                        <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
+                        It seems you do not have your Kingdom Hearts II copy extracted.
+                        </TextBlock>
+                        <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
+                        You already have your Kingdom Hearts II copy extracted.
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
+                        <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
+                            You do not have any extracted data from a supported game.
+                        </TextBlock>
+                        <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
+                            You already have extracted data from a supported game.
+                        </TextBlock>
+                    </StackPanel>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                        Press the button below to initialize the game extraction. It will take between 5 and 15 minutes based on the speed of your hard drive.
                     </TextBlock>
-                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
-                    You already have your Kingdom Hearts II copy extracted.
+                    <Button Margin="0 0 0 6" Width="120" Height="22" HorizontalAlignment="Left" Command="{Binding ExtractGameDataCommand}">Extract game data</Button>
+                    <ProgressBar Margin="0 0 0 6" Height="22" Visibility="{Binding ProgressBarVisibility}" Minimum="0" Maximum="1" Value="{Binding ExtractionProgress}"/>
+                    <TextBlock Margin="0 0 0 3" Visibility="{Binding ExtractionCompleteVisibility}">
+                        The extraction of the game's data succeded!
                     </TextBlock>
-                </StackPanel>
-                <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
-                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
-                        You do not have any extracted data from a supported game.
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">
+                            <Run Foreground="Red">WARNING</Run>
+                            If you do not extract a games data only Lua Scripts will function properly. Only check the box below if you will only be installing Lua Scripts in Mods Manager.
                     </TextBlock>
-                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
-                        You already have extracted data from a supported game.
-                    </TextBlock>
-                </StackPanel>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    Press the button below to initialize the game extraction. It will take between 5 and 15 minutes based on the speed of your hard drive.
-                </TextBlock>
-                <Button Margin="0 0 0 6" Width="120" Height="22" HorizontalAlignment="Left" Command="{Binding ExtractGameDataCommand}">Extract game data</Button>
-                <ProgressBar Margin="0 0 0 6" Height="22" Visibility="{Binding ProgressBarVisibility}" Minimum="0" Maximum="1" Value="{Binding ExtractionProgress}"/>
-                <TextBlock Margin="0 0 0 3" Visibility="{Binding ExtractionCompleteVisibility}">
-                    The extraction of the game's data succeded!
-                </TextBlock>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">               
+                    <CheckBox IsChecked="{Binding OverrideGameDataFound}" Content="Skip Game Extraction" Visibility="{Binding PcReleaseConfigVisibility}" Margin="0 0 0 4"/>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">
                         <Run Foreground="Red">WARNING</Run>
-                        If you do not extract a games data only Lua Scripts will function properly. Only check the box below if you will only be installing Lua Scripts in Mods Manager.
-                </TextBlock>
-                <CheckBox IsChecked="{Binding OverrideGameDataFound}" Content="Skip Game Extraction" Visibility="{Binding PcReleaseConfigVisibility}" Margin="0 0 0 4"/>
-            </StackPanel>
+                        If you do not have the space to extract the remastered files for each game (which are about 80% of the sizes listed above) you can check the box below to skip extracting them. Some mods may have visual issues because of this but for those with limited storage space on their computer this should help reduce the space required to extract said games.
+                    </TextBlock>
+                    <CheckBox Visibility="{Binding PcReleaseConfigVisibility}" IsChecked="{Binding SkipRemastered}" Content="Skip Extracting Remastered Files"/>
+                </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="PageRegion"
