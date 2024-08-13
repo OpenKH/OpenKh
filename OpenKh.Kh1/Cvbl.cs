@@ -179,6 +179,7 @@ namespace OpenKh.Kh1
 
         public CvblHeader Header;
         public List<Submesh> Submeshes = new();
+        public List<MeshEntry> MeshEntries = new();
 
         private static Dictionary<uint, Matrix4x4> MdlsJointsToDictionary(List<Mdls.MdlsJoint> joints)
         {
@@ -220,6 +221,8 @@ namespace OpenKh.Kh1
             str.Seek(meshEntriesOffset, SeekOrigin.Begin);
                 
             for (var i = 0; i < Header.NumMeshes; i++) meshEntries.Add(BinaryMapping.ReadObject<MeshEntry>(str));
+
+            MeshEntries = meshEntries;
 
             foreach (var meshEntry in meshEntries)
             {

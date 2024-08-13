@@ -67,7 +67,7 @@ namespace OpenKh.Bbs
         public TableOffsetHeader tableOffsetHeader = new();
         public List<StreamHeader> StreamHeaders = [];
         public List<byte[]> StreamFiles = [];
-        public List<byte[]> MediaFiles = [];
+        public List<byte[]> MediaFiles = []; //6 = .ogg file, everything else is a .wav with msadpcm codec, throw it at ffmpeg /shrug
 
         public static Scd Read(Stream stream)
         {
@@ -100,7 +100,7 @@ namespace OpenKh.Bbs
                 if (streamInfo.Codec == 6)
                 {
                     var extradataOffset = 0u;
-                    if (streamInfo.AuxChunkCount > 0) extradataOffset += BitConverter.ToUInt32(st.Skip((int)extradataOffset).Take(4).ToArray(), 0);
+                    if (streamInfo.AuxChunkCount > 0) extradataOffset += BitConverter.ToUInt32(st.Take(4).ToArray(), 0);
 
                     var encryptionKey = st[extradataOffset + 0x02];
                     var seekTableSize = BitConverter.ToUInt32(st.Skip((int)extradataOffset + 0x10).Take(4).ToArray(), 0);
@@ -112,16 +112,34 @@ namespace OpenKh.Bbs
 
                     var endPosition = startOffset + vorbHeaderSize;
                 
-                    for (var i = startOffset; i < endPosition; i++)
-                    {
-                        decryptedFile[i] = (byte)(decryptedFile[i]^encryptionKey);
-                    }
+                    for (var i = startOffset; i < endPosition; i++) decryptedFile[i] = (byte)(decryptedFile[i]^encryptionKey);
                     
                     var oggSize = vorbHeaderSize + streamInfo.StreamSize;
                     
                     scd.MediaFiles.Add(decryptedFile.Skip((int)startOffset).Take((int)oggSize).ToArray());
                 }
-                else scd.MediaFiles.Add(Array.Empty<byte>());
+                else
+                {
+                    var streamSize = streamInfo.StreamSize;
+                    var channelCount = streamInfo.ChannelCount;
+                    var sampleRate = streamInfo.SampleRate;
+
+                    var length = streamSize + (0x4e - 0x8);
+
+                    var msadpcm = Array.Empty<byte>()
+                        .Concat(BitConverter.GetBytes(0x46464952)) //"RIFF"
+                        .Concat(BitConverter.GetBytes(length)) //overall file size - 8
+                        .Concat(BitConverter.GetBytes(0x45564157)) //"WAVE"
+                        .Concat(BitConverter.GetBytes(0x20746D66)) //"fmt "
+                        .Concat(BitConverter.GetBytes(0x32))
+                        .Concat(st.Take(0x32))
+                        .Concat(BitConverter.GetBytes(0x61746164)) //"data"
+                        .Concat(BitConverter.GetBytes((int)streamSize))
+                        .Concat(st.Skip(0x32))
+                        .ToArray();
+                    
+                    scd.MediaFiles.Add(msadpcm);
+                }
                 
 
 
