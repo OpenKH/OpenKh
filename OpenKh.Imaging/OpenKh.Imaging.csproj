@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
 
     <PackageReference Include="System.Memory" Version="4.5.5" />
