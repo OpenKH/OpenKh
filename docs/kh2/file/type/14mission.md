@@ -37,7 +37,7 @@ Entries are 64 bytes long, though there seem to be parts that are unused or unkn
 | 0x26   | uint8  | Bitflag 3
 | 0x27   | uint8  | Padding (0x19)
 
-##Functions
+## Functions
 Functions are pre-defined.
 Attempting to add Retry or Quit to forced fights will cause the game to crash.
 | Value  | Description
@@ -55,7 +55,7 @@ Attempting to add Retry or Quit to forced fights will cause the game to crash.
 | 0x11 	 | Save
 | 0x13 	 | Return to Menu
 
-##Pause Effects
+## Pause Effects
 | Value  | Description
 |--------|------------
 | 0x00 	 | Slight fade on-pause
@@ -63,14 +63,14 @@ Attempting to add Retry or Quit to forced fights will cause the game to crash.
 | 0x02 	 | Completely whitens the screen on-pause.
 | 0x03 	 | Fades from white to black on-pause.
 
-##Pause Effects (2)
+## Pause Effects (2)
 | Value  | Description
 |--------|------------
 | 0x0F 	 | Show Pause Animation
 | 0x0D 	 | Positions Pause & Options Downwards
 | 0xFF 	 | No Pause Animation
 
-##Bitflag 1
+## Bitflag 1
 | Value  | Description
 |--------|------------
 | 0x00 	 | Do not show additional text in-battle
@@ -78,7 +78,7 @@ Attempting to add Retry or Quit to forced fights will cause the game to crash.
 | 0x02 	 | ???
 | 0x04 	 | ???
 
-##Bitflag 2
+## Bitflag 2
 | Value  | Description
 |--------|------------
 | 0x00 	 | ???
@@ -86,7 +86,7 @@ Attempting to add Retry or Quit to forced fights will cause the game to crash.
 | 0x02 	 | ???
 | 0x04 	 | ???
 
-##Bitflag 3
+## Bitflag 3
 | Value  | Description
 |--------|------------
 | 0x00 	 | ???
