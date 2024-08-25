@@ -1,7 +1,7 @@
 # [Kingdom Hearts II](../../index.md) - 14mission.bin
 
 This is the file that is used by [MSN](../../../../msn.md) files known as "Pause Menu Controller." This file ties specific ID's to predetermined functions and text ID's.
-ID 1 for example is used by the game almost anytime Sora game-overs from a battle due.
+ID 1 for example is used by the game almost anytime Sora game-overs from a battle. ID 0x08 and 0x20 are used in Atlantica, and feature bitflags that prevent unpausing with the Start button.
 
 ## Header
 
