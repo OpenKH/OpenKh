@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using Godot;
 using Godot.Collections;
+using OpenKh.Godot.Helpers;
 using OpenKh.Godot.Nodes;
 using OpenKh.Godot.Resources;
 using OpenKh.Imaging;
@@ -37,21 +38,6 @@ public partial class MdlxImporter : EditorImportPlugin
 
     private static Shader BasicShader = ResourceLoader.Load<Shader>("res://Assets/Shaders/KH2BasicShader.gdshader");
     private static Shader AnimatedShader = ResourceLoader.Load<Shader>("res://Assets/Shaders/KH2AnimatedShader.gdshader");
-
-    private static int SearchBytes(byte[] inside, byte[] find) 
-    {
-        var len = find.Length;
-        var limit = inside.Length - len;
-        for( var i = 0;  i <= limit;  i++ )
-        {
-            var k = 0;
-            for(;  k < len;  k++ )
-                if(find[k] != inside[i+k]) 
-                    break;
-            if (k == len) return i;
-        }
-        return -1;
-    }
     
     public override Error _Import(string sourceFile, string savePath, Dictionary options, Array<string> platformVariants, Array<string> genFiles)
     {
@@ -64,9 +50,9 @@ public partial class MdlxImporter : EditorImportPlugin
         var root = new Node3D();
         root.Name = name;
         
-        var relativePath = Path.GetRelativePath(Helpers.Kh2ImportOriginalPath, realPath);
+        var relativePath = Path.GetRelativePath(ImportHelpers.Kh2ImportOriginalPath, realPath);
         
-        var hdTexturesPath = Path.Combine(Helpers.Kh2ImportRemasteredPath, relativePath);
+        var hdTexturesPath = Path.Combine(ImportHelpers.Kh2ImportRemasteredPath, relativePath);
 
         var usesHdTextures = false;
         var hdTextures = new System.Collections.Generic.Dictionary<int, string>();
@@ -337,7 +323,7 @@ public partial class MdlxImporter : EditorImportPlugin
                     //GD.Print(uv);
 
                     //normal = rotate * normal;
-                    positions.Add(new Vector3(pos.X, pos.Y, pos.Z) * Helpers.KH2PositionScale);
+                    positions.Add(new Vector3(pos.X, pos.Y, pos.Z) * ImportHelpers.KH2PositionScale);
                     normals.Add(normal);
                     uvs.Add(uv);
                     colors.Add(color);
@@ -378,6 +364,16 @@ public partial class MdlxImporter : EditorImportPlugin
             mesh.Mesh = arrayMesh;
             mesh.Owner = root;
             skeleton.CreateSkinFromRestTransforms();
+
+            /*
+            var mapper = new KH2SkeletonPlayer();
+            
+            root.AddChild(mapper);
+            mapper.Owner = root;
+            mapper.Name = "AnimationPlayer";
+            mapper.Skeleton = skeleton;
+            mapper.ClonePose();
+            */
 
             foreach (var anim in animList) mesh.TextureAnimations.Add(anim);
 

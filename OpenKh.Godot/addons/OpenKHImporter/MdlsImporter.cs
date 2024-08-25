@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using Godot;
 using Godot.Collections;
+using OpenKh.Godot.Helpers;
 using OpenKh.Kh1;
 using Array = Godot.Collections.Array;
 using Vector2 = Godot.Vector2;

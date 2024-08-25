@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using Godot;
 using Godot.Collections;
+using OpenKh.Godot.Helpers;
 using OpenKh.Kh1;
 using Array = Godot.Collections.Array;
 
@@ -30,6 +31,7 @@ public partial class CvblImporter : EditorImportPlugin
     public override Array<Dictionary> _GetImportOptions(string path, int presetIndex) => base._GetImportOptions(path, presetIndex);
     public override Error _Import(string sourceFile, string savePath, Dictionary options, Array<string> platformVariants, Array<string> genFiles)
     {
+        return Error.Bug; //TODO: remove this once i actually start focusing on KH1 assets, for now im focused on KH2 assets and this reimporting every bootup causes a giant headache
         var realPath = ProjectSettings.GlobalizePath(sourceFile);
 
         var name = new DirectoryInfo(Path.GetDirectoryName(realPath)).Name;
@@ -37,9 +39,9 @@ public partial class CvblImporter : EditorImportPlugin
         var root = new Node3D();
         root.Name = /*Path.GetFileNameWithoutExtension(realPath)*/ name;
         
-        var relativePath = Path.GetRelativePath(Helpers.Kh1ImportRemasteredPath, Path.GetFullPath(Path.Combine(Path.GetDirectoryName(realPath), "..")));
+        var relativePath = Path.GetRelativePath(ImportHelpers.Kh1ImportRemasteredPath, Path.GetFullPath(Path.Combine(Path.GetDirectoryName(realPath), "..")));
         
-        var mdlsPath = Path.GetFullPath(Path.Combine(Helpers.Kh1ImportOriginalPath, relativePath, name));
+        var mdlsPath = Path.GetFullPath(Path.Combine(ImportHelpers.Kh1ImportOriginalPath, relativePath, name));
         
         //GD.Print(relativePath);
         
@@ -103,7 +105,7 @@ public partial class CvblImporter : EditorImportPlugin
                     var vert = submesh.Vertices[(int)index];
 
                     var p = vert.Position;
-                    var pos = Helpers.FromKH1Position(p.X, p.Y, p.Z);
+                    var pos = ImportHelpers.FromKH1Position(p.X, p.Y, p.Z);
                     var nor = vert.Normal;
                     var normal = new Vector3(nor.X, nor.Y, nor.Z);
                     var uv = vert.UV;

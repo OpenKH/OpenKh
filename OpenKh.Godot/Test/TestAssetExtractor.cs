@@ -3,8 +3,8 @@ using System.IO;
 using System.Threading.Tasks;
 using Godot;
 using OpenKh.Egs;
+using OpenKh.Godot.Helpers;
 using Environment = System.Environment;
-using Helpers = OpenKh.Godot.addons.OpenKHImporter.Helpers;
 
 namespace OpenKh.Godot.Test;
 
@@ -74,37 +74,37 @@ public partial class TestAssetExtractor : Node
         {
             _imported = true;
 
-            Directory.CreateDirectory(Helpers.Kh1ImportOriginalPath);
-            Directory.CreateDirectory(Helpers.Kh1ImportRemasteredPath);
+            Directory.CreateDirectory(ImportHelpers.Kh1ImportOriginalPath);
+            Directory.CreateDirectory(ImportHelpers.Kh1ImportRemasteredPath);
 			
-            Directory.CreateDirectory(Helpers.Kh2ImportOriginalPath);
-            Directory.CreateDirectory(Helpers.Kh2ImportRemasteredPath);
+            Directory.CreateDirectory(ImportHelpers.Kh2ImportOriginalPath);
+            Directory.CreateDirectory(ImportHelpers.Kh2ImportRemasteredPath);
 			
             foreach (var item in ImportedKH1)
             {
                 GD.Print(item);
-                var originalDirectory = Path.Combine(Helpers.Kh1ImportOriginalPath, item);
+                var originalDirectory = Path.Combine(ImportHelpers.Kh1ImportOriginalPath, item);
                 Directory.CreateDirectory(Path.GetDirectoryName(originalDirectory));
-                File.Copy(Path.Combine(Helpers.Kh1OriginalPath, item), Path.Combine(Helpers.Kh1ImportOriginalPath, item), true);
+                File.Copy(Path.Combine(ImportHelpers.Kh1OriginalPath, item), Path.Combine(ImportHelpers.Kh1ImportOriginalPath, item), true);
 
-                if (!Directory.Exists(Path.Combine(Helpers.Kh1RemasteredPath, item))) continue;
+                if (!Directory.Exists(Path.Combine(ImportHelpers.Kh1RemasteredPath, item))) continue;
 				
-                var remasteredDirectory = Path.Combine(Helpers.Kh1ImportRemasteredPath, item);
+                var remasteredDirectory = Path.Combine(ImportHelpers.Kh1ImportRemasteredPath, item);
                 Directory.CreateDirectory(remasteredDirectory);
-                CopyFilesRecursively(Path.Combine(Helpers.Kh1RemasteredPath, item), remasteredDirectory);
+                CopyFilesRecursively(Path.Combine(ImportHelpers.Kh1RemasteredPath, item), remasteredDirectory);
             }
             foreach (var item in ImportedKH2)
             {
                 GD.Print(item);
-                var originalDirectory = Path.Combine(Helpers.Kh2ImportOriginalPath, item);
+                var originalDirectory = Path.Combine(ImportHelpers.Kh2ImportOriginalPath, item);
                 Directory.CreateDirectory(Path.GetDirectoryName(originalDirectory));
-                File.Copy(Path.Combine(Helpers.Kh2OriginalPath, item), Path.Combine(Helpers.Kh2ImportOriginalPath, item), true);
+                File.Copy(Path.Combine(ImportHelpers.Kh2OriginalPath, item), Path.Combine(ImportHelpers.Kh2ImportOriginalPath, item), true);
 
-                if (!Directory.Exists(Path.Combine(Helpers.Kh2RemasteredPath, item))) continue;
+                if (!Directory.Exists(Path.Combine(ImportHelpers.Kh2RemasteredPath, item))) continue;
 				
-                var remasteredDirectory = Path.Combine(Helpers.Kh2ImportRemasteredPath, item);
+                var remasteredDirectory = Path.Combine(ImportHelpers.Kh2ImportRemasteredPath, item);
                 Directory.CreateDirectory(remasteredDirectory);
-                CopyFilesRecursively(Path.Combine(Helpers.Kh2RemasteredPath, item), remasteredDirectory);
+                CopyFilesRecursively(Path.Combine(ImportHelpers.Kh2RemasteredPath, item), remasteredDirectory);
             }
         }
         while (_messages.TryPop(out var msg)) GD.Print(msg);

@@ -14,6 +14,10 @@ config/name="OpenKh.Godot"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[debug_draw_3d]
+
+settings/3d/volumetric_defaults/thickness=0.0
+
 [dotnet]
 
 project/assembly_name="OpenKh.Godot"
