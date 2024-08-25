@@ -16,7 +16,7 @@ This file is splitted into two parts: The first `0x1C` bytes are the [header](#h
 | 0x02   | uint16 | Id (used in [ARD](ard.md))
 | 0x04   | uint16 | [Flags](#flags)
 | 0x06   | uint16 | Information Bar Text Id (loaded from `msg\{LANGUAGE}\{WORLD_ID}.bar`)
-| 0x08   | byte/BitArray | [Pause Menu Controller ID](14mission.md))
+| 0x08   | byte/BitArray | [Pause Menu Controller ID](14mission.md)
 | 0x09   | byte | Padding
 | 0x0A   | uint16 | Pause Menu Information Text Id (loaded from `msg\{LANGUAGE}\{WORLD_ID}.bar`)
 | 0x0C   | byte | Entry number in BAR to IMGD file for "Help" screen
