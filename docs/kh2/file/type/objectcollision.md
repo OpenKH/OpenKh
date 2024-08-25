@@ -32,28 +32,29 @@ Define collisions for objects. They can be found in [MDLX](mdlx.md) for every ob
 
 ### Collision type
 
-Unfortunately many of them are still unknown.
-
 | Id | Description
 |----|-------------
-| 0  |
+| 0  | Background Collision
 | 1  | Object collision
 | 2  | Battle collision
-| 3  |
+| 3  | Target Collision
 | 4  | Map collision
 | 5  | Reaction command where the argument points to the [Command Table](../../dictionary/commands.md)
-| 6  |
-| 7  |
-| 8  |
-| 9  |
-| 10 |
-| 11 |
-| 12 |
-| 13 |
-| 14 |
-| 15 |
-| 16 |
-| 17 |
+| 6  | Attack Collision
+| 7  | Camera Collision
+| 8  | Cast Item Collision
+| 9  | Item Collision
+| 10 | IK Collision
+| 11 | IK Down Collision
+| 12 | Neck Collision
+| 13 | Guard Collision
+| 14 | Ref RC Collision
+| 15 | Weapon Top Collision
+| 16 | Stun Collision
+| 17 | Head Collision
+| 18 | Blind Collision
+| 19 | Talk Camera Collision
+| 20 | RTN NPC Neck Collision
 
 ### Collision shape
 
@@ -61,5 +62,5 @@ Unfortunately many of them are still unknown.
 |----|-------------
 | 0  | Ellipsoid
 | 1  | Column
-| 2  | unused
-| 3  | Ellipsoid / Sphere?
+| 2  | Cube
+| 3  | Sphere
