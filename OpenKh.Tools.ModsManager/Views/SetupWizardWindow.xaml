@@ -13,9 +13,6 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
-        <Style TargetType="CheckBox">
-            <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
-        </Style>
         <Style TargetType="xctk:WizardPage">
             <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
             <Setter Property="Background" Value="{Binding ColorTheme.BackgroundColor}"/>
@@ -229,8 +226,11 @@
                             You already have extracted data from a supported game.
                         </TextBlock>
                     </StackPanel>
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding Pcsx2ConfigVisibility}">
                         Press the button below to initialize the game extraction. It will take between 5 and 15 minutes based on the speed of your hard drive.
+                    </TextBlock>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">
+                        Press the button below to initialize the game extraction. Depending on the speed of your storage, if its a hard drive or an SSD, and how many games selected to extract extraction time may vary a lot.
                     </TextBlock>
                     <Button Margin="0 0 0 6" Width="120" Height="22" HorizontalAlignment="Left" Command="{Binding ExtractGameDataCommand}">Extract game data</Button>
                     <ProgressBar Margin="0 0 0 6" Height="22" Visibility="{Binding ProgressBarVisibility}" Minimum="0" Maximum="1" Value="{Binding ExtractionProgress}"/>
