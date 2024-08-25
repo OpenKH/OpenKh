@@ -6,7 +6,7 @@ Mission file. They are located in `msn/{language}/` and describe how a certain m
 
 This is the entry point of the file. It is a binary-type file and it's name is always `{WORLD_ID}{MAP_INDEX}`. Example: for the file `EH21_MS101`, where `EH` is the [world](../../worlds.md) and `21` is the map index, the mission name is called `EH21`.
 
-This file is splitted into two parts: The first `0x1C` bytes are the [header](#header). This length is always fixed. After that comes a block of variable length which contains [opcodes](#opcodes).
+This file is splitted into two parts: The first `0x1C` bytes are the [header](#header). This length is always fixed. After that comes a block of variable length which contains [opcodes](#opcodes). This is terminated by a 0x00 int.
 
 ### Header
 
@@ -16,10 +16,10 @@ This file is splitted into two parts: The first `0x1C` bytes are the [header](#h
 | 0x02   | uint16 | Id (used in [ARD](ard.md))
 | 0x04   | uint16 | [Flags](#flags)
 | 0x06   | uint16 | Information Bar Text Id (loaded from `msg\{LANGUAGE}\{WORLD_ID}.bar`)
-| 0x08   | byte/BitArray | Pause Menu Controller
+| 0x08   | byte/BitArray | [Pause Menu Controller ID](14mission.md))
 | 0x09   | byte | Padding
 | 0x0A   | uint16 | Pause Menu Information Text Id (loaded from `msg\{LANGUAGE}\{WORLD_ID}.bar`)
-| 0x0C   | BitArray | Boolean Flag Array [5]
+| 0x0C   | byte | Entry number in BAR to IMGD file for "Help" screen
 | 0x0D   | byte | [Bonus Reward](00battle.md#bons)
 | 0x0E   | byte | Antiform Multiplier
 | 0x0F   | byte | Padding
@@ -193,10 +193,13 @@ Used 10 times.
 
 #### DriveRefillRatio
 
-Defines how fast the drive gauge fills/drains.
+Defines how fast the drive gauge fills/drains, and also determines if Sora can use other Drive Forms when alone. 
+| Offset | Type  | Description
+|--------|-------|------------
+| 00     | float | Refill Multiplier
 
 Used 10 times.
-
+Refill Multiplier cannot be equal to 1, otherwise Sora will not have access to other forms when alone.
 
 #### AddDrive
 
@@ -216,9 +219,9 @@ Its purpose is currently unknown.
 
 ## Animation loader
 
-A mission file can contain between 0 and multiple animation loaders. Their names are usually `0a`, `1a`.
+A mission file can contain between 0 and multiple Event files. Their names are usually `0a`, `1a`.
 
-Its purpose is currently unknonw.
+Its purpose seems to be defining how the camera should move before the battle starts. 
 
 ## Sequences
 
