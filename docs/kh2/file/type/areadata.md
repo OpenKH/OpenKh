@@ -280,7 +280,7 @@ Set the memory area `0034ecdc` with the 4-byte parameter. Very uncommon as it's 
 
 Looks like similar to [Spawn](#spawn), but it's way less used. Found 210 times, mostly in `map` and just once in `wi00` as `evt`. 
 
-May be related to only enabling certain spawns through MapScript AI. In wi00, it checks if specific ProgressFlags have been enabled, and will enable or disable specified SpawnAlt's if these ProgressFlags have or haven't been triggered.
+It can spawn alternate versions of entites depending on what conditions are met inside the ARDs AI file. In `wi00` for example, different versions of the same entity are activated to be spawned depending on which Progress Flags are checked in the AI.
 
 
 #### MapScript
