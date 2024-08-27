@@ -195,14 +195,14 @@ Each program is a list of functions, defined as followed:
 There is a total of 30 operation codes for the spawn script. The parser can be found at [sub_181d30](#notes).
 
 - 00: [Spawn](#spawn)
-- 01: [MapOcclusion](#mapocclusion)
+- 01: [MapVisibility](#mapvisibility)
 - 02: [RandomSpawn](#randomspawn)
 - 03: [CasualSpawn](#casualspawn)
 - 04: [Capacity](#capacity)
 - 05: [AllocEnemy](#allocenemy)
 - 06: [unknown](#unknown06)
 - 07: [unknown](#unknown07)
-- 09: [unknown](#unknown09)
+- 09: [SpawnAlt](#spawnalt)
 - 0a: [MapScript](#mapscript)
 - 0b: [BarrierFlag](#barrierflag)
 - 0c: [AreaSettings](#areasettings)
@@ -229,9 +229,25 @@ There is a total of 30 operation codes for the spawn script. The parser can be f
 
 Loads a [Spawn](#spawn) file. The parameter is a 4-byte string with the name of the spawn of the ARD's BAR file. This is the most used opcode, with a usage count of 11949.
 
-#### MapOcclusion
+#### MapVisibility
 
 Specify a 64-bit mask that is responsible to enable or disable specific map meshes and collisions. This is very common and used 2186 times.
+
+The way it works is as follows:
+
+.map files have two parts with a "Group" value. DrawModelInfo within the .doct, which is responsible for the visible mesh data, and collisionMesh within the .coct, which is responsible for the collision mesh data.
+
+Each mesh inside of these two gets assigned a "Group" value, and depending on this value, specific bitflags need to be toggled on or off in order to have those groups appear. 
+
+Example: Most meshes are assigned a default group value of 0. This corresponds to the bitflag of 1. So, to enable most of the map and collision meshes, we must specify 0x01 within the MapVisibility, like so: 
+
+MapVisibility 0x00000001 0x00000000
+
+If we had some meshes that we wanted to turn on or off depending on story progress, we could assign those a group value of 1. Then, when we want to enable them, we must specify the bitflag 0x02 within MapVisibility, like so:
+
+MapVisibility 0x00000003 0x00000000
+
+This will enable meshes with both groups 0 and 1, and turn off meshes of any other group number.
 
 #### RandomSpawn
 
@@ -260,15 +276,18 @@ Set the memory area `0034ecd8` with the 4-byte parameter. Changes the amount of 
 
 Set the memory area `0034ecdc` with the 4-byte parameter. Very uncommon as it's ony found 7 times in the maps `ca12` and `nm02` in `btl`. Changes the amount of room transitions needed to respawn an object if destroyed.
 
-#### Unknown09
+#### SpawnAlt
 
-Looks like similar to [Spawn](#spawn), but it's way less used. Found 210 times, mostly in `map` and just once in `wi00` as `evt`.
+Looks like similar to [Spawn](#spawn), but it's way less used. Found 210 times, mostly in `map` and just once in `wi00` as `evt`. 
+
+May be related to only enabling certain spawns through MapScript AI. In wi00, it checks if specific ProgressFlags have been enabled, and will enable or disable specified SpawnAlt's if these ProgressFlags have or haven't been triggered.
+
 
 #### MapScript
 
 Used to execute the bdx (AI) subfile within the ARD. The argument defines the index of the subfile to be used.
 
-#### Barrier
+#### BarrierFlag
 
 Set the memory area `0034ecc8`, which seems to define which parts of the map are blocked by an invisible barrier. It might be related on enabling or disabling certain collisions of a map file. Found 203 times and only in `map`.
 
@@ -300,7 +319,7 @@ Set the map's background musics. The single 4-byte parameter can be read as two 
 
 #### MsgWall
 
-Set the memory area `0034ece4`, which represents the message displayed below when the player touches an invisible wall. Found 80 times and only in `map`.
+Set the memory area `0034ece4`, which represents the message displayed below when the player touches an invisible wall. Found 80 times and only in `map`. The argument specifies a text ID from sys.bar.
 
 #### AllocPacket
 
@@ -344,7 +363,7 @@ It seems to do something with `01c60550`. It is only used 3 times in `hb13` by `
 
 #### If
 
-Conditionals for the script based on the entrance.
+Conditionals for the script based on the entrance. Used most often in the Coliseum.
 
 #### Unknown1d
 
