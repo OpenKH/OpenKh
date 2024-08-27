@@ -217,7 +217,7 @@
 | 316 | M_EX870 | (M) Sorcerer v2 - Cubes? |
 | 317 | M_EX880 | (M) Creeper |
 | 318 | M_EX990 | (M) Dusk |
-| 319 | F_EX000 | (F) ??? - Chest related (EX) |
+| 319 | F_EX000 | (F) Examine Prompt: Reticle (EX) |
 | 320 | F_EX030 | (F) Treasure chest S |
 | 321 | F_EX030_BB | (F) Treasure chest S (BB) |
 | 322 | F_EX030_HE | (F) Treasure chest S (HE) |
@@ -532,7 +532,7 @@
 | 864 | F_TR060 | (F) MCP wall (TR) |
 | 865 | B_EX200 | (B) Twilight Thorn's Energy Ball (Break Raid RC) |
 | 866 | H_CA020 | (H) Elizabeth (CA) |
-| 900 | W_EX000 | (W) ??? (EX000) |
+| 900 | W_EX000 | (W) AntiForm Dummy (loads Anti Forms SFX) (EX000) |
 | 901 | N_TR010_TSURU | (N) Sark (TSURU) (TR) |
 | 902 | LAST_ATTACKER | LAST_ATTACKER |
 | 903 | N_LM270_MATSU | (N) Ursula (huge) (MATSU) (LM) |
@@ -618,7 +618,7 @@
 | 1026 | N_BB070_RTN | (N) Mrs. Potts (RTN) (BB) |
 | 1027 | N_BB080_RTN | (N) Wardrobe maid (RTN) (BB) |
 | 1028 | N_BB090_RTN | (N) Belle (Ball Dress) (RTN) (BB) |
-| 1029 | P_BB000_RTN | (N) ??? (RTN) (BB) |
+| 1029 | P_BB000_RTN | (N) Beast (RTN) (BB) |
 | 1030 | TR_PLAYER | TR_PLAYER |
 | 1033 | F_CA030_DARK | (F) Port Royal's crane (CA) |
 | 1034 | F_CA030_LIGHT | (F) Port Royal's crane (CA) |
@@ -677,8 +677,8 @@
 | 1113 | B_LK120 | (B) Groundshaker |
 | 1114 | M_EX610 | (M) Strafer |
 | 1115 | P_EX330 | (P) Peter Pan |
-| 1137 | F_CA670 | (F) ??? (CA) |
-| 1138 | F_CA671 | (F) ??? (CA) |
+| 1137 | F_CA670 | (F) Cursed Medallion (CA) |
+| 1138 | F_CA671 | (F) Cursed Medallion (CA) |
 | 1139 | F_NM540_ISHIDA | (F) Broken present box (NM) |
 | 1159 | SHOP_POINT_SUB | SHOP_POINT_SUB |
 | 1160 | N_AL080_RTN | (N) Peddler (RTN) (AL) |
@@ -1164,7 +1164,7 @@
 | 1752 | F_TT620 | (F) Train (TT) |
 | 1753 | F_TT630 | (F) Train's door (TT) |
 | 1754 | F_TT631 | (F) Train's door (dark) (TT) |
-| 1755 | P_TR010 | (P) ??? (TR) |
+| 1755 | P_TR010 | (P) Setup Limit - Path? (TR) |
 | 1756 | F_PO080 | (F) Honey pot (PO) |
 | 1757 | H_EX790 | (H) Sora (KH1 clothes) (EX) |
 | 1758 | F_WI060_PETE | (F) Cannon tower (PETE) (WI) |
@@ -1469,7 +1469,7 @@
 | 2095 | N_EX600_BTL | (N) Setzer (BTL) (EX) |
 | 2096 | F_EH100 | (F) Xemnas's dragon energy core (EH) |
 | 2097 | N_LK110_MATSU | (N) Pete (lion) (MATSU) (LK) |
-| 2098 | P_EX360 | (P) ??? (EX) |
+| 2098 | P_EX360 | (P) Chicken Little Extra Effects (EX) |
 | 2099 | B_LK110_PHANTOM | (M) Scar Ghost |
 | 2104 | F_TT100 | (F) Trashcan (TT) |
 | 2105 | F_AL090_01 | (F) Falling pillar 1 (AL) |
@@ -1512,7 +1512,7 @@
 | 2142 | F_EX030_NM_XMAS | (F) Treasure chest S (NM_XMAS) |
 | 2143 | F_EX040_NM_XMAS | (F) Treasure chest L (NM_XMAS) |
 | 2144 | B_EX250 | (?) Xemna's dragon's arms (Anchored) |
-| 2145 | P_EH010 | (P) ??? - Path? Pyramid? (EH) |
+| 2145 | P_EH010 | (P) Session Limit - Path? Pyramid? (EH) |
 | 2146 | WM_COCKPIT | (WM) Cockpit |
 | 2147 | WM_HANGAR | (WM) Hangar |
 | 2148 | F_HB700 | (F) ??? - Path? Pyramid? (HB) |
@@ -1895,10 +1895,10 @@
 | 2552 | W_EX030_84_TR | (W) Akashic Record+ (TR) |
 | 2553 | W_EX030_84_WI | (W) Akashic Record+ (WI) |
 | 2554 | M_EX880_DANCER_LV99 | (M) Demyx's water form (Data) |
-| 2555 | F_EX000_DC | (F) ??? - Chest related (DC) (EX) |
+| 2555 | F_EX000_DC | (F) Examine Prompt: Reticle (Lingering Will Portal) 
 | 2556 | B_EX220_LV99 | (F) Saix's claymore limit cut (Usable) |
 | 2557 | B_EX430 | (?) Related to Lingering Will? |
 | 2558 | M_EX350_02_GM | (M) Mushroom 2 (GM) |
 | 2559 | M_EX350_11_GM | (M) Mushroom 11 (GM) |
 | 2560 | F_HB601 | (F) Ansem Laboratory's Xemnas's CD for Chamber of Repose (HB) |
-| 2561 | H_CM030 | (H) ??? (CM)
+| 2561 | H_CM030 | (H) Zexion (CM)
