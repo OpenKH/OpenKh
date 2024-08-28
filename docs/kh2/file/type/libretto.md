@@ -1,6 +1,6 @@
 # [Kingdom Hearts II](../../index.md) - Libretto
 
-This is the file that connects the Text ID in MSG files with Talk Message in ARD files. The world-specific libretto files is a BAR file with only 1 subfile while 13libretto.bin is the subfile directly. The structure below assumes that you have extracted said subfile.
+This is the file that connects the Text ID in MSG files with Talk Message (known as `Reaction Command` in MapStudio) in ARD files. The world-specific libretto files is a BAR file with only 1 subfile while 13libretto.bin is the subfile directly. The structure below assumes that you have extracted said subfile.
 
 ## Header
 
