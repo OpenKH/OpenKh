@@ -941,8 +941,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         var sourceFile = Path.Combine(ConfigurationService.GameModPath, _launchGame, entry.Key);
                         var destFile = Path.Combine(patchStagingDir, entry.Value);
-                        Directory.CreateDirectory(Path.GetDirectoryName(destFile));
-                        File.Move(sourceFile, destFile);
+                        if (File.Exists(sourceFile))
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(destFile));
+                            File.Move(sourceFile, destFile);
+                        }
                     }
 
                     foreach (var directory in Directory.GetDirectories(Path.Combine(ConfigurationService.GameModPath, _launchGame)))
