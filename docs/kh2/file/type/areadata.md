@@ -34,7 +34,7 @@ When referring to _entrance_ it means that is the index where to spawn the chara
 | 04     | short | [Entity count](#entity)
 | 06     | short | [Event activator count](#event-activator)
 | 08     | short | [Walk path count](#walk-path). Usually 1.
-| 0a     | short | [Unknown tableA count](#unknown-table-a)
+| 0a     | short | [Return Parameter](#return-parameter)
 | 0c     | int   | [Signal count](#signal-table)
 | 10     | int   | Always 0 [*¹](#notes)
 | 14     | int   | Always 0 [*¹](#notes)
@@ -65,9 +65,12 @@ Approach Direction Trigger determines if the event is triggered only when approa
 | 1e     | short | Serial
 | 20     | int   | Argument 1
 | 24     | int   | Argument 2
-| 28     | int   | Talk message
-| 2c     | int   | Reaction command
-| 30     | int   | Unknown
+| 28     | int   | [Talk message](libretto.md)
+| 2a     | short | Spawn Delay
+| 2c     | short | Reaction command
+| 30     | short | Spawn range
+| 32     | byte  | Level
+| 33     | byte  | Medal
 | 34     | int   | Always 0 [*¹](#notes)
 | 38     | int   | Always 0 [*¹](#notes)
 | 3c     | int   | Always 0 [*¹](#notes)
@@ -78,7 +81,7 @@ Approach Direction Trigger determines if the event is triggered only when approa
 |----|-------------|-----------------
 | 0  | Do nothing  |
 | 1  | Spawn at entrance | Filter by entrance index
-| 2  | Used by enemies | Unknown
+| 2  | Used by enemies | Unknown; possibly do not spawn unless a certain `Signal` value's `Argument` is detected?
 | 3  | Used by enemies | Unknown
 
 #### Event activator
@@ -139,14 +142,16 @@ From some early tests, the entities would pick a random point in the walk path a
 
 Just a 12-byte structure, read as Vector3f.
 
-### Unknown table A
+### Return Parameter
+
+Unknown.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | byte  | Unknown
-| 01     | byte  | Unknown
-| 02     | byte  | Unknown
-| 03     | byte  | Unknown
+| 00     | byte  | Id
+| 01     | byte  | Type
+| 02     | byte  | Rate
+| 03     | byte  | EntryType
 | 04     | byte  | Unknown
 | 05     | byte  | Unknown
 | 06     | short | Unknown
@@ -154,6 +159,12 @@ Just a 12-byte structure, read as Vector3f.
 | 0c     | int   | Unknown
 
 ### Signal table
+
+Seems to be used in conjunction with Event Activators and AI scripts. 
+
+An Event Activator to spawn enemies has both a `Id` and `Entrance` (called `Place` in MapStudio) value. When the Event Activator is triggered, the `Entrance` value is used as the Signal Id, and the `Id` value is used as the Argument. An AI script for a mission file can then detect that this Event Activator has been triggered using `SIGNAL_CALLBACK (TR10)`, and subsequently do further actions like summoning barriers to prevent the player from leaving, calling the information bar for mission text, etc. 
+
+One such example is for the Cavern of Remembrance forced fights, used to force the player into finishing a mission when they step on a trigger point. The player will step on the Event Activator, whose `Entrance` value will be used as a signal by the missions AI script to cause the mission to start. Then, the Spawn Groups for the mission will detect that the Event Activator was stepped on using the Signal Id & Argument passed from the Event Activator's Spawn Group, and spawn in the first spawn group for enemies.
 
 | Offset | Type  | Description
 |--------|-------|------------
@@ -168,7 +179,7 @@ Just a 12-byte structure, read as Vector3f.
 
 This is a micro-code that is responsible to change the behaviour of a specific map.
 
-Every map have three script files: `map`, `btl` and `evt`, loaded in this very speicfic order. Each file have a list of programs, where every program is represented by an unique ID. When a map loads, the game instructs the map loader which program to load ([sub_181cc0](#notes)). A map can load only a single program per script file by their ID. This is done by the Local Set or by reading those information in the save data area. The IDs varies from 0 to 50 and it is unique per area. While all the IDs starting from 51 are unique per world. For instance, you can find the Program ID 6 in both TT02 and TT04. But you can only find the Program ID 55 in for the area 4 for Twilight Town world. This is helpful be coherent with the Local Set based on the story progress.
+Every map have three script files: `map`, `btl` and `evt`, loaded in this very speicfic order. Each file have a list of programs, where every program is represented by an unique ID. When a map loads, the game instructs the map loader which program to load ([sub_181cc0](#notes)). A map can load only a single program per script file by their ID. This is done by the Local Set or by reading those information in the save data area. The IDs vary from 0 to 50 and are unique per area. However, all the IDs starting from 51 are unique per world. For instance, you can find the Program ID 6 in both TT02 and TT04. But you can only find the Program ID 55 in for the area 4 for Twilight Town world. This is helpful be coherent with the Local Set based on the story progress.
 
 ### Structure
 
@@ -237,15 +248,15 @@ The way it works is as follows:
 
 .map files have two parts with a "Group" value. DrawModelInfo within the .doct, which is responsible for the visible mesh data, and collisionMesh within the .coct, which is responsible for the collision mesh data.
 
-Each mesh inside of these two gets assigned a "Group" value, and depending on this value, specific bitflags need to be toggled on or off in order to have those groups appear. 
+Each mesh inside of these two gets assigned a "Group" value, and depending on this value, specific bitmasks need to be toggled on or off in order to have those groups appear. 
 
-Example: Most meshes are assigned a default group value of 0. This corresponds to the bitflag of 1. So, to enable most of the map and collision meshes, we must specify 0x01 within the MapVisibility, like so: 
+Example: Most meshes are assigned a default group value of 0. This corresponds to the bitmask of 1. So, to enable most of the map and collision meshes, we must specify 0x01 within the MapVisibility, like so: 
 
-MapVisibility 0x00000001 0x00000000
+`MapVisibility 0x00000001 0x00000000`
 
-If we had some meshes that we wanted to turn on or off depending on story progress, we could assign those a group value of 1. Then, when we want to enable them, we must specify the bitflag 0x02 within MapVisibility, like so:
+If we had some meshes that we wanted to turn on or off depending on story progress, we could assign those a group value of 1. Then, when we want to enable them, we must specify the bitmask 0x02 within MapVisibility, like so:
 
-MapVisibility 0x00000003 0x00000000
+`MapVisibility 0x00000003 0x00000000`
 
 This will enable meshes with both groups 0 and 1, and turn off meshes of any other group number.
 
@@ -297,7 +308,9 @@ Enqueue a message to perform a series of actions. Here it is possible to play an
 
 #### Unknown0e
 
-Set the memory area `0034ece0` with the first 4-byte parameter, which affects the minimap. Used 323 times and only in `map`.
+Set the memory area `0034ece0` with the first 4-byte parameter, which affects the minimap loaded in. The value used determines which index of filetype `Tim2` to use to display the minimap. The game uses this whenever new exits open up or if an exit becomes inaccessible, like the path in eh04. A value of 99 can disable the minimap entirely.
+
+Used 323 times and only in `map`.
 
 #### Party
 
@@ -328,6 +341,13 @@ Set the memory area `0034ecd4`, which is related to the amount of memory reserve
 #### Camera
 
 Set the memory area `0034ece8`, which sets the camera mode for the map with the first 4-byte parameter. It has a parameter of `1` or `2`. Found 39 times and only in `map` for `hb17`, `lk13`, `mu07` and `po00`.
+
+| Value | Description   
+|-------|---------------
+| 0     | Default Camera     
+| 1     | Locked overhead camera, like in po00. Press Select to get an overhead view.       
+| 2     | Indoor type camera. Lower FoV and restricted Y-axis.
+| 3     | Left stick controls X-axis of the camera
 
 #### StatusFlag3
 
@@ -393,14 +413,24 @@ The scene script contains functions with a variable amount of parameters.
 | Opcode | Name     | Description
 |--------|----------|-------------
 | 00     | Event    | Play an event. Parameters: type, event name.
-| 01     | Jump     | Change maps. Parameters: padding, type, world, area, entrance, localset, fade type.
+| 01     | Jump     | Change maps. [Parameters](#jump-parameters): padding, type, world, area, entrance, localset, fade type.
 | 02     | ProgressFlag | Update story progress flag.
 | 03     | MenuFlag | Unlock options in the menu.
-| 04     | Member   | Change party member.
+| 04     | Member   | Change party member. Values used are the same as for [Party](#Party)
 | 05     |          | Heals Sora's stats depending on the argument (auto revert, full heal, HP&MP only)
 | 06     | Inventory | Obtain one or more items. It is possible to obtain up to 7 items in a row.
-| 07     | PartyMenu | Shows the party menu if Member is also defined.
+| 07     | PartyMenu | Shows the party menu if Member is also defined. 1 shows standard "Party in/Party Out", 2 shows the "Departing member" message. 
 | 08     |          | Sets a flag. Purpose unknown.
+
+### Jump Parameters:
+| Parameter | Description
+|-------|-------------
+| Type     | Exact function unsure. Type 1 seems to always use Localset 0, while Type 2 specifies a Localset
+| World    | 2 character abbreviation for the [world](../../worlds.md) to jump to. 
+| Area     | Which map in that world to jump to
+| Entrance | Which spawn the Party will use
+| Localset | Specify a Program ID from the World to execute 
+| FadeType | How to fade out a screen transition. -1 to use the current worlds room transition, 1 for a generic black fadeout.
 
 ## Notes
 
