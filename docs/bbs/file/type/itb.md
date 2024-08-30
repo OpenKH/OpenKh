@@ -30,16 +30,22 @@ This file can be found in the `item` folder or within `arc/system/common_xx.arc`
 | 0x1A    | uint8   | Item Count in `BD`
 | 0x1B    | uint8   | Item Count in `WM`
 
-## ITC Data
+## ITB Data
 
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16   | Treasure Box ID
-| 0x2     | uint16   | Item ID
-| 0x4     | uint8   | [Item Kind](#Item-Kind)
+| 0x2     | uint16   | Reward ID
+| 0x4     | uint8   | [Reward Kind](#Reward-Kind)
 | 0x5     | uint8   | World ID
 | 0x6     | uint8   | Report ID
 | 0x7     | uint8   | Padding
+
+## Reward Kind
+| Value | Name  | Description
+|--------|-------|------------
+| 0     | COMMAND   | 
+| 1     | ITEM   | 
 
 ## Item Kind
 

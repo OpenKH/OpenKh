@@ -4,12 +4,14 @@ using Microsoft.Xna.Framework.Input;
 using OpenKh.Engine;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.CustomImGui;
+using OpenKh.Tools.Kh2MapStudio.Models;
 using OpenKh.Tools.Kh2MapStudio.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Windows;
 using Xe.Tools.Wpf.Dialogs;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
@@ -98,18 +100,24 @@ namespace OpenKh.Tools.Kh2MapStudio
                 EnumerateMapList();
 
                 _objEntryController?.Dispose();
+
+                // Determine the objentry file to use
+                var objEntryFileName = Path.Combine(_gamePath, "mapstudio", "00objentry.bin");
+                if (!File.Exists(objEntryFileName))
+                {
+                    objEntryFileName = Path.Combine(_gamePath, "00objentry.bin");
+                }
+
                 _objEntryController = new ObjEntryController(
                     _bootstrap.GraphicsDevice,
                     _objPath,
-                    Path.Combine(_gamePath, "00objentry.bin"));
+                    objEntryFileName);
                 _mapRenderer.ObjEntryController = _objEntryController;
 
                 Settings.Default.GamePath = value;
                 Settings.Default.Save();
-
             }
         }
-
         private string MapName
         {
             get => _mapName;
@@ -181,6 +189,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                     }
                 }
 
+                
                 if (EditorSettings.ViewCamera)
                     CameraWindow.Run(_mapRenderer.Camera);
                 if (EditorSettings.ViewLayerControl)
@@ -189,6 +198,8 @@ namespace OpenKh.Tools.Kh2MapStudio
                     SpawnPointWindow.Run(_mapRenderer);
                 if (EditorSettings.ViewMeshGroup)
                     MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
+                if (EditorSettings.ViewCollision && _mapRenderer.MapCollision != null)
+                    CollisionWindow.Run(_mapRenderer.MapCollision.Coct);
                 if (EditorSettings.ViewBobDescriptor)
                     BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
                 if (EditorSettings.ViewSpawnScriptMap)
@@ -198,6 +209,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                 if (EditorSettings.ViewSpawnScriptEvent)
                     SpawnScriptWindow.Run("evt", _mapRenderer.SpawnScriptEvent);
 
+
                 if (EditorSettings.ViewEventScript && _mapRenderer.EventScripts != null)
                 {
                     foreach (var eventScript in _mapRenderer.EventScripts)
@@ -206,6 +218,12 @@ namespace OpenKh.Tools.Kh2MapStudio
                     }
                 }
             });
+
+            //Add separate Camera Window if setting is toggled on.
+            if (EditorSettings.SeparateCamera)
+            {
+                SeparateWindow.Run(_mapRenderer.Camera);
+            };
 
             SelectArdFilesPopup();
 
@@ -289,10 +307,11 @@ namespace OpenKh.Tools.Kh2MapStudio
             ForControl(() =>
             {
                 var nextPos = ImGui.GetCursorPos();
-                var ret = ImGui.Begin("MapList",
-                    ImGuiWindowFlags.NoDecoration |
-                    ImGuiWindowFlags.NoCollapse |
-                    ImGuiWindowFlags.NoMove);
+                var ret = ImGui.Begin("Map List", //List of all the maps, the left-side bar.
+                    //ImGuiWindowFlags.NoDecoration | //Removes the scroll-bar
+                    ImGuiWindowFlags.NoCollapse | //Prevents it from being collapsible
+                    ImGuiWindowFlags.AlwaysAutoResize | //NEW: Resizes the window to accomodate maps of various name lengths.
+                    ImGuiWindowFlags.NoMove); //Prevents it from being moved around
                 ImGui.SetWindowPos(nextPos);
                 ImGui.SetWindowSize(new Vector2(64, 0));
                 return ret;
@@ -324,11 +343,11 @@ namespace OpenKh.Tools.Kh2MapStudio
                     }
                 }
             }));
-            ImGui.SameLine();
+            //ImGui.SameLine();
 
             if (!IsMapOpen)
             {
-                ImGui.Text("Please select a map to edit.");
+                //ImGui.Text("Select a map to edit."); //Text. Appears at the bottom of the list, commented out.
                 return;
             }
 
@@ -357,29 +376,57 @@ namespace OpenKh.Tools.Kh2MapStudio
                         ForMenuItem("Light Collision", ExportLightCollision, _mapRenderer.ShowLightCollision.HasValue);
                     });
                     ImGui.Separator();
-                    ForMenu("Preferences", () =>
-                    {
-                        ForEdit("Movement speed", () => EditorSettings.MoveSpeed, x => EditorSettings.MoveSpeed = x);
-                        ForEdit("Movement speed (shift)", () => EditorSettings.MoveSpeedShift, x => EditorSettings.MoveSpeedShift = x);
-                    });
-                    ImGui.Separator();
                     ForMenuItem("Exit", MenuFileExit);
                 });
                 ForMenu("View", () =>
                 {
                     ForMenuCheck("Camera", () => EditorSettings.ViewCamera, x => EditorSettings.ViewCamera = x);
+                    ForMenuCheck("Separate Camera Window", () => EditorSettings.SeparateCamera, x => EditorSettings.SeparateCamera = x);
                     ForMenuCheck("Layer control", () => EditorSettings.ViewLayerControl, x => EditorSettings.ViewLayerControl = x);
                     ForMenuCheck("Spawn points", () => EditorSettings.ViewSpawnPoint, x => EditorSettings.ViewSpawnPoint = x);
                     ForMenuCheck("BOB descriptors", () => EditorSettings.ViewBobDescriptor, x => EditorSettings.ViewBobDescriptor = x);
                     ForMenuCheck("Mesh group", () => EditorSettings.ViewMeshGroup, x => EditorSettings.ViewMeshGroup = x);
+                    ForMenuCheck("Collision (Experimental)", () => EditorSettings.ViewCollision, x => EditorSettings.ViewCollision = x);
                     ForMenuCheck("Spawn script MAP", () => EditorSettings.ViewSpawnScriptMap, x => EditorSettings.ViewSpawnScriptMap = x);
                     ForMenuCheck("Spawn script BTL", () => EditorSettings.ViewSpawnScriptBattle, x => EditorSettings.ViewSpawnScriptBattle = x);
                     ForMenuCheck("Spawn script EVT", () => EditorSettings.ViewSpawnScriptEvent, x => EditorSettings.ViewSpawnScriptEvent = x);
                     ForMenuCheck("Event script", () => EditorSettings.ViewEventScript, x => EditorSettings.ViewEventScript = x);
                 });
+
+                ForMenu("Preferences", () =>
+                {
+                    ForMenu("Movement Speed", () =>
+                    {
+                        ForEdit("Default Speed", () => EditorSettings.MoveSpeed, x => EditorSettings.MoveSpeed = x);
+                        ForEdit("Accelerated Speed (hold shift)", () => EditorSettings.MoveSpeedShift, x => EditorSettings.MoveSpeedShift = x);
+                    });
+                    ForMenu("Event Activator Colors & Opacity", () =>
+                    {
+                        ForEdit5("Opacity", () => EditorSettings.OpacityLevel, x => EditorSettings.OpacityLevel = x);
+                        ForEdit5("Red", () => EditorSettings.RedValue, x => EditorSettings.RedValue = x);
+                        ForEdit5("Green", () => EditorSettings.GreenValue, x => EditorSettings.GreenValue = x);
+                        ForEdit5("Blue", () => EditorSettings.BlueValue, x => EditorSettings.BlueValue = x);
+                    });
+                    ForMenu("Event Activator Entrance Colors & Opacity", () =>
+                    {
+                        ForEdit5("Opacity", () => EditorSettings.OpacityEntranceLevel, x => EditorSettings.OpacityEntranceLevel = x);
+                        ForEdit5("Red", () => EditorSettings.RedValueEntrance, x => EditorSettings.RedValueEntrance = x);
+                        ForEdit5("Green", () => EditorSettings.GreenValueEntrance, x => EditorSettings.GreenValueEntrance = x);
+                        ForEdit5("Blue", () => EditorSettings.BlueValueEntrance, x => EditorSettings.BlueValueEntrance = x);
+                    });
+                    ForMenu("Default Window Size", () =>
+                    {
+                        ForEdit("Window Width", () => EditorSettings.InitialWindowWidth, x => EditorSettings.InitialWindowWidth = x);
+                        ForEdit("Window Height", () => EditorSettings.InitialWindowHeight, x => EditorSettings.InitialWindowHeight = x);
+
+                    });
+                });
+
                 ForMenu("Help", () =>
                 {
                     ForMenuItem("About", ShowAboutDialog);
+                    ForMenuItem("Preference Info", ShowPrefDialog);
+                    ForMenuItem("Controls", ShowControlsDialog);
                 });
             });
         }
@@ -527,7 +574,6 @@ namespace OpenKh.Tools.Kh2MapStudio
                 camera.CameraPosition += new Vector3(0, 1 * moveSpeed * 5, 0);
             if (keyboard.IsKeyDown(Keys.LeftControl))
                 camera.CameraPosition += new Vector3(0, -1 * moveSpeed * 5, 0);
-
             if (keyboard.IsKeyDown(Keys.Up))
                 camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);
             if (keyboard.IsKeyDown(Keys.Down))
@@ -578,6 +624,29 @@ namespace OpenKh.Tools.Kh2MapStudio
             MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
 
         private void ShowAboutDialog() =>
-            MessageBox.Show("OpenKH is amazing.");
+            //MessageBox.Show("OpenKH is amazing.");
+            MessageBox.Show("Welcome to OpenKH MapStudio." +
+            "\n\nThis tool allows you to view .map files along with their associated .ard files." +
+            "\n\nThe .map and .ard files are loaded using the extracted game data. " +
+            "\n\nEntities are loaded from the extracted 00objentry.bin & obj folder. New maps and entities can be added into the extracted game data to have them usable in MapStudio." +
+            "\n\nAlternatively, you can create a folder named mapstudio in your extracted game folder. Placing a modified 00objentry.bin as well as any MDLXs inside that folder will cause MapStudio to prioritize loading from that folder instead." +
+            "\n\nA .map file contains the geometry and collision of the map." +
+            "\n\nAn .ard file controls what spawns inside of a map." +
+            "\n\nSpawn points, where you can encounter enemies, cutscenes, cutscene triggers, chest locations, etc. are all handled by .ard files." +
+            "\n\nView documentation on openkh.dev to learn more about the file."
+            );
+
+        private void ShowPrefDialog() =>
+            MessageBox.Show("Movement speed will alter how fast you can move through the map." +
+            "\n\nEvent Activator Opacity & Red, Green, and Blue Values all control how the triggers that send you to different areas & spawn enemies will look." +
+            "\n\nEntrance Marker will mark the entrances of warp points with that color, so that you can properly orient the entrance in the map." +
+            "\n\nValues for RGBA are floats. For the most accurate representation of warps the values should be set between 0 and 1, though values below 0 and above 1 will work." +
+            "\n\nValues for Opacity are floats between 0 and 1.");
+
+        private void ShowControlsDialog() =>
+             MessageBox.Show("W/A/S/D/E/Q: Moves in any direction, influenced by the camera's rotation." +
+             "\n\nLeft Control/Space: Move directly down/up, regardless of camera's rotation." +
+             "\n\nShift: Increase movement speed (can be changed under Preferences)." +
+             "\n\nLeft Click/Arrow Keys: Rotate Camera");
     }
 }

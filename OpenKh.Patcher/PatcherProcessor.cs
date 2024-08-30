@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization;
+using OpenKh.Bbs;
 
 namespace OpenKh.Patcher
 {
@@ -79,13 +80,13 @@ namespace OpenKh.Patcher
             "Recom",
         };
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null)
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null, string Language = "en", bool Tests = false)
         {
-            
+
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
             try
             {
-                
+
                 if (metadata.Assets == null)
                     throw new Exception("No assets found.");
                 if (metadata.Game != null && GamesList.Contains(metadata.Game.ToLower()) && metadata.Game.ToLower() != LaunchGame.ToLower())
@@ -116,8 +117,8 @@ namespace OpenKh.Patcher
                                 _packageFile = assetFile.Package != null && !fastMode ? assetFile.Package : "bbs_first";
                                 break;
                             case "Recom":
-                                if (assetFile!= null)
-                                _packageFile = "Recom";
+                                if (assetFile != null)
+                                    _packageFile = "Recom";
                                 break;
                             default:
                                 _packageFile = assetFile.Package != null && !fastMode ? assetFile.Package : "kh2_first";
@@ -180,18 +181,97 @@ namespace OpenKh.Patcher
 
                         context.EnsureDirectoryExists(dstFile);
 
+                        //Update: Prevent from copying a blank file should it not exist.
                         try
                         {
-                            context.CopyOriginalFile(name, dstFile);
+                            bool multi = false;
+                            if (assetFile.Multi != null)
+                            {
+                                foreach (var entry in assetFile.Multi)
+                                {
+                                    if (File.Exists(context.GetOriginalAssetPath(entry.Name)))
+                                    {
+                                        multi = true;
+                                    }
+                                }
+                            }
+                            //If editing subfiles (not Method: copy and not Method: imd)  make sure the original file exists OR
+                            //If copying a file from the mod (NOT Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
+                            //If copying a file from the users extraction (Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
+                            //Ignore if its from a test
+                            if ((assetFile.Method != "copy" && assetFile.Method != "imd" && (File.Exists(context.GetOriginalAssetPath(assetFile.Name)) || multi)) ||
+                            ((assetFile.Method == "copy" || assetFile.Method == "imd") && assetFile.Source[0].Type != "internal" && File.Exists(context.GetSourceModAssetPath(assetFile.Source[0].Name))) ||
+                            ((assetFile.Method == "copy" || assetFile.Method == "imd") && assetFile.Source[0].Type == "internal" && (File.Exists(context.GetOriginalAssetPath(assetFile.Source[0].Name)) || multi)) ||
+                            Tests)
+                            {
+                                context.CopyOriginalFile(name, dstFile);
 
-                            using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                            PatchFile(context, assetFile, _stream);
+                                using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                                PatchFile(context, assetFile, _stream);
 
-                            _stream.Close();
-                            _stream.Dispose();
+                                _stream.Close();
+                                _stream.Dispose();
+                            }
+                            else
+                            {
+                                List<string> globalFilePaths = new List<string> { ".a.fr", ".a.gr", ".a.it", ".a.sp", ".a.us", "/fr/", "/gr/", "/it/", "/sp/", "/us/" };
+                                if (assetFile.Method != "copy" && assetFile.Method != "imd")
+                                {
+                                    if (platform == 2)
+                                    {
+                                        if (Language != "jp")
+                                        {
+                                            if (!context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
+                                            {
+                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (!globalFilePaths.Any(x=>context.GetOriginalAssetPath(assetFile.Name).Contains(x)))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                    }
+                                }
+                                else if (assetFile.Source[0].Type == "internal")
+                                {
+                                    if (platform == 2)
+                                    {
+                                        if (Language != "jp")
+                                        {
+                                            if (!context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (!globalFilePaths.Any(x => context.GetOriginalAssetPath(assetFile.Name).Contains(x)))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                    }
+                                }
+                                else
+                                {
+                                    Log.Warn("File not found: " + context.GetSourceModAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your mod install of: " + metadata.Title);
+                                }
+                            }
                         }
-
                         catch (IOException) { }
+                        //This is here so the user does not have to close Mod Manager to see what the warnings were if any. Helpful especially on PC since the build window closes after build unlike emulator where it stays open during mod injection.
+                        Log.Flush();
                     }
                 });
             }
@@ -216,6 +296,9 @@ namespace OpenKh.Patcher
                 case "bar":
                 case "binarc":
                     PatchBinarc(context, assetFile, stream);
+                    break;
+                case "bbsarc":
+                    PatchBBSArc(context, assetFile, stream);
                     break;
                 case "imd":
                 case "imgd":
@@ -243,6 +326,9 @@ namespace OpenKh.Patcher
                 case "listpatch":
                     PatchList(context, assetFile.Source, stream);
                     break;
+                case "synthpatch":
+                    PatchSynth(context, assetFile.Source, stream);
+                    break;
                 default:
                     Log.Warn($"Method '{assetFile.Method}' not recognized for '{assetFile.Name}'. Falling back to 'copy'");
                     CopyFile(context, assetFile, stream);
@@ -259,7 +345,7 @@ namespace OpenKh.Patcher
             if (assetFile.Source == null || assetFile.Source.Count == 0)
                 throw new Exception($"File '{assetFile.Name}' does not contain any source");
 
-            string srcFile; 
+            string srcFile;
 
             if (assetFile.Source[0].Type == "internal")
             {
@@ -275,6 +361,10 @@ namespace OpenKh.Patcher
             srcStream.CopyTo(stream);
         }
 
+
+
+
+        //Binarc Update: Specify by Name OR Index. Some files in BARS may have the same name but different indexes, and you want to patch a later index only.
         private static void PatchBinarc(Context context, AssetFile assetFile, Stream stream)
         {
             var binarc = Bar.IsValid(stream) ? Bar.Read(stream) :
@@ -288,7 +378,20 @@ namespace OpenKh.Patcher
                 if (!Enum.TryParse<Bar.EntryType>(file.Type, true, out var barEntryType))
                     throw new Exception($"BinArc type {file.Type} not recognized");
 
-                var entry = binarc.FirstOrDefault(x => x.Name == file.Name && x.Type == barEntryType);
+                Bar.Entry entry = null;
+
+                // Check if the name is specified
+                if (!string.IsNullOrEmpty(file.Name))
+                {
+                    entry = binarc.FirstOrDefault(x => x.Name == file.Name && x.Type == barEntryType);
+                }
+                // If name is not specified but index is
+                else if (file.Index >= 0 && file.Index < binarc.Count)
+                {
+                    entry = binarc[file.Index];
+                }
+
+                //If entry is not found by name or index, create a new one
                 if (entry == null)
                 {
                     entry = new Bar.Entry
@@ -306,6 +409,39 @@ namespace OpenKh.Patcher
             Bar.Write(stream.SetPosition(0), binarc);
             foreach (var entry in binarc)
                 entry.Stream?.Dispose();
+        }
+
+        private static void PatchBBSArc(Context context, AssetFile assetFile, Stream stream)
+        {
+            var entryList = Arc.IsValid(stream) ? Arc.Read(stream).ToList() : new List<Arc.Entry>();
+            foreach (var file in assetFile.Source)
+            {
+                var entry = entryList.FirstOrDefault(e => e.Name == file.Name);
+
+                if (entry == null)
+                {
+                    entry = new Arc.Entry()
+                    {
+                        Name = file.Name
+                    };
+                    entryList.Add(entry);
+                }
+                else if (entry.IsLink)
+                {
+                    throw new Exception("Cannot patch an arc link!");
+                }
+
+                MemoryStream data = new MemoryStream();
+                if (entry.Data != null)
+                {
+                    data.Write(entry.Data);
+                    data.SetPosition(0);
+                }
+                PatchFile(context, file, data);
+                entry.Data = data.ToArray();
+            }
+
+            OpenKh.Bbs.Arc.Write(entryList, stream.SetPosition(0));
         }
 
         private static Imgd CreateImageImd(Context context, AssetFile source)
@@ -429,7 +565,7 @@ namespace OpenKh.Patcher
             if (!File.Exists(srcFile))
                 throw new FileNotFoundException($"The mod does not contain the file {scriptName}", srcFile);
 
- 
+
             var programsInput = File.ReadAllText(context.GetSourceModAssetPath(scriptName));
             var ascii = BdxAsciiModel.ParseText(programsInput);
             var decoder = new BdxEncoder(
@@ -457,14 +593,18 @@ namespace OpenKh.Patcher
             if (!File.Exists(srcFile))
                 throw new FileNotFoundException($"The mod does not contain the file {assetFile.Source[0].Name}", srcFile);
 
-            var spawnPoint = Helpers.YamlDeserialize<List<Kh2.Ard.SpawnPoint>>(File.ReadAllText(srcFile));
+            var spawnPoint = OpenKh.Common.Helpers.YamlDeserialize<List<Kh2.Ard.SpawnPoint>>(File.ReadAllText(srcFile));
 
             Kh2.Ard.SpawnPoint.Write(stream.SetPosition(0), spawnPoint);
         }
 
         private static readonly Dictionary<string, byte> characterMap = new Dictionary<string, byte>(){
-            { "Sora", 1 }, { "Donald", 2 }, { "Goofy", 3 },  { "Mickey", 4 },  { "Auron", 5 }, { "PingMulan",6 }, { "Aladdin", 7 },  { "Sparrow", 8 }, { "Beast", 9 },  { "Jack", 10 },  { "Simba", 11 }, { "Tron", 12 }, { "Riku", 13 }, { "Roxas", 14}, {"Ping", 15} 
+            { "Sora", 1 }, { "Donald", 2 }, { "Goofy", 3 },  { "Mickey", 4 },  { "Auron", 5 }, { "PingMulan",6 }, { "Aladdin", 7 },  { "Sparrow", 8 }, { "Beast", 9 },  { "Jack", 10 },  { "Simba", 11 }, { "Tron", 12 }, { "Riku", 13 }, { "Roxas", 14}, {"Ping", 15}
         };
+
+        private static readonly Dictionary<string, byte> worldIndexMap = new Dictionary<string, byte>(StringComparer.OrdinalIgnoreCase){
+    { "worldzz", 0 }, { "endofsea", 1 }, { "twilighttown", 2 },  { "destinyisland", 3 },  { "hollowbastion", 4 }, { "beastscastle", 5 }, { "olympuscoliseum", 6 },  { "agrabah", 7 }, { "thelandofdragons", 8 },  { "100acrewood", 9 },  { "prideland", 10 }, { "atlantica", 11 }, { "disneycastle", 12 }, { "timelessriver", 13}, {"halloweentown", 14}, { "worldmap", 15 }, { "portroyal", 16 }, { "spaceparanoids", 17 }, { "theworldthatneverwas", 18 }
+    };
 
         private static readonly IDeserializer deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
 
@@ -615,11 +755,25 @@ namespace OpenKh.Patcher
                     case "atkp":
                         var atkpList = Kh2.Battle.Atkp.Read(stream);
                         var moddedAtkp = deserializer.Deserialize<List<Kh2.Battle.Atkp>>(sourceText);
+
                         foreach (var attack in moddedAtkp)
                         {
-                            var oldAtkp = atkpList.First(x => x.Id == attack.Id && x.SubId == attack.SubId && x.Switch == attack.Switch);
-                            atkpList[atkpList.IndexOf(oldAtkp)] = attack;
+                            //Same general template used for cmd, enmp, and przt.
+                            // Check if the attack exists in atkpList based on Id, SubId, and Switch
+                            var existingAttack = atkpList.FirstOrDefault(x => x.Id == attack.Id && x.SubId == attack.SubId && x.Switch == attack.Switch);
+
+                            if (existingAttack != null)
+                            {
+                                // Update existing attack in atkpList
+                                atkpList[atkpList.IndexOf(existingAttack)] = attack;
+                            }
+                            else
+                            {
+                                // Add the attack to atkpList if it doesn't exist
+                                atkpList.Add(attack);
+                            }
                         }
+
                         Kh2.Battle.Atkp.Write(stream.SetPosition(0), atkpList);
                         break;
 
@@ -646,70 +800,593 @@ namespace OpenKh.Patcher
                         foreach (var plrp in moddedPlrp)
                         {
                             var oldPlrp = plrpList.First(x => x.Character == plrp.Character && x.Id == plrp.Id);
-                            plrpList[plrpList.IndexOf(oldPlrp)] = plrp;
+                            if (oldPlrp != null)
+                            {
+                                plrpList[plrpList.IndexOf(oldPlrp)] = plrp;
+                            }
+                            else
+                            {
+                                plrpList.Add(plrp);
+                            }
                         }
                         Kh2.Battle.Plrp.Write(stream.SetPosition(0), plrpList);
                         break;
 
                     case "cmd":
-                        var cmdList = Kh2.SystemData.Cmd.Read(stream); 
-                        var moddedCmd = deserializer.Deserialize<List<Kh2.SystemData.Cmd>>(sourceText); 
-                        foreach (var commands in moddedCmd) 
+                        var cmdList = Kh2.SystemData.Cmd.Read(stream);
+                        var moddedCmd = deserializer.Deserialize<List<Kh2.SystemData.Cmd>>(sourceText);
+
+                        foreach (var commands in moddedCmd)
                         {
-                            var oldCommands = cmdList.First(x => x.Id == commands.Id && x.Id == commands.Id);
-                            cmdList[cmdList.IndexOf(oldCommands)] = commands;
+                            var existingCommand = cmdList.FirstOrDefault(x => x.Id == commands.Id);
+
+                            if (existingCommand != null)
+                            {
+                                cmdList[cmdList.IndexOf(existingCommand)] = commands;
+                            }
+                            else
+                            {
+                                cmdList.Add(commands);
+                            }
                         }
+
                         Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList);
                         break;
+
+                    case "localset":
+                        var localList = Kh2.Localset.Read(stream);
+                        var moddedLocal = deserializer.Deserialize<List<Kh2.Localset>>(sourceText);
+
+                        foreach (var set in moddedLocal)
+                        {
+                            var existingSet = localList.FirstOrDefault(x => x.ProgramId == set.ProgramId);
+
+                            if (existingSet != null)
+                            {
+                                localList[localList.IndexOf(existingSet)] = set;
+                            }
+                            else
+                            {
+                                localList.Add(set);
+                            }
+                        }
+
+                        Kh2.Localset.Write(stream.SetPosition(0), localList);
+                        break;
+
+                    case "jigsaw":
+                        var jigsawList = Kh2.Jigsaw.Read(stream);
+                        var moddedJigsaw = deserializer.Deserialize<List<Kh2.Jigsaw>>(sourceText);
+
+                        foreach (var piece in moddedJigsaw)
+                        {
+                            //Allow variations of capitalizations with World spellings; can't handle an extra space unfortunately, making it inconsistent with Arif.
+                            //Can just use ID's for worlds, though.
+                            if (worldIndexMap.TryGetValue(piece.World.ToString().Replace(" ", "").ToLower(), out var worldValue))
+                            {
+                                piece.World = (Kh2.Jigsaw.WorldList)worldValue;
+                            }
+
+                            var existingPiece = jigsawList.FirstOrDefault(x => x.Picture == piece.Picture && x.Part == piece.Part); //Identify a puzzle by its Picture+Part.
+
+                            if (existingPiece != null)
+                            {
+                                jigsawList[jigsawList.IndexOf(existingPiece)] = piece;
+                            }
+                            else
+                            {
+                                jigsawList.Add(piece);
+                            }
+                        }
+
+                        Kh2.Jigsaw.Write(stream.SetPosition(0), jigsawList);
+                        break;
+
+
 
                     case "enmp":
                         var enmpList = Kh2.Battle.Enmp.Read(stream);
                         var moddedEnmp = deserializer.Deserialize<List<Kh2.Battle.Enmp>>(sourceText);
+
                         foreach (var enmp in moddedEnmp)
                         {
-                            var oldEnmp = enmpList.First(x => x.Id == enmp.Id);
-                            enmpList[enmpList.IndexOf(oldEnmp)] = enmp;
+                            var existingEnmp = enmpList.FirstOrDefault(x => x.Id == enmp.Id);
+
+                            if (existingEnmp != null)
+                            {
+                                enmpList[enmpList.IndexOf(existingEnmp)] = enmp;
+                            }
+                            else
+                            {
+                                enmpList.Add(enmp);
+                            }
                         }
+
                         Kh2.Battle.Enmp.Write(stream.SetPosition(0), enmpList);
                         break;
+
                     case "sklt":
                         var skltList = Kh2.SystemData.Sklt.Read(stream);
                         var moddedSklt = deserializer.Deserialize<List<Kh2.SystemData.Sklt>>(sourceText);
+
                         foreach (var sklt in moddedSklt)
                         {
-                            var oldSklt = skltList.First(x => x.CharacterId == sklt.CharacterId);
-                            skltList[skltList.IndexOf(oldSklt)] = sklt;
+                            var existingSklt = skltList.FirstOrDefault(x => x.CharacterId == sklt.CharacterId);
+
+                            if (existingSklt != null)
+                            {
+                                skltList[skltList.IndexOf(existingSklt)] = sklt;
+                            }
+                            else
+                            {
+                                skltList.Add(sklt);
+                            }
                         }
+
                         Kh2.SystemData.Sklt.Write(stream.SetPosition(0), skltList);
                         break;
-                       
+
                     case "przt":
                         var prztList = Kh2.Battle.Przt.Read(stream);
                         var moddedPrzt = deserializer.Deserialize<List<Kh2.Battle.Przt>>(sourceText);
+
                         foreach (var przt in moddedPrzt)
                         {
-                            var oldPrzt = prztList.First(x => x.Id == przt.Id);
-                            prztList[prztList.IndexOf(oldPrzt)] = przt;
+                            var existingPrzt = prztList.FirstOrDefault(x => x.Id == przt.Id);
+
+                            if (existingPrzt != null)
+                            {
+                                prztList[prztList.IndexOf(existingPrzt)] = przt;
+                            }
+                            else
+                            {
+                                prztList.Add(przt);
+                            }
                         }
                         Kh2.Battle.Przt.Write(stream.SetPosition(0), prztList);
                         break;
 
                     case "magc":
-                        var magcList = Kh2.Battle.Magc.Read(stream); 
-                        var moddedMagc = deserializer.Deserialize<List<Kh2.Battle.Magc>>(sourceText); 
+                        var magcList = Kh2.Battle.Magc.Read(stream);
+                        var moddedMagc = deserializer.Deserialize<List<Kh2.Battle.Magc>>(sourceText);
                         foreach (var magc in moddedMagc)
                         {
-                            var oldMagc = magcList.First(x => x.Id == magc.Id && x.Level == magc.Level);
-                            magcList[magcList.IndexOf(oldMagc)] = magc;
+                            var existingMagc = magcList.First(x => x.Id == magc.Id && x.Level == magc.Level);
+                            if (existingMagc != null)
+                            {
+                                //existingMagc = MergeHelper.Merge(existingMagc, magc);
+                                magcList[magcList.IndexOf(existingMagc)] = magc;
+                            }
+                            else
+                            {
+                                magcList.Add(magc);
+                            }
                         }
                         Kh2.Battle.Magc.Write(stream.SetPosition(0), magcList);
+                        break;
+
+                    case "btlv":
+                        var btlvList = Kh2.Battle.Btlv.Read(stream);
+                        var moddedBtlv = deserializer.Deserialize<List<Kh2.Battle.Btlv>>(sourceText);
+
+                        foreach (var btlv in moddedBtlv)
+                        {
+                            var existingBtlv = btlvList.FirstOrDefault(x => x.Id == btlv.Id);
+
+                            if (existingBtlv != null)
+                            {
+                                btlvList[btlvList.IndexOf(existingBtlv)] = btlv;
+                            }
+                            else
+                            {
+                                btlvList.Add(btlv);
+                            }
+                        }
+
+                        Kh2.Battle.Btlv.Write(stream.SetPosition(0), btlvList);
+                        break;
+
+                    case "vtbl":
+                        var vtblList = Kh2.Battle.Vtbl.Read(stream);
+                        var moddedVtbl = deserializer.Deserialize<List<Kh2.Battle.Vtbl>>(sourceText);
+
+                        foreach (var vtbl in moddedVtbl)
+                        {
+                            var existingVtbl = vtblList.FirstOrDefault(x => x.Id == vtbl.Id && x.CharacterId == vtbl.CharacterId);
+                            //Search for CharacterID & "Action" ID.
+                            if (existingVtbl != null)
+                            {
+                                vtblList[vtblList.IndexOf(existingVtbl)] = vtbl;
+
+                            }
+                            else
+                            {
+                                vtblList.Add(vtbl);
+                            }
+                        }
+
+                        Kh2.Battle.Vtbl.Write(stream.SetPosition(0), vtblList);
+                        break;
+
+                    //Add new limits. ID found -> Continue.
+                    case "limt":
+                        var limtList = Kh2.Battle.Limt.Read(stream);
+                        var moddedLimt = deserializer.Deserialize<List<Kh2.Battle.Limt>>(sourceText);
+
+                        foreach (var limt in moddedLimt)
+                        {
+                            var existingLimt = limtList.FirstOrDefault(x => x.Id == limt.Id);
+
+                            if (existingLimt != null)
+                            {
+                                limtList[limtList.IndexOf(existingLimt)] = limt;
+                            }
+                            else
+                            {
+                                limtList.Add(limt);
+                            }
+                        }
+                        Kh2.Battle.Limt.Write(stream.SetPosition(0), limtList);
+                        break;
+
+                    //Listpatch for Arif. Takes a string as an input for the WorldIndex to use, and ints for the roomIndex to edit.
+                    //Strings do not need to worry about capitalization, etc. so long as they have the same characters.
+                    case "arif":
+                        var originalData = Kh2.SystemData.Arif.Read(stream);
+                        var patches = deserializer.Deserialize<Dictionary<string, Dictionary<int, Kh2.SystemData.Arif>>>(sourceText);
+
+                        foreach (var worldPatch in patches)
+                        {
+                            if (!worldIndexMap.TryGetValue(worldPatch.Key.ToLower().Replace(" ", ""), out var worldIndex))
+                            {
+                                Log.Warn($"Invalid world index: {worldPatch.Key}");
+                            }
+
+                            if (worldIndex >= 0 && worldIndex < originalData.Count)
+                            {
+                                var worldData = originalData[worldIndex];
+
+                                foreach (var areaPatch in worldPatch.Value)
+                                {
+                                    int areaIndex = areaPatch.Key;
+                                    var patch = areaPatch.Value;
+
+                                    // Add new areas.
+                                    while (areaIndex >= worldData.Count)
+                                    {
+                                        worldData.Add(new Kh2.SystemData.Arif
+                                        {
+                                            Bgms = new Kh2.SystemData.BgmSet[8],
+                                            Reserved = new byte[11]
+                                        });
+
+                                        // Initialize the BgmSet elements within the Bgms array
+                                        for (int i = 0; i < 8; i++)
+                                        {
+                                            worldData[worldData.Count - 1].Bgms[i] = new Kh2.SystemData.BgmSet();
+                                        }
+                                    }
+                                    // End of adding new areas.
+
+                                    if (areaIndex >= 0 && areaIndex < worldData.Count)
+                                    {
+                                        var areaData = worldData[areaIndex];
+                                        //Below: Compares each field to see if it's specified in the YML.
+                                        //If yes, update w/ YML value.
+                                        //If no, retain original value.
+                                        areaData.Flags = patch.Flags != 0 ? patch.Flags : areaData.Flags;
+                                        areaData.Reverb = patch.Reverb != 0 ? patch.Reverb : areaData.Reverb;
+                                        areaData.SoundEffectBank1 = patch.SoundEffectBank1 != 0 ? patch.SoundEffectBank1 : areaData.SoundEffectBank1;
+                                        areaData.SoundEffectBank2 = patch.SoundEffectBank2 != 0 ? patch.SoundEffectBank2 : areaData.SoundEffectBank2;
+                                        for (int i = 0; i < patch.Bgms.Length && i < areaData.Bgms.Length; i++)
+                                        {
+                                            areaData.Bgms[i].BgmField = patch.Bgms[i].BgmField != 0 ? (ushort)patch.Bgms[i].BgmField : areaData.Bgms[i].BgmField;
+                                            areaData.Bgms[i].BgmBattle = patch.Bgms[i].BgmBattle != 0 ? (ushort)patch.Bgms[i].BgmBattle : areaData.Bgms[i].BgmBattle;
+                                        }
+                                        areaData.Voice = patch.Voice != 0 ? patch.Voice : areaData.Voice;
+                                        areaData.NavigationMapItem = patch.NavigationMapItem != 0 ? patch.NavigationMapItem : areaData.NavigationMapItem;
+                                        areaData.Command = patch.Command != 0 ? patch.Command : areaData.Command;
+                                        areaData.Reserved = patch.Reserved != null ? patch.Reserved : areaData.Reserved;
+                                    }
+                                }
+                            }
+                        }
+
+
+                        Kh2.SystemData.Arif.Write(stream.SetPosition(0), originalData);
+                        break;
+
+                    case "place":
+                        var originalPlace = Kh2.Places.Read(stream);
+                        var moddedPlace = deserializer.Deserialize<List<Kh2.Places.PlacePatch>>(sourceText);
+
+                        foreach (var place in moddedPlace)
+                        {
+                            if (place.Index >= 0 && place.Index < originalPlace.Count)
+                            {
+                                // Update existing entry
+                                originalPlace[place.Index].MessageId = place.MessageId;
+                                originalPlace[place.Index].Padding = place.Padding;
+                            }
+                            else if (place.Index == originalPlace.Count)
+                            {
+                                // Add new entry
+                                originalPlace.Add(new Places { MessageId = place.MessageId, Padding = place.Padding });
+                            }
+                            else
+                            {
+                                // Expand the list and add the new entry at the specified index
+                                while (originalPlace.Count < place.Index)
+                                {
+                                    originalPlace.Add(new Places { MessageId = 0, Padding = 0 });
+                                }
+                                originalPlace.Add(new Places { MessageId = place.MessageId, Padding = place.Padding });
+                            }
+                        }
+
+                        Kh2.Places.Write(stream.SetPosition(0), originalPlace);
+                        break;
+
+                    case "soundinfo":
+                        var originalSoundInfo = Kh2.Soundinfo.Read(stream);
+                        var moddedSoundInfo = deserializer.Deserialize<List<Kh2.Soundinfo.SoundinfoPatch>>(sourceText);
+
+                        foreach (var info in moddedSoundInfo)
+                        {
+                            while (originalSoundInfo.Count <= info.Index)
+                            {
+                                originalSoundInfo.Add(new Soundinfo
+                                {
+                                    Reverb = 0,
+                                    Rate = 0,
+                                    EnvironmentWAV = 0,
+                                    EnvironmentSEB = 0,
+                                    EnvironmentNUMBER = 0,
+                                    EnvironmentSPOT = 0,
+                                    FootstepWAV = 0,
+                                    FootstepSORA = 0,
+                                    FootstepDONALD = 0,
+                                    FootstepGOOFY = 0,
+                                    FootstepWORLDFRIEND = 0,
+                                    FootstepOTHER = 0
+                                });
+                            }
+
+                            originalSoundInfo[info.Index].Reverb = info.Reverb;
+                            originalSoundInfo[info.Index].Rate = info.Rate;
+                            originalSoundInfo[info.Index].EnvironmentWAV = info.EnvironmentWAV;
+                            originalSoundInfo[info.Index].EnvironmentSEB = info.EnvironmentSEB;
+                            originalSoundInfo[info.Index].EnvironmentNUMBER = info.EnvironmentNUMBER;
+                            originalSoundInfo[info.Index].EnvironmentSPOT = info.EnvironmentSPOT;
+                            originalSoundInfo[info.Index].FootstepWAV = info.FootstepWAV;
+                            originalSoundInfo[info.Index].FootstepSORA = info.FootstepSORA;
+                            originalSoundInfo[info.Index].FootstepDONALD = info.FootstepDONALD;
+                            originalSoundInfo[info.Index].FootstepGOOFY = info.FootstepGOOFY;
+                            originalSoundInfo[info.Index].FootstepWORLDFRIEND = info.FootstepWORLDFRIEND;
+                            originalSoundInfo[info.Index].FootstepOTHER = info.FootstepOTHER;
+                        }
+
+                        // Write the updated list back to the stream
+                        Kh2.Soundinfo.Write(stream.SetPosition(0), originalSoundInfo);
+                        break;
+
+                    case "libretto":
+                        var originalLibretto = Kh2.Libretto.Read(stream);
+
+                        var patches2 = deserializer.Deserialize<List<Kh2.Libretto.TalkMessagePatch>>(sourceText);
+
+                        foreach (var patch in patches2)
+                        {
+                            var definition = originalLibretto.Definitions.FirstOrDefault(def => def.TalkMessageId == patch.TalkMessageId);
+
+                            if (definition != null)
+                            {
+                                definition.Unknown = patch.Unknown;
+
+                                var contentList = new List<Libretto.TalkMessageContent>();
+                                foreach (var contentPatch in patch.Contents)
+                                {
+                                    contentList.Add(new Libretto.TalkMessageContent
+                                    {
+                                        Unknown1 = contentPatch.Unknown1,
+                                        TextId = contentPatch.TextId
+                                    });
+                                }
+                                originalLibretto.Contents[originalLibretto.Definitions.IndexOf(definition)] = contentList;
+                            }
+                            else
+                            {
+                                var newDefinition = new Libretto.TalkMessageDefinition
+                                {
+                                    TalkMessageId = patch.TalkMessageId,
+                                    Unknown = patch.Unknown,
+                                    ContentPointer = 0 // Will update this later after adding content entries
+                                };
+
+                                originalLibretto.Definitions.Add(newDefinition);
+                                originalLibretto.Count++;
+
+                                var contentList = new List<Libretto.TalkMessageContent>();
+                                foreach (var contentPatch in patch.Contents)
+                                {
+                                    contentList.Add(new Libretto.TalkMessageContent
+                                    {
+                                        Unknown1 = contentPatch.Unknown1,
+                                        TextId = contentPatch.TextId
+                                    });
+                                }
+                                originalLibretto.Contents.Add(contentList);
+                            }
+                        }
+
+                        stream.Position = 0;
+                        Kh2.Libretto.Write(stream, originalLibretto);
+                        break;
+
+
+                    case "memt":
+                        var memt = Kh2.SystemData.Memt.Read(stream);
+                        var memtEntries = memt.Entries.Cast<Kh2.SystemData.Memt.EntryFinalMix>().ToList();
+                        var memtPatches = deserializer.Deserialize<Kh2.SystemData.Memt.MemtPatches>(sourceText);
+
+                        if (memtPatches.MemtEntries != null)
+                        {
+                            foreach (var patch in memtPatches.MemtEntries)
+                            {
+                                if (patch.Index < 0)
+                                    throw new IndexOutOfRangeException($"Invalid index {patch.Index} for Memt.");
+
+                                if (patch.Index >= memtEntries.Count)
+                                {
+                                    // Index is beyond current entries, append new entries up to the patch index
+                                    while (memtEntries.Count <= patch.Index)
+                                    {
+                                        memtEntries.Add(new Kh2.SystemData.Memt.EntryFinalMix());
+                                    }
+                                }
+
+                                var memtEntry = memtEntries[patch.Index];
+                                memtEntry.WorldId = patch.WorldId;
+                                memtEntry.CheckStoryFlag = patch.CheckStoryFlag;
+                                memtEntry.CheckStoryFlagNegation = patch.CheckStoryFlagNegation;
+                                memtEntry.Unk06 = patch.Unk06;
+                                memtEntry.Unk08 = patch.Unk08;
+                                memtEntry.Unk0A = patch.Unk0A;
+                                memtEntry.Unk0C = patch.Unk0C;
+                                memtEntry.Unk0E = patch.Unk0E;
+                                memtEntry.Members = patch.Members.ToArray();
+
+                                memtEntries[patch.Index] = memtEntry;
+                            }
+
+                            memt.Entries.Clear();
+                            memt.Entries.AddRange(memtEntries);
+
+                            stream.Position = 0;
+                            Kh2.SystemData.Memt.Write(stream, memt);
+                        }
+
+                        if (memtPatches.MemberIndices != null)
+                        {
+                            foreach (var patch in memtPatches.MemberIndices)
+                            {
+                                if (patch.Index < 0 || patch.Index >= memt.MemberIndexCollection.Length)
+                                    throw new IndexOutOfRangeException($"Invalid MemberIndices index {patch.Index}.");
+
+                                var memberIndices = memt.MemberIndexCollection[patch.Index];
+                                memberIndices.Player = patch.Player;
+                                memberIndices.Friend1 = patch.Friend1;
+                                memberIndices.Friend2 = patch.Friend2;
+                                memberIndices.FriendWorld = patch.FriendWorld;
+
+                                memt.MemberIndexCollection[patch.Index] = memberIndices;
+                            }
+
+                            stream.Position = 0;
+                            Kh2.SystemData.Memt.Write(stream, memt);
+                        }
+                        break;
+
+                    //New: Pref listpatches. More rigid as they're mostly offset-based. Can be updated to eventually support addition though.
+                    case "fmab":
+                        var fmabList = Kh2.SystemData.Fmab.Read(stream);
+
+                        var moddedFmab = deserializer.Deserialize<Kh2.SystemData.Fmab.FmabEntries>(sourceText);
+
+                        foreach (var patch in moddedFmab.Entries)
+                        {
+                            if (patch.Key >= 0 && patch.Key < fmabList.Count)
+                            {
+                                fmabList[patch.Key] = patch.Value;
+                            }
+                        }
+
+                        stream.SetLength(0);
+                        Kh2.SystemData.Fmab.Write(stream, fmabList);
                         break;
 
                     default:
                         break;
                 }
             }
+        }
+        private static void PatchSynth(Context context, List<AssetFile> sources, Stream stream)
+        {
+            foreach (var source in sources)
+            {
+                string sourceText = File.ReadAllText(context.GetSourceModAssetPath(source.Name));
+                switch (source.Type)
+                {
+                    case "recipe":
+                        var recipeList = Kh2.Mixdata.ReciLP.Read(stream); // Read existing Reci list
+                        var moddedRecipes = deserializer.Deserialize<List<Kh2.Mixdata.ReciLP>>(sourceText); // Deserialize modded recipes
 
+                        foreach (var moddedRecipe in moddedRecipes)
+                        {
+                            var existingRecipe = recipeList.FirstOrDefault(x => x.Id == moddedRecipe.Id);
+
+                            if (existingRecipe != null)
+                            {
+                                // Update existing recipe in the list
+                                recipeList[recipeList.IndexOf(existingRecipe)] = moddedRecipe;
+
+                                // Update other properties as needed
+                            }
+                            else
+                            {
+                                // Add new recipe to the list
+                                recipeList.Add(moddedRecipe);
+                            }
+                        }
+
+                        // Write the updated recipe list back to the stream
+                        Kh2.Mixdata.ReciLP.Write(stream, recipeList); // Pass IEnumerable<Reci>
+                        break;
+
+                    case "condition":
+                        var conditionList = Kh2.Mixdata.CondLP.Read(stream);
+                        var moddedConditions = deserializer.Deserialize<List<Kh2.Mixdata.CondLP>>(sourceText);
+
+                        foreach (var moddedCondition in moddedConditions)
+                        {
+                            var existingCondition = conditionList.FirstOrDefault(x => x.TextId == moddedCondition.TextId);
+
+                            if (existingCondition != null)
+                            {
+                                conditionList[conditionList.IndexOf(existingCondition)] = moddedCondition;
+
+                            }
+                            else
+                            {
+                                conditionList.Add(moddedCondition);
+                            }
+                        }
+
+                        Kh2.Mixdata.CondLP.Write(stream, conditionList); // Pass IEnumerable<Reci>
+                        break;
+
+                    case "level":
+                        var levelList = Kh2.Mixdata.LeveLP.Read(stream);
+                        var moddedLevels = deserializer.Deserialize<List<Kh2.Mixdata.LeveLP>>(sourceText);
+
+                        foreach (var moddedLevel in moddedLevels)
+                        {
+                            var existingLevel = levelList.FirstOrDefault(x => x.Title == moddedLevel.Title);
+
+                            if (existingLevel != null)
+                            {
+                                levelList[levelList.IndexOf(existingLevel)] = moddedLevel;
+                            }
+                            else
+                            {
+                                levelList.Add(moddedLevel);
+                            }
+                        }
+
+                        Kh2.Mixdata.LeveLP.Write(stream, levelList);
+                        break;
+                }
+            }
         }
     }
 }

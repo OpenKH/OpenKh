@@ -29,8 +29,10 @@ namespace OpenKh.Tools.Kh2MapStudio
         public string GamePath { get; }
         #endregion
 
-        const int InitialWindowWidth = 1000;
-        const int InitialWindowHeight = 800;
+        //New variables for being able to change the default Window Height & Width
+        readonly int InitialWindowWidth = (int)(EditorSettings.InitialWindowWidth);
+        readonly int InitialWindowHeight = (int)(EditorSettings.InitialWindowHeight);
+        //
         private readonly MonoGameImGuiBootstrap _bootstrap;
         private App _app;
 

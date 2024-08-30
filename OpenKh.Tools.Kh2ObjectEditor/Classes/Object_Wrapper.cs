@@ -13,7 +13,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Classes
         public string MsetPath { get; set; }
 
         public Bar MdlxBar { get; set; }
-        public Bar MsetBar { get; set; }
+        public BinaryArchive MsetBar { get; set; }
 
         public ModelSkeletal ModelFile { get; set; }
         public ModelCollision CollisionFile { get; set; }
@@ -49,7 +49,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Classes
                 if (!Bar.IsValid(streamMset))
                     throw new Exception("File is not a valid MSET: " + MsetPath);
 
-                MsetBar = Bar.Read(streamMset);
+                MsetBar = BinaryArchive.Read(streamMset);
             }
         }
 
@@ -82,9 +82,9 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Classes
             if(MsetBar != null)
             {
                 MsetEntries = new List<MotionSelector_Wrapper>();
-                for(int i = 0; i < MsetBar.Count; i++)
+                for(int i = 0; i < MsetBar.Entries.Count; i++)
                 {
-                    MsetEntries.Add(new MotionSelector_Wrapper(i, MsetBar[i]));
+                    MsetEntries.Add(new MotionSelector_Wrapper(i, MsetBar.Entries[i]));
                 }
             }
         }

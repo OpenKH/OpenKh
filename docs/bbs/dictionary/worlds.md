@@ -410,7 +410,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  JF02   | ジャンフェス(cd09) | Jump Festa (cd09)  |             |
 |  JF03   | ジャンフェス(sb10) | Jump Festa (sb10  |             |
 |  JF10   | シンデレラ城下町 | The Town  |             |
-|  JF11   | ポリゴンぶんかつけんしょ | Poly. Partition Test  |             |
+|  JF11   | ポリゴンぶんかつけんしょ | Polygon Partition Test  |             |
 |  JF20   | ノートルダム（そと） |   | Notredame (Exterior)            | Text only present in HD ReMiX
 |  JF21   | ノートルダム（なか） |   | Notredame (Interior)            | Text only present in HD ReMiX
 |  JF70   | tt27 | tt27  |             |

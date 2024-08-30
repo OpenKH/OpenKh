@@ -41,7 +41,7 @@
                 <Label FontWeight="Bold">Filters</Label>
                 <StackPanel Orientation="Horizontal">
                     <Label>Name:</Label>
-                    <TextBox Text="{Binding FilterName}" Width="100" VerticalContentAlignment="Center"></TextBox>
+                    <TextBox Name="FilterName" Text="{Binding FilterName}" Width="100" VerticalContentAlignment="Center" PreviewKeyDown="FilterName_PreviewKeyDown"></TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label>Hide Dummies:</Label>
@@ -60,6 +60,7 @@
                         <Separator/>
                         <MenuItem Header="Copy motion" Click="Motion_Copy"/>
                         <MenuItem Header="Replace with copied motion" Click="Motion_Replace"/>
+                        <MenuItem Header="Export FBX animation" Click="Motion_Export"/>
                         <MenuItem Header="Replace with imported FBX animation" Click="Motion_Import"/>
                         <Separator/>
                         <MenuItem Header="Export RC as mset" Click="RC_Export"/>

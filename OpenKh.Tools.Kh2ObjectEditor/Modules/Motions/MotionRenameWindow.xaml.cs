@@ -13,12 +13,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
             MotionIndex = motionIndex;
             ParentControl = parent;
             InitializeComponent();
-            NameTextBox.Text = MsetService.Instance.MsetBar[MotionIndex].Name;
+            NameTextBox.Text = MsetService.Instance.MsetBinarc.Entries[MotionIndex].Name;
         }
 
         private void Button_Rename(object sender, RoutedEventArgs e)
         {
-            MsetService.Instance.MsetBar[MotionIndex].Name = NameTextBox.Text;
+            MsetService.Instance.MsetBinarc.Entries[MotionIndex].Name = NameTextBox.Text;
             ParentControl.ThisVM.Motions[MotionIndex].setName();
             ParentControl.ThisVM.applyFilters();
             this.Close();

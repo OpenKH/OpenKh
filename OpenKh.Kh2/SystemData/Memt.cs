@@ -104,19 +104,49 @@ namespace OpenKh.Kh2.SystemData
         public List<IEntry> Entries { get; }
         public MemberIndices[] MemberIndexCollection { get; }
 
+        public class MemtEntryPatch
+        {
+            public int Index { get; set; }
+            public short WorldId { get; set; }
+            public short CheckStoryFlag { get; set; }
+            public short CheckStoryFlagNegation { get; set; }
+            public short Unk06 { get; set; }
+            public short Unk08 { get; set; }
+            public short Unk0A { get; set; }
+            public short Unk0C { get; set; }
+            public short Unk0E { get; set; }
+            public List<short> Members { get; set; }
+        }
+
+        public class MemberIndicesPatch
+        {
+            public int Index { get; set; }
+            public byte Player { get; set; }
+            public byte Friend1 { get; set; }
+            public byte Friend2 { get; set; }
+            public byte FriendWorld { get; set; }
+        }
+
+        public class MemtPatches
+        {
+            public List<MemtEntryPatch> MemtEntries { get; set; }
+            public List<MemberIndicesPatch> MemberIndices { get; set; }
+        }
+
         public Memt()
         {
-            Entries = new List<EntryFinalMix>().Cast<IEntry>().ToList();
-            MemberIndexCollection = new MemberIndices[1]
+            Entries = new List<IEntry>();
+            MemberIndexCollection = new MemberIndices[7];
+            for (int i = 0; i < MemberIndexCollection.Length; i++)
             {
-                new MemberIndices
+                MemberIndexCollection[i] = new MemberIndices
                 {
                     Player = 0,
-                    Friend1 = 1,
-                    Friend2 = 2,
-                    FriendWorld = 3
-                }
-            };
+                    Friend1 = 0,
+                    Friend2 = 0,
+                    FriendWorld = 0
+                };
+            }
         }
 
         internal Memt(Stream stream)
