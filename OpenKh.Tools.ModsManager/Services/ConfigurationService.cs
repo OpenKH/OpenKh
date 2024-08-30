@@ -40,6 +40,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool PanaceaInstalled { get; internal set; }
             public bool ShowConsole { get; internal set; } = false;
             public bool DebugLog { get; internal set; } = false;
+            public bool SoundDebug { get; internal set; } = false;
             public bool EnableCache { get; internal set; } = true;
             public bool QuickMenu { get; internal set; } = false;
             public bool DevView { get; internal set; } = false;
@@ -313,6 +314,15 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.DebugLog = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool SoundDebug
+        {
+            get => _config.SoundDebug;
+            set
+            {
+                _config.SoundDebug = value;
                 _config.Save(ConfigPath);
             }
         }
