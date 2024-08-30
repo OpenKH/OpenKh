@@ -552,7 +552,7 @@
 | 925 | F_TR520 | (F) Energy core (TR) |
 | 926 | F_TR540 | (F) Solar Sailer |
 | 927 | H_TR010_TSURU | (H) Tron (TSURU) (TR) |
-| 928 | F_NM140 | (F) ??? (NM) |
+| 928 | F_NM140 | (F) Conveyor Belt Activator? (NM) |
 | 929 | WM_CURSOR | (WM) Gummi ship |
 | 930 | WM_SYMBOL_TT | (WM) Traverse Town world |
 | 931 | WM_SYMBOL_HB | (WM) Hollow Bastion world |
@@ -1080,7 +1080,7 @@
 | 1652 | N_EX870 | (N) Org XIII member - Type G (EX) |
 | 1653 | N_EX580 | (N) Raijin (EX) |
 | 1654 | N_EX590 | (N) Fujin (EX) |
-| 1655 | F_NM150 | (F) ??? (NM) |
+| 1655 | F_NM150 | (F) Conveyor Belt Activator? (NM) |
 | 1656 | N_EX570_BTL | (N) Seifer (BTL) (EX) |
 | 1657 | F_EH000 | (F) Crooked Ascension room (EH) |
 | 1658 | F_EH010 | (F) Twilight's View room (EH) |
@@ -1856,7 +1856,7 @@
 | 2494 | F_HB040_WH | (F) CoR's orb (white) (HB) |
 | 2495 | F_HB070 | (F) CoR's droppable spike (HB) |
 | 2496 | F_HB080 | (F) CoR's steam wheel (HB) |
-| 2497 | F_HB110 | (F) ??? (HB) |
+| 2497 | F_HB110 | (F) CoR Conveyor Belt Activator (HB) |
 | 2498 | F_HB120 | (F) ??? (HB) |
 | 2499 | F_HB130 | (F) ??? (HB) |
 | 2500 | B_EX110_LV99 | (B99) Axel (Limit Cut) |
