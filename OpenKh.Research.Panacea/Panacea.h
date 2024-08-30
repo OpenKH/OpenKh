@@ -17,6 +17,7 @@ namespace Panacea
     __int64  __cdecl GetRemasteredCount();
     Axa::RemasteredEntry* __cdecl GetRemasteredEntry(Axa::CFileMan* a1, int* origOffsetPtr, int assetNum);
     void* GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizePtr, int assetNum);
+    bool OpenFileImpl(Axa::PackageFile* a1, const char* filePath, const char* altBasePath);
     namespace VAG_STREAM
     {
         void play(const char* fileName, int volume, int fadeVolume, int time);

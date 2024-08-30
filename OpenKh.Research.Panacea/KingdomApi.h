@@ -61,6 +61,7 @@ namespace Axa
         char CurrentFileName[260]{};
         int unk3 = 0;
         void* GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizePtr, int assetNum);
+        static bool OpenFileImpl(Axa::PackageFile* a1, const char* filePath, const char* altBasePath);
     };
 
     class CFileMan
@@ -132,6 +133,7 @@ PFN_DECLARE(void, Axa_FreeAllPackages, ());
 PFN_DECLARE(__int64, Axa_CFileMan_GetRemasteredCount, ());
 PFN_DECLARE(Axa::RemasteredEntry*, Axa_CFileMan_GetRemasteredEntry, (Axa::CFileMan* a1, int* origOffsetPtr, int assetNum));
 PFN_DECLARE(void*, Axa_PackageFile_GetRemasteredAsset, (Axa::PackageFile* a1, unsigned int* assetSizePtr, int assetNum));
+PFN_DECLARE(bool, Axa_PackageFile_OpenFileImpl, (Axa::PackageFile* a1, const char* filePath, const char* altBasePath));
 PFN_DECLARE(__int64, Axa_AxaSoundStream__threadProc, (unsigned int* instance));
 PFN_DECLARE(int, Axa_OpenFile, (const char* Format, int OFlag));
 PFN_DECLARE(void, Axa_DebugPrint, (const char* Format, ...));
