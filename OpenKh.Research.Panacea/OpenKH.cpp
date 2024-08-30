@@ -117,6 +117,7 @@ std::wstring OpenKH::m_ExtractPath = L"";
 bool OpenKH::m_ShowConsole = false;
 bool OpenKH::m_DebugLog = false;
 bool OpenKH::m_EnableCache = true;
+bool OpenKH::m_SoundDebug = false;
 bool QuickMenu = false;
 const uint8_t quickmenupat[] = { 0xB1, 0x01, 0x90 };
 const std::wstring gamefolders[] = {
@@ -205,6 +206,8 @@ void OpenKH::Initialize()
                 fputs("debug_log=true\n", f);
             if (m_EnableCache)
                 fputs("enable_cache=true\n", f);
+            if (m_SoundDebug)
+                fputs("sound_debug=true\n", f);
             if (QuickMenu)
                 fputs("quick_menu=true\n", f);
             fclose(f);
@@ -294,6 +297,8 @@ void OpenKH::ReadSettings(const char* filename)
             parseBool(value, m_DebugLog);
         else if (!strncmp(key, "enable_cache", sizeof(buf)))
             parseBool(value, m_EnableCache);
+        else if (!strncmp(key, "sound_debug", sizeof(buf)))
+            parseBool(value, m_SoundDebug);
         else if (!strncmp(key, "quick_launch", sizeof(buf)))
         {
             if (!_stricmp(value, "kh1") || !_stricmp(value, "kh3d"))

@@ -1398,7 +1398,7 @@ void Panacea::VAG_STREAM::exit()
 
 void Panacea::DebugPrint(const char* format, ...)
 {
-    if (OpenKH::m_DebugLog)
+    if (OpenKH::m_DebugLog && OpenKH::m_SoundDebug)
     {
         va_list args;
         va_start(args, format);
