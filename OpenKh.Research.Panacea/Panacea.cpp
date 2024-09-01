@@ -222,6 +222,7 @@ struct MyAppVtbl
     void* onFrameForSaveWait;
     void* func3;
     void* func4recom;
+    void* func5recom;
 };
 
 MyAppVtbl customAppVtbl;
