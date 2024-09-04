@@ -15,6 +15,7 @@ PFN_DEFINE(Axa_FreeAllPackages);
 PFN_DEFINE(Axa_CFileMan_GetRemasteredCount);
 PFN_DEFINE(Axa_CFileMan_GetRemasteredEntry);
 PFN_DEFINE(Axa_PackageFile_GetRemasteredAsset);
+PFN_DEFINE(Axa_PackageFile_OpenFileImpl);
 PFN_DEFINE(Axa_AxaSoundStream__threadProc);
 PFN_DEFINE(Axa_OpenFile);
 PFN_DEFINE(Axa_DebugPrint);
@@ -79,6 +80,11 @@ Axa::RemasteredEntry* Axa::CFileMan::GetRemasteredEntry(CFileMan* a1, int* origO
 void* Axa::PackageFile::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizePtr, int assetNum)
 {
     return pfn_Axa_PackageFile_GetRemasteredAsset(a1, assetSizePtr, assetNum);
+}
+
+bool Axa::PackageFile::OpenFileImpl(Axa::PackageFile* a1, const char* filePath, const char* altBasePath)
+{
+    return pfn_Axa_PackageFile_OpenFileImpl(a1, filePath, altBasePath);
 }
 
 __int64 Axa::AxaSoundStream::_threadProc(unsigned int* instance)

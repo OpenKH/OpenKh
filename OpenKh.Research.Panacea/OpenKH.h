@@ -23,6 +23,7 @@ namespace OpenKH
     extern bool m_ShowConsole;
     extern bool m_DebugLog;
     extern bool m_EnableCache;
+    extern bool m_SoundDebug;
 
     void Initialize();
 
