@@ -28,6 +28,7 @@ public partial class TestAssetExtractor : Node
     {
         "obj/P_EX100.mdlx", //Sora
         "obj/P_EX100.mset", //Sora's Moveset
+        "map/hb26.map", //Garden of Assemblage
     };
     
     public override void _Ready()

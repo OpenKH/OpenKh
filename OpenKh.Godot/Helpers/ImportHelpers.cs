@@ -73,5 +73,12 @@ public static class ImportHelpers
     public static Quaternion Rotation(this ModelCommon.Bone bone) => CommonRotation(bone.RotationX, bone.RotationY, bone.RotationZ);
 
     public static Vector3 Scale(this ModelCommon.Bone bone) => new(bone.ScaleX, bone.ScaleY, bone.ScaleZ);
-    public static Transform3D Transform(this ModelCommon.Bone bone) => new(new Basis(bone.Rotation()).Scaled(bone.Scale()), bone.Position());
+    public static Transform3D Transform(this ModelCommon.Bone bone)
+    {
+        var scaleTransform = Transform3D.Identity.Scaled(bone.Scale());
+        var rotationTransform = new Transform3D(new Basis(bone.Rotation()), Vector3.Zero);
+        var translationTransform = Transform3D.Identity.Translated(bone.Position());
+
+        return translationTransform * rotationTransform * scaleTransform;
+    }
 }

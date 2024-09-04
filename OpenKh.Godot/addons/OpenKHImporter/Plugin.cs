@@ -15,6 +15,7 @@ public partial class Plugin : EditorPlugin
 		typeof(ScdImporter),
 		typeof(CvblImporter),
 		typeof(MsetImporter),
+        typeof(MapImporter),
 	];
 	private Array<EditorImportPlugin> Importers = new();
 	public override void _EnterTree()
