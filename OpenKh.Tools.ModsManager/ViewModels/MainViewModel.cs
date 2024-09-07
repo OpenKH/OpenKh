@@ -705,7 +705,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             return Task.CompletedTask;
                         }
                     }
-                    if (ConfigurationService.PCVersion == "Steam" && !(_launchGame == "kh3d"))
+                    if (ConfigurationService.PCVersion == "Steam" && !(_launchGame == "kh3d") && ConfigurationService.SteamAPITrick1525 == false)
                     {
                         if (ConfigurationService.PcReleaseLocation != null)
                         {
@@ -741,7 +741,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             return Task.CompletedTask;
                         }
                     }
-                    else if (ConfigurationService.PCVersion == "Steam" && _launchGame == "kh3d")
+                    else if (ConfigurationService.PCVersion == "Steam" && _launchGame == "kh3d" && ConfigurationService.SteamAPITrick28 == false)
                     {
                         if (ConfigurationService.PcReleaseLocationKH3D != null)
                         {
