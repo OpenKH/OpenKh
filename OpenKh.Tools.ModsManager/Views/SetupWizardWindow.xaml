@@ -386,7 +386,7 @@
                 </ComboBox>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                    <Run Foreground="Red">WARNING</Run>
-                    You must run the games first before creating this file otherwise the game will not boot. If you have installed it before running each game delete it using the delete button and run each game first.
+                    Steam must be running otherwise the game will fail to start. It will start to open then crash for seemingly no reason. Make sure steam is open if using this.
                 </TextBlock>
                 <Button Margin="0 0 0 6" Content="Create steam_appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding InstallSteamAPIFile}"/>
                 <Button Margin="0 0 0 6" Content="Delete steam_appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveSteamAPIFile}"/>
