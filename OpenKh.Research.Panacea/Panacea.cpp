@@ -697,35 +697,44 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
 {
     std::vector<int> assetoffs{};
     const wchar_t* ext = PathFindExtensionW(path);
-    if (ext[-2] == L'.' && ext[-1] == L'a')
-        ext -= 2;
-    if (!_wcsicmp(ext, L".imd"))
-        GetIMDOffsets(addr, 0, assetoffs);
-    else if (!_wcsicmp(ext, L".imz"))
-        GetIMZOffsets(addr, 0, assetoffs);
-    else if (!_wcsicmp(ext, L".tm2"))
-        GetTM2Offsets(addr, 0, assetoffs);
-    else if (!_wcsicmp(ext, L".pax"))
-        GetPAXOffsets(addr, 0, assetoffs);
-    else if (!_wcsicmp(ext, L".2dd")
-        || !_wcsicmp(ext, L".2ld")
-        || !_wcsicmp(ext, L".a.fm")
-        || !_wcsicmp(ext, L".a.fr")
-        || !_wcsicmp(ext, L".a.gr")
-        || !_wcsicmp(ext, L".a.it")
-        || !_wcsicmp(ext, L".a.sp")
-        || !_wcsicmp(ext, L".a.us")
-        || !_wcsicmp(ext, L".a.uk")
-        || !_wcsicmp(ext, L".a.jp")
-        || !_wcsicmp(ext, L".bar")
-        || !_wcsicmp(ext, L".bin")
-        || !_wcsicmp(ext, L".mag")
-        || !_wcsicmp(ext, L".map")
-        || !_wcsicmp(ext, L".mdlx"))
-        GetBAROffsets(addr, 0, assetoffs);
-    else // unknown file type
+    switch (OpenKH::m_GameID)
+    {
+    case OpenKH::GameId::KingdomHearts2:
+        if (ext[-2] == L'.' && ext[-1] == L'a')
+            ext -= 2;
+        if (!_wcsicmp(ext, L".imd"))
+            GetIMDOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".imz"))
+            GetIMZOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".tm2"))
+            GetTM2Offsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".pax"))
+            GetPAXOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".2dd")
+            || !_wcsicmp(ext, L".2ld")
+            || !_wcsicmp(ext, L".a.fm")
+            || !_wcsicmp(ext, L".a.fr")
+            || !_wcsicmp(ext, L".a.gr")
+            || !_wcsicmp(ext, L".a.it")
+            || !_wcsicmp(ext, L".a.sp")
+            || !_wcsicmp(ext, L".a.us")
+            || !_wcsicmp(ext, L".a.uk")
+            || !_wcsicmp(ext, L".a.jp")
+            || !_wcsicmp(ext, L".bar")
+            || !_wcsicmp(ext, L".bin")
+            || !_wcsicmp(ext, L".mag")
+            || !_wcsicmp(ext, L".map")
+            || !_wcsicmp(ext, L".mdlx"))
+            GetBAROffsets(addr, 0, assetoffs);
+        else // unknown file type
+            for (int i = 0; i < entries.size(); ++i)
+                assetoffs.push_back(entries[i].origOffset);
+        break;
+    default:
         for (int i = 0; i < entries.size(); ++i)
             assetoffs.push_back(entries[i].origOffset);
+        break;
+    }
     std::vector<Axa::RemasteredEntry> modfiles;
     ScanFolder(remasteredFolder, modfiles);
     if (modfiles.size() >= assetoffs.size())
