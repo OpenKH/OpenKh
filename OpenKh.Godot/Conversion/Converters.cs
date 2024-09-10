@@ -22,25 +22,28 @@ namespace OpenKh.Godot.Conversion;
 
 public static class Converters
 {
+    //KH2 entity shaders
     private static Shader BasicShader = ResourceLoader.Load<Shader>("res://Assets/Shaders/KH2BasicShader.gdshader");
     private static Shader AnimatedShader = ResourceLoader.Load<Shader>("res://Assets/Shaders/KH2AnimatedShader.gdshader");
+    
+    //KH2 world shaders
+    private static Shader WorldOpaqueShader = ResourceLoader.Load<Shader>("res://Assets/Shaders/KH2WorldOpaqueShader.gdshader");
+    private static Shader WorldAlphaMixShader = ResourceLoader.Load<Shader>("res://Assets/Shaders/KH2WorldAlphaMixShader.gdshader");
+    private static Shader WorldAlphaAddShader = ResourceLoader.Load<Shader>("res://Assets/Shaders/KH2WorldAlphaAddShader.gdshader");
+    private static Shader WorldAlphaSubShader = ResourceLoader.Load<Shader>("res://Assets/Shaders/KH2WorldAlphaSubShader.gdshader");
+    private static Shader WorldAlphaMulShader = ResourceLoader.Load<Shader>("res://Assets/Shaders/KH2WorldAlphaMulShader.gdshader");
 
     public static KH2Mdlx FromMdlx(Bar bar, List<ImageTexture> hdTexs = null)
     {
         var usesHdTextures = hdTexs is not null;
 
-        var hdTextureCount = 0;
-        var hdTextureMap = new System.Collections.Generic.Dictionary<int, int>();
-
         var root = new KH2Mdlx();
-
-        var barFile = bar;
 
         var skeletalModels = new List<ModelSkeletal>();
         var textures = new List<ModelTexture>();
         var collisions = new List<byte[]>();
 
-        foreach (var barEntry in barFile)
+        foreach (var barEntry in bar)
         {
             try
             {
@@ -81,10 +84,9 @@ public static class Converters
 
         var texImg = textures.First();
 
-
-        var images = usesHdTextures
-            ? hdTexs
-            : texImg.Images
+        var mapper = new TextureMapper(usesHdTextures ? hdTexs : null);
+        
+        var images = texImg.Images
                 .Select(texture => Image.CreateFromData(texture.Size.Width, texture.Size.Height, false, Image.Format.Rgba8, texture.ToBgra32().BGRAToRGBA()))
                 .Select(ImageTexture.CreateFromImage)
                 .ToList();
@@ -124,7 +126,10 @@ public static class Converters
                 var material = new ShaderMaterial();
 
                 var texIndex = (int)group.Header.TextureIndex;
-                var tex = images[texIndex];
+                //var tex = images[texIndex];
+
+                var tex = mapper.GetTexture(texIndex, images[texIndex]);
+                /*
                 if (usesHdTextures)
                 {
                     if (!hdTextureMap.TryGetValue(texIndex, out var hdTexIndex))
@@ -135,6 +140,7 @@ public static class Converters
                     }
                     tex = images[hdTexIndex];
                 }
+                */
                 var texSize = texImg.Images[texIndex].Size;
                 var originalSize = new Vector2(texSize.Width, texSize.Height);
 
@@ -146,7 +152,14 @@ public static class Converters
                     {
                         var uvFront = new Vector2(animation.UOffsetInBaseImage, animation.VOffsetInBaseImage) / originalSize;
                         var uvBack = new Vector2(animation.UOffsetInBaseImage + animation.SpriteWidth, animation.VOffsetInBaseImage + animation.SpriteHeight) / originalSize;
+                        
+                        var data = ImageDataHelpers.FromIndexed8ToBitmap32(animation.SpriteImage, texImg.Images[texIndex].GetClut(), ImageDataHelpers.RGBA).BGRAToRGBA();
 
+                        var sprite = Image.CreateFromData(animation.SpriteWidth, animation.SpriteHeight * animation.NumSpritesInImageData, false, Image.Format.Rgba8, data);
+
+                        var animatedTex = mapper.GetNextTexture(ImageTexture.CreateFromImage(sprite));
+                        
+                        /*
                         ImageTexture animatedTex;
 
                         if (usesHdTextures)
@@ -163,6 +176,7 @@ public static class Converters
 
                             animatedTex = ImageTexture.CreateFromImage(sprite);
                         }
+                        */
 
                         material.SetShaderParameter($"Sprite{textureAnimations}", animatedTex);
                         material.SetShaderParameter($"TextureOriginalUV{textureAnimations}", new Vector4(uvFront.X, uvFront.Y, uvBack.X, uvBack.Y));
@@ -202,11 +216,7 @@ public static class Converters
                 {
                     material.Shader = BasicShader;
                 }
-
-                //if ()
-
-                //material.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
-
+                
                 //GD.Print($"{header.Alpha},{header.AlphaAdd},{header.AlphaSub},{header.AlphaEx}");
 
                 //TODO:
@@ -314,22 +324,109 @@ public static class Converters
 
         return root;
     }
+
+    public static Node3D FromCoct(Coct collision)
+    {
+        var root = new Node3D();
+        for (var index = 0; index < collision.Nodes.Count; index++)
+        {
+            var node = collision.Nodes[index];
+            var body = new Node3D();
+            
+            root.AddChild(body);
+            
+            body.Name = $"Node_{index}";
+
+            for (var index1 = 0; index1 < node.Meshes.Count; index1++)
+            {
+                var mesh = node.Meshes[index1];
+
+                var meshNode = new Node3D();
+                body.AddChild(meshNode);
+
+                meshNode.Name = $"Mesh_{index1}";
+
+                var collisions = new System.Collections.Generic.Dictionary<int, ConcavePolygonShape3D>();
+                
+                //staticBody.CollisionLayer = mesh.Group; //TODO
+                
+                foreach (var c in mesh.Collisions)
+                {
+                    var flags = c.Attributes.Flags;
+
+                    if (!collisions.TryGetValue(flags, out var shape))
+                    {
+                        var staticBody = new StaticBody3D();
+                        meshNode.AddChild(staticBody);
+                        staticBody.Name = $"Collisions_{flags:B16}";
+                        staticBody.CollisionLayer = (uint)flags;
+                        
+                        var bodyShape = new CollisionShape3D();
+                        staticBody.AddChild(bodyShape);
+                        bodyShape.Name = "Shape";
+                    
+                        shape = new ConcavePolygonShape3D();
+                        shape.SetBackfaceCollisionEnabled(true);
+                        
+                        bodyShape.Shape = shape;
+                        
+                        collisions.Add(flags, shape);
+                    }
+                    
+                    var one = collision.VertexList[c.Vertex1];
+                    var two = collision.VertexList[c.Vertex2];
+                    var three = collision.VertexList[c.Vertex3];
+                    
+                    var vec1 = new Vector3(one.X, -one.Y, -one.Z) * ImportHelpers.KH2PositionScale;
+                    var vec2 = new Vector3(two.X, -two.Y, -two.Z) * ImportHelpers.KH2PositionScale;
+                    var vec3 = new Vector3(three.X, -three.Y, -three.Z) * ImportHelpers.KH2PositionScale;
+
+                    var quad = collision.VertexList.Count > c.Vertex4 && c.Vertex4 >= 0;
+
+                    if (quad)
+                    {
+                        var four = collision.VertexList[c.Vertex4];
+                        var vec4 = new Vector3(four.X, -four.Y, -four.Z) * ImportHelpers.KH2PositionScale;
+                        
+                        shape.Data = shape.Data.Concat(new[]
+                        {
+                            vec1, vec2, vec3,
+                            vec1, vec3, vec4,
+                        }).ToArray();
+                    }
+                    else
+                    {
+                        shape.Data = shape.Data.Concat(new[]
+                        {
+                            vec1, vec2, vec3,
+                        }).ToArray();
+                    }
+                }
+            }
+        }
+        return root;
+    }
+
+    private enum AlphaType
+    {
+        Mix,
+        Add,
+        Sub,
+        Mul,
+        Scissor,
+        Opaque
+    }
+    
     public static Node3D FromMap(Bar map, List<ImageTexture> hdTexs = null)
     {
-        var usesHdTextures = hdTexs is not null;
-
-        var hdTextureCount = 0;
-        var hdTextureMap = new System.Collections.Generic.Dictionary<int, int>();
-
-        var root = new Node3D();
-
-        /*
-        GD.Print(map.Count);
         foreach (var entry in map)
         {
-            GD.Print($"{entry.Name}: {entry.Type}");
+            GD.Print($"{entry.Name}, {entry.Type}");
         }
-        */
+        
+        var usesHdTextures = hdTexs is not null;
+
+        var root = new Node3D();
 
         var mainModel = map.FirstOrDefault(i => i.Name == "MAP" && i.Type == Bar.EntryType.Model);
 
@@ -346,108 +443,103 @@ public static class Converters
         root.AddChild(mesh);
 
         var arrayMesh = new ArrayMesh();
+
+        var mapper = new TextureMapper(usesHdTextures ? hdTexs : null);
         
-        var images = usesHdTextures
-            ? hdTexs
-            : texImg.Images
+        var images = texImg.Images
                 .Select(texture => Image.CreateFromData(texture.Size.Width, texture.Size.Height, false, Image.Format.Rgba8, texture.ToBgra32().BGRAToRGBA()))
                 .Select(ImageTexture.CreateFromImage)
                 .ToList();
         
-        var indexBuffer = new int[4];
-        var recentIndex = 0;
-
-        var meshDictionary = new System.Collections.Generic.Dictionary<(int texIndex, bool alpha, bool alphaAdd, bool alphaSub), (List<Vector3> pos, List<Vector2> uv, List<Color> color)>();
+        var meshDictionary = new System.Collections.Generic.Dictionary<(int texIndex, AlphaType alpha, int uvsc), (List<Vector3> pos, List<Color> color, List<Vector2> uvs)>();
+        
+        var maxId = background.Chunks.Max(i => i.TextureId);
+        
+        for (var i = 0; i <= maxId; i++) mapper.GetTexture(i, null);
         
         for (var m = 0; m < background.Chunks.Count; m++)
         {
             var chunk = background.Chunks[m];
             var texIndex = chunk.TextureId;
-
-            var positions = new List<Vector3>();
-            //var normals = new List<Vector3>();
-            var colors = new List<Color>();
-            var uvs = new List<Vector2>();
-
-            var indices = new List<int>();
-
-            var unpacker = new VifUnpacker(chunk.VifPacket);
-            unpacker.Run();
-            using var str = new MemoryStream(unpacker.Memory);
-
-            var vpu = VpuPacket.Read(str);
-
-            //var useNormal = vpu.Normals.Length > 0;
-            var useColor = vpu.Colors.Length > 0;
             
-            GD.Print(vpu.Indices.Length);
+            //GD.Print($"{chunk.UVScrollIndex:B8}, {texIndex}");
+
+            var alphaType = AlphaType.Opaque;
+            if (chunk.IsAlphaAdd) alphaType = AlphaType.Add;
+            else if (chunk.IsAlphaSubtract) alphaType = AlphaType.Sub;
+            //else if (chunk.IsMulti) alphaType = AlphaType.Mul;
+            else if (chunk.IsAlpha) alphaType = AlphaType.Mix;
             
-            var baseVertexIndex = positions.Count;
-            foreach (var index in vpu.Indices)
-            {
-                var i = index.Index;
-                var pos = vpu.Vertices[i];
-                var indexInfo = vpu.Indices[i];
-
-                positions.Add(new Vector3(pos.X, pos.Y, pos.Z) * ImportHelpers.KH2PositionScale);
-                uvs.Add(new Vector2(indexInfo.U / 4096f, indexInfo.V / 4096f));
-
-                /*
-                if (useNormal)
-                {
-                    var normal = vpu.Normals[i];
-                    normals.Add(new Vector3(normal.X, normal.Y, normal.Z));
-                }
-                else normals.Add(Vector3.One);
-                */
-                if (useColor)
-                {
-                    var color = vpu.Colors[i];
-                    colors.Add(new Color(color.R / 128f, color.G / 128f, color.B / 128f, color.A / 128f));
-                }
-                else colors.Add(Colors.White);
-                
-                indexBuffer[(recentIndex++) & 3] = baseVertexIndex + i;
-                switch (index.Function)
-                {
-                    case VpuPacket.VertexFunction.DrawTriangleDoubleSided:
-                        indices.Add(indexBuffer[(recentIndex - 1) & 3]);
-                        indices.Add(indexBuffer[(recentIndex - 3) & 3]);
-                        indices.Add(indexBuffer[(recentIndex - 2) & 3]);
-                        indices.Add(indexBuffer[(recentIndex - 1) & 3]);
-                        indices.Add(indexBuffer[(recentIndex - 2) & 3]);
-                        indices.Add(indexBuffer[(recentIndex - 3) & 3]);
-                        break;
-                    case VpuPacket.VertexFunction.Stock:
-                        break;
-                    case VpuPacket.VertexFunction.DrawTriangleInverse:
-                        indices.Add(indexBuffer[(recentIndex - 1) & 3]);
-                        indices.Add(indexBuffer[(recentIndex - 3) & 3]);
-                        indices.Add(indexBuffer[(recentIndex - 2) & 3]);
-                        break;
-                    case VpuPacket.VertexFunction.DrawTriangle:
-                        indices.Add(indexBuffer[(recentIndex - 1) & 3]);
-                        indices.Add(indexBuffer[(recentIndex - 2) & 3]);
-                        indices.Add(indexBuffer[(recentIndex - 3) & 3]);
-                        break;
-                }
-            }
-
-            var dictIndex = (texIndex, chunk.IsAlpha, chunk.IsAlphaAdd, chunk.IsAlphaSubtract);
+            var dictIndex = (texIndex, alphaType, chunk.UVScrollIndex);
 
             if (!meshDictionary.TryGetValue(dictIndex, out var result))
             {
                 result = ([], [], []);
                 meshDictionary.Add(dictIndex, result);
             }
-            result.pos.AddRange(indices.Select(i => positions[i]).ToArray());
-            result.uv.AddRange(indices.Select(i => uvs[i]).ToArray());
-            result.color.AddRange(indices.Select(i => colors[i]).ToArray());
+            
+            var vertices = new List<(Vector3 pos, Vector2 uv, Color color)>();
 
-            //var flags = Mesh.ArrayFormat.FormatVertex | Mesh.ArrayFormat.FormatTexUV;
+            var unpacker = new VifUnpacker(chunk.VifPacket);
+            while (unpacker.Run() != VifUnpacker.State.End)
+            {
+                var currentIndex = vertices.Count;
+                
+                using var str = new MemoryStream(unpacker.Memory);
 
-            //if (useNormal) flags |= Mesh.ArrayFormat.FormatNormal;
-            //if (useColor) flags |= Mesh.ArrayFormat.FormatColor; 
+                var vpu = VpuPacket.Read(str);
+                var useColor = vpu.Colors.Length > 0;
+                
+                var colors = useColor ? 
+                    vpu.Colors.Select(i => new Color(i.R / 128f, i.G / 128f, i.B / 128f, i.A / 128f)).ToList() : 
+                    Enumerable.Repeat(new Color(0.5f, 0.5f, 0.5f), vpu.Indices.Length).ToList();
+                
+                for (var i = 0; i < vpu.Indices.Length; i++)
+                {
+                    var ind = vpu.Indices[i];
+                    var pos = vpu.Vertices[ind.Index];
+                    vertices.Add((new Vector3(pos.X, pos.Y, pos.Z) * ImportHelpers.KH2PositionScale, new Vector2((short)(ushort)ind.U, (short)(ushort)ind.V) / 4096f, colors[i]));
+                }
+
+                var indices = vpu.Indices;
+                
+                var resultPos = new List<Vector3>();
+                var resultColor = new List<Color>();
+                var resultUv = new List<Vector2>();
+
+                for (var i = 0; i < vpu.Indices.Length; i++)
+                {
+                    var index = indices[i];
+                    var func = index.Function;
+
+                    var cur = currentIndex + i;
+                    
+                    if (func is VpuPacket.VertexFunction.DrawTriangle or VpuPacket.VertexFunction.DrawTriangleDoubleSided)
+                    {
+                        var first = cur - 1;
+                        var second = cur - 2;
+                        var third = cur;
+                    
+                        resultPos.AddRange([ vertices[first].pos, vertices[second].pos, vertices[third].pos ]);
+                        resultUv.AddRange([ vertices[first].uv, vertices[second].uv, vertices[third].uv ]);
+                        resultColor.AddRange([ vertices[first].color, vertices[second].color, vertices[third].color ]);
+                    }
+                    if (func is VpuPacket.VertexFunction.DrawTriangleInverse or VpuPacket.VertexFunction.DrawTriangleDoubleSided)
+                    {
+                        var first = cur - 2;
+                        var second = cur - 1;
+                        var third = cur;
+                    
+                        resultPos.AddRange([ vertices[first].pos, vertices[second].pos, vertices[third].pos ]);
+                        resultUv.AddRange([ vertices[first].uv, vertices[second].uv, vertices[third].uv ]);
+                        resultColor.AddRange([ vertices[first].color, vertices[second].color, vertices[third].color ]);
+                    }
+                }
+                
+                result.pos.AddRange(resultPos);
+                result.color.AddRange(resultColor);
+                result.uvs.AddRange(resultUv);
+            }
         }
 
         var mIndex = 0;
@@ -456,51 +548,63 @@ public static class Converters
         {
             var texIndex = meshCollection.Key.texIndex;
             var alpha = meshCollection.Key.alpha;
-            var alphaAdd = meshCollection.Key.alphaAdd;
-            var alphaSub = meshCollection.Key.alphaSub;
-
-            var pos = meshCollection.Value.pos;
-            var uv = meshCollection.Value.uv;
-            var color = meshCollection.Value.color;
+            var uvsc = meshCollection.Key.uvsc;
             
-            var tex = images[texIndex];
-            if (usesHdTextures)
-            {
-                if (!hdTextureMap.TryGetValue(texIndex, out var hdTexIndex))
-                {
-                    hdTextureMap[texIndex] = hdTextureCount;
-                    hdTexIndex = hdTextureCount;
-                    hdTextureCount++;
-                }
-                tex = images[hdTexIndex];
-            }
+            //GD.Print($"{texIndex}, {uvsc:B8}");
+            var nativeImage = images[texIndex];
+            
+            var tex = mapper.GetTexture(texIndex, nativeImage);
+            
             //var texSize = texImg.Images[texIndex].Size;
             var material = new ShaderMaterial();
-            material.Shader = BasicShader;
 
-            if (alpha)
+            material.Shader = alpha switch
             {
-                material.SetShaderParameter("Alpha", true);
-                material.SetShaderParameter("Scissor", true);
-            }
-            if (alphaAdd)
+                AlphaType.Mix => WorldAlphaMixShader,
+                AlphaType.Add => WorldAlphaAddShader,
+                AlphaType.Sub => WorldAlphaSubShader,
+                AlphaType.Mul => WorldAlphaMulShader,
+                _ => WorldOpaqueShader,
+            };
+            
+            //var uvX = 
+            
+            if (uvsc > 0 && uvsc < texImg.TextureFooterData.UvscList.Count)
             {
-                material.SetShaderParameter("Alpha", true);
+                var nativeSize = nativeImage.GetSize();
+                GD.Print($"{uvsc}, {texImg.TextureFooterData.UvscList.Count}");
+                
+                var findUvsc = texImg.TextureFooterData.UvscList[uvsc];
+                
+                var uSpeed = (findUvsc.UScrollSpeed / 20000f) / nativeSize.X;
+                var vSpeed = (findUvsc.VScrollSpeed / 20000f) / nativeSize.Y;
+                
+                material.SetShaderParameter("UVScrollSpeed", new Vector2(uSpeed, vSpeed));
             }
-            if (alphaSub)
+            
+            /*
+            var findUvsc = texImg.TextureFooterData.UvscList.FirstOrDefault(i => i.TextureIndex == texIndex);
+            if (findUvsc is not null)
             {
-                material.SetShaderParameter("Alpha", true);
+                var nativeSize = nativeImage.GetSize();
+                
+                var uSpeed = (findUvsc.UScrollSpeed / 20000f) / nativeSize.X;
+                var vSpeed = (findUvsc.VScrollSpeed / 20000f) / nativeSize.Y;
+                
+                GD.Print($"{uvsc}, {texImg.TextureFooterData.UvscList.Count} | {findUvsc.UScrollSpeed}, {findUvsc.VScrollSpeed} | {uSpeed}, {vSpeed}");
+                
+                material.SetShaderParameter("UVScrollSpeed", new Vector2(uSpeed, vSpeed));
             }
+            */
+            
             material.SetShaderParameter("Texture", tex);
             
             var array = new Array();
             array.Resize((int)Mesh.ArrayType.Max);
             
-            array[(int)Mesh.ArrayType.Vertex] = pos.ToArray();
-            array[(int)Mesh.ArrayType.TexUV] = uv.ToArray();
-
-            //array[(int)Mesh.ArrayType.Normal] = normals.ToArray();
-            array[(int)Mesh.ArrayType.Color] = color.ToArray();
+            array[(int)Mesh.ArrayType.Vertex] = meshCollection.Value.pos.ToArray();
+            array[(int)Mesh.ArrayType.TexUV] = meshCollection.Value.uvs.ToArray();
+            array[(int)Mesh.ArrayType.Color] = meshCollection.Value.color.ToArray();
             
             arrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, array, flags: Mesh.ArrayFormat.FormatVertex | Mesh.ArrayFormat.FormatTexUV | Mesh.ArrayFormat.FormatColor);
             arrayMesh.SurfaceSetMaterial(mIndex, material);
@@ -509,7 +613,17 @@ public static class Converters
 
         mesh.Name = "Background";
         mesh.Mesh = arrayMesh;
-        mesh.Owner = root;
+        //mesh.Owner = root;
+
+        var collision = map.FirstOrDefault(i => i.Type == Bar.EntryType.CollisionOctalTree);
+
+        if (collision is not null)
+        {
+            var coll = FromCoct(Coct.Read(collision.Stream));
+            root.AddChild(coll);
+            coll.Name = "Collision";
+            //coll.Owner = root;
+        }
 
         return root;
     }

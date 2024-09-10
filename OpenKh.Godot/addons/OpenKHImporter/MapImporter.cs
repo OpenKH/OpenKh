@@ -99,6 +99,8 @@ public partial class MapImporter : EditorImportPlugin
         var result = Converters.FromMap(barFile, images);
         
         result.Name = name;
+
+        foreach (var child in result.FindChildren("*", "", true, false)) child.Owner = result;
         
         var packed = new PackedScene();
         packed.Pack(result);
