@@ -30,7 +30,14 @@ public static class ImportHelpers
     public static readonly string Kh2ImportOriginalPath = Path.Combine(Kh2ImportPath, "original");
     public static readonly string Kh2ImportRemasteredPath = Path.Combine(Kh2ImportPath, "remastered");
 
+    public static Transform3D CreateTransform(Vector3 pos, Vector3 rot, Vector3 scale)
+    {
+        var scaleTransform = Transform3D.Identity.Scaled(scale);
+        var rotationTransform = new Transform3D(new Basis(CommonRotation(rot.X, rot.Y, rot.Z)), Vector3.Zero);
+        var translationTransform = Transform3D.Identity.Translated(pos);
 
+        return translationTransform * rotationTransform * scaleTransform;
+    }
     public static Quaternion CommonRotation(float x, float y, float z)
     {
         var rotationMatrixX = Matrix4x4.CreateRotationX(x);

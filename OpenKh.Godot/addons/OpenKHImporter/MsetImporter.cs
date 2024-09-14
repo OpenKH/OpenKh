@@ -49,6 +49,11 @@ public partial class MsetImporter : EditorImportPlugin
         
         var container = new KH2Moveset();
 
+        foreach (var entry in msetBinarc.Entries)
+        {
+            GD.Print(entry.Type);
+        }
+
         container.AnimationBinaries = new Array<AnimationBinaryResource>(msetBinarc.Entries.Select(entry => entry.Link < 0 || msetBinarc.Subfiles[entry.Link].Length == 0 ? null : new AnimationBinaryResource
             { Binary = msetBinarc.Subfiles[entry.Link]}));
         

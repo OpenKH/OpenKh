@@ -97,6 +97,8 @@ public partial class MdlxImporter : EditorImportPlugin
         }
 
         var result = Converters.FromMdlx(barFile, usesHdTextures ? images : null);
+        
+        foreach (var child in result.FindChildren("*", "", true, false)) child.Owner = result;
 
         result.Name = name;
         

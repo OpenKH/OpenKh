@@ -17,6 +17,7 @@ using OpenKh.Kh2.Models;
 using OpenKh.Kh2.TextureFooter;
 using OpenKh.Ps2;
 using Array = Godot.Collections.Array;
+using Environment = Godot.Environment;
 
 namespace OpenKh.Godot.Conversion;
 
@@ -85,246 +86,211 @@ public static class Converters
         var texImg = textures.First();
 
         var mapper = new TextureMapper(usesHdTextures ? hdTexs : null);
+
+        if (skeletalModels.Count <= 0) return null;
         
-        var images = texImg.Images
-                .Select(texture => Image.CreateFromData(texture.Size.Width, texture.Size.Height, false, Image.Format.Rgba8, texture.ToBgra32().BGRAToRGBA()))
-                .Select(ImageTexture.CreateFromImage)
-                .ToList();
-
-        if (skeletalModels.Count > 0)
+        var skeleton = FromModelSkeletal(skeletalModels.First(), texImg, mapper);
+        
+        root.Skeleton = skeleton;
+        if (collisions.Count != 0)
         {
-            //TODO
-            var model = skeletalModels.First();
-
-            var arrayMesh = new ArrayMesh();
-            var skeleton = new Skeleton3D();
-
-            root.AddChild(skeleton);
-
-            foreach (var bone in model.Bones) skeleton.AddBone(bone.Index.ToString());
-
-            var boneCount = skeleton.GetBoneCount();
-
-            foreach (var bone in model.Bones.Where(i => i.ParentIndex < boneCount && i.ParentIndex >= 0)) skeleton.SetBoneParent(bone.Index, bone.ParentIndex);
-            foreach (var bone in model.Bones) skeleton.SetBoneRest(bone.Index, bone.Transform());
-
-            skeleton.ResetBonePoses();
-
-            skeleton.Owner = root;
-            skeleton.Name = "Skeleton";
-
-            var textureAnimations = 0;
-
-            var animList = new List<KH2TextureAnimation>();
-
-            for (var m = 0; m < model.Groups.Count; m++)
-            {
-                var group = model.Groups[m];
-
-                var header = group.Header;
-                var mesh = group.Mesh;
-                var material = new ShaderMaterial();
-
-                var texIndex = (int)group.Header.TextureIndex;
-                //var tex = images[texIndex];
-
-                var tex = mapper.GetTexture(texIndex, images[texIndex]);
-                /*
-                if (usesHdTextures)
-                {
-                    if (!hdTextureMap.TryGetValue(texIndex, out var hdTexIndex))
-                    {
-                        hdTextureMap[texIndex] = hdTextureCount;
-                        hdTexIndex = hdTextureCount;
-                        hdTextureCount++;
-                    }
-                    tex = images[hdTexIndex];
-                }
-                */
-                var texSize = texImg.Images[texIndex].Size;
-                var originalSize = new Vector2(texSize.Width, texSize.Height);
-
-                if (texImg.TextureFooterData.TextureAnimationList.Any(i => i.TextureIndex == texIndex))
-                {
-                    material.Shader = AnimatedShader;
-                    var find = texImg.TextureFooterData.TextureAnimationList.Where(i => i.TextureIndex == texIndex).ToArray();
-                    foreach (var animation in find)
-                    {
-                        var uvFront = new Vector2(animation.UOffsetInBaseImage, animation.VOffsetInBaseImage) / originalSize;
-                        var uvBack = new Vector2(animation.UOffsetInBaseImage + animation.SpriteWidth, animation.VOffsetInBaseImage + animation.SpriteHeight) / originalSize;
-                        
-                        var data = ImageDataHelpers.FromIndexed8ToBitmap32(animation.SpriteImage, texImg.Images[texIndex].GetClut(), ImageDataHelpers.RGBA).BGRAToRGBA();
-
-                        var sprite = Image.CreateFromData(animation.SpriteWidth, animation.SpriteHeight * animation.NumSpritesInImageData, false, Image.Format.Rgba8, data);
-
-                        var animatedTex = mapper.GetNextTexture(ImageTexture.CreateFromImage(sprite));
-                        
-                        /*
-                        ImageTexture animatedTex;
-
-                        if (usesHdTextures)
-                        {
-                            var hdTexIndex = hdTextureCount;
-                            hdTextureCount++;
-                            animatedTex = images[hdTexIndex];
-                        }
-                        else
-                        {
-                            var data = ImageDataHelpers.FromIndexed8ToBitmap32(animation.SpriteImage, texImg.Images[texIndex].GetClut(), ImageDataHelpers.RGBA).BGRAToRGBA();
-
-                            var sprite = Image.CreateFromData(animation.SpriteWidth, animation.SpriteHeight * animation.NumSpritesInImageData, false, Image.Format.Rgba8, data);
-
-                            animatedTex = ImageTexture.CreateFromImage(sprite);
-                        }
-                        */
-
-                        material.SetShaderParameter($"Sprite{textureAnimations}", animatedTex);
-                        material.SetShaderParameter($"TextureOriginalUV{textureAnimations}", new Vector4(uvFront.X, uvFront.Y, uvBack.X, uvBack.Y));
-
-                        animList.Add(new KH2TextureAnimation
-                        {
-                            SpriteFrameCount = animation.NumSpritesInImageData,
-                            TextureIndex = texIndex,
-                            CurrentAnimation = animation.DefaultAnimationIndex,
-                            AnimationList = new Array<KH2TextureAnimations>(animation.FrameGroupList.Select(i => new KH2TextureAnimations
-                            {
-                                Frames = new Array<KH2TextureAnimationFrame>(i.IndexedFrameList.Select(j => new KH2TextureAnimationFrame
-                                {
-                                    ImageIndex = j.Value.SpriteImageIndex,
-                                    JumpDelta = j.Value.FrameIndexDelta,
-                                    MaxTime = j.Value.MaximumLength / 60f,
-                                    MinTime = j.Value.MinimumLength / 60f,
-                                    Operation = new Func<KH2TextureAnimationOperation>(() => j.Value.FrameControl switch
-                                    {
-                                        TextureFrameControl.EnableSprite => KH2TextureAnimationOperation.EnableSprite,
-                                        TextureFrameControl.DisableSprite => KH2TextureAnimationOperation.DisableSprite,
-                                        TextureFrameControl.Jump => KH2TextureAnimationOperation.Jump,
-                                        TextureFrameControl.Stop => KH2TextureAnimationOperation.Stop,
-                                        _ => throw new ArgumentOutOfRangeException(),
-                                    }).Invoke(),
-                                    ResourceLocalToScene = true,
-                                })),
-                                ResourceLocalToScene = true,
-                            })),
-                            ResourceLocalToScene = true,
-                        });
-
-                        textureAnimations++;
-                    }
-                }
-                else
-                {
-                    material.Shader = BasicShader;
-                }
-                
-                //GD.Print($"{header.Alpha},{header.AlphaAdd},{header.AlphaSub},{header.AlphaEx}");
-
-                //TODO:
-                //I believe Alpha refers to Alpha Scissor, as this mode is used on Sora's crown and various strap textures
-                //I presume AlphaAdd and Sub set the transparency, with Add and Sub modes
-                //I presume AlphaEx refers to 'alpha extended', and is true alpha blending - ie 'mix'
-                //Verify if these assumptions are correct, and what happens if they're stacked
-
-                if (header.Alpha)
-                {
-                    material.SetShaderParameter("Alpha", true);
-                    material.SetShaderParameter("Scissor", true);
-                }
-                if (header.AlphaAdd)
-                {
-                    material.SetShaderParameter("Alpha", true);
-                }
-                if (header.AlphaSub)
-                {
-                    material.SetShaderParameter("Alpha", true);
-                }
-                if (header.AlphaEx)
-                {
-                    material.SetShaderParameter("Alpha", true);
-                }
-
-                material.SetShaderParameter("Texture", tex);
-
-                var positions = new List<Vector3>();
-                var normals = new List<Vector3>();
-                var colors = new List<Color>();
-                var uvs = new List<Vector2>();
-                var bones = new List<int>();
-                var weights = new List<float>();
-
-                var array = new Array();
-                array.Resize((int)Mesh.ArrayType.Max);
-
-                foreach (var verts in mesh.Triangles)
-                {
-                    foreach (var index in verts.ToArray().Reverse())
-                    {
-                        var vert = mesh.Vertices[index];
-                        var pos = vert.Position;
-
-                        var normal = vert.Normal is not null ? new Vector3(vert.Normal.X, vert.Normal.Y, vert.Normal.Z) : Vector3.Up;
-                        var color = vert.Color is not null ? new Color(vert.Color.R, vert.Color.G, vert.Color.B, vert.Color.A) : Colors.White;
-
-                        var uv = new Vector2(vert.U / 4096, vert.V / 4096);
-
-                        positions.Add(new Vector3(pos.X, pos.Y, pos.Z) * ImportHelpers.KH2PositionScale);
-                        normals.Add(normal);
-                        uvs.Add(uv);
-                        colors.Add(color);
-
-                        for (var i = 0; i < 4; i++)
-                        {
-                            if (vert.BPositions.Count > i)
-                            {
-                                var p = vert.BPositions[i];
-                                bones.Add(p.BoneIndex);
-                                weights.Add(p.Position.W == 0 ? 1 : p.Position.W);
-                            }
-                            else
-                            {
-                                bones.Add(0);
-                                weights.Add(0);
-                            }
-                        }
-                    }
-                }
-
-                array[(int)Mesh.ArrayType.Vertex] = positions.ToArray();
-                array[(int)Mesh.ArrayType.Normal] = normals.ToArray();
-                array[(int)Mesh.ArrayType.TexUV] = uvs.ToArray();
-                array[(int)Mesh.ArrayType.Bones] = bones.ToArray();
-                array[(int)Mesh.ArrayType.Weights] = weights.ToArray();
-
-                arrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, array, flags:
-                    Mesh.ArrayFormat.FormatVertex | Mesh.ArrayFormat.FormatBones | Mesh.ArrayFormat.FormatNormal | Mesh.ArrayFormat.FormatTexUV |
-                    Mesh.ArrayFormat.FormatWeights);
-                arrayMesh.SurfaceSetMaterial(m, material);
-            }
-
-            {
-                var mesh = new KH2MeshInstance3D();
-                skeleton.AddChild(mesh);
-                mesh.Name = "Model";
-                mesh.Mesh = arrayMesh;
-                mesh.Owner = root;
-                skeleton.CreateSkinFromRestTransforms();
-
-                foreach (var anim in animList) mesh.TextureAnimations.Add(anim);
-
-                if (collisions.Count != 0)
-                {
-                    root.ModelCollisions = new ModelCollisionResource();
-                    root.ModelCollisions.Binary = collisions.First();
-                }
-
-                root.Meshes.Add(mesh);
-                root.Skeleton = skeleton;
-            }
+            skeleton.ModelCollisions = new ModelCollisionResource();
+            skeleton.ModelCollisions.Binary = collisions.First();
         }
+        //root.Mesh = skeleton.GetChildren().OfType<KH2MeshInstance3D>().First();
 
         return root;
     }
 
+    public static KH2Skeleton3D FromModelSkeletal(ModelSkeletal model, ModelTexture texImg, TextureMapper mapper)
+    {
+        mapper.ResetMap();
+        
+        var images = texImg.Images
+            .Select(texture => Image.CreateFromData(texture.Size.Width, texture.Size.Height, false, Image.Format.Rgba8, texture.ToBgra32().BGRAToRGBA()))
+            .Select(ImageTexture.CreateFromImage)
+            .ToList();
+        
+        var arrayMesh = new ArrayMesh();
+        var skeleton = new KH2Skeleton3D();
+
+        foreach (var bone in model.Bones) skeleton.AddBone(bone.Index.ToString());
+
+        var boneCount = skeleton.GetBoneCount();
+
+        foreach (var bone in model.Bones.Where(i => i.ParentIndex < boneCount && i.ParentIndex >= 0)) skeleton.SetBoneParent(bone.Index, bone.ParentIndex);
+        foreach (var bone in model.Bones) skeleton.SetBoneRest(bone.Index, bone.Transform());
+
+        skeleton.ResetBonePoses();
+
+        var textureAnimations = 0;
+
+        var animList = new List<KH2TextureAnimation>();
+
+        for (var m = 0; m < model.Groups.Count; m++)
+        {
+            var group = model.Groups[m];
+
+            var header = group.Header;
+            var mesh = group.Mesh;
+            var material = new ShaderMaterial();
+
+            var texIndex = (int)group.Header.TextureIndex;
+
+            var tex = mapper.GetTexture(texIndex, images[texIndex]);
+            
+            var texSize = texImg.Images[texIndex].Size;
+            var originalSize = new Vector2(texSize.Width, texSize.Height);
+
+            if (texImg.TextureFooterData.TextureAnimationList.Any(i => i.TextureIndex == texIndex))
+            {
+                material.Shader = AnimatedShader;
+                var find = texImg.TextureFooterData.TextureAnimationList.Where(i => i.TextureIndex == texIndex).ToArray();
+                foreach (var animation in find)
+                {
+                    var uvFront = new Vector2(animation.UOffsetInBaseImage, animation.VOffsetInBaseImage) / originalSize;
+                    var uvBack = new Vector2(animation.UOffsetInBaseImage + animation.SpriteWidth, animation.VOffsetInBaseImage + animation.SpriteHeight) / originalSize;
+                        
+                    var data = ImageDataHelpers.FromIndexed8ToBitmap32(animation.SpriteImage, texImg.Images[texIndex].GetClut(), ImageDataHelpers.RGBA).BGRAToRGBA();
+
+                    var sprite = Image.CreateFromData(animation.SpriteWidth, animation.SpriteHeight * animation.NumSpritesInImageData, false, Image.Format.Rgba8, data);
+
+                    var animatedTex = mapper.GetNextTexture(ImageTexture.CreateFromImage(sprite));
+
+                    material.SetShaderParameter($"Sprite{textureAnimations}", animatedTex);
+                    material.SetShaderParameter($"TextureOriginalUV{textureAnimations}", new Vector4(uvFront.X, uvFront.Y, uvBack.X, uvBack.Y));
+
+                    animList.Add(new KH2TextureAnimation
+                    {
+                        SpriteFrameCount = animation.NumSpritesInImageData,
+                        TextureIndex = texIndex,
+                        CurrentAnimation = animation.DefaultAnimationIndex,
+                        AnimationList = new Array<KH2TextureAnimations>(animation.FrameGroupList.Select(i => new KH2TextureAnimations
+                        {
+                            Frames = new Array<KH2TextureAnimationFrame>(i.IndexedFrameList.Select(j => new KH2TextureAnimationFrame
+                            {
+                                ImageIndex = j.Value.SpriteImageIndex,
+                                JumpDelta = j.Value.FrameIndexDelta,
+                                MaxTime = j.Value.MaximumLength / 60f,
+                                MinTime = j.Value.MinimumLength / 60f,
+                                Operation = new Func<KH2TextureAnimationOperation>(() => j.Value.FrameControl switch
+                                {
+                                    TextureFrameControl.EnableSprite => KH2TextureAnimationOperation.EnableSprite,
+                                    TextureFrameControl.DisableSprite => KH2TextureAnimationOperation.DisableSprite,
+                                    TextureFrameControl.Jump => KH2TextureAnimationOperation.Jump,
+                                    TextureFrameControl.Stop => KH2TextureAnimationOperation.Stop,
+                                    _ => throw new ArgumentOutOfRangeException(),
+                                }).Invoke(),
+                                ResourceLocalToScene = true,
+                            })),
+                            ResourceLocalToScene = true,
+                        })),
+                        ResourceLocalToScene = true,
+                    });
+
+                    textureAnimations++;
+                }
+            }
+            else
+            {
+                material.Shader = BasicShader;
+            }
+
+            //TODO:
+            //I believe Alpha refers to Alpha Scissor, as this mode is used on Sora's crown and various strap textures
+            //I presume AlphaAdd and Sub set the transparency, with Add and Sub modes
+            //I presume AlphaEx refers to 'alpha extended', and is true alpha blending - ie 'mix'
+            //Verify if these assumptions are correct, and what happens if they're stacked
+
+            if (header.Alpha)
+            {
+                material.SetShaderParameter("Alpha", true);
+                material.SetShaderParameter("Scissor", true);
+            }
+            if (header.AlphaAdd)
+            {
+                material.SetShaderParameter("Alpha", true);
+            }
+            if (header.AlphaSub)
+            {
+                material.SetShaderParameter("Alpha", true);
+            }
+            if (header.AlphaEx)
+            {
+                material.SetShaderParameter("Alpha", true);
+            }
+
+            material.SetShaderParameter("Texture", tex);
+
+            var positions = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var colors = new List<Color>();
+            var uvs = new List<Vector2>();
+            var bones = new List<int>();
+            var weights = new List<float>();
+
+            var array = new Array();
+            array.Resize((int)Mesh.ArrayType.Max);
+
+            foreach (var verts in mesh.Triangles)
+            {
+                foreach (var index in verts.ToArray().Reverse())
+                {
+                    var vert = mesh.Vertices[index];
+                    var pos = vert.Position;
+
+                    var normal = vert.Normal is not null ? new Vector3(vert.Normal.X, vert.Normal.Y, vert.Normal.Z) : Vector3.Up;
+                    var color = vert.Color is not null ? new Color(vert.Color.R, vert.Color.G, vert.Color.B, vert.Color.A) : Colors.White;
+
+                    var uv = new Vector2(vert.U / 4096, vert.V / 4096);
+
+                    positions.Add(new Vector3(pos.X, pos.Y, pos.Z) * ImportHelpers.KH2PositionScale);
+                    normals.Add(normal);
+                    uvs.Add(uv);
+                    colors.Add(color);
+
+                    for (var i = 0; i < 4; i++)
+                    {
+                        if (vert.BPositions.Count > i)
+                        {
+                            var p = vert.BPositions[i];
+                            bones.Add(p.BoneIndex);
+                            weights.Add(p.Position.W == 0 ? 1 : p.Position.W);
+                        }
+                        else
+                        {
+                            bones.Add(0);
+                            weights.Add(0);
+                        }
+                    }
+                }
+            }
+
+            array[(int)Mesh.ArrayType.Vertex] = positions.ToArray();
+            array[(int)Mesh.ArrayType.Normal] = normals.ToArray();
+            array[(int)Mesh.ArrayType.TexUV] = uvs.ToArray();
+            array[(int)Mesh.ArrayType.Bones] = bones.ToArray();
+            array[(int)Mesh.ArrayType.Weights] = weights.ToArray();
+
+            arrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, array, flags:
+                Mesh.ArrayFormat.FormatVertex | Mesh.ArrayFormat.FormatBones | Mesh.ArrayFormat.FormatNormal | Mesh.ArrayFormat.FormatTexUV |
+                Mesh.ArrayFormat.FormatWeights);
+            arrayMesh.SurfaceSetMaterial(m, material);
+        }
+
+        {
+            var mesh = new KH2MeshInstance3D();
+            skeleton.AddChild(mesh);
+            mesh.Name = "Model";
+            mesh.Mesh = arrayMesh;
+            skeleton.CreateSkinFromRestTransforms();
+            skeleton.Mesh = mesh;
+
+            foreach (var anim in animList) mesh.TextureAnimations.Add(anim);
+        }
+
+        return skeleton;
+    }
     public static Node3D FromCoct(Coct collision)
     {
         var root = new Node3D();
@@ -416,70 +382,47 @@ public static class Converters
         Scissor,
         Opaque
     }
-    
-    public static Node3D FromMap(Bar map, List<ImageTexture> hdTexs = null)
+
+    public static Node3D FromModelBackground(ModelBackground background, ModelTexture texImg, TextureMapper mapper)
     {
-        foreach (var entry in map)
-        {
-            GD.Print($"{entry.Name}, {entry.Type}");
-        }
+        var meshRoot = new Node3D();
+        var chunkIndex = 0;
         
-        var usesHdTextures = hdTexs is not null;
-
-        var root = new Node3D();
-
-        var mainModel = map.FirstOrDefault(i => i.Name == "MAP" && i.Type == Bar.EntryType.Model);
-
-        if (mainModel is null) return null;
-
-        var mainModelTextures = map.FirstOrDefault(i => i.Name == "MAP" && i.Type == Bar.EntryType.ModelTexture);
-
-        if (mainModelTextures is null) return null;
-
-        var background = new ModelBackground(new MemoryStream(mainModel.Stream.ReadAllBytes().Skip(0x90).ToArray()));
-        var texImg = ModelTexture.Read(mainModelTextures.Stream);
-
-        var mesh = new MeshInstance3D();
-        root.AddChild(mesh);
-
-        var arrayMesh = new ArrayMesh();
-
-        var mapper = new TextureMapper(usesHdTextures ? hdTexs : null);
+        mapper.ResetMap();
         
         var images = texImg.Images
-                .Select(texture => Image.CreateFromData(texture.Size.Width, texture.Size.Height, false, Image.Format.Rgba8, texture.ToBgra32().BGRAToRGBA()))
-                .Select(ImageTexture.CreateFromImage)
-                .ToList();
-        
-        var meshDictionary = new System.Collections.Generic.Dictionary<(int texIndex, AlphaType alpha, int uvsc), (List<Vector3> pos, List<Color> color, List<Vector2> uvs)>();
+            .Select(texture => Image.CreateFromData(texture.Size.Width, texture.Size.Height, false, Image.Format.Rgba8, texture.ToBgra32().BGRAToRGBA()))
+            .Select(ImageTexture.CreateFromImage)
+            .ToList();
         
         var maxId = background.Chunks.Max(i => i.TextureId);
         
         for (var i = 0; i <= maxId; i++) mapper.GetTexture(i, null);
         
-        for (var m = 0; m < background.Chunks.Count; m++)
+        foreach (var chunk in background.Chunks)
         {
-            var chunk = background.Chunks[m];
-            var texIndex = chunk.TextureId;
-            
-            //GD.Print($"{chunk.UVScrollIndex:B8}, {texIndex}");
+            var mesh = new MeshInstance3D();
+            meshRoot.AddChild(mesh);
+            mesh.Name = $"Chunk_{chunkIndex}";
+            mesh.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
 
+            mesh.SortingOffset = (chunk.DrawPriority * background.Chunks.Count) + chunkIndex;
+
+            var arrayMesh = new ArrayMesh();
+            
+            var texIndex = chunk.TextureId;
             var alphaType = AlphaType.Opaque;
             if (chunk.IsAlphaAdd) alphaType = AlphaType.Add;
             else if (chunk.IsAlphaSubtract) alphaType = AlphaType.Sub;
             //else if (chunk.IsMulti) alphaType = AlphaType.Mul;
             else if (chunk.IsAlpha) alphaType = AlphaType.Mix;
             
-            var dictIndex = (texIndex, alphaType, chunk.UVScrollIndex);
-
-            if (!meshDictionary.TryGetValue(dictIndex, out var result))
-            {
-                result = ([], [], []);
-                meshDictionary.Add(dictIndex, result);
-            }
-            
             var vertices = new List<(Vector3 pos, Vector2 uv, Color color)>();
-
+            
+            var positions = new List<Vector3>();
+            var color = new List<Color>();
+            var uvs = new List<Vector2>();
+            
             var unpacker = new VifUnpacker(chunk.VifPacket);
             while (unpacker.Run() != VifUnpacker.State.End)
             {
@@ -536,29 +479,18 @@ public static class Converters
                     }
                 }
                 
-                result.pos.AddRange(resultPos);
-                result.color.AddRange(resultColor);
-                result.uvs.AddRange(resultUv);
+                positions.AddRange(resultPos);
+                color.AddRange(resultColor);
+                uvs.AddRange(resultUv);
             }
-        }
-
-        var mIndex = 0;
-
-        foreach (var meshCollection in meshDictionary)
-        {
-            var texIndex = meshCollection.Key.texIndex;
-            var alpha = meshCollection.Key.alpha;
-            var uvsc = meshCollection.Key.uvsc;
             
-            //GD.Print($"{texIndex}, {uvsc:B8}");
             var nativeImage = images[texIndex];
             
             var tex = mapper.GetTexture(texIndex, nativeImage);
             
-            //var texSize = texImg.Images[texIndex].Size;
             var material = new ShaderMaterial();
 
-            material.Shader = alpha switch
+            material.Shader = alphaType switch
             {
                 AlphaType.Mix => WorldAlphaMixShader,
                 AlphaType.Add => WorldAlphaAddShader,
@@ -566,54 +498,104 @@ public static class Converters
                 AlphaType.Mul => WorldAlphaMulShader,
                 _ => WorldOpaqueShader,
             };
+
+            var uvsc = chunk.UVScrollIndex;
+
+            var shiftedUvsc = uvsc >> 1;
             
-            //var uvX = 
-            
-            if (uvsc > 0 && uvsc < texImg.TextureFooterData.UvscList.Count)
+            var nativeSize = nativeImage.GetSize();
+
+            if (shiftedUvsc < texImg.TextureFooterData.UvscList.Count && shiftedUvsc >= 0)
             {
-                var nativeSize = nativeImage.GetSize();
-                GD.Print($"{uvsc}, {texImg.TextureFooterData.UvscList.Count}");
-                
-                var findUvsc = texImg.TextureFooterData.UvscList[uvsc];
+                var findUvsc = texImg.TextureFooterData.UvscList[shiftedUvsc];
                 
                 var uSpeed = (findUvsc.UScrollSpeed / 20000f) / nativeSize.X;
                 var vSpeed = (findUvsc.VScrollSpeed / 20000f) / nativeSize.Y;
                 
                 material.SetShaderParameter("UVScrollSpeed", new Vector2(uSpeed, vSpeed));
+                material.SetShaderParameter("UVScrollEnabled", (float)(uvsc & 1));
             }
-            
-            /*
-            var findUvsc = texImg.TextureFooterData.UvscList.FirstOrDefault(i => i.TextureIndex == texIndex);
-            if (findUvsc is not null)
-            {
-                var nativeSize = nativeImage.GetSize();
-                
-                var uSpeed = (findUvsc.UScrollSpeed / 20000f) / nativeSize.X;
-                var vSpeed = (findUvsc.VScrollSpeed / 20000f) / nativeSize.Y;
-                
-                GD.Print($"{uvsc}, {texImg.TextureFooterData.UvscList.Count} | {findUvsc.UScrollSpeed}, {findUvsc.VScrollSpeed} | {uSpeed}, {vSpeed}");
-                
-                material.SetShaderParameter("UVScrollSpeed", new Vector2(uSpeed, vSpeed));
-            }
-            */
             
             material.SetShaderParameter("Texture", tex);
             
             var array = new Array();
             array.Resize((int)Mesh.ArrayType.Max);
             
-            array[(int)Mesh.ArrayType.Vertex] = meshCollection.Value.pos.ToArray();
-            array[(int)Mesh.ArrayType.TexUV] = meshCollection.Value.uvs.ToArray();
-            array[(int)Mesh.ArrayType.Color] = meshCollection.Value.color.ToArray();
+            array[(int)Mesh.ArrayType.Vertex] = positions.ToArray();
+            array[(int)Mesh.ArrayType.TexUV] = uvs.ToArray();
+            array[(int)Mesh.ArrayType.Color] = color.ToArray();
             
             arrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, array, flags: Mesh.ArrayFormat.FormatVertex | Mesh.ArrayFormat.FormatTexUV | Mesh.ArrayFormat.FormatColor);
-            arrayMesh.SurfaceSetMaterial(mIndex, material);
-            mIndex++;
+            arrayMesh.SurfaceSetMaterial(0, material);
+            
+            mesh.Mesh = arrayMesh;
+            
+            chunkIndex++;
         }
 
-        mesh.Name = "Background";
-        mesh.Mesh = arrayMesh;
-        //mesh.Owner = root;
+        return meshRoot;
+    }
+    public static Node3D FromMap(Bar map, List<ImageTexture> hdTexs = null)
+    {
+        foreach (var entry in map)
+        {
+            GD.Print($"{entry.Name}, {entry.Type}");
+        }
+        
+        var usesHdTextures = hdTexs is not null;
+        
+        var mainModel = map.FirstOrDefault(i => i.Name == "MAP" && i.Type == Bar.EntryType.Model);
+        if (mainModel is null) return null;
+
+        var mainModelTextures = map.FirstOrDefault(i => i.Name == "MAP" && i.Type == Bar.EntryType.ModelTexture);
+        if (mainModelTextures is null) return null;
+        
+        var root = new Node3D();
+
+        var environment = new WorldEnvironment();
+        root.AddChild(environment);
+        environment.Name = "Environment";
+        var env = new Environment();
+        env.BackgroundMode = Environment.BGMode.Color;
+        env.BackgroundColor = Colors.Black;
+
+        environment.Environment = env;
+        
+        var background = new ModelBackground(new MemoryStream(mainModel.Stream.ReadAllBytes().Skip(0x90).ToArray()));
+        var texImg = ModelTexture.Read(mainModelTextures.Stream);
+
+        var mapper = new TextureMapper(usesHdTextures ? hdTexs : null);
+        
+        var modelBackground = FromModelBackground(background, texImg, mapper);
+        
+        root.AddChild(modelBackground);
+        modelBackground.Name = "Background";
+
+        var sky0Model = map.FirstOrDefault(i => i.Name == "SK0" && i.Type == Bar.EntryType.Model);
+        var sky0Textures = map.FirstOrDefault(i => i.Name == "SK0" && i.Type == Bar.EntryType.ModelTexture);
+
+        if (sky0Model is not null && sky0Textures is not null)
+        {
+            var sky0Background = new ModelBackground(new MemoryStream(sky0Model.Stream.ReadAllBytes().Skip(0x90).ToArray()));
+            var sky0TexImg = ModelTexture.Read(sky0Textures.Stream);
+            
+            var modelSky0 = FromModelBackground(sky0Background, sky0TexImg, mapper);
+            root.AddChild(modelSky0);
+            modelSky0.Name = "Skybox_0";
+        }
+        
+        var sky1Model = map.FirstOrDefault(i => i.Name == "SK1" && i.Type == Bar.EntryType.Model);
+        var sky1Textures = map.FirstOrDefault(i => i.Name == "SK1" && i.Type == Bar.EntryType.ModelTexture);
+
+        if (sky1Model is not null && sky1Textures is not null)
+        {
+            var sky1Background = new ModelBackground(new MemoryStream(sky1Model.Stream.ReadAllBytes().Skip(0x90).ToArray()));
+            var sky1TexImg = ModelTexture.Read(sky1Textures.Stream);
+            
+            var modelSky1 = FromModelBackground(sky1Background, sky1TexImg, mapper);
+            root.AddChild(modelSky1);
+            modelSky1.Name = "Skybox_1";
+        }
 
         var collision = map.FirstOrDefault(i => i.Type == Bar.EntryType.CollisionOctalTree);
 
@@ -622,7 +604,66 @@ public static class Converters
             var coll = FromCoct(Coct.Read(collision.Stream));
             root.AddChild(coll);
             coll.Name = "Collision";
-            //coll.Owner = root;
+        }
+        
+        var bobList = new List<(ModelSkeletal model, ModelTexture texture, byte[] anim)>();
+        
+        for (var i = 0; i < map.Count - 2; i++)
+        {
+            var a = map[i];
+            var b = map[i+1];
+            var c = map[i+2];
+
+            if (a is null || b is null || c is null) continue;
+            if (a.Name != "BOB" || b.Name != "BOB" || c.Name != "BOB") continue;
+            if (a.Type != Bar.EntryType.Model || b.Type != Bar.EntryType.ModelTexture || c.Type != Bar.EntryType.AnimationMap) continue;
+
+            var model = ModelSkeletal.Read(a.Stream);
+            var texture = ModelTexture.Read(b.Stream);
+            var anim = c.Stream.Length > 0 ? 
+                c.Stream.ReadAllBytes() : 
+                null;
+
+            var mesh = FromModelSkeletal(model, texture, mapper);
+            var meshRoot = new Node3D();
+            meshRoot.AddChild(mesh);
+            
+            bobList.Add((model, texture, anim));
+        }
+        
+        var bobPlacement = map.FirstOrDefault(i => i.Name == "out" && i.Type == Bar.EntryType.BgObjPlacement);
+        if (bobPlacement is not null)
+        {
+            var bobNode = new Node3D();
+            root.AddChild(bobNode);
+            bobNode.Name = "BackgroundObjects";
+            
+            bobPlacement.Stream.Seek(0, SeekOrigin.Begin);
+            var bop = Bop.Read(bobPlacement.Stream);
+            
+            for (var index = 0; index < bop.Entries.Count; index++)
+            {
+                var p = bop.Entries[index];
+                if (p.BobIndex >= bobList.Count) continue;
+
+                var bob = bobList[(int)p.BobIndex];
+
+                var obj = FromModelSkeletal(bob.model, bob.texture, mapper);
+
+                var pos = new Vector3(p.PositionX, -p.PositionY, -p.PositionZ) * ImportHelpers.KH2PositionScale;
+                var rotation = new Vector3(p.RotationX, p.RotationY, p.RotationZ);
+                var scale = new Vector3(p.ScaleX, p.ScaleY, p.ScaleZ);
+
+                bobNode.AddChild(obj);
+                obj.Transform = ImportHelpers.CreateTransform(pos, rotation, scale);
+                obj.Name = index.ToString();
+                
+                if (false && bob.anim is not null) //TODO
+                {
+                    obj.CurrentAnimation = new AnimationBinaryResource(){ Binary = bob.anim };
+                    obj.Animating = true;
+                }
+            }
         }
 
         return root;

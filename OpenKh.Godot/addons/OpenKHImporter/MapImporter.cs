@@ -100,13 +100,20 @@ public partial class MapImporter : EditorImportPlugin
         
         result.Name = name;
 
-        foreach (var child in result.FindChildren("*", "", true, false)) child.Owner = result;
+        foreach (var c in result.GetChildren()) SetOwner(c, result);
+        
+        GD.Print(result.FindChildren("*", "", true, false).Count);
         
         var packed = new PackedScene();
         packed.Pack(result);
         ResourceSaver.Save(packed, $"{savePath}.{_GetSaveExtension()}");
 
         return Error.Ok;
+    }
+    private static void SetOwner(Node node, Node owner)
+    {
+        node.Owner = owner;
+        foreach (var c in node.GetChildren()) SetOwner(c, owner);
     }
 }
 

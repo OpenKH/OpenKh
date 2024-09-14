@@ -95,12 +95,10 @@ namespace OpenKh.Godot.Helpers
                 else array[index].Z = val;
             }
 
-            public AnimationSimulation(Motion.InterpolatedMotion motion, KH2Mdlx mdlx, float time)
+            public AnimationSimulation(Motion.InterpolatedMotion motion, KH2Skeleton3D skeleton, float time)
             {
                 MotionFile = motion;
                 Time = time;
-
-                var skeleton = mdlx.Skeleton;
 
                 IgnoreScale = motion.MotionHeader.SubType == 1;
                 
@@ -300,18 +298,21 @@ namespace OpenKh.Godot.Helpers
 
                 var collisionBones = new List<int>();
 
-                foreach (var collision in mdlx.ModelCollisions.Value.EntryList.Where(collision => (ObjectCollision.TypeEnum)collision.Type == ObjectCollision.TypeEnum.IK))
+                if (skeleton.ModelCollisions is not null)
                 {
-                    //TODO: actual collision
-                    var centerBone = collision.Bone;
-                    var firstBone = skeleton.GetBoneParent(centerBone);
-                    var tipBone = skeleton.GetBoneChildren(centerBone).First();
+                    foreach (var collision in skeleton.ModelCollisions.Value.EntryList.Where(collision => (ObjectCollision.TypeEnum)collision.Type == ObjectCollision.TypeEnum.IK))
+                    {
+                        //TODO: actual collision
+                        var centerBone = collision.Bone;
+                        var firstBone = skeleton.GetBoneParent(centerBone);
+                        var tipBone = skeleton.GetBoneChildren(centerBone).First();
                     
-                    collisionBones.AddRange([centerBone, firstBone, tipBone]);
+                        collisionBones.AddRange([centerBone, firstBone, tipBone]);
 
-                    CalculateIK(skeleton, firstBone, centerBone, tipBone, false);
+                        CalculateIK(skeleton, firstBone, centerBone, tipBone, false);
+                    }
                 }
-
+                
                 for (var i = 0; i < motion.Joints.Count - 2; i++)
                 {
                     var a = motion.Joints[i]; //first
@@ -608,15 +609,24 @@ namespace OpenKh.Godot.Helpers
                 return list;
             }
         }
-        
-        public static void ApplyInterpolatedMotion(Motion.InterpolatedMotion motion, KH2Mdlx mdlx, float time)
+
+        public static float Loop(Motion.InterpolatedMotion motion, float time)
         {
             var frameTime = time * motion.InterpolatedMotionHeader.FrameData.FramesPerSecond;
             var diff = 60 / motion.InterpolatedMotionHeader.FrameData.FramesPerSecond;
             
             var actualFrame = Mathf.Wrap(frameTime * diff, motion.InterpolatedMotionHeader.FrameData.FrameStart * diff, motion.InterpolatedMotionHeader.FrameData.FrameEnd * diff);
 
-            var sim = new AnimationSimulation(motion, mdlx, actualFrame);
+            return (actualFrame / diff) / motion.InterpolatedMotionHeader.FrameData.FramesPerSecond;
+        }
+        public static void ApplyInterpolatedMotion(Motion.InterpolatedMotion motion, KH2Skeleton3D skeleton, float time)
+        {
+            var frameTime = time * motion.InterpolatedMotionHeader.FrameData.FramesPerSecond;
+            var diff = 60 / motion.InterpolatedMotionHeader.FrameData.FramesPerSecond;
+            
+            var actualFrame = Mathf.Wrap(frameTime * diff, motion.InterpolatedMotionHeader.FrameData.FrameStart * diff, motion.InterpolatedMotionHeader.FrameData.FrameEnd * diff);
+
+            var sim = new AnimationSimulation(motion, skeleton, actualFrame);
         }
     }
 }

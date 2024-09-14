@@ -8,7 +8,5 @@ namespace OpenKh.Godot.Nodes;
 [Tool]
 public partial class KH2Mdlx : Node3D
 {
-    [Export] public Skeleton3D Skeleton;
-    [Export] public ModelCollisionResource ModelCollisions;
-    [Export] public Array<KH2MeshInstance3D> Meshes = new();
+    [Export] public KH2Skeleton3D Skeleton;
 }

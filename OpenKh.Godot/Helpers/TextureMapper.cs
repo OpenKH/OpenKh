@@ -15,6 +15,13 @@ namespace OpenKh.Godot.Helpers
             if (map is not null) TextureMap = map;
             CurrentIndex = index;
         }
+        public void ResetMap() => TextureMap.Clear();
+
+        public TextureMapper(TextureMapper old)
+        {
+            HdTextures = old.HdTextures;
+            CurrentIndex = old.CurrentIndex;
+        }
 
         public ImageTexture GetTexture(int index, ImageTexture fallback)
         {

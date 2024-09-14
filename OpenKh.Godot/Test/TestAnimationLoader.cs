@@ -107,6 +107,6 @@ public partial class TestAnimationLoader : Node
             _lastAnimation = Animation;
         }
         
-        AnimationHelpers.ApplyInterpolatedMotion(anim.MotionFile, Model, AnimationTime * AnimationTimeMultiplier);
+        AnimationHelpers.ApplyInterpolatedMotion(anim.MotionFile, Model.Skeleton, AnimationTime * AnimationTimeMultiplier);
     }
 }
