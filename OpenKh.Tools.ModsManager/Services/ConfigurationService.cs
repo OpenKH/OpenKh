@@ -40,11 +40,14 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool PanaceaInstalled { get; internal set; }
             public bool ShowConsole { get; internal set; } = false;
             public bool DebugLog { get; internal set; } = false;
+            public bool SoundDebug { get; internal set; } = false;
             public bool EnableCache { get; internal set; } = true;
             public bool QuickMenu { get; internal set; } = false;
             public bool DevView { get; internal set; } = false;
             public bool AutoUpdateMods { get; internal set; }
             public string pcVersion { get; internal set; } = "EGS";
+            public bool steamAPITrick1525 {  get; internal set; } = false;
+            public bool steamAPITrick28 { get; internal set; } = false;
             public List<string> GamesToExtract { get; internal set; } = new List<string> { "kh2" };
             public bool SkipRemastered { get; internal set; } = false;
             public string LaunchGame { get; internal set; } = "kh2";
@@ -316,6 +319,15 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
+        public static bool SoundDebug
+        {
+            get => _config.SoundDebug;
+            set
+            {
+                _config.SoundDebug = value;
+                _config.Save(ConfigPath);
+            }
+        }
         public static bool EnableCache
         {
             get => _config.EnableCache;
@@ -358,6 +370,24 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.pcVersion = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool SteamAPITrick1525
+        {
+            get => _config.steamAPITrick1525;
+            set
+            {
+                _config.steamAPITrick1525 = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool SteamAPITrick28
+        {
+            get => _config.steamAPITrick28;
+            set
+            {
+                _config.steamAPITrick28 = value;
                 _config.Save(ConfigPath);
             }
         }

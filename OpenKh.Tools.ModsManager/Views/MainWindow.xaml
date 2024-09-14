@@ -91,6 +91,7 @@
                 <MenuItem Header="Panacea Settings" Visibility="{Binding PanaceaSettings}">
                     <MenuItem Header="Enable Console" IsCheckable="True" IsChecked="{Binding PanaceaConsoleEnabled}" StaysOpenOnClick="True"/>
                     <MenuItem Header="Enable Debug Log" IsCheckable="True" IsChecked="{Binding PanaceaDebugLogEnabled}" IsEnabled="{Binding PanaceaConsoleEnabled}" StaysOpenOnClick="True"/>
+                    <MenuItem Header="Enable Sound Debug" IsCheckable="True" IsChecked="{Binding PanaceaSoundDebugEnabled}" IsEnabled="{Binding PanaceaDebugLogEnabled}" StaysOpenOnClick="True"/>
                     <MenuItem Header="Enable Cache" IsCheckable="True" IsChecked="{Binding PanaceaCacheEnabled}" StaysOpenOnClick="True"/>
                     <MenuItem Header="Enable Quick Menu" IsCheckable="True" IsChecked="{Binding PanaceaQuickMenuEnabled}" StaysOpenOnClick="True"/>
                 </MenuItem>
