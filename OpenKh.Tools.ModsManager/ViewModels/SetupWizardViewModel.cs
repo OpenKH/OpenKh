@@ -200,8 +200,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 switch (ConfigurationService.PcReleaseLanguage)
                 {
                     case "jp":
+                        _pcReleaseLanguage = "jp";
                         return 1;
                     default:
+                        _pcReleaseLanguage = "en";
                         return 0;
                 }
             }
@@ -211,9 +213,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     case 1:
                         ConfigurationService.PcReleaseLanguage = "jp";
+                        _pcReleaseLanguage = "jp";
                         break;
                     default:
                         ConfigurationService.PcReleaseLanguage = "en";
+                        _pcReleaseLanguage = "en";
                         break;
                 }
             }
@@ -226,10 +230,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 switch (ConfigurationService.PCVersion)
                 {
                     case "Steam":
+                        WizardPageAfterLuaBackend = PageSteamAPITrick;
                         return 1;
                     case "Other":
+                        WizardPageAfterLuaBackend = PageGameData;
                         return 2;
                     default:
+                        WizardPageAfterLuaBackend = PageGameData;
                         return 0;
                 }
             }
@@ -240,21 +247,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     case 1:
                         _pcVersion = "Steam";
                         ConfigurationService.PCVersion = "Steam";
+                        WizardPageAfterLuaBackend = PageSteamAPITrick;
                         break;
                     case 2:
                         _pcVersion = "Other";
                         ConfigurationService.PCVersion = "Other";
+                        WizardPageAfterLuaBackend = PageGameData;
                         break;
                     default:
                         _pcVersion = "EGS";
                         ConfigurationService.PCVersion = "EGS";
+                        WizardPageAfterLuaBackend = PageGameData;
                         break;
                 }
-                WizardPageAfterLuaBackend = LaunchOption switch
-                {
-                    1 => PageSteamAPITrick,
-                    _ => PageGameData,
-                };
             }
         }
         public RelayCommand SelectOpenKhGameEngineCommand { get; }
@@ -494,21 +499,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
             }
 
-        }
-        public string PcReleaseLanguage
-        {
-            get => _pcReleaseLanguage;
-            set
-            {
-                _pcReleaseLanguage = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(PcReleaseLanguage));
-                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
-                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
-                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
-                OnPropertyChanged(nameof(IsGameSelected));
-                OnPropertyChanged(nameof(IsGameDataFound));
-            }
         }
 
         public RelayCommand SelectGameDataLocationCommand { get; }
