@@ -24,6 +24,7 @@ This document will focus on teaching you how to create mods using the OpenKH Mod
       * [fmab](#fmab-source-example)
       * [enmp](#enmp-source-example)
       * [fmlv](#fmlv-source-example)
+      * [lvpm](#lvpm-source-example)
       * [lvup](#lvup-source-example)
       * [bons](#bons-source-example)
       * [atkp](#atkp-source-example)
@@ -525,6 +526,17 @@ Final:
   FormId: 5
   FormLevel: 1
   GrowthAbilityLevel: 1
+```
+
+### `lvpm` Source Example
+```
+- Level: 0
+  HpMultiplier: 100
+  Strength: 45
+  Defense: 26
+  MaxStrength: 16
+  MinStrength: 5
+  Experience: 3212
 ```
 
 ### `lvup` Source Example
