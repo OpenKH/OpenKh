@@ -1,9 +1,9 @@
-using OpenKh.Tools.Kh2ObjectEditor.Services;
-using static OpenKh.Tools.Kh2ObjectEditor.Modules.Model.ModuleModelMeshes_VM;
-using System.Collections.ObjectModel;
 using OpenKh.Kh2;
-using static OpenKh.Tools.Kh2ObjectEditor.Modules.Effects.M_EffectDpdTexture_VM;
-using System.Windows;
+using OpenKh.Tools.Kh2ObjectEditor.Services;
+using System;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Windows.Forms;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 {
@@ -52,6 +52,41 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 
             ApdxService.Instance.PaxFile.DpxPackage.DpdList[index] = ClipboardService.Instance.FetchDpd();
             loadDpds();
+        }
+        public void Dpd_Export(int index)
+        {
+            Kh2.Dpd dpd = ApdxService.Instance.PaxFile.DpxPackage.DpdList[index];
+
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.FileName = "DPD_" + index;
+            dlg.DefaultExt = ".dpd";
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                MemoryStream dpdStream = new MemoryStream();
+                dpd.getAsStream().CopyTo(dpdStream);
+                File.WriteAllBytes(dlg.FileName, dpdStream.ToArray());
+            }
+        }
+        public void Dpd_Import()
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string filePath = openFileDialog.FileName;
+
+                    Kh2.Dpd dpd;
+                    using (Stream stream = openFileDialog.OpenFile())
+                    {
+                        dpd = new Kh2.Dpd(stream);
+                    }
+                    ApdxService.Instance.PaxFile.DpxPackage.DpdList.Add(dpd);
+                    loadDpds();
+                }
+            }
         }
 
         public class DpdWrapper

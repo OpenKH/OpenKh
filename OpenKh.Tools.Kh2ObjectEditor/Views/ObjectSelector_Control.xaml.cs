@@ -1,6 +1,7 @@
 using OpenKh.Tools.Kh2ObjectEditor.Classes;
 using OpenKh.Tools.Kh2ObjectEditor.ViewModel;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Views
 {
@@ -28,6 +29,15 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         private void Button_ApplyFilters(object sender, System.Windows.RoutedEventArgs e)
         {
             ThisVM.applyFilters();
+        }
+
+        private void FilterName_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                ThisVM.FilterName = FilterName.Text;
+                ThisVM.applyFilters();
+            }
         }
     }
 }

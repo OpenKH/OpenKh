@@ -50,21 +50,22 @@ namespace OpenKh.Tools.KhModels.View
         private void Button_ShowMesh(object sender, RoutedEventArgs e)
         {
             thisVM.ShowMesh = ! thisVM.ShowMesh;
-            thisVM.SetOptions();
-            thisVM.VpService.Render();
+            thisVM.VpController.SetVisibilityMesh(thisVM.ShowMesh);
+            thisVM.VpController.Render();
         }
         private void Button_ShowWireframe(object sender, RoutedEventArgs e)
         {
             thisVM.ShowWireframe = !thisVM.ShowWireframe;
-            thisVM.SetOptions();
-            thisVM.VpService.Render();
+            thisVM.VpController.SetVisibilityWireframe(thisVM.ShowWireframe);
+            thisVM.VpController.Render();
         }
         private void Button_ShowSkeleton(object sender, RoutedEventArgs e)
         {
             thisVM.ShowSkeleton = !thisVM.ShowSkeleton;
             thisVM.ShowJoints = !thisVM.ShowJoints;
-            thisVM.SetOptions();
-            thisVM.VpService.Render();
+            thisVM.VpController.SetVisibilitySkeleton(thisVM.ShowSkeleton);
+            thisVM.VpController.SetVisibilityJoint(thisVM.ShowJoints);
+            thisVM.VpController.Render();
         }
     }
 }

@@ -91,6 +91,7 @@
                 <MenuItem Header="Panacea Settings" Visibility="{Binding PanaceaSettings}">
                     <MenuItem Header="Enable Console" IsCheckable="True" IsChecked="{Binding PanaceaConsoleEnabled}" StaysOpenOnClick="True"/>
                     <MenuItem Header="Enable Debug Log" IsCheckable="True" IsChecked="{Binding PanaceaDebugLogEnabled}" IsEnabled="{Binding PanaceaConsoleEnabled}" StaysOpenOnClick="True"/>
+                    <MenuItem Header="Enable Sound Debug" IsCheckable="True" IsChecked="{Binding PanaceaSoundDebugEnabled}" IsEnabled="{Binding PanaceaDebugLogEnabled}" StaysOpenOnClick="True"/>
                     <MenuItem Header="Enable Cache" IsCheckable="True" IsChecked="{Binding PanaceaCacheEnabled}" StaysOpenOnClick="True"/>
                     <MenuItem Header="Enable Quick Menu" IsCheckable="True" IsChecked="{Binding PanaceaQuickMenuEnabled}" StaysOpenOnClick="True"/>
                 </MenuItem>
@@ -106,6 +107,13 @@
                             <Run Text="{Binding CurrentVersion, Mode=OneTime}"/>
                         </TextBlock>
                     </MenuItem.Header>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Frequently Asked Questions" Command="{Binding OpenLinkCommand}"
+                    CommandParameter="https://openkh.dev/tool/GUI.ModsManager/FAQ">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource WebURL_16x}"/>
+                    </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="Download _latest version" Command="{Binding OpenLinkCommand}"

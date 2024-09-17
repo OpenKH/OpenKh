@@ -46,7 +46,7 @@ namespace OpenKh.Common
             Flush();
         }
 
-        private static void Flush()
+        public static void Flush()
         {
             const int Timeout = 3000;
 

@@ -28,5 +28,5 @@ This data chunk repeats as many times as the field `Number of Items` specifies.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | uint16   | Item Index
+| 0x0     | uint16   | Command Index
 | 0x2     | uint16   | Padding

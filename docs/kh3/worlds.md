@@ -9,7 +9,7 @@
 | DP | [Land of Departure ](#land-of-departure)| Land of **D**e**p**arture
 | DW | [Dark World        ](#dark-world)| **D**ark **W**orld
 | EW | [The Final World   ](#the-final-world)| **E**nd **W**orld
-| EX | [EX                ](#ex)| System
+| EX | [EX (Battlegates)  ](#ex)| **Ex**tra
 | FZ | [Arendelle         ](#arendelle)| **F**ro**z**en
 | GM | [Gummiship         ](#gummiship)| **G**u**m**miship
 | HE | [Olympus           ](#olympus)| **He**rcules
@@ -20,7 +20,7 @@
 | RG | [Radiant Garden    ](#radiant-garden)| **R**adiant **G**arden
 | SF | [SF                ](#sf)| **S**ecret **F**orest
 | SP | [SP                ](#sp)|
-| SS | [SS                ](#ss)|
+| SS | [Shibuya (Yozora)  ](#ss)| **S**ecret **S**ection
 | TS | [Toy Box           ](#toy-box)| **T**oy **S**tory
 | TT | [Twilight Town     ](#twilight-town)| **T**wilight **T**own
 | WM | [World Map         ](#world-map)| **W**orld **M**ap

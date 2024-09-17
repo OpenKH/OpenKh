@@ -1,10 +1,13 @@
 using OpenKh.Command.Bdxio.Models;
 using OpenKh.Command.Bdxio.Utils;
+using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
 using SharpDX.DirectWrite;
+using System;
 using System.IO;
 using System.Windows;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.AI
 {
@@ -70,6 +73,59 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.AI
             BdxStream = new MemoryStream(BdxStreamOut);
             BdxStream.Position = 0;
             MdlxService.Instance.BdxFile = BdxStream;
+        }
+
+        // Tests the AI ingame.
+        // IMPORTANT: AI must be of the same length, be careful because there's no control of this.
+        public void TestAiIngame()
+        {
+            string filename = Path.GetFileName(MdlxService.Instance.MdlxPath);
+
+            if (filename == "")
+                return;
+
+            long fileAddress;
+            try
+            {
+                fileAddress = ProcessService.getAddressOfFile(filename);
+            }
+            catch (Exception exc)
+            {
+                System.Windows.Forms.MessageBox.Show("Game is not running", "There was an error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            if (fileAddress == 0)
+            {
+                System.Windows.Forms.MessageBox.Show("Couldn't find file", "There was an error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            int entryOffset = -1;
+            foreach(Bar.Entry entry in MdlxService.Instance.MdlxBar)
+            {
+                if(entry.Type == Bar.EntryType.Bdx)
+                {
+                    entryOffset = entry.Offset;
+                    break;
+                }
+            }
+            if (entryOffset == -1)
+            {
+                System.Windows.Forms.MessageBox.Show("AI file not found", "There was an error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            long aiFileAddress = fileAddress + entryOffset;
+
+            MemoryStream aiStream = new MemoryStream();
+            MdlxService.Instance.BdxFile.Position = 0;
+            MdlxService.Instance.BdxFile.CopyTo(aiStream);
+            MdlxService.Instance.BdxFile.Position = 0;
+            aiStream.Position = 0;
+
+            byte[] streamBytes = aiStream.ToArray();
+            MemoryAccess.writeMemory(ProcessService.KH2Process, aiFileAddress, streamBytes, true);
         }
     }
 }

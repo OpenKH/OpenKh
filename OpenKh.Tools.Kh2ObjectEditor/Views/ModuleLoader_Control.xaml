@@ -21,6 +21,7 @@
         <StackPanel Grid.Column="1" Background="White">
             <Label Visibility="Visible" x:Name="TabModel" MouseLeftButtonUp="TabClick_Model">Model</Label>
             <Label Visibility="Visible" x:Name="TabTextures" MouseLeftButtonUp="TabClick_Textures">Textures</Label>
+            <Label Visibility="Visible" x:Name="TabUI" MouseLeftButtonUp="TabClick_UI">UI</Label>
             <Label Visibility="Visible" x:Name="TabCollisions" MouseLeftButtonUp="TabClick_Collisions">Collisions</Label>
             <Label Visibility="Visible" x:Name="TabMotions" MouseLeftButtonUp="TabClick_Motions">Motions</Label>
             <Label Visibility="Visible" x:Name="TabParticles" MouseLeftButtonUp="TabClick_Particles">Particles</Label>

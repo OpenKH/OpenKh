@@ -13,7 +13,11 @@ namespace OpenKh.Kh2.Battle
         [Data] public ushort MinStrength { get; set; }
         [Data] public ushort Experience { get; set; }
 
+        //Default
         public static List<Lvpm> Read(Stream stream) => BaseList<Lvpm>.Read(stream, 99);
+
+        //Override for having a custom amount of entries
+        public static List<Lvpm> Read(Stream stream, int count) => BaseList<Lvpm>.Read(stream, count);
 
         public static void Write(Stream stream, IEnumerable<Lvpm> items) => BaseList<Lvpm>.Write(stream, items);
 

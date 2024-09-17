@@ -1,8 +1,6 @@
-using OpenKh.Tools.Common.Wpf;
-using System.IO;
+using ModelingToolkit.Objects;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using static OpenKh.Tools.Kh2ObjectEditor.Modules.Textures.TextureImages_VM;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
@@ -24,8 +22,15 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
 
         public void loadImage(int index)
         {
-            BitmapSource BitmapImage = ThisVM.Textures[index].Texture.GetBimapSource();
-            ImageFrame.Source = BitmapImage;
+            MtMaterial mat = new MtMaterial();
+            mat.Data = ThisVM.Textures[index].Texture.GetData();
+            mat.Clut = ThisVM.Textures[index].Texture.GetClut();
+            mat.Width = ThisVM.Textures[index].Texture.Size.Width;
+            mat.Height = ThisVM.Textures[index].Texture.Size.Height;
+            mat.ColorSize = 1;
+            mat.PixelHasAlpha = true;
+            mat.GenerateBitmap();
+            ImageFrame.Source = mat.GetAsBitmapImage();
         }
 
         private void list_doubleCLick(object sender, System.Windows.Input.MouseButtonEventArgs e)

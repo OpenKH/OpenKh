@@ -112,12 +112,40 @@ namespace OpenKh.Kh2.Battle
 
         public static List<Atkp> Read(Stream stream) => BaseTable<Atkp>.Read(stream);
 
+        //New ATKP: Extra byte addition is no longer hardcoded to add to a specific position.
+        //Rather, they're now added at the end.
+        //The bytes seem to not be important, the strings resemble ones found in AI.
+        //However, to prevent messing with the ATKP offset unless explicity adding attack hitboxes, they'll be appended to the end of the file.
         public static void Write(Stream stream, IEnumerable<Atkp> items)
         {
+            // Get the initial length of the stream
+            long initialLength = stream.Length;
+
+            // Write the items to the stream
             BaseTable<Atkp>.Write(stream, 6, items);
-            stream.Position = 130232;            
-            stream.Write(endBytes,0,277);
+
+            // Check if the stream length has increased
+            if (stream.Length > initialLength)
+            {
+
+                // Seek to the end of the stream
+                stream.Seek(0, SeekOrigin.End);
+
+                // Append the bytes to the end of the stream
+                stream.Write(endBytes, 0, endBytes.Length);
+            }
+            if (stream.Length == initialLength)
+            {
+                // Seek to the end of the stream
+                stream.Seek(0, SeekOrigin.End);
+            }
+            //Currently if you're just editing hitboxes, nothing changes. No offset differences occur.
+            //If you add one hitbox, it overwrites endbytes until it reaches the end of the file, and starts appending new bytes AND endbytes after.
+
+            else
+            {
+                // If no new data was written, do nothing
+            }
         }
-            
     }
 }

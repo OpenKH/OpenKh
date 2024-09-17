@@ -8,6 +8,19 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
     {
         // Note: Objects are copied as bytes or string in order to not copy the reference
 
+        private byte[] _motion { get; set; }
+        public void StoreMotion(byte[] motionFile)
+        {
+            _motion = motionFile;
+        }
+        public byte[] FetchMotion()
+        {
+            if (_motion == null)
+                return null;
+
+            return _motion;
+        }
+
         private Stream _dpd { get; set; }
         public void StoreDpd(Dpd dpd)
         {
