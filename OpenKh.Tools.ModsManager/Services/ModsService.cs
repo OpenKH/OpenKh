@@ -152,7 +152,6 @@ namespace OpenKh.Tools.ModsManager.Services
                         break;
                     case MessageBoxResult.No:
                         throw new ModAlreadyExistsExceptions(modName);
-                        break;
                 }
             }
 
@@ -309,7 +308,6 @@ namespace OpenKh.Tools.ModsManager.Services
                         break;
                     case MessageBoxResult.No:
                         throw new ModAlreadyExistsExceptions(repositoryName);
-                        break;
                 }
             }
 
@@ -362,7 +360,6 @@ namespace OpenKh.Tools.ModsManager.Services
                         break;
                     case MessageBoxResult.No:
                         throw new ModAlreadyExistsExceptions(modName);
-                        break;
                 }
             }
             Directory.CreateDirectory(modPath);

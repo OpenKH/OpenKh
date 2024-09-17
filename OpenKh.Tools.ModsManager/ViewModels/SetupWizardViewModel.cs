@@ -1,7 +1,5 @@
 using Octokit;
 using OpenKh.Common;
-using OpenKh.Kh1;
-using OpenKh.Kh2;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Services;
 using System;
@@ -11,15 +9,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using Xe.IO;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 using Ionic.Zip;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Runtime.ExceptionServices;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
 {
@@ -45,13 +40,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         const int PC = 2;
 
         private int _gameEdition;
-        private string _pcVersion;
         private string _isoLocation;
         private string _openKhGameEngineLocation;
         private string _pcsx2Location;
         private string _pcReleaseLocation;
         private string _pcReleaseLocationKH3D;
-        private string _pcReleasesSelected;
         private int _gameCollection = 0;
         private string _pcReleaseLanguage;
         private string _gameDataLocation;
@@ -245,17 +238,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 switch (value)
                 {
                     case 1:
-                        _pcVersion = "Steam";
                         ConfigurationService.PCVersion = "Steam";
                         WizardPageAfterLuaBackend = PageSteamAPITrick;
                         break;
                     case 2:
-                        _pcVersion = "Other";
                         ConfigurationService.PCVersion = "Other";
                         WizardPageAfterLuaBackend = PageGameData;
                         break;
                     default:
-                        _pcVersion = "EGS";
                         ConfigurationService.PCVersion = "EGS";
                         WizardPageAfterLuaBackend = PageGameData;
                         break;
@@ -325,19 +315,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
                     File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == 2)
                 {
-                    return _pcReleasesSelected = "both";
+                    return "both";
                 }
                 else if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
                     File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))) && _gameEdition == 2)
                 {
 
-                    return _pcReleasesSelected = "1.5+2.5";
+                    return "1.5+2.5";
                 }
                 else if (Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
                     File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == 2)
                 {
 
-                    return _pcReleasesSelected = "2.8";
+                    return "2.8";
                 }
                 return "";
             }
@@ -685,7 +675,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         case MessageBoxResult.Yes:
                             goto BEGIN;
-                            break;
                     }
                 }
             });
@@ -995,7 +984,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     var releases = gitClient.Repository.Release.GetLatest(owner: "Sirius902", name: "LuaBackend").Result;
                     string DownPath = Path.GetTempPath() + "LuaBackend" + Path.GetExtension(releases.Assets[0].Name);
                     string TempExtractionLocation = Path.GetTempPath() + "LuaBackend";
+                    #pragma warning disable SYSLIB0014 // Type or member is obsolete
                     var _client = new WebClient();
+                    #pragma warning restore SYSLIB0014 // Type or member is obsolete
                     _client.DownloadFile(new System.Uri(releases.Assets[0].BrowserDownloadUrl), DownPath);
                     try
                     {
