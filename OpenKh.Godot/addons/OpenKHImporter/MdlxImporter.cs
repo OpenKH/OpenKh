@@ -85,26 +85,26 @@ public partial class MdlxImporter : EditorImportPlugin
 
         var barFile = Bar.Read(stream);
 
-        var images = usesHdTextures ? Enumerable.Repeat((ImageTexture)null, hdTextures.Max(i => i.Key) + 1).ToList() : [];
+        var images = usesHdTextures ? Enumerable.Repeat((Texture2D)null, hdTextures.Max(i => i.Key) + 1).ToList() : null;
 
         if (usesHdTextures)
         {
             foreach (var index in hdTextures)
             {
-                var texture = ResourceLoader.Load<ImageTexture>(index.Value);
+                var texture = ResourceLoader.Load<Texture2D>(index.Value);
                 images[index.Key] = texture;
             }
         }
 
-        var result = Converters.FromMdlx(barFile, usesHdTextures ? images : null);
-        
-        foreach (var child in result.FindChildren("*", "", true, false)) child.Owner = result;
-
+        var result = Converters.FromMdlx(barFile, images);
+        result.SetOwner();
         result.Name = name;
+        
+        GD.Print(result.GetChildren().Count);
         
         var packed = new PackedScene();
         packed.Pack(result);
-        ResourceSaver.Save(packed, $"{savePath}.{_GetSaveExtension()}");
+        GD.Print(ResourceSaver.Save(packed, $"{savePath}.{_GetSaveExtension()}"));
 
         return Error.Ok;
     }

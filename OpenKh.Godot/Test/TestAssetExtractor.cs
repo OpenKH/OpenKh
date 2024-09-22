@@ -29,6 +29,10 @@ public partial class TestAssetExtractor : Node
         "obj/P_EX100.mdlx", //Sora
         "obj/P_EX100.mset", //Sora's Moveset
         "map/hb26.map", //Garden of Assemblage
+        "menu/us/title.2ld", //Title Screen
+        "vagstream/Title.win32.scd", //Title Screen sounds
+        "field2d/us/tt0command.2dd", //TT0 command menu
+        "field2d/us/tt0field.2dd",
     };
     
     public override void _Ready()

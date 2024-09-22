@@ -1,0 +1,14 @@
+[remap]
+
+importer="ScdImporter"
+type="SoundContainer"
+uid="uid://cp525miobepn0"
+path="res://.godot/imported/Title.win32.scd-14ad028f5f06cb40cf02d6a1fc5d2ac4.tres"
+
+[deps]
+
+source_file="res://Imported/kh2/original/vagstream/Title.win32.scd"
+dest_files=["res://.godot/imported/Title.win32.scd-14ad028f5f06cb40cf02d6a1fc5d2ac4.tres"]
+
+[params]
+

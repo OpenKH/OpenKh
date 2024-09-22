@@ -11,7 +11,7 @@ public partial class KH2Skeleton3D : Skeleton3D
     [Export] public KH2MeshInstance3D Mesh;
     [Export] public ModelCollisionResource ModelCollisions;
 
-    [Export] public AnimationBinaryResource CurrentAnimation;
+    [Export] public InterpolatedMotionResource CurrentAnimation;
     [Export] public bool Animating = false;
     [Export] public float AnimationTime;
     [Export] public float AnimationDeltaMultiplier = 1;
@@ -24,9 +24,9 @@ public partial class KH2Skeleton3D : Skeleton3D
         if (Animating && Mesh is not null && CurrentAnimation is not null)
         {
             AnimationTime += ((float)delta) * AnimationDeltaMultiplier;
-            if (AnimateLoop) AnimationTime = AnimationHelpers.Loop(CurrentAnimation.Value.MotionFile, AnimationTime);
+            if (AnimateLoop) AnimationTime = AnimationHelpers.Loop(CurrentAnimation.Value, AnimationTime);
             
-            AnimationHelpers.ApplyInterpolatedMotion(CurrentAnimation.Value.MotionFile, this, AnimationTime);
+            AnimationHelpers.ApplyInterpolatedMotion(CurrentAnimation.Value, this, AnimationTime);
         }
     }
 }

@@ -75,9 +75,7 @@ public partial class MapImporter : EditorImportPlugin
         
         var barFile = Bar.Read(stream);
         
-        Converters.FromMap(barFile);
-        
-        var images = usesHdTextures ? Enumerable.Repeat((ImageTexture)null, hdTextures.Max(i => i.Key) + 1).ToList() : [];
+        var images = usesHdTextures ? Enumerable.Repeat((Texture2D)null, hdTextures.Max(i => i.Key) + 1).ToList() : null;
 
         if (usesHdTextures)
         {
@@ -85,7 +83,7 @@ public partial class MapImporter : EditorImportPlugin
             {
                 try
                 {
-                    var texture = ResourceLoader.Load<ImageTexture>(index.Value);
+                    var texture = ResourceLoader.Load<Texture2D>(index.Value);
                     images[index.Key] = texture;
                 }
                 catch
@@ -95,25 +93,16 @@ public partial class MapImporter : EditorImportPlugin
                 }
             }
         }
-
+        
         var result = Converters.FromMap(barFile, images);
-        
         result.Name = name;
-
-        foreach (var c in result.GetChildren()) SetOwner(c, result);
-        
-        GD.Print(result.FindChildren("*", "", true, false).Count);
+        result.SetOwner();
         
         var packed = new PackedScene();
         packed.Pack(result);
         ResourceSaver.Save(packed, $"{savePath}.{_GetSaveExtension()}");
 
         return Error.Ok;
-    }
-    private static void SetOwner(Node node, Node owner)
-    {
-        node.Owner = owner;
-        foreach (var c in node.GetChildren()) SetOwner(c, owner);
     }
 }
 

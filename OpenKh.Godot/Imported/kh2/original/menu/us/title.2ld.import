@@ -1,0 +1,14 @@
+[remap]
+
+importer="InterfaceLayoutImporter"
+type="PackedScene"
+uid="uid://cw57iob50x6u6"
+path="res://.godot/imported/title.2ld-29d2025d4547e97de15d85a2ef93a2d9.scn"
+
+[deps]
+
+source_file="res://Imported/kh2/original/menu/us/title.2ld"
+dest_files=["res://.godot/imported/title.2ld-29d2025d4547e97de15d85a2ef93a2d9.scn"]
+
+[params]
+

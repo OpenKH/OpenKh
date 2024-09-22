@@ -2,6 +2,7 @@ using System.IO;
 using System.Numerics;
 using Godot;
 using OpenKh.Kh1;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Models;
 using Quaternion = Godot.Quaternion;
 using Vector3 = Godot.Vector3;
@@ -29,6 +30,16 @@ public static class ImportHelpers
     public static readonly string Kh2ImportPath = Path.Combine(ImportPath, "kh2");
     public static readonly string Kh2ImportOriginalPath = Path.Combine(Kh2ImportPath, "original");
     public static readonly string Kh2ImportRemasteredPath = Path.Combine(Kh2ImportPath, "remastered");
+    public static void SetOwner(this Node node)
+    {
+        foreach (var c in node.FindChildren("*", "", true, false)) c.Owner = node;
+        //foreach (var c in node.GetChildren()) SetOwnerRecursive(c, node);
+    }
+    private static void SetOwnerRecursive(this Node node, Node owner)
+    {
+        node.Owner = owner;
+        foreach (var c in node.GetChildren()) SetOwnerRecursive(c, owner);
+    }
 
     public static Transform3D CreateTransform(Vector3 pos, Vector3 rot, Vector3 scale)
     {
@@ -87,5 +98,12 @@ public static class ImportHelpers
         var translationTransform = Transform3D.Identity.Translated(bone.Position());
 
         return translationTransform * rotationTransform * scaleTransform;
+    }
+    public static void PrintEntries(this Bar bar)
+    {
+        foreach (var entry in bar)
+        {
+            GD.Print($"{entry.Index}, {entry.Name}, {entry.Type}");
+        }
     }
 }

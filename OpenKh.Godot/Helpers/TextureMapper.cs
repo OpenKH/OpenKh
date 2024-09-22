@@ -5,11 +5,11 @@ namespace OpenKh.Godot.Helpers
 {
     public class TextureMapper
     {
-        public readonly List<ImageTexture> HdTextures = [];
+        public readonly List<Texture2D> HdTextures = [];
         public readonly Dictionary<int, int> TextureMap = new();
         public int CurrentIndex { get; private set; }
 
-        public TextureMapper(IEnumerable<ImageTexture> hdTextures, Dictionary<int, int> map = null, int index = 0)
+        public TextureMapper(IEnumerable<Texture2D> hdTextures, Dictionary<int, int> map = null, int index = 0)
         {
             if (hdTextures is not null) HdTextures.AddRange(hdTextures);
             if (map is not null) TextureMap = map;
@@ -23,7 +23,7 @@ namespace OpenKh.Godot.Helpers
             CurrentIndex = old.CurrentIndex;
         }
 
-        public ImageTexture GetTexture(int index, ImageTexture fallback)
+        public Texture2D GetTexture(int index, Texture2D fallback)
         {
             if (!TextureMap.TryGetValue(index, out var value))
             {
@@ -36,7 +36,7 @@ namespace OpenKh.Godot.Helpers
             return HdTextures[value] ?? fallback;
         }
 
-        public ImageTexture GetNextTexture(ImageTexture fallback)
+        public Texture2D GetNextTexture(Texture2D fallback)
         {
             var value = CurrentIndex;
             CurrentIndex++;
