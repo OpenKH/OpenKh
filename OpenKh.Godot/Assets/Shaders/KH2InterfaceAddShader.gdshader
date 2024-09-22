@@ -1,7 +1,16 @@
 shader_type canvas_item;
 render_mode unshaded, blend_add;
 
+#include "KH2InterfaceCommon.gdshaderinc"
+
+void vertex()
+{
+	vertColor = COLOR;
+	minimaxi = CUSTOM0;
+	uvAdj = CUSTOM1.rg;
+}
+
 void fragment()
 {
-	//COLOR = texture(TEXTURE, UV);
+	COLOR = Compute(vertColor, UV, TEXTURE);
 }

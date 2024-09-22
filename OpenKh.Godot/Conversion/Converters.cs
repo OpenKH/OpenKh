@@ -761,6 +761,8 @@ public static class Converters
 
             var positions = new List<Vector2>();
             var uvs = new List<Vector2>();
+            var adjustments = new List<Vector2>();
+            var miniMaxis = new List<Vector4>();
             var colors = new List<Color>();
             
             foreach (var spritePart in spriteGroup)
@@ -777,20 +779,17 @@ public static class Converters
                 var uvBottomLeft = new Vector2(sprite.Left, sprite.Bottom);
                 var uvBottomRight = new Vector2(sprite.Right, sprite.Bottom);
 
-                //TODO: are these actually the sides, or are they corners? and if they're corners, which ones?
-                var overall = new Color(0, 0, 0, 0);
-                foreach (var c in new[]{sprite.ColorLeft, sprite.ColorRight, sprite.ColorTop, sprite.ColorBottom})
-                {
-                    var bytes = BitConverter.GetBytes(c);
+                var min = new Vector2(Mathf.Min(sprite.Left, sprite.Right), Mathf.Min(sprite.Top, sprite.Bottom)) / nativeTexSize;
+                var max = new Vector2(Mathf.Max(sprite.Left, sprite.Right), Mathf.Max(sprite.Top, sprite.Bottom)) / nativeTexSize;
 
-                    var red = bytes[0] / 128f;
-                    var green = bytes[1] / 128f;
-                    var blue = bytes[2] / 128f;
-                    var alpha = bytes[3] / 128f;
+                var miniMaxi = new Vector4(min.X, min.Y, max.X, max.Y);
+                
+                var colorTopLeft = sprite.ColorLeft.ConvertColor();
+                var colorTopRight = sprite.ColorTop.ConvertColor();
+                var colorBottomLeft = sprite.ColorRight.ConvertColor();
+                var colorBottomRight = sprite.ColorBottom.ConvertColor();
 
-                    overall += new Color(red, green, blue, alpha);
-                }
-                overall *= new Color(0.25f, 0.25f, 0.25f, 0.25f);
+                var movement = new Vector2(sprite.UTranslation, sprite.VTranslation);
                         
                 positions.AddRange(
                 [
@@ -802,20 +801,35 @@ public static class Converters
                     uvTopLeft, uvTopRight, uvBottomLeft,
                     uvBottomLeft, uvTopRight, uvBottomRight,
                 ]);
+                adjustments.AddRange(
+                [
+                    movement, movement, movement,
+                    movement, movement, movement,
+                ]);
+                miniMaxis.AddRange(
+                [
+                    miniMaxi, miniMaxi, miniMaxi,
+                    miniMaxi, miniMaxi, miniMaxi,
+                ]);
                 colors.AddRange(
                 [
-                    overall, overall, overall,
-                    overall, overall, overall,
+                    colorTopLeft, colorTopRight, colorBottomLeft,
+                    colorBottomLeft, colorTopRight, colorBottomRight,
                 ]);
             }
 
             array[(int)Mesh.ArrayType.Vertex] = positions.ToArray();
             array[(int)Mesh.ArrayType.TexUV] = uvs.Select(u => u / nativeTexSize).ToArray();
             array[(int)Mesh.ArrayType.Color] = colors.ToArray();
+            array[(int)Mesh.ArrayType.Custom0] = miniMaxis.SelectMany(i => new[] { i.X, i.Y, i.Z, i.W }).ToArray();
+            array[(int)Mesh.ArrayType.Custom1] = adjustments.SelectMany(i => new[] { i.X, i.Y, }).ToArray();
+
+            const Mesh.ArrayFormat miniMaxiShift = (Mesh.ArrayFormat)((int)Mesh.ArrayCustomFormat.RgbaFloat << (int)Mesh.ArrayFormat.FormatCustom0Shift);
+            const Mesh.ArrayFormat adjustmentShift = (Mesh.ArrayFormat)((int)Mesh.ArrayCustomFormat.RgFloat << (int)Mesh.ArrayFormat.FormatCustom1Shift);
             
             if (spriteGroup.Count > 0)
                 mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, array,
-                    flags: Mesh.ArrayFormat.FormatVertex | Mesh.ArrayFormat.FormatTexUV | Mesh.ArrayFormat.FormatColor | Mesh.ArrayFormat.FlagUse2DVertices);
+                    flags: Mesh.ArrayFormat.FormatVertex | Mesh.ArrayFormat.FormatTexUV | Mesh.ArrayFormat.FormatColor | Mesh.ArrayFormat.FlagUse2DVertices | miniMaxiShift | adjustmentShift);
             
             sequenceNode.Sprites.Add(mesh);
         }
@@ -853,24 +867,9 @@ public static class Converters
                     BounceCount = new Vector2I(currentAnim.BounceXCount, currentAnim.BounceYCount),
                     ColorBlend = currentAnim.ColorBlend,
                 };
-                
-                var sbytes = BitConverter.GetBytes(currentAnim.ColorStart);
 
-                var sred = sbytes[0] / 128f;
-                var sgreen = sbytes[1] / 128f;
-                var sblue = sbytes[2] / 128f;
-                var salpha = sbytes[3] / 128f;
-
-                anim.ColorStart = new Color(sred, sgreen, sblue, salpha);
-                    
-                var ebytes = BitConverter.GetBytes(currentAnim.ColorEnd);
-
-                var ered = ebytes[0] / 128f;
-                var egreen = ebytes[1] / 128f;
-                var eblue = ebytes[2] / 128f;
-                var ealpha = ebytes[3] / 128f;
-                    
-                anim.ColorEnd = new Color(ered, egreen, eblue, ealpha);
+                anim.ColorStart = currentAnim.ColorStart.ConvertColor();
+                anim.ColorEnd = currentAnim.ColorEnd.ConvertColor();
                 
                 groupResource.Animations.Add(anim);
             }

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Numerics;
 using Godot;
@@ -105,5 +106,16 @@ public static class ImportHelpers
         {
             GD.Print($"{entry.Index}, {entry.Name}, {entry.Type}");
         }
+    }
+    public static Color ConvertColor(this uint c)
+    {
+        var bytes = BitConverter.GetBytes(c);
+
+        var red = bytes[0] / 128f;
+        var green = bytes[1] / 128f;
+        var blue = bytes[2] / 128f;
+        var alpha = bytes[3] / 128f;
+
+        return new Color(red, green, blue, alpha);
     }
 }
