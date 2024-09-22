@@ -285,7 +285,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
                 ReloadModsList();
                 if (ModsList.Count > 0)
-                    FetchUpdates();
+                    _ = FetchUpdates();
             }
         }
 
@@ -478,7 +478,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigPcsx2Location = ConfigurationService.Pcsx2Location,
                     ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation,
                     ConfigPcReleaseLocationKH3D = ConfigurationService.PcReleaseLocationKH3D,
-                    ConfigPcReleaseLanguage = ConfigurationService.PcReleaseLanguage,
                     ConfigRegionId = ConfigurationService.RegionId,
                     ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
                 };
@@ -534,7 +533,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
             CheckForModUpdatesCommand = new RelayCommand(_ =>
             {
-                FetchUpdates();
+                _ = FetchUpdates();
             });
 
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
@@ -543,7 +542,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }));
 
             CheckOpenkhUpdateCommand = new RelayCommand(
-                _ => UpdateOpenkhAsync()
+                _ => _ = UpdateOpenkhAsync()
             );
 
             YamlGeneratorCommand = new RelayCommand(
@@ -565,7 +564,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             );
 
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
-            FetchUpdates();
+            _ = FetchUpdates();
 
             if (ConfigurationService.WizardVersionNumber < _wizardVersionNumber)
                 WizardCommand.Execute(null);
@@ -1343,7 +1342,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 ConfigurationService.EnabledMods = File.ReadAllLines(filename);
                 ReloadModsList();
                 if (ModsList.Count > 0)
-                    FetchUpdates();
+                    _ = FetchUpdates();
             }
             else
             {

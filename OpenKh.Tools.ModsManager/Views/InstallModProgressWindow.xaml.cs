@@ -48,7 +48,7 @@ namespace OpenKh.Tools.ModsManager.Views
                 OnPropertyChanged();
             }
         }
-        
+
         public string ProgressText
         {
             get => _progressText;
@@ -58,7 +58,7 @@ namespace OpenKh.Tools.ModsManager.Views
                 OnPropertyChanged();
             }
         }
-        
+
         public bool ProgressUnknown
         {
             get => _progressUnknown;
@@ -68,7 +68,7 @@ namespace OpenKh.Tools.ModsManager.Views
                 OnPropertyChanged();
             }
         }
-        
+
         public float ProgressValue
         {
             get => _progressValue;

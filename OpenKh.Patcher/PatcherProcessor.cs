@@ -777,6 +777,19 @@ namespace OpenKh.Patcher
                         Kh2.Battle.Atkp.Write(stream.SetPosition(0), atkpList);
                         break;
 
+                    case "lvpm":
+                        var lvpmList = Kh2.Battle.Lvpm.Read(stream);
+                        var moddedLvpm = deserializer.Deserialize<List<Kh2.Battle.LvpmHelper>>(sourceText);
+                        var helperList = Kh2.Battle.LvpmHelper.ConvertLvpmListToHelper(lvpmList);
+
+                        foreach (var level in moddedLvpm)
+                        {
+                            var oldLvpm = helperList.First(x => x.Level == level.Level);
+                            lvpmList[helperList.IndexOf(oldLvpm)] = Kh2.Battle.LvpmHelper.ConvertLvpmHelperToLvpm(level);
+                        }
+                        Kh2.Battle.Lvpm.Write(stream.SetPosition(0), lvpmList);
+                        break;
+
                     case "objentry":
                         var objEntryList = Kh2.Objentry.Read(stream).ToDictionary(x => x.ObjectId, x => x);
                         var moddedObjEntry = deserializer.Deserialize<Dictionary<uint, Kh2.Objentry>>(sourceText);
