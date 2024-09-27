@@ -32,11 +32,14 @@ public partial class TestAssetExtractor : Node
         "menu/us/title.2ld", //Title Screen
         "vagstream/Title.win32.scd", //Title Screen sounds
         "field2d/us/tt0command.2dd", //TT0 command menu
-        "field2d/us/tt0field.2dd",
+        "field2d/us/tt0field.2dd", //TT0 UI elements
+        "00objentry.bin", //Object entries
+        "03system.bin", //System data
     };
     
     public override void _Ready()
     {
+        //TODO: this is my path
         var gamePath = "/mnt/LocalDisk2/SteamLibrary/steamapps/common/KINGDOM HEARTS -HD 1.5+2.5 ReMIX-/Image/dt";
         var files = Directory.GetFiles(gamePath);
         foreach (var path in files)

@@ -94,7 +94,7 @@ public partial class MapImporter : EditorImportPlugin
             }
         }
         
-        var result = Converters.FromMap(barFile, images);
+        var result = ModelConverters.FromMap(barFile, images);
         result.Name = name;
         result.SetOwner();
         

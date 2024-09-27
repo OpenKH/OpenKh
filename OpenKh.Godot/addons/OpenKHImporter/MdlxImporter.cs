@@ -96,7 +96,7 @@ public partial class MdlxImporter : EditorImportPlugin
             }
         }
 
-        var result = Converters.FromMdlx(barFile, images);
+        var result = ModelConverters.FromMdlx(barFile, images);
         result.SetOwner();
         result.Name = name;
         
