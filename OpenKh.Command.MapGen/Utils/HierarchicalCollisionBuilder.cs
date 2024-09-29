@@ -70,7 +70,7 @@ namespace OpenKh.Command.MapGen.Utils
                     var v3 = face.positionList[2];
                     var v4 = quad ? face.positionList[3] : Vector3.Zero;
 
-                    collisionMesh.Collisions.Add(coct.Complete(
+                    var collision = coct.Complete(
                         new Collision
                         {
                             Vertex1 = helper.AllocateVertex(v1.X, -v1.Y, -v1.Z), // why -Y and -Z ?
@@ -82,7 +82,16 @@ namespace OpenKh.Command.MapGen.Utils
                             FloorLevel = face.matDef.floorLevel,
                         },
                         inflate: 1
-                    ));
+                    );
+
+                    if (float.IsNaN(collision.Plane.D))
+                    {
+                        // 3 points are on the same line (not a plane)
+                    }
+                    else
+                    {
+                        collisionMesh.Collisions.Add(collision);
+                    }
                 }
 
                 coct.Complete(collisionMesh);
