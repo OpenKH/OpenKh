@@ -1871,6 +1871,107 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
+        void ListPatchLvpmTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00battle.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "lvpm",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "LvpmList.yml",
+                                        Type = "lvpm"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            {
+                var lvpmEntry = new List<Kh2.Battle.Lvpm>()
+                {
+                    new Kh2.Battle.Lvpm
+                    {
+                        HpMultiplier = 89,
+                        Strength = 77,
+                        Defense = 88,
+                        MaxStrength = 40,
+                        MinStrength = 32,
+                        Experience = 777
+                    }
+                };
+
+                using var lvpmStream = new MemoryStream();
+                Kh2.Battle.Lvpm.Write(lvpmStream, lvpmEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "lvpm",
+                        Type = Bar.EntryType.List,
+                        Stream = lvpmStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "LvpmList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+
+                var serializer = new Serializer();
+                var moddedLvpm = new List<Kh2.Battle.LvpmHelper>{
+                    new Kh2.Battle.LvpmHelper
+                    {
+                        Level = 0,
+                        HpMultiplier = 89,
+                        Strength = 77,
+                        Defense = 88,
+                        MaxStrength = 40,
+                        MinStrength = 32,
+                        Experience = 777
+                    }
+                };
+                writer.Write(serializer.Serialize(moddedLvpm));
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            AssertFileExists(ModOutputDir, "00battle.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var lvpmStream = Kh2.Battle.Lvpm.Read(binarc[0].Stream, 1);
+                var helperList = Kh2.Battle.LvpmHelper.ConvertLvpmListToHelper(lvpmStream);
+                Assert.Equal(0, helperList[0].Level);
+                Assert.Equal(89, helperList[0].HpMultiplier);
+                Assert.Equal(77, helperList[0].Strength);
+                Assert.Equal(88, helperList[0].Defense);
+                Assert.Equal(40, helperList[0].MaxStrength);
+                Assert.Equal(32, helperList[0].MinStrength);
+                Assert.Equal(777, helperList[0].Experience);
+            });
+        }
+
+        [Fact]
         public void ListPatchPrztTest()
         {
             var patcher = new PatcherProcessor();

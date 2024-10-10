@@ -33,7 +33,23 @@ namespace OpenKh.Kh2
         }
     }
 
+    public class BaseList<T>
+    where T : class
+    {
+        public static List<T> Read(Stream stream, int count)
+        {
+            return Enumerable.Range(0, count)
+                .Select(_ => BinaryMapping.ReadObject<T>(stream))
+                .ToList();
+        }
 
+        public static void Write(Stream stream, IEnumerable<T> items)
+        {
+            var itemList = items as IList<T> ?? items.ToList();
+            foreach (var item in itemList)
+                BinaryMapping.WriteObject(stream, item);
+        }
+    }
 
     public class BaseShortTable<T>
         where T : class

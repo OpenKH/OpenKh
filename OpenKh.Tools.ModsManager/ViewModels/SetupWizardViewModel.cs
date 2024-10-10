@@ -1,7 +1,5 @@
 using Octokit;
 using OpenKh.Common;
-using OpenKh.Kh1;
-using OpenKh.Kh2;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Services;
 using System;
@@ -11,15 +9,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using Xe.IO;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 using Ionic.Zip;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Runtime.ExceptionServices;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
 {
@@ -45,13 +40,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         const int PC = 2;
 
         private int _gameEdition;
-        private string _pcVersion;
         private string _isoLocation;
         private string _openKhGameEngineLocation;
         private string _pcsx2Location;
         private string _pcReleaseLocation;
         private string _pcReleaseLocationKH3D;
-        private string _pcReleasesSelected;
         private int _gameCollection = 0;
         private string _pcReleaseLanguage;
         private string _gameDataLocation;
@@ -78,12 +71,21 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged();
             }
         }
+        private Xceed.Wpf.Toolkit.WizardPage _wizardPageAfterLuaBackend;
+        public Xceed.Wpf.Toolkit.WizardPage WizardPageAfterLuaBackend
+        {
+            get => _wizardPageAfterLuaBackend;
+            private set
+            {
+                _wizardPageAfterLuaBackend = value;
+                OnPropertyChanged();
+            }
+        }
         public Xceed.Wpf.Toolkit.WizardPage PageIsoSelection { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageEosInstall { get; internal set; }
-        public Xceed.Wpf.Toolkit.WizardPage PageEosConfig { get; internal set; }
-        public Xceed.Wpf.Toolkit.WizardPage PageLuaBackendInstall { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PageSteamAPITrick { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageRegion { get; internal set; }
-        public Xceed.Wpf.Toolkit.WizardPage PCLaunchOption { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PageGameData { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage LastPage { get; internal set; }
 
         public WizardPageStackService PageStack { get; set; } = new WizardPageStackService();
@@ -191,8 +193,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 switch (ConfigurationService.PcReleaseLanguage)
                 {
                     case "jp":
+                        _pcReleaseLanguage = "jp";
                         return 1;
                     default:
+                        _pcReleaseLanguage = "en";
                         return 0;
                 }
             }
@@ -202,9 +206,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     case 1:
                         ConfigurationService.PcReleaseLanguage = "jp";
+                        _pcReleaseLanguage = "jp";
                         break;
                     default:
                         ConfigurationService.PcReleaseLanguage = "en";
+                        _pcReleaseLanguage = "en";
                         break;
                 }
             }
@@ -217,10 +223,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 switch (ConfigurationService.PCVersion)
                 {
                     case "Steam":
+                        WizardPageAfterLuaBackend = PageSteamAPITrick;
                         return 1;
                     case "Other":
+                        WizardPageAfterLuaBackend = PageGameData;
                         return 2;
                     default:
+                        WizardPageAfterLuaBackend = PageGameData;
                         return 0;
                 }
             }
@@ -229,16 +238,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 switch (value)
                 {
                     case 1:
-                        _pcVersion = "Steam";
                         ConfigurationService.PCVersion = "Steam";
+                        WizardPageAfterLuaBackend = PageSteamAPITrick;
                         break;
                     case 2:
-                        _pcVersion = "Other";
                         ConfigurationService.PCVersion = "Other";
+                        WizardPageAfterLuaBackend = PageGameData;
                         break;
                     default:
-                        _pcVersion = "EGS";
                         ConfigurationService.PCVersion = "EGS";
+                        WizardPageAfterLuaBackend = PageGameData;
                         break;
                 }
             }
@@ -306,19 +315,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
                     File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == 2)
                 {
-                    return _pcReleasesSelected = "both";
+                    return "both";
                 }
                 else if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
                     File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))) && _gameEdition == 2)
                 {
 
-                    return _pcReleasesSelected = "1.5+2.5";
+                    return "1.5+2.5";
                 }
                 else if (Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
                     File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == 2)
                 {
 
-                    return _pcReleasesSelected = "2.8";
+                    return "2.8";
                 }
                 return "";
             }
@@ -481,21 +490,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
 
         }
-        public string PcReleaseLanguage
-        {
-            get => _pcReleaseLanguage;
-            set
-            {
-                _pcReleaseLanguage = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(PcReleaseLanguage));
-                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
-                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
-                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
-                OnPropertyChanged(nameof(IsGameSelected));
-                OnPropertyChanged(nameof(IsGameDataFound));
-            }
-        }
 
         public RelayCommand SelectGameDataLocationCommand { get; }
         public string GameDataLocation
@@ -546,6 +540,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     return false;
             }
         }
+        public RelayCommand InstallSteamAPIFile {  get; set; }
+        public RelayCommand RemoveSteamAPIFile { get; set; }
         public RelayCommand InstallLuaBackendCommand { get; set; }
         public RelayCommand RemoveLuaBackendCommand { get; set; }
         public Visibility LuaBackendFoundVisibility => IsLuaBackendInstalled ? Visibility.Visible : Visibility.Collapsed;
@@ -679,7 +675,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         case MessageBoxResult.Yes:
                             goto BEGIN;
-                            break;
                     }
                 }
             });
@@ -989,7 +984,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     var releases = gitClient.Repository.Release.GetLatest(owner: "Sirius902", name: "LuaBackend").Result;
                     string DownPath = Path.GetTempPath() + "LuaBackend" + Path.GetExtension(releases.Assets[0].Name);
                     string TempExtractionLocation = Path.GetTempPath() + "LuaBackend";
+                    #pragma warning disable SYSLIB0014 // Type or member is obsolete
                     var _client = new WebClient();
+                    #pragma warning restore SYSLIB0014 // Type or member is obsolete
                     _client.DownloadFile(new System.Uri(releases.Assets[0].BrowserDownloadUrl), DownPath);
                     try
                     {
@@ -1268,6 +1265,44 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     OnPropertyChanged(nameof(IsLuaBackendInstalled));
                     OnPropertyChanged(nameof(LuaBackendFoundVisibility));
                     OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
+                }
+            });
+            InstallSteamAPIFile = new RelayCommand(_ =>
+            {
+                if (GameCollection == 0)
+                {
+                    if (Directory.Exists(ConfigurationService.PcReleaseLocation))
+                    {
+                        File.WriteAllText(Path.Combine(ConfigurationService.PcReleaseLocation, "steam_appid.txt"), "2552430");
+                        ConfigurationService.SteamAPITrick1525 = true;
+                    }
+                }
+                else if (GameCollection == 1)
+                {
+                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                    {
+                        File.WriteAllText(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "steam_appid.txt"), "2552440");
+                        ConfigurationService.SteamAPITrick28 = true;
+                    }
+                }
+            });
+            RemoveSteamAPIFile = new RelayCommand(_ =>
+            {
+                if (GameCollection == 0)
+                {
+                    if (File.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "steam_appid.txt")))
+                    {
+                        File.Delete(Path.Combine(ConfigurationService.PcReleaseLocation, "steam_appid.txt"));
+                        ConfigurationService.SteamAPITrick1525 = false;
+                    }
+                }
+                else if (GameCollection == 1)
+                {
+                    if (File.Exists(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "steam_appid.txt")))
+                    {
+                        File.Delete(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "steam_appid.txt"));
+                        ConfigurationService.SteamAPITrick28 = false;
+                    }
                 }
             });
         }

@@ -222,6 +222,7 @@ struct MyAppVtbl
     void* onFrameForSaveWait;
     void* func3;
     void* func4recom;
+    void* func5recom;
 };
 
 MyAppVtbl customAppVtbl;
@@ -236,6 +237,7 @@ Hook<PFN_Axa_CFileMan_GetFileSize>* Hook_Axa_CFileMan_GetFileSize;
 Hook<PFN_Axa_CFileMan_GetRemasteredCount>* Hook_Axa_CFileMan_GetRemasteredCount;
 Hook<PFN_Axa_CFileMan_GetRemasteredEntry>* Hook_Axa_CFileMan_GetRemasteredEntry;
 Hook<PFN_Axa_PackageFile_GetRemasteredAsset>* Hook_Axa_PackageFile_GetRemasteredAsset;
+Hook<PFN_Axa_PackageFile_OpenFileImpl>* Hook_Axa_PackageFile_OpenFileImpl;
 Hook<PFN_VAG_STREAM_play>* Hook_VAG_STREAM_play;
 Hook<PFN_VAG_STREAM_fadeOut>* Hook_VAG_STREAM_fadeOut;
 Hook<PFN_VAG_STREAM_setVolume>* Hook_VAG_STREAM_setVolume;
@@ -318,6 +320,7 @@ void Panacea::Initialize()
     Hook_Axa_CFileMan_GetRemasteredCount = NewHook(pfn_Axa_CFileMan_GetRemasteredCount, Panacea::GetRemasteredCount, "Axa::CFileMan::GetRemasteredCount");
     Hook_Axa_CFileMan_GetRemasteredEntry = NewHook(pfn_Axa_CFileMan_GetRemasteredEntry, Panacea::GetRemasteredEntry, "Axa::CFileMan::GetRemasteredEntry");
     Hook_Axa_PackageFile_GetRemasteredAsset = NewHook(pfn_Axa_PackageFile_GetRemasteredAsset, Panacea::GetRemasteredAsset, "Axa::PackageFile::GetRemasteredAsset");
+    Hook_Axa_PackageFile_OpenFileImpl = NewHook(pfn_Axa_PackageFile_OpenFileImpl, Panacea::OpenFileImpl, "Axa::PackageFile::OpenFileImpl");
     Hook_VAG_STREAM_play = NewHook(pfn_VAG_STREAM_play, Panacea::VAG_STREAM::play, "VAG_STREAM::play");
     Hook_VAG_STREAM_fadeOut = NewHook(pfn_VAG_STREAM_fadeOut, Panacea::VAG_STREAM::fadeOut, "VAG_STREAM::fadeOut");
     Hook_VAG_STREAM_setVolume = NewHook(pfn_VAG_STREAM_setVolume, Panacea::VAG_STREAM::setVolume, "VAG_STREAM::setVolume");
@@ -694,35 +697,44 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
 {
     std::vector<int> assetoffs{};
     const wchar_t* ext = PathFindExtensionW(path);
-    if (ext[-2] == L'.' && ext[-1] == L'a')
-        ext -= 2;
-    if (!_wcsicmp(ext, L".imd"))
-        GetIMDOffsets(addr, 0, assetoffs);
-    else if (!_wcsicmp(ext, L".imz"))
-        GetIMZOffsets(addr, 0, assetoffs);
-    else if (!_wcsicmp(ext, L".tm2"))
-        GetTM2Offsets(addr, 0, assetoffs);
-    else if (!_wcsicmp(ext, L".pax"))
-        GetPAXOffsets(addr, 0, assetoffs);
-    else if (!_wcsicmp(ext, L".2dd")
-        || !_wcsicmp(ext, L".2ld")
-        || !_wcsicmp(ext, L".a.fm")
-        || !_wcsicmp(ext, L".a.fr")
-        || !_wcsicmp(ext, L".a.gr")
-        || !_wcsicmp(ext, L".a.it")
-        || !_wcsicmp(ext, L".a.sp")
-        || !_wcsicmp(ext, L".a.us")
-        || !_wcsicmp(ext, L".a.uk")
-        || !_wcsicmp(ext, L".a.jp")
-        || !_wcsicmp(ext, L".bar")
-        || !_wcsicmp(ext, L".bin")
-        || !_wcsicmp(ext, L".mag")
-        || !_wcsicmp(ext, L".map")
-        || !_wcsicmp(ext, L".mdlx"))
-        GetBAROffsets(addr, 0, assetoffs);
-    else // unknown file type
+    switch (OpenKH::m_GameID)
+    {
+    case OpenKH::GameId::KingdomHearts2:
+        if (ext[-2] == L'.' && ext[-1] == L'a')
+            ext -= 2;
+        if (!_wcsicmp(ext, L".imd"))
+            GetIMDOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".imz"))
+            GetIMZOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".tm2"))
+            GetTM2Offsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".pax"))
+            GetPAXOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".2dd")
+            || !_wcsicmp(ext, L".2ld")
+            || !_wcsicmp(ext, L".a.fm")
+            || !_wcsicmp(ext, L".a.fr")
+            || !_wcsicmp(ext, L".a.gr")
+            || !_wcsicmp(ext, L".a.it")
+            || !_wcsicmp(ext, L".a.sp")
+            || !_wcsicmp(ext, L".a.us")
+            || !_wcsicmp(ext, L".a.uk")
+            || !_wcsicmp(ext, L".a.jp")
+            || !_wcsicmp(ext, L".bar")
+            || !_wcsicmp(ext, L".bin")
+            || !_wcsicmp(ext, L".mag")
+            || !_wcsicmp(ext, L".map")
+            || !_wcsicmp(ext, L".mdlx"))
+            GetBAROffsets(addr, 0, assetoffs);
+        else // unknown file type
+            for (int i = 0; i < entries.size(); ++i)
+                assetoffs.push_back(entries[i].origOffset);
+        break;
+    default:
         for (int i = 0; i < entries.size(); ++i)
             assetoffs.push_back(entries[i].origOffset);
+        break;
+    }
     std::vector<Axa::RemasteredEntry> modfiles;
     ScanFolder(remasteredFolder, modfiles);
     if (modfiles.size() >= assetoffs.size())
@@ -796,6 +808,15 @@ void GetRemasteredFiles(Axa::PackageFile* fileinfo, const wchar_t* path, void* a
 #endif
         RemasteredData.insert_or_assign(fileinfo->CurrentFileName, entries);
     }
+}
+
+bool Panacea::OpenFileImpl(Axa::PackageFile* a1, const char* filePath, const char* altBasePath)
+{
+    auto ret = Hook_Axa_PackageFile_OpenFileImpl->Unpatch()(a1, filePath, altBasePath);
+    Hook_Axa_PackageFile_OpenFileImpl->Patch();
+    if (ret)
+        strcpy_s(a1->CurrentFileName, filePath);
+    return ret;
 }
 
 long __cdecl Panacea::LoadFile(Axa::CFileMan* _this, const char* filename, void* addr, bool useHdAsset)
@@ -1006,7 +1027,7 @@ void* __cdecl Panacea::LoadFileWithMalloc(Axa::CFileMan* _this, const char* file
     {
         if (OpenKH::m_DebugLog)
             fwprintf(stdout, L"LoadFileWithMalloc(\"%ls\", %d, \"%hs\")\n", path, useHdAsset, filename2);
-        auto fileinfo = Axa::PackageMan::GetFileInfo(filename, 0);
+        auto fileinfo = Axa::PackageMan::GetFileInfo(filename, filename2);
         if (*sizePtr == -1)
             return nullptr;
         FILE* file = _wfopen(path, L"rb");
@@ -1167,10 +1188,15 @@ long __cdecl Panacea::GetFileSize(Axa::CFileMan* _this, const char* filename)
 
 __int64 __cdecl Panacea::GetRemasteredCount()
 {
+    __int64 count;
     auto found = RemasteredData.find(PackageFiles[LastOpenedPackage]->CurrentFileName);
     if (found != RemasteredData.end())
-        return found->second.size();
-    return PackageFiles[LastOpenedPackage]->CurrentFileData.remasteredCount;
+        count = found->second.size();
+    else
+        count = PackageFiles[LastOpenedPackage]->CurrentFileData.remasteredCount;
+    if (OpenKH::m_DebugLog)
+        fwprintf(stdout, L"GetRemasteredCount() = %lld\n", count);
+    return count;
 }
 
 Axa::RemasteredEntry* Panacea::GetRemasteredEntry(Axa::CFileMan* a1, int* origOffsetPtr, int assetNum)
@@ -1181,10 +1207,14 @@ Axa::RemasteredEntry* Panacea::GetRemasteredEntry(Axa::CFileMan* a1, int* origOf
         if (assetNum >= found->second.size())
             return nullptr;
         *origOffsetPtr = found->second[assetNum].origOffset;
+        if (OpenKH::m_DebugLog)
+            fprintf(stdout, "GetRemasteredEntry(%d) = \"%s\"\n", assetNum, found->second[assetNum].name);
         return &found->second[assetNum];
     }
     auto ret = Hook_Axa_CFileMan_GetRemasteredEntry->Unpatch()(a1, origOffsetPtr, assetNum);
     Hook_Axa_CFileMan_GetRemasteredEntry->Patch();
+    if (OpenKH::m_DebugLog)
+        fprintf(stdout, "GetRemasteredEntry(%d) = \"%s\"\n", assetNum, ret->name);
     return ret;
 }
 
@@ -1207,6 +1237,8 @@ void* Panacea::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizeP
     wchar_t path[MAX_PATH];
     if (GetRawFile(path, sizeof(path), a1->CurrentFileName))
     {
+        if (OpenKH::m_DebugLog)
+            fwprintf(stdout, L"GetRemasteredAsset(%d) = \"%ls\"\n", assetNum, path);
         FILE* file = _wfopen(path, L"rb");
         Axa::PkgEntry pkgent;
         fread(&pkgent, sizeof(pkgent), 1, file);
@@ -1254,6 +1286,8 @@ void* Panacea::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizeP
     }
     if (GetFileAttributesW(remastered) != INVALID_FILE_ATTRIBUTES)
     {
+        if (OpenKH::m_DebugLog)
+            fwprintf(stdout, L"GetRemasteredAsset(%d) = \"%ls\"\n", assetNum, remastered);
         FILE* file = _wfopen(remastered, L"rb");
         fseek(file, 0, SEEK_END);
         *assetSizePtr = ftell(file);
@@ -1269,6 +1303,8 @@ void* Panacea::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizeP
         fclose(file);
         return addr;
     }
+    if (OpenKH::m_DebugLog)
+        fwprintf(stdout, L"GetRemasteredAsset(%d)\n", assetNum);
     auto ret = Hook_Axa_PackageFile_GetRemasteredAsset->Unpatch()(a1, assetSizePtr, assetNum);
     Hook_Axa_PackageFile_GetRemasteredAsset->Patch();
     return ret;
@@ -1372,7 +1408,7 @@ void Panacea::VAG_STREAM::exit()
 
 void Panacea::DebugPrint(const char* format, ...)
 {
-    if (OpenKH::m_DebugLog)
+    if (OpenKH::m_DebugLog && OpenKH::m_SoundDebug)
     {
         va_list args;
         va_start(args, format);

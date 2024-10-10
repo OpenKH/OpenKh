@@ -341,7 +341,7 @@
             Title="Install Lua Backend"
             Description="Lua Backend allows you to use Lua Scripts with the PC version of Kingdom Hearts."
             PreviousPage="{Binding PageStack.Back}"
-            NextPage="{Binding ElementName=PageGameData}">
+            NextPage="{Binding WizardPageAfterLuaBackend}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
                 <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
@@ -369,6 +369,27 @@
                 If you wish to uninstall Lua Backend completely press the button below.
                 </TextBlock>
                 <Button Margin="0 0 0 6" Content="Uninstall Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveLuaBackendCommand}" Visibility="{Binding LuaBackendFoundVisibility}"/>
+            </StackPanel>
+        </xctk:WizardPage>
+        <xctk:WizardPage
+            x:Name="PageSteamAPITrick"
+            PageType="Interior"
+            Title="Launch Games Directly (Steam)"
+            Description="Steam allows you to launch the exes directly through a one line text file located in the games install folder."
+            PreviousPage="{Binding PageStack.Back}"
+            NextPage="{Binding ElementName=PageGameData}">
+            <StackPanel>
+                <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
+                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
+                    <ComboBoxItem>KINGDOM HEARTS HD 1.5+2.5 ReMIX</ComboBoxItem>
+                    <ComboBoxItem>KINGDOM HEARTS HD 2.8 Final Chapter Prologue</ComboBoxItem>
+                </ComboBox>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                   <Run Foreground="Red">WARNING</Run>
+                    Steam must be running otherwise the game will fail to start. It will start to open then crash for seemingly no reason. Make sure steam is open if using this.
+                </TextBlock>
+                <Button Margin="0 0 0 6" Content="Create steam__appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding InstallSteamAPIFile}"/>
+                <Button Margin="0 0 0 6" Content="Delete steam__appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveSteamAPIFile}"/>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
