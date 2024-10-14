@@ -18,13 +18,15 @@
                 <TabItem.Header>
                     <Label>Models</Label>
                 </TabItem.Header>
-                <ContentControl Name="Tab_Models"/>
+                <Label>Unimplemented</Label>
+                <!--<ContentControl Name="Tab_Models"/>-->
             </TabItem>
             <TabItem>
                 <TabItem.Header>
                     <Label>Shapes</Label>
                 </TabItem.Header>
-                <ContentControl Name="Tab_Shapes"/>
+                <Label>Unimplemented</Label>
+                <!--<ContentControl Name="Tab_Shapes"/>-->
             </TabItem>
             <TabItem>
                 <TabItem.Header>
@@ -36,7 +38,8 @@
                 <TabItem.Header>
                     <Label>Data</Label>
                 </TabItem.Header>
-                <ContentControl Name="Tab_Data"/>
+                <Label>Unimplemented</Label>
+                <!--<ContentControl Name="Tab_Data"/>-->
             </TabItem>
         </TabControl>
     </Grid>
