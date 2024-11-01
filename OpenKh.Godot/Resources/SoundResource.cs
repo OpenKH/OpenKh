@@ -11,7 +11,12 @@ public partial class SoundResource : Resource
         msadpcm,
     }
     [Export] public AudioStream Sound;
-    [Export] public long LoopStart;
-    [Export] public long LoopEnd;
+    [Export] public uint SampleRate;
+    [Export] public uint ChannelCount;
+    [Export] public uint LoopStartRaw;
+    [Export] public uint LoopEndRaw;
+    [Export] public float LoopStart;
+    [Export] public float LoopEnd;
+    [Export] public bool Loop;
     [Export] public Codec OriginalCodec;
 }

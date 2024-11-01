@@ -52,14 +52,16 @@ public static class ImportHelpers
     }
     public static Quaternion CommonRotation(float x, float y, float z)
     {
+        var rotationMatrix = RotationMatrix(x, y, z);
+        Matrix4x4.Decompose(rotationMatrix, out _, out var rot, out _);
+        return new Quaternion(rot.X, rot.Y, rot.Z, rot.W);
+    }
+    public static Matrix4x4 RotationMatrix(float x, float y, float z)
+    {
         var rotationMatrixX = Matrix4x4.CreateRotationX(x);
         var rotationMatrixY = Matrix4x4.CreateRotationY(y);
         var rotationMatrixZ = Matrix4x4.CreateRotationZ(z);
-        var rotationMatrix = rotationMatrixX * rotationMatrixY * rotationMatrixZ;
-        Matrix4x4.Decompose(rotationMatrix, out _, out var rot, out _);
-        //TODO: why the fuck does this work, it's used in the openkh model viewer, how do i replicate it without a matrix4x4?
-
-        return new Quaternion(rot.X, rot.Y, rot.Z, rot.W);
+        return rotationMatrixX * rotationMatrixY * rotationMatrixZ;
     }
     public static byte[] BGRAToRGBA(this byte[] data)
     {

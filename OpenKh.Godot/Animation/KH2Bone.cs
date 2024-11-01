@@ -8,10 +8,8 @@ namespace OpenKh.Godot.Animation
         public int Parent;
         public int Child;
         public int Flags;
-        //these are intentionally using systems.numerics types
-        //i want to have the ANB playback be framework agnostic
-        public Vector4 RestScale;
-        public Vector4 RestRotation;
-        public Vector4 RestPosition;
+        public Vector4 Scale;
+        public Vector4 Rotation;
+        public Vector4 Position;
     }
 }

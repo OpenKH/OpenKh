@@ -7,6 +7,7 @@ using OpenKh.Godot.Nodes;
 using OpenKh.Kh2;
 using Quaternion = Godot.Quaternion;
 using Vector3 = Godot.Vector3;
+using Vector4 = System.Numerics.Vector4;
 
 namespace OpenKh.Godot.Helpers
 {
@@ -31,7 +32,7 @@ namespace OpenKh.Godot.Helpers
         public static Transform3D CreateTransform(Vector3 pos, Vector3 rot, Vector3 scale)
         {
             var scaleTransform = Transform3D.Identity.Scaled(scale);
-            var rotationTransform = new Transform3D(new Basis(AnimationRotation(rot)), Vector3.Zero);
+            var rotationTransform = new Transform3D(new Basis(AnimationRotation(rot).Normalized()), Vector3.Zero);
             var translationTransform = Transform3D.Identity.Translated(pos);
 
             return translationTransform * rotationTransform * scaleTransform;
@@ -39,10 +40,12 @@ namespace OpenKh.Godot.Helpers
 
         private class AnimationSimulation
         {
-            private Vector3[] Positions;
-            private Vector3[] Rotations;
-            private Vector3[] Scales;
+            private Vector4[] Positions;
+            private Vector4[] Rotations;
+            private Vector4[] Scales;
             private int[] Parent;
+            private int[] Siblings;
+            private int[] Children;
             private Transform3D[] Transforms;
             private int BoneCount;
             private int IKCount;
@@ -69,7 +72,7 @@ namespace OpenKh.Godot.Helpers
             }
             private void SetBoneValue(Motion.Channel channel, int index, float value)
             {
-                Vector3[] array;
+                Vector4[] array;
                 if (channel.IsPositionChannel()) array = Positions;
                 else if (channel.IsRotationChannel()) array = Rotations;
                 else array = Scales;
@@ -81,7 +84,7 @@ namespace OpenKh.Godot.Helpers
             private void ExpressionSetBoneValue(Motion.Channel channel, int index, float value)
             {
                 var val = value;
-                Vector3[] array;
+                Vector4[] array;
                 if (channel.IsPositionChannel()) array = Positions;
                 else if (channel.IsRotationChannel())
                 {
@@ -94,6 +97,11 @@ namespace OpenKh.Godot.Helpers
                 else if (channel.IsYChannel()) array[index].Y = val;
                 else array[index].Z = val;
             }
+            private void CalculateMatrices()
+            {
+                for (var i = 0; i < TotalCount; i++) CalculateMatrix(i);
+            }
+            private void CalculateMatrix(int i) => Transforms[i] = CreateTransform(Positions[i].ToGodot().XYZ(), Rotations[i].ToGodot().XYZ(), Scales[i].ToGodot().XYZ());
 
             public AnimationSimulation(Motion.InterpolatedMotion motion, KH2Skeleton3D skeleton, float time)
             {
@@ -102,7 +110,6 @@ namespace OpenKh.Godot.Helpers
 
                 IgnoreScale = motion.MotionHeader.SubType == 1;
                 
-                skeleton.ResetBonePoses();
                 var skeletonBoneCount = skeleton.GetBoneCount();
 
                 var totalCount = motion.Joints.Count;
@@ -111,31 +118,38 @@ namespace OpenKh.Godot.Helpers
                 TotalCount = motion.InterpolatedMotionHeader.TotalBoneCount;
                 IKCount = TotalCount - BoneCount;
                 
-                Positions = Enumerable.Repeat(Vector3.Zero, totalCount).ToArray();
-                Rotations = Enumerable.Repeat(Vector3.Zero, totalCount).ToArray();
-                Scales = Enumerable.Repeat(Vector3.One, totalCount).ToArray();
+                Positions = Enumerable.Repeat(Vector4.Zero, totalCount).ToArray();
+                Rotations = Enumerable.Repeat(Vector4.Zero, totalCount).ToArray();
+                Scales = Enumerable.Repeat(Vector4.One, totalCount).ToArray();
                 Parent = Enumerable.Repeat(-1, totalCount).ToArray();
+                Siblings = Enumerable.Repeat(-1, totalCount).ToArray();
+                Children = Enumerable.Repeat(-1, totalCount).ToArray();
                 Transforms = Enumerable.Repeat(Transform3D.Identity, totalCount).ToArray();
+
+                var kh2Skeleton = skeleton.BoneList.ToList();
                 
                 for (var i = 0; i < motion.InterpolatedMotionHeader.BoneCount; i++)
                 {
                     if (i >= skeletonBoneCount) break;
-                    var pose = skeleton.GetBonePose(i);
-                    Positions[i] = pose.Origin / ImportHelpers.KH2PositionScale;
-                    Rotations[i] = pose.Basis.GetRotationQuaternion().GetEuler(EulerOrder.Zyx);
-                    Scales[i] = pose.Basis.Scale;
-                    Parent[i] = skeleton.GetBoneParent(i);
-                    //GD.Print($"{i}, {joint.JointId}");
+                    var khBone = kh2Skeleton[i];
+                    
+                    Positions[i] = khBone.Position;
+                    Rotations[i] = khBone.Rotation;
+                    Scales[i] = khBone.Scale;
+                    Parent[i] = khBone.Parent;
+                    Children[i] = khBone.Child;
+                    Siblings[i] = khBone.Sibling;
                 }
 
-                for (var i = 0; i < motion.IKHelpers.Count; i++)
+                foreach (var ikHelper in motion.IKHelpers)
                 {
-                    var ikHelper = motion.IKHelpers[i];
-                    var index = /*BoneCount + i*/ ikHelper.Index; //TODO
-                    Positions[index] = new Vector3(ikHelper.TranslateX, ikHelper.TranslateY, ikHelper.TranslateZ);
-                    Rotations[index] = new Vector3(ikHelper.RotateX, ikHelper.RotateY, ikHelper.RotateZ);
-                    Scales[index] = new Vector3(ikHelper.ScaleX, ikHelper.ScaleY, ikHelper.ScaleZ);
+                    var index = ikHelper.Index; //TODO
+                    Positions[index] = new Vector4(ikHelper.TranslateX, ikHelper.TranslateY, ikHelper.TranslateZ, ikHelper.TranslateW);
+                    Rotations[index] = new Vector4(ikHelper.RotateX, ikHelper.RotateY, ikHelper.RotateZ, ikHelper.RotateW);
+                    Scales[index] = new Vector4(ikHelper.ScaleX, ikHelper.ScaleY, ikHelper.ScaleZ, ikHelper.ScaleW);
                     Parent[index] = ikHelper.ParentId;
+                    Children[index] = ikHelper.ChildId;
+                    Siblings[index] = ikHelper.SiblingId;
                 }
                 
                 //apply rest values
@@ -145,141 +159,41 @@ namespace OpenKh.Godot.Helpers
                 foreach (var fCurve in motion.FCurvesForward) HandleCurve(fCurve);
                 foreach (var fCurve in motion.FCurvesInverse) HandleCurve(fCurve, true);
                 
-                //TODO: order of operations for expressions and constraints? which goes first?
+                CalculateMatrices();
                 
-                //apply expressions to bones
-                foreach (var expression in motion.Expressions) ExpressionSetBoneValue((Motion.Channel)expression.TargetChannel, expression.TargetId, Expression(motion.ExpressionNodes, expression.NodeId));
-                
-                //convert SRT to matrices
-                for (var i = 0; i < totalCount; i++)
+                var currentExpression = 0;
+                var currentConstraint = 0;
+                foreach (var joint in motion.Joints)
                 {
-                    //Transforms[i] = CreateTransform(Positions[i], Rotations[i], Scales[i]);
-                    Transforms[i] = /*CreateTransform(basePositions[i], baseRotations[i], baseScales[i]) * */ CreateTransform(Positions[i], Rotations[i], Scales[i]);
-                }
-                
-                //apply constraints to bones
-                foreach (var constraint in motion.Constraints)
-                {
-                    var source = constraint.SourceJointId;
-                    var target = constraint.ConstrainedJointId;
-
-                    var limiter = constraint.LimiterId == -1 ? null : motion.Limiters[constraint.LimiterId];
-
-                    var type = constraint.Type;
-                    // 0 	Position                Set global position to another bone
-                    // 1 	Path                    Follow a path TODO: uhhhhh?
-                    // 2 	Orientation             Set global rotation to another bone
-                    // 3 	Direction               Point an object at another object, using a specified axis. TODO how do we know what axis, it's default is X
-                    // 4 	Up Vector               Point an object at another object, using the Y axis.
-                    // 5 	Two Points              Set global position between two other bones
-                    // 6 	Scale                   Set global scale to another bone
-                    // 7 	Camera                  Custom, no idea, probably put the bone directly on the camera?
-                    // 8 	Camera Path             Custom, no idea
-                    // 9 	Int Path                Custom, no idea
-                    // 10 	Int                     Custom, no idea
-                    // 11 	Camera Up Vector        Custom, no idea
-                    // 12 	Position Limit
-                    // 13 	Rotation Limit
-                
-                    switch (type)
+                    var i = joint.JointId;
+                    while (true)
                     {
-                        case 0:
-                        {
-                            SetGlobalTransform(target, GetGlobalTransform(target) with { Origin = GetGlobalTransform(source).Origin });
-                            break;
-                        }
-                        case 2:
-                        {
-                            var targetRot = GetGlobalTransform(source).Basis.GetRotationQuaternion();
-                        
-                            var current = GetGlobalTransform(target);
-                            SetGlobalTransform(target, current with { Basis = new Basis(targetRot).Scaled(current.Basis.Scale) });
-                            break;
-                        }
-                        case 3:
-                        case 4:
-                        {
-                            var sourceTransform = GetGlobalTransform(source);
-
-                            var currentParentTransform = GetGlobalTransform(Parent[target]);
-
-                            var current = GetGlobalTransform(target);
-                            
-                            var up = (currentParentTransform.Basis * Vector3.Up).Normalized();
-                            
-                            if (sourceTransform.Origin.Normalized().Abs().IsEqualApprox(up))
-                            {
-                                //TODO: point upward or downward
-                                GD.Print("IMPLEMENT: point upward");
-                            }
-                            else
-                            {
-                                /*
-                                DebugDraw3D.DrawPosition(Transform3D.Identity.Scaled(Vector3.One * ImportHelpers.KH2PositionScale) * sourceTransform.ScaledLocal(
-                                    (Vector3.One / ImportHelpers.KH2PositionScale) / 2), Colors.Pink, 0.5f);
-                                    */
-                                
-                                var offset = type == 3 ? Quaternion.FromEuler(new Vector3(0, Mathf.Pi / 2, 0)) : Quaternion.FromEuler(new Vector3(Mathf.Pi / 2, 0, 0));
-                                
-                                var newTransform = current.LookingAt(sourceTransform.Origin, up) * new Transform3D(new Basis(offset), Vector3.Zero); //TODO: is this correct?
-                                SetGlobalTransform(target, newTransform);
-
-                                //var newTarget = GetGlobalTransform(target);
-                                
-                                //DebugDraw3D.DrawLine(newTarget.Origin * ImportHelpers.KH2PositionScale, (newTarget.TranslatedLocal(Vector3.Right * 2000).Origin * ImportHelpers.KH2PositionScale));
-                            }
-                            
-                            break;
-                        }
-                        case 6:
-                        {
-                            var targetScale = GetGlobalTransform(source).Basis.Scale;
-
-                            var current = GetGlobalTransform(target);
-                            SetGlobalTransform(target, current with { Basis = new Basis(current.Basis.GetRotationQuaternion()).Scaled(targetScale) });
-                            break;
-                        }
-                        //mute these until i actually implement them
-                        case 12:
-                        {
-                            if (limiter is null) continue;
-                            
-                            var sourceTransform = GetGlobalTransform(source);
-                            var targetTransform = GetGlobalTransform(target);
-
-                            var targetRelative = sourceTransform.AffineInverse() * targetTransform;
-
-                            if (limiter.Type == Motion.LimiterType.Box)
-                            {
-                                
-                            }
-                            else
-                            {
-                                
-                            }
-                            break;
-                        }
-                        case 13:
-                        {
-                            if (limiter is null) continue;
-                            
-                            var transform = Transforms[target];
-                            var rotation = transform.Basis.GetRotationQuaternion().GetEuler(EulerOrder.Zyx);
-                            rotation = rotation.Clamp(new Vector3(limiter.MinX, limiter.MinY, limiter.MinZ), new Vector3(limiter.MaxX, limiter.MaxY, limiter.MaxZ));
-
-                            Transforms[target] = CreateTransform(transform.Origin, rotation, transform.Basis.Scale);
-                            
-                            //TODO: ehhhh?
-                            
-                            break;
-                        }
-                        default:
-                        {
-                            GD.Print($"not implemented constraint: {type}");
-                            break;
-                        }
+                        if (currentExpression >= motion.Expressions.Count) break;
+                        var expression = motion.Expressions[currentExpression];
+                        if (expression.TargetId != i) break;
+                        ExpressionSetBoneValue((Motion.Channel)expression.TargetChannel, i, Expression(motion.ExpressionNodes, expression.NodeId));
+                        CalculateMatrix(i);
+                        currentExpression++;
+                    }
+                    while (true)
+                    {
+                        if (currentConstraint >= motion.Constraints.Count) break;
+                        var constraint = motion.Constraints[currentConstraint];
+                        if (constraint.ConstrainedJointId != i) break;
+                        CalculateConstraint(constraint);
+                        //CalculateMatrix(i);
+                        currentConstraint++;
                     }
                 }
+
+                /*
+                foreach (var expression in motion.Expressions)
+                {
+                    ExpressionSetBoneValue((Motion.Channel)expression.TargetChannel, expression.TargetId, Expression(motion.ExpressionNodes, expression.NodeId));
+                    CalculateMatrix(expression.TargetId);
+                }
+                foreach (var constraint in motion.Constraints) CalculateConstraint(constraint);
+                */
 
                 //apply to skeleton
                 for (var i = 0; i < TotalCount; i++)
@@ -296,6 +210,7 @@ namespace OpenKh.Godot.Helpers
                     skeleton.SetBonePose(i, transform);
                 }
 
+                /*
                 var collisionBones = new List<int>();
 
                 if (skeleton.ModelCollisions is not null)
@@ -304,8 +219,8 @@ namespace OpenKh.Godot.Helpers
                     {
                         //TODO: actual collision
                         var centerBone = collision.Bone;
-                        var firstBone = skeleton.GetBoneParent(centerBone);
-                        var tipBone = skeleton.GetBoneChildren(centerBone).First();
+                        var firstBone = Parent[centerBone];
+                        var tipBone = Children[centerBone];
                     
                         collisionBones.AddRange([centerBone, firstBone, tipBone]);
 
@@ -330,11 +245,155 @@ namespace OpenKh.Godot.Helpers
                         CalculateIK(skeleton, firstBone, centerBone, tipBone, true);
                     }
                 }
+                */
             }
+            private void CalculateConstraint(Motion.Constraint constraint)
+            {
+                var motion = MotionFile;
+                var source = constraint.SourceJointId;
+                var target = constraint.ConstrainedJointId;
 
+                var limiter = constraint.LimiterId == -1 ? null : motion.Limiters[constraint.LimiterId];
+                    
+                if (constraint.ActivationCount > 0)
+                {
+                    var activators = motion.ConstraintActivations.Skip(constraint.ActivationStartId - 1).Take(constraint.ActivationCount);
+                    var current = activators.Where(i => i.Time <= Time).MaxBy(i => i.Time);
+                    var currentActive = current is not null && current.Active > 0;
+                    if (!currentActive) return;
+                }
+
+                var type = constraint.Type;
+                // 0 	Position                Set global position to another bone
+                // 1 	Path                    Follow a path TODO: uhhhhh?
+                // 2 	Orientation             Set global rotation to another bone
+                // 3 	Direction               Point an object at another object, using a specified axis. TODO how do we know what axis, it's default is X
+                // 4 	Up Vector               Point an object at another object, using the Y axis.
+                // 5 	Two Points              Set global position between two other bones
+                // 6 	Scale                   Set global scale to another bone
+                // 7 	Camera                  Custom, no idea, probably put the bone directly on the camera?
+                // 8 	Camera Path             Custom, no idea
+                // 9 	Int Path                Custom, no idea
+                // 10 	Int                     Custom, no idea
+                // 11 	Camera Up Vector        Custom, no idea
+                // 12 	Position Limit
+                // 13 	Rotation Limit
+                
+                switch (type)
+                {
+                    case 0:
+                    {
+                        SetGlobalTransform(target, GetGlobalTransform(target) with { Origin = GetGlobalTransform(source).Origin });
+                        break;
+                    }
+                    case 2:
+                    {
+                        var targetRot = GetGlobalTransform(source).Basis.GetRotationQuaternion();
+                        
+                        var current = GetGlobalTransform(target);
+                        SetGlobalTransform(target, current with { Basis = new Basis(targetRot).Scaled(current.Basis.Scale) });
+                        break;
+                    }
+                    case 3:
+                    case 4:
+                    {
+                        var sourceTransform = GetGlobalTransform(source);
+                        var currentParentTransform = GetGlobalTransform(Parent[target]);
+                        var current = GetGlobalTransform(target);
+                        var up = (currentParentTransform.Basis * Vector3.Up).Normalized();
+                            
+                        if (sourceTransform.Origin.Normalized().Abs().IsEqualApprox(up))
+                        {
+                            //TODO: point upward or downward
+                            GD.Print("IMPLEMENT: point upward");
+                        }
+                        else
+                        {
+                            var offset = type == 3 ? Quaternion.FromEuler(new Vector3(0, Mathf.Pi / 2, 0)) : Quaternion.FromEuler(new Vector3(Mathf.Pi / 2, 0, 0));
+                                
+                            var newTransform = current.LookingAt(sourceTransform.Origin, up) * new Transform3D(new Basis(offset), Vector3.Zero); //TODO: is this correct?
+                            SetGlobalTransform(target, newTransform);
+                        }
+                            
+                        break;
+                    }
+                    case 6:
+                    {
+                        var targetScale = GetGlobalTransform(source).Basis.Scale;
+
+                        var current = GetGlobalTransform(target);
+                        SetGlobalTransform(target, current with { Basis = new Basis(current.Basis.GetRotationQuaternion()).Scaled(targetScale) });
+                        break;
+                    }
+                    case 12:
+                    {
+                        if (limiter is null) return;
+                            
+                        var sourceTransform = GetGlobalTransform(source);
+                        var targetTransform = GetGlobalTransform(target);
+
+                        var targetRelative = sourceTransform.AffineInverse() * targetTransform;
+                            
+                        //GD.Print($"position type {(int)limiter.Type} min {limiter.MinX} {limiter.MinY} {limiter.MinZ} {limiter.MinW} max {limiter.MaxX} {limiter.MaxY} {limiter.MaxZ} {limiter.MaxW}");
+
+                        //if (limiter.Type == Motion.LimiterType.Box)
+                        if (true)
+                        {
+                            var pos = targetRelative.Origin.Max(new Vector3(limiter.MinX, limiter.MinY, limiter.MinZ)).Min(new Vector3(limiter.MaxX, limiter.MaxY, limiter.MaxZ));
+                            var newRelative = targetRelative with { Origin = pos };
+                            var rel = sourceTransform * newRelative;
+                            //SetGlobalTransform(target, rel);
+                        }
+                        else //sphere
+                        {
+                            var length = targetRelative.Origin.Length();
+                                
+                        }
+                        break;
+                    }
+                    case 13:
+                    {
+                        if (limiter is null) return;
+                            
+                        var transform = Transforms[target];
+                        var rotation = transform.Basis.GetRotationQuaternion().GetEuler(EulerOrder.Zyx);
+                        rotation = rotation.Clamp(new Vector3(limiter.MinX, limiter.MinY, limiter.MinZ), new Vector3(limiter.MaxX, limiter.MaxY, limiter.MaxZ));
+                            
+                        //GD.Print($"rotation type {(int)limiter.Type} min {limiter.MinX} {limiter.MinY} {limiter.MinZ} {limiter.MinW} max {limiter.MaxX} {limiter.MaxY} {limiter.MaxZ} {limiter.MaxW}");
+
+                        Transforms[target] = CreateTransform(transform.Origin, rotation, transform.Basis.Scale);
+                            
+                        //TODO: ehhhh?
+                            
+                        break;
+                    }
+                    default:
+                    {
+                        GD.Print($"not implemented constraint: {type}");
+                        break;
+                    }
+                }
+            }
             private void CalculateIK(Skeleton3D skeleton, int first, int center, int tip, bool flip)
             {
-                //return;
+                {
+                    var sourceTransform = GetGlobalTransform(tip);
+                    var currentParentTransform = GetGlobalTransform(Parent[first]);
+                    var current = GetGlobalTransform(first);
+                    var up = (currentParentTransform.Basis * Vector3.Up).Normalized();
+                            
+                    if (sourceTransform.Origin.Normalized().Abs().IsEqualApprox(up))
+                    {
+                    }
+                    else
+                    {
+                        var offset = Quaternion.FromEuler(new Vector3(Mathf.Pi / 2, 0, 0));
+                                
+                        var newTransform = current.LookingAt(sourceTransform.Origin, up) * new Transform3D(new Basis(offset), Vector3.Zero); //TODO: is this correct?
+                        SetGlobalTransform(first, newTransform);
+                    }
+                }
+                
                 var targetTransform = skeleton.GetBoneGlobalPose(tip);
                 skeleton.SetBonePoseRotation(center, Quaternion.Identity);
                 skeleton.ResetBonePose(center);
@@ -343,20 +402,12 @@ namespace OpenKh.Godot.Helpers
                 var firstGlobalPose = skeleton.GetBoneGlobalPose(first);
                 var centerGlobalPose = skeleton.GetBoneGlobalPose(center);
                 var tipGlobalPose = skeleton.GetBoneGlobalPose(tip);
-                var firstParentGlobalPose = skeleton.GetBoneGlobalPose(skeleton.GetBoneParent(first));
 
                 var firstToTarget = firstGlobalPose.Origin.DistanceTo(targetTransform.Origin);
                 var firstBoneLength = firstGlobalPose.Origin.DistanceTo(centerGlobalPose.Origin);
                 var secondBoneLength = centerGlobalPose.Origin.DistanceTo(tipGlobalPose.Origin);
 
                 if (firstBoneLength + secondBoneLength < firstToTarget) return;
-
-                //var targetInverse = targetTransform.AffineInverse();
-                var tipInverse = tipGlobalPose.AffineInverse();
-                
-                var centerRelativeToTip = tipInverse * centerGlobalPose;
-                //var firstRelativeToTip = tipInverse * firstGlobalPose;
-                //var firstParentRelativeToTip = tipInverse * firstParentGlobalPose;
                 
                 var aAngle = Mathf.Acos(((firstBoneLength*firstBoneLength)+(secondBoneLength*secondBoneLength)-(firstToTarget*firstToTarget)) / (2 * firstBoneLength * secondBoneLength));
                 var bAngle = Mathf.Acos(((firstToTarget*firstToTarget)+(secondBoneLength*secondBoneLength)-(firstBoneLength*firstBoneLength)) / (2 * firstToTarget * secondBoneLength));
@@ -370,40 +421,13 @@ namespace OpenKh.Godot.Helpers
                 {
                     centerAngle *= -1;
                     firstAngle *= -1;
-                    //transformAngle *= -1;
                 }
-
-                //var transformedCenterRelativeToTip = new Transform3D(new Basis(Quaternion.FromEuler(new Vector3(0,0,transformAngle))), Vector3.Zero) * centerRelativeToTip;
                 
-                //DebugDraw3D.DrawPosition(targetTransform);
-                //var transformedFirstRelativeToTip = firstRelativeToTip.LookingAt(transformedCenterRelativeToTip.Origin, (firstParentRelativeToTip * Vector3.Up).Normalized());
-
-                //var centerGlobal = targetTransform * transformedCenterRelativeToTip;
-                //var centerRelativeToFirstParent = firstParentGlobalPose.AffineInverse() * centerGlobal;
-                
-                /*
-                skeleton.SetBonePose(first, skeleton.GetBonePose(first).LookingAt(centerRelativeToFirstParent.Origin) * 
-                                            new Transform3D(new Basis(Quaternion.FromEuler(new Vector3(-Mathf.Pi / 2, Mathf.Pi / 2, 0))), Vector3.Zero));
-                                            */
-                
-                //skeleton.SetBoneGlobalPose(first, (targetTransform * transformedFirstRelativeToTip) * new Transform3D(new Basis(Quaternion.FromEuler(new Vector3(-Mathf.Pi / 2, 0, 0))), Vector3.Zero));
-                //skeleton.SetBoneGlobalPose(center, targetTransform * transformedCenterRelativeToTip);
-
-                //skeleton.SetBoneGlobalPose(center, skeleton.GetBoneGlobalPose(center) * new Transform3D(new Basis(Quaternion.FromEuler(new Vector3(0,0,centerAngle))), Vector3.Zero));
                 skeleton.SetBonePoseRotation(center, Quaternion.FromEuler(new Vector3(0,0,centerAngle)));
+                
+                //skeleton.SetBoneGlobalPose(first, new Transform3D(new Basis(targetTransform.Basis.GetRotationQuaternion()).Scaled(firstGlobalPose.Basis.Scale), firstGlobalPose.Origin));
+                
                 skeleton.SetBonePoseRotation(first, skeleton.GetBonePoseRotation(first) * Quaternion.FromEuler(new Vector3(0,0,firstAngle)));
-
-
-                //firstGlobalPose = skeleton.GetBoneGlobalPose(first);
-
-                //var rotationDiff = targetTransform.Basis.GetRotationQuaternion().GetEuler(EulerOrder.Xyz).X - firstGlobalPose.Basis.GetRotationQuaternion().GetEuler(EulerOrder.Xyz).X;
-                //var rotationDiff2 = targetTransform.Basis.GetRotationQuaternion().GetEuler(EulerOrder.Zyx).X - firstGlobalPose.Basis.GetRotationQuaternion().GetEuler(EulerOrder.Zyx).X;
-
-                //var rotationDiff3 = firstGlobalPose.Basis.GetRotationQuaternion().GetEuler(EulerOrder.Xyz).X - targetTransform.Basis.GetRotationQuaternion().GetEuler(EulerOrder.Xyz).X;
-                //var rotationDiff4 = firstGlobalPose.Basis.GetRotationQuaternion().GetEuler(EulerOrder.Zyx).X - targetTransform.Basis.GetRotationQuaternion().GetEuler(EulerOrder.Zyx).X;
-
-                //skeleton.SetBonePoseRotation(first, Quaternion.FromEuler(new Vector3(rotationDiff,0,0)) * skeleton.GetBonePoseRotation(first));
-
                 skeleton.SetBoneGlobalPose(tip, targetTransform);
 
                 //GD.Print($"{rotationDiff}, {rotationDiff2}, {rotationDiff3}, {rotationDiff4}");
@@ -448,7 +472,7 @@ namespace OpenKh.Godot.Helpers
                 var bone = ik ? fCurve.JointId + BoneCount : fCurve.JointId;
                 var channel = fCurve.ChannelValue;
                 
-                Vector3[] array;
+                Vector4[] array;
                 if (channel.IsPositionChannel()) array = Positions;
                 else if (channel.IsRotationChannel()) array = Rotations;
                 else array = Scales;
@@ -467,7 +491,9 @@ namespace OpenKh.Godot.Helpers
             {
                 if (index < 0 || index >= expressionNodes.Count) return 0;
                 var node = expressionNodes[index];
-                switch ((Motion.ExpressionType)node.Type)
+                var nodeType = (Motion.ExpressionType)node.Type;
+                
+                switch (nodeType)
                 {
                     case Motion.ExpressionType.FUNC_SIN: return Mathf.Sin(Mathf.DegToRad(Expression(expressionNodes, node.CAR)));
                     case Motion.ExpressionType.FUNC_COS: return Mathf.Cos(Mathf.DegToRad(Expression(expressionNodes, node.CAR)));
@@ -508,6 +534,7 @@ namespace OpenKh.Godot.Helpers
                         if (a >= 0 && (Motion.ExpressionType)expressionNodes[a].Type == Motion.ExpressionType.LIST && b < 0)
                         {
                             var list = ListExpression(expressionNodes, a);
+                            if (list.Count == 0) return 0;
                             return list.Sum() / list.Count;
                         }
                         break;
@@ -524,17 +551,34 @@ namespace OpenKh.Godot.Helpers
                         }
                         break;
                     }
-                    //case Motion.ExpressionType.FUNC_AT_FRAME:
-                        //in softimage, at frame gets the value of the expression at the frame # (Frame Offset function in docs)
-                        //this is uh
-                        //literal time travel?
-                        //i have no idea how to implement this send help
-                        //break;
-                    //case Motion.ExpressionType.FUNC_CTR_DIST:
-                        //in softimage, center to center returns the distance between two objects (Center to Center function in docs)
-                        //i presume here it would be distance between two bones, with A and B being
-                        //the indices of the bones, but i don't have examples yet
-                        //break;
+                    case Motion.ExpressionType.FUNC_AT_FRAME:
+                    case Motion.ExpressionType.FUNC_AT_FRAME_ROT:
+                    {
+                        var time = Expression(expressionNodes, node.CAR);
+                        time = (time * 60) / MotionFile.InterpolatedMotionHeader.FrameData.FramesPerSecond;
+                        
+                        var curve = (int)Expression(expressionNodes, node.CDR);
+                        var value = GetCurveValue(curve < MotionFile.FCurvesForward.Count ? 
+                            MotionFile.FCurvesForward[curve] : 
+                            MotionFile.FCurvesInverse[curve - MotionFile.FCurvesForward.Count], 
+                            time);
+
+                        return nodeType == Motion.ExpressionType.FUNC_AT_FRAME_ROT ? Mathf.RadToDeg(value) : value;
+                    }
+                    case Motion.ExpressionType.FUNC_CTR_DIST:
+                    {
+                        var bone1 = node.CAR;
+                        var bone2 = node.CDR;
+                        if (bone1 >= TotalCount) bone1 = 0;
+                        if (bone2 >= TotalCount) bone2 = 0;
+                        
+                        CalculateMatrices();
+
+                        var trans1 = GetGlobalTransform(bone1);
+                        var trans2 = GetGlobalTransform(bone2);
+
+                        return trans1.Origin.DistanceTo(trans2.Origin);
+                    }
                     case Motion.ExpressionType.FUNC_FMOD: return Expression(expressionNodes, node.CAR) % Expression(expressionNodes, node.CDR); //fmod returns the mod without casting
                     case Motion.ExpressionType.OP_PLUS: return Expression(expressionNodes, node.CAR) + Expression(expressionNodes, node.CDR);
                     case Motion.ExpressionType.OP_MINUS: return Expression(expressionNodes, node.CAR) - Expression(expressionNodes, node.CDR);
@@ -548,10 +592,8 @@ namespace OpenKh.Godot.Helpers
                     case Motion.ExpressionType.OP_LE: return Expression(expressionNodes, node.CAR) <= Expression(expressionNodes, node.CDR) ? 1 : 0;
                     case Motion.ExpressionType.OP_AND: return Expression(expressionNodes, node.CAR) >= 1 && Expression(expressionNodes, node.CDR) >= 1 ? 1 : 0;
                     case Motion.ExpressionType.OP_OR: return Expression(expressionNodes, node.CAR) >= 1 || Expression(expressionNodes, node.CDR) >= 1 ? 1 : 0;
-                    case Motion.ExpressionType.VARIABLE_FC: return Time; //im a little bit stupid, "frame current"
+                    case Motion.ExpressionType.VARIABLE_FC: return Time;
                     case Motion.ExpressionType.CONSTANT_NUM: return node.Value;
-                    //TODO: are these in local or global space?
-                    /*
                     case Motion.ExpressionType.FCURVE_ETRNX: return Positions[node.Element].X;
                     case Motion.ExpressionType.FCURVE_ETRNY: return Positions[node.Element].Y;
                     case Motion.ExpressionType.FCURVE_ETRNZ: return Positions[node.Element].Z;
@@ -561,24 +603,10 @@ namespace OpenKh.Godot.Helpers
                     case Motion.ExpressionType.FCURVE_SCALX: return Scales[node.Element].X;
                     case Motion.ExpressionType.FCURVE_SCALY: return Scales[node.Element].Y;
                     case Motion.ExpressionType.FCURVE_SCALZ: return Scales[node.Element].Z;
-                    */
-                    case Motion.ExpressionType.FCURVE_ETRNX: return GetGlobalTransform(node.Element).Origin.X;
-                    case Motion.ExpressionType.FCURVE_ETRNY: return GetGlobalTransform(node.Element).Origin.Y;
-                    case Motion.ExpressionType.FCURVE_ETRNZ: return GetGlobalTransform(node.Element).Origin.Z;
-                    case Motion.ExpressionType.FCURVE_ROTX: return Mathf.RadToDeg(GetGlobalTransform(node.Element).Basis.GetEuler(EulerOrder.Zyx).X);
-                    case Motion.ExpressionType.FCURVE_ROTY: return Mathf.RadToDeg(GetGlobalTransform(node.Element).Basis.GetEuler(EulerOrder.Zyx).Y);
-                    case Motion.ExpressionType.FCURVE_ROTZ: return Mathf.RadToDeg(GetGlobalTransform(node.Element).Basis.GetEuler(EulerOrder.Zyx).Z);
-                    case Motion.ExpressionType.FCURVE_SCALX: return GetGlobalTransform(node.Element).Basis.Scale.X;
-                    case Motion.ExpressionType.FCURVE_SCALY: return GetGlobalTransform(node.Element).Basis.Scale.Y;
-                    case Motion.ExpressionType.FCURVE_SCALZ: return GetGlobalTransform(node.Element).Basis.Scale.Z;
                     case Motion.ExpressionType.LIST:
                         //this is a special case, don't handle it here, if this case is met something went wrong
                         break;
                     case Motion.ExpressionType.ELEMENT_NAME: return 0; //this actually does literally nothing lmao
-                    case Motion.ExpressionType.FUNC_AT_FRAME_ROT:
-                        //i don't know what this is, doesn't seem to exist in softimage, is this related to at_frame?
-
-                        //this is indeed related to at_frame, both do time travel
                     default:
                     {
                         GD.Print(

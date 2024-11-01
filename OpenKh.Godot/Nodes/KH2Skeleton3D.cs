@@ -40,9 +40,9 @@ public partial class KH2Skeleton3D : Skeleton3D
                 Parent = BoneParent[i],
                 Child = BoneChild[i],
                 Flags = BoneFlags[i],
-                RestScale = BoneRestScale[i].ToSystem(),
-                RestRotation = BoneRestRotation[i].ToSystem(),
-                RestPosition = BoneRestPosition[i].ToSystem(),
+                Scale = BoneRestScale[i].ToSystem(),
+                Rotation = BoneRestRotation[i].ToSystem(),
+                Position = BoneRestPosition[i].ToSystem(),
             });
         }
         set
@@ -68,9 +68,9 @@ public partial class KH2Skeleton3D : Skeleton3D
                 BoneParent[i] = v.Parent;
                 BoneChild[i] = v.Child;
                 BoneFlags[i] = v.Flags;
-                BoneRestScale[i] = v.RestScale.ToGodot();
-                BoneRestRotation[i] = v.RestRotation.ToGodot();
-                BoneRestPosition[i] = v.RestPosition.ToGodot();
+                BoneRestScale[i] = v.Scale.ToGodot();
+                BoneRestRotation[i] = v.Rotation.ToGodot();
+                BoneRestPosition[i] = v.Position.ToGodot();
             }
         }
     }

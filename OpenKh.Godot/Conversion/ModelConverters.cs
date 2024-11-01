@@ -92,14 +92,15 @@ namespace OpenKh.Godot.Conversion
                     // ignored
                 }
             }
-
-            var texImg = textures.First();
-
+            
             var mapper = new TextureMapper(usesHdTextures ? hdTexs : null);
+            
+            GD.Print($"skl {skeletalModels.Count}");
 
-            if (skeletalModels.Count <= 0) return null;
+            if (skeletalModels.Count == 0 || textures.Count == 0) return null;
 
-            var skeleton = FromModelSkeletal(skeletalModels.First(), texImg, mapper);
+            var skeleton = FromModelSkeletal(skeletalModels.First(), textures.First(), mapper);
+            root.AddChild(skeleton);
 
             root.Skeleton = skeleton;
             if (collisions.Count != 0)
@@ -107,7 +108,6 @@ namespace OpenKh.Godot.Conversion
                 skeleton.ModelCollisions = new ModelCollisionResource();
                 skeleton.ModelCollisions.Binary = collisions.First();
             }
-            //root.Mesh = skeleton.GetChildren().OfType<KH2MeshInstance3D>().First();
 
             return root;
         }
@@ -115,13 +115,16 @@ namespace OpenKh.Godot.Conversion
         {
             mapper.ResetMap();
 
-            var images = texImg.Images
+            var images = texImg.Images?
                 .Select(texture => Image.CreateFromData(texture.Size.Width, texture.Size.Height, false, Image.Format.Rgba8, texture.ToBgra32().BGRAToRGBA()))
                 .Select(ImageTexture.CreateFromImage)
-                .ToList();
+                .ToList() ?? [];
 
             var arrayMesh = new ArrayMesh();
             var skeleton = new KH2Skeleton3D();
+            var khmesh = new KH2MeshInstance3D();
+            skeleton.AddChild(khmesh);
+            khmesh.Name = "Model";
 
             foreach (var bone in model.Bones) skeleton.AddBone(bone.Index.ToString());
 
@@ -136,9 +139,9 @@ namespace OpenKh.Godot.Conversion
                 Parent = i.ParentIndex,
                 Child = i.ChildIndex,
                 Flags = i.Flags,
-                RestScale = new System.Numerics.Vector4(i.ScaleX, i.ScaleY, i.ScaleZ, i.ScaleW),
-                RestRotation = new System.Numerics.Vector4(i.RotationX,i.RotationY,i.RotationZ,i.RotationW),
-                RestPosition = new System.Numerics.Vector4(i.TranslationX,i.TranslationY,i.TranslationZ,i.TranslationW),
+                Scale = new System.Numerics.Vector4(i.ScaleX, i.ScaleY, i.ScaleZ, i.ScaleW),
+                Rotation = new System.Numerics.Vector4(i.RotationX,i.RotationY,i.RotationZ,i.RotationW),
+                Position = new System.Numerics.Vector4(i.TranslationX,i.TranslationY,i.TranslationZ,i.TranslationW),
             });
 
             skeleton.ResetBonePoses();
@@ -176,6 +179,8 @@ namespace OpenKh.Godot.Conversion
                         var sprite = Image.CreateFromData(animation.SpriteWidth, animation.SpriteHeight * animation.NumSpritesInImageData, false, Image.Format.Rgba8, data);
 
                         var animatedTex = mapper.GetNextTexture(ImageTexture.CreateFromImage(sprite));
+                        
+                        khmesh.AnimatedTextures.Add(animatedTex);
 
                         material.SetShaderParameter($"Sprite{textureAnimations}", animatedTex);
                         material.SetShaderParameter($"TextureOriginalUV{textureAnimations}", new Vector4(uvFront.X, uvFront.Y, uvBack.X, uvBack.Y));
@@ -184,7 +189,7 @@ namespace OpenKh.Godot.Conversion
                         {
                             SpriteFrameCount = animation.NumSpritesInImageData,
                             TextureIndex = texIndex,
-                            CurrentAnimation = animation.DefaultAnimationIndex,
+                            DefaultAnimationIndex = animation.DefaultAnimationIndex,
                             AnimationList = new Array<KH2TextureAnimations>(animation.FrameGroupList.Select(i => new KH2TextureAnimations
                             {
                                 Frames = new Array<KH2TextureAnimationFrame>(i.IndexedFrameList.Select(j => new KH2TextureAnimationFrame
@@ -298,16 +303,18 @@ namespace OpenKh.Godot.Conversion
                 arrayMesh.SurfaceSetMaterial(m, material);
             }
 
-            {
-                var mesh = new KH2MeshInstance3D();
-                skeleton.AddChild(mesh);
-                mesh.Name = "Model";
-                mesh.Mesh = arrayMesh;
-                skeleton.CreateSkinFromRestTransforms();
-                skeleton.Mesh = mesh;
+            var maxIndex = mapper.TextureMap.Max(i => i.Key);
 
-                foreach (var anim in animList) mesh.TextureAnimations.Add(anim);
+            for (var i = 0; i <= maxIndex; i++)
+            {
+                var tex = mapper.GetTexture(i, images[i]);
+                khmesh.Textures.Add(tex);
             }
+
+            khmesh.Mesh = arrayMesh;
+            skeleton.CreateSkinFromRestTransforms();
+            skeleton.Mesh = khmesh;
+            foreach (var anim in animList) khmesh.TextureAnimations.Add(anim);
 
             return skeleton;
         }
@@ -699,6 +706,30 @@ namespace OpenKh.Godot.Conversion
             }
 
             return root;
+        }
+
+        public static KH2Moveset FromMoveset(Bar mset)
+        {
+            var container = new KH2Moveset();
+            
+            
+
+            container.Entries = new Array<KH2MovesetEntry>(mset.Select(entry => entry?.Stream is null || entry.Stream.Length == 0
+                ? null
+                : new KH2MovesetEntry
+                { 
+                    Motion = new Func<InterpolatedMotionResource>(() =>
+                    {
+                        var bar = Bar.Read(entry.Stream);
+                        var a = new InterpolatedMotionResource
+                        {
+                            Binary = bar.FirstOrDefault(i => i.Type == Bar.EntryType.Motion)?.Stream.ReadAllBytes(),
+                        };
+                        return a;
+                    }).Invoke(),
+                }));
+
+            return container;
         }
     }
 }

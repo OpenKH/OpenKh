@@ -97,8 +97,8 @@ public partial class MdlxImporter : EditorImportPlugin
         }
 
         var result = ModelConverters.FromMdlx(barFile, images);
-        result.SetOwner();
         result.Name = name;
+        result.SetOwner();
         
         GD.Print(result.GetChildren().Count);
         

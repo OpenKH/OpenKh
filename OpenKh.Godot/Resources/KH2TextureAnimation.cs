@@ -7,15 +7,18 @@ namespace OpenKh.Godot.Resources;
 public partial class KH2TextureAnimation : Resource
 {
     [Export] public int TextureIndex;
-    
     [Export] public int SpriteFrameCount;
-    
+    [Export] public int DefaultAnimationIndex;
     [Export] public Array<KH2TextureAnimations> AnimationList;
+    
+    /*
     [Export] public int CurrentAnimation;
     [Export] public int CurrentAnimationFrame;
     [Export] public float AnimationTimer;
     [Export] public float RandomAnimationTime = -1;
+    */
 
+    /*
     [Export]
     public int SetCurrentAnimation
     {
@@ -29,5 +32,6 @@ public partial class KH2TextureAnimation : Resource
             CurrentAnimation = index;
         }
     }
+    */
     public Vector2 GetMaterialFrameParameter(int frame) => new(frame / (float)SpriteFrameCount, (frame+1) / (float)SpriteFrameCount);
 }

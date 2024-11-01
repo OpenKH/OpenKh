@@ -40,6 +40,7 @@ namespace OpenKh.Godot.Helpers
         {
             var value = CurrentIndex;
             CurrentIndex++;
+            if (value >= HdTextures.Count) return fallback;
             
             return HdTextures[value] ?? fallback;
         }

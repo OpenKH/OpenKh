@@ -1,3 +1,4 @@
+/*
 #if TOOLS
 using System;
 using Godot;
@@ -21,7 +22,7 @@ public partial class Plugin : EditorPlugin
 	];
 	private Array<EditorImportPlugin> Importers = new();
 	public override void _EnterTree()
-	{
+    {
 		foreach (var t in ImporterTypes)
 		{
 			var importer = Activator.CreateInstance(t) as EditorImportPlugin;
@@ -37,3 +38,5 @@ public partial class Plugin : EditorPlugin
 	}
 }
 #endif
+*/
+//deprecated

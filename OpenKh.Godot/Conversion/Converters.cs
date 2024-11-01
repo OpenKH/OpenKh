@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Intrinsics.Arm;
+using System.Security.Cryptography;
+using System.Text;
 using FFMpegCore;
 using FFMpegCore.Pipes;
 using Godot;
@@ -18,6 +21,7 @@ using OpenKh.Kh2.TextureFooter;
 using OpenKh.Ps2;
 using Array = Godot.Collections.Array;
 using Environment = Godot.Environment;
+using FileAccess = Godot.FileAccess;
 
 namespace OpenKh.Godot.Conversion;
 
@@ -41,7 +45,7 @@ public static class Converters
             var img = Imgd.Read(image.Stream);
             var seq = Sequence.Read(sequence.Stream);
 
-            var sequenceResource = FromSequence(seq, TextureConverters.FromIgmd(img), mapper.GetNextTexture(null));
+            var sequenceResource = FromSequence(seq, TextureConverters.FromImgd(img), mapper.GetNextTexture(null));
 
             var sequenceNode = new KH2InterfaceSequencePlayer();
 
@@ -201,7 +205,7 @@ public static class Converters
         if (imageEntry is null || layoutEntry is null) return null;
 
         var nativeImages = new Imgz(imageEntry.Stream);
-        var nativeImageList = nativeImages.Images.Select(TextureConverters.FromIgmd).ToList();
+        var nativeImageList = nativeImages.Images.Select(TextureConverters.FromImgd).ToList();
 
         for (var i = 0; i < nativeImageList.Count; i++) mapper.GetTexture(i, null);
 
@@ -240,35 +244,74 @@ public static class Converters
         {
             var media = scd.MediaFiles[index];
             var header = scd.StreamHeaders[index];
-            var streamFile = scd.StreamFiles[index];
+            //var streamFile = scd.StreamFiles[index];
 
-            if (header.Codec == 6)
+            switch (header.Codec)
             {
-                container.Sounds.Add(new SoundResource
+                case 6:
+                    container.Sounds.Add(new SoundResource
+                    {
+                        Sound = AudioStreamOggVorbis.LoadFromBuffer(media),
+                        SampleRate = header.SampleRate,
+                        LoopStartRaw = header.LoopStart,
+                        LoopEndRaw = header.LoopEnd,
+                        LoopStart = (header.LoopStart * header.ChannelCount) / (float)header.SampleRate,
+                        LoopEnd = ((header.LoopEnd - header.LoopStart) * header.ChannelCount) / (float)header.SampleRate,
+                        Loop = header.LoopStart != 0 && header.LoopEnd != 0,
+                        ChannelCount = header.ChannelCount,
+                        OriginalCodec = SoundResource.Codec.Ogg,
+                    });
+                    break;
+                case 12:
                 {
-                    Sound = AudioStreamOggVorbis.LoadFromBuffer(media),
-                    LoopStart = header.LoopStart,
-                    LoopEnd = header.LoopEnd,
-                    OriginalCodec = SoundResource.Codec.Ogg,
-                });
-            }
-            else
-            {
-                //convert from MSADPCM to ogg, godot doesnt support MSADPCM wav files
-                var output = new MemoryStream();
-                FFMpegArguments
-                    .FromPipeInput(new StreamPipeSource(new MemoryStream(media)))
-                    .OutputToPipe(new StreamPipeSink(output), ffmpegOptions =>
-                        ffmpegOptions.ForceFormat("ogg"))
-                    .ProcessSynchronously();
+                    //convert from MSADPCM to ogg, godot doesnt support MSADPCM wav files
+                    var hash = SHA256.HashData(media);
+                    var hashString = Convert.ToHexString(hash);
+                    var path = $"user://khcache/msadpcm/{hashString}.cache";
 
-                container.Sounds.Add(new SoundResource
+                    byte[] result;
+                    
+                    if (FileAccess.FileExists(path))
+                    {
+                        using var file = FileAccess.OpenCompressed(path, FileAccess.ModeFlags.Read, FileAccess.CompressionMode.GZip);
+                        result = file.GetBuffer((long)file.GetLength());
+                    }
+                    else
+                    {
+                        var output = new MemoryStream();
+                        FFMpegArguments
+                            .FromPipeInput(new StreamPipeSource(new MemoryStream(media)))
+                            .OutputToPipe(new StreamPipeSink(output), ffmpegOptions =>
+                                ffmpegOptions.ForceFormat("ogg"))
+                            .ProcessSynchronously();
+
+                        result = output.GetBuffer();
+
+                        DirAccess.MakeDirRecursiveAbsolute("user://khcache/msadpcm/");
+                        
+                        using var file = FileAccess.OpenCompressed(path, FileAccess.ModeFlags.Write, FileAccess.CompressionMode.GZip);
+                        file.StoreBuffer(result);
+                    }
+
+                    container.Sounds.Add(new SoundResource
+                    {
+                        Sound = AudioStreamOggVorbis.LoadFromBuffer(result),
+                        SampleRate = header.SampleRate,
+                        LoopStartRaw = header.LoopStart,
+                        LoopEndRaw = header.LoopEnd,
+                        LoopStart = (header.LoopStart * header.ChannelCount) / (float)header.SampleRate,
+                        LoopEnd = ((header.LoopEnd - header.LoopStart) * header.ChannelCount) / (float)header.SampleRate,
+                        Loop = header.LoopStart != 0 && header.LoopEnd != 0,
+                        ChannelCount = header.ChannelCount,
+                        OriginalCodec = SoundResource.Codec.msadpcm,
+                    });
+                    break;
+                }
+                default:
                 {
-                    Sound = AudioStreamOggVorbis.LoadFromBuffer(output.GetBuffer()),
-                    LoopStart = header.LoopStart,
-                    LoopEnd = header.LoopEnd,
-                    OriginalCodec = SoundResource.Codec.msadpcm,
-                });
+                    container.Sounds.Add(null);
+                    break;
+                }
             }
         }
 

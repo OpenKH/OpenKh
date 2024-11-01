@@ -2,12 +2,13 @@ using Godot;
 using OpenKh.Godot.Helpers;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 
 namespace OpenKh.Godot.Conversion
 {
     public static class TextureConverters
     {
-        public static Texture2D FromIgmd(Imgd imgd)
+        public static Texture2D FromImgd(Imgd imgd)
         {
             var data = imgd.GetData();
             
@@ -30,5 +31,6 @@ namespace OpenKh.Godot.Conversion
             }
             return null;
         }
+        public static Texture2D FromTm2(Tm2 tm2) => FromImgd(tm2.AsImgd()); //TODO: theres a better way to do this but im lazy
     }
 }

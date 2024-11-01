@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="OpenKh.Godot"
+run/main_scene="res://Scenes/Root.tscn"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
 run/max_fps=60
 config/icon="res://icon.svg"
@@ -29,4 +30,8 @@ import/use_multiple_threads=false
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/OpenKHImporter/plugin.cfg")
+enabled=PackedStringArray()
+
+[gui]
+
+theme/default_font_multichannel_signed_distance_field=true
