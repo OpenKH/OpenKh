@@ -506,12 +506,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public bool IsNotExtracting { get; private set; }
-        public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) ||
+        public bool IsGameDataFound => IsNotExtracting && (GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) ||
             (GameEdition == PC && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) ||
             GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) ||
             Directory.Exists(Path.Combine(GameDataLocation, "bbs", "message")) ||
-            Directory.Exists(Path.Combine(GameDataLocation, "Recom", "SYS"))))||
-            Directory.Exists(Path.Combine(GameDataLocation, "kh3d","setdata"))||
+            Directory.Exists(Path.Combine(GameDataLocation, "Recom", "SYS"))||
+            Directory.Exists(Path.Combine(GameDataLocation, "kh3d","setdata"))))||
             OverrideGameDataFound);
         public Visibility GameDataNotFoundVisibility => !IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
