@@ -1,19 +1,9 @@
 using McMaster.Extensions.CommandLineUtils;
-using OpenKh.Common;
 using OpenKh.Common.Exceptions;
-using OpenKh.Kh2;
-using OpenKh.Kh2Anim.Mset;
-using OpenKh.Kh2Anim.Mset.Interfaces;
-using OpenKh.Research.Kh2Anim.Models;
 using OpenKh.Research.Kh2Anim.Subcommands;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
-using System.Numerics;
 using System.Reflection;
-using System.Xml.Serialization;
 
 namespace OpenKh.Research.Kh2Anim
 {

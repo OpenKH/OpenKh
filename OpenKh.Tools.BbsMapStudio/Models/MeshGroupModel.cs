@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.MonoGame;
-using OpenKh.Kh2;
 using OpenKh.Bbs;
 using OpenKh.Imaging;
 using System;

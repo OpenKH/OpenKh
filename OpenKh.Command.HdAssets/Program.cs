@@ -3,10 +3,8 @@ using OpenKh.Common.Archives;
 using OpenKh.Common;
 using OpenKh.Egs;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace OpenKh.Command.HdAssets

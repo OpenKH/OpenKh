@@ -1,7 +1,5 @@
 using OpenKh.Ps2;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace OpenKh.Kh2.Models.VIF
 {

@@ -3,7 +3,6 @@ using OpenKh.Kh2;
 using System.Collections.Generic;
 using System.IO;
 using Xunit;
-using Xunit.Sdk;
 
 namespace OpenKh.Tests.kh2
 {

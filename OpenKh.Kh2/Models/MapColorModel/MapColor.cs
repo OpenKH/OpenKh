@@ -1,7 +1,3 @@
-using OpenKh.Kh2.Utils;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xe.BinaryMapper;
 using Xe.Graphics;
 

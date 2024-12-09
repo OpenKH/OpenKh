@@ -1,7 +1,6 @@
 using nQuant.Core.TrueColor;
 using OpenKh.Command.ImgTool.Interfaces;
 using OpenKh.Imaging;
-using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

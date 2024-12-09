@@ -1,14 +1,9 @@
 using OpenKh.Common;
-using OpenKh.Command.MapGen.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Xe.BinaryMapper;
-using OpenKh.Kh2;
 using System.Linq;
-using McMaster.Extensions.CommandLineUtils.Conventions;
-using System.ComponentModel;
 using System.Numerics;
 
 namespace OpenKh.Command.MapGen.Utils

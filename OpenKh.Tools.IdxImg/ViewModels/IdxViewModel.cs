@@ -2,7 +2,6 @@ using OpenKh.Kh2;
 using OpenKh.Tools.IdxImg.Interfaces;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
