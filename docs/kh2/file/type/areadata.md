@@ -211,13 +211,13 @@ There is a total of 30 operation codes for the spawn script. The parser can be f
 - 03: [CasualSpawn](#casualspawn)
 - 04: [Capacity](#capacity)
 - 05: [AllocEnemy](#allocenemy)
-- 06: [unknown](#unknown06)
-- 07: [unknown](#unknown07)
+- 06: [EnemyHistoryDepth](#enemyhistorydepth)
+- 07: [GimmickHistoryDepth](#gimmickhistorydepth)
 - 09: [SpawnAlt](#spawnalt)
 - 0a: [MapScript](#mapscript)
 - 0b: [BarrierFlag](#barrierflag)
 - 0c: [AreaSettings](#areasettings)
-- 0e: [unknown](#unknown0e)
+- 0e: [NaviMap](#navimap)
 - 0f: [Party](#party)
 - 10: [Bgm](#bgm)
 - 11: [MsgWall](#msgwall)
@@ -279,13 +279,13 @@ Set the memory area `01c6053c`, which represents an integer that holds the capac
 
 Set the memory area `0034ecd0`, which represents the amount of memory reserved for enemies. It is not exactly clear why and how this is used. Found 34 times almost every time in `btl`.
 
-#### Unknown06
+#### EnemyHistoryDepth
 
-Set the memory area `0034ecd8` with the 4-byte parameter. Changes the amount of room transitions needed to respawn an enemy if defeated.
+Formerly known as Unknown06. Set the memory area `0034ecd8` with the 4-byte parameter. Changes the amount of room transitions needed to respawn an enemy if defeated.
 
-#### Unknown07
+#### GimmickHistoryDepth
 
-Set the memory area `0034ecdc` with the 4-byte parameter. Very uncommon as it's ony found 7 times in the maps `ca12` and `nm02` in `btl`. Changes the amount of room transitions needed to respawn an object if destroyed.
+Formerly known as Unknown07. Set the memory area `0034ecdc` with the 4-byte parameter. Very uncommon as it's ony found 7 times in the maps `ca12` and `nm02` in `btl`. Changes the amount of room transitions needed to respawn an object if destroyed.
 
 #### SpawnAlt
 
@@ -306,9 +306,9 @@ Set the memory area `0034ecc8`, which seems to define which parts of the map are
 
 Enqueue a message to perform a series of actions. Here it is possible to play an event, jump into another map, set the story flags, set the menu flags, set specific party members, obtain items or invoke the party menu. Refer to [Area settings script](#area-settings-script) to know more. This is commonly used, as the usage count tops 2408 times. It is only found in `evt` scripts.
 
-#### Unknown0e
+#### NaviMap
 
-Set the memory area `0034ece0` with the first 4-byte parameter, which affects the minimap loaded in. The value used determines which index of filetype `Tim2` to use to display the minimap. The game uses this whenever new exits open up or if an exit becomes inaccessible, like the path in eh04. A value of 99 can disable the minimap entirely.
+Formerly known as Unknown0e. Set the memory area `0034ece0` with the first 4-byte parameter, which affects the minimap loaded in. The value used determines which index of filetype `Tim2` to use to display the minimap. The game uses this whenever new exits open up or if an exit becomes inaccessible, like the path in eh04. A value of 99 can disable the minimap entirely.
 
 Used 323 times and only in `map`.
 
