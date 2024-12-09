@@ -1,6 +1,5 @@
 using OpenKh.Common;
 using OpenKh.Imaging;
-using OpenKh.Kh2.Ard;
 using System.Drawing;
 using System.IO;
 using System.Linq;

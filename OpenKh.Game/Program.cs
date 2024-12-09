@@ -2,7 +2,6 @@ using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Win32.SafeHandles;
 using OpenKh.Common;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reflection;

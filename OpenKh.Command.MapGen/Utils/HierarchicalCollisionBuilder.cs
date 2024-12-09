@@ -4,12 +4,9 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.Utils;
 using System;
-using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Numerics;
-using System.Text;
 using static OpenKh.Kh2.Coct;
 
 namespace OpenKh.Command.MapGen.Utils

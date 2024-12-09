@@ -1,6 +1,5 @@
 using OpenKh.Engine.Input;
 using OpenKh.Engine.Renderers;
-using OpenKh.Game.Infrastructure;
 
 namespace OpenKh.Game.States.Title
 {

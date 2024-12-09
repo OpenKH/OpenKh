@@ -1,8 +1,3 @@
-using Microsoft.VisualBasic.CompilerServices;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace OpenKh.Command.MapGen.Models
 {
     public class MaterialDef

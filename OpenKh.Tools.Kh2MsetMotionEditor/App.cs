@@ -3,7 +3,6 @@ using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using OpenKh.AssimpUtils;
-using OpenKh.Engine;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Tools.Kh2MsetMotionEditor.Helpers;

@@ -1,6 +1,5 @@
 using OpenKh.Engine.Renderers;
 using OpenKh.Common;
-using OpenKh.Game.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
 using OpenKh.Engine.Input;

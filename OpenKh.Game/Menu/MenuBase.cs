@@ -1,5 +1,4 @@
 using OpenKh.Engine.Input;
-using OpenKh.Game.Infrastructure;
 
 namespace OpenKh.Game.Menu
 {

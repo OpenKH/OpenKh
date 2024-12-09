@@ -1,5 +1,4 @@
 using OpenKh.Kh2;
-using OpenKh.Tools.Kh2ObjectEditor.Modules.Motions;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
 using System;

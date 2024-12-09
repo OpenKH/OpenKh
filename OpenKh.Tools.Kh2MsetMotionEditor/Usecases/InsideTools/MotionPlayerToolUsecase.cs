@@ -1,10 +1,8 @@
 using ImGuiNET;
-using MathNet.Numerics.LinearAlgebra.Factorization;
 using OpenKh.Tools.Kh2MsetMotionEditor.Helpers;
 using OpenKh.Tools.Kh2MsetMotionEditor.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Numerics;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases.InsideTools

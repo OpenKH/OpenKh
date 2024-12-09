@@ -1,7 +1,6 @@
 using OpenKh.Kh2;
 using OpenKh.Tools.DpdViewer.Models;
 using System.Collections.Generic;
-using System.Linq;
 using Xe.Tools.Wpf.Models;
 
 namespace OpenKh.Tools.DpdViewer.ViewModels

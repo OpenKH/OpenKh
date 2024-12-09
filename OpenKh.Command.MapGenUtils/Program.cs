@@ -1,7 +1,5 @@
 using McMaster.Extensions.CommandLineUtils;
-using Newtonsoft.Json.Serialization;
 using NJsonSchema;
-using NJsonSchema.Generation;
 using OpenKh.Command.MapGen.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;

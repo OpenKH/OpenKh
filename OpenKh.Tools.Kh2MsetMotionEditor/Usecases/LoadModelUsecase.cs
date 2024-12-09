@@ -1,17 +1,10 @@
-using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
-using OpenKh.Engine;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2MsetMotionEditor.Helpers;
-using OpenKh.Tools.Kh2MsetMotionEditor.Models.BoneDictSpec;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using xna = Microsoft.Xna.Framework;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
 {

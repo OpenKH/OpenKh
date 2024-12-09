@@ -1,4 +1,3 @@
-using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
@@ -8,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
 {

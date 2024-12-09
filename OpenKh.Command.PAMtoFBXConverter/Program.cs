@@ -1,6 +1,3 @@
-using OpenKh.Engine.Parsers;
-using OpenKh.Imaging;
-
 using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.IO;
@@ -9,8 +6,6 @@ using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using OpenKh.Bbs;
 using System.Collections.Generic;
-using System.Numerics;
-using OpenKh.Common.Utils;
 using Assimp;
 
 namespace OpenKh.Command.PAMtoFBXConverter

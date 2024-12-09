@@ -1,7 +1,6 @@
 using Assimp;
 using ImGuiNET;
 using Microsoft.Xna.Framework.Input;
-using OpenKh.Kh2;
 using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Tools.BbsMapStudio.Windows;
 using System;

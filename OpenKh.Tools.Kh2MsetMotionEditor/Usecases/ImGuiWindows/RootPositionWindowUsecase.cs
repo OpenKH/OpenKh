@@ -2,12 +2,7 @@ using ImGuiNET;
 using OpenKh.Tools.Kh2MsetMotionEditor.Helpers;
 using OpenKh.Tools.Kh2MsetMotionEditor.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using YamlDotNet.Serialization;
 using static OpenKh.Kh2.Motion;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 

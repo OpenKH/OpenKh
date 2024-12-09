@@ -1,11 +1,6 @@
-using NSubstitute;
 using OpenKh.Engine.Renderers;
-using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.Engine

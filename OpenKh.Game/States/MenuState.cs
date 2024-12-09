@@ -7,7 +7,6 @@ using OpenKh.Game.Menu;
 using OpenKh.Kh2;
 using System.Collections.Generic;
 using System.Linq;
-using OpenKh.Game.Debugging;
 using OpenKh.Engine.Input;
 
 namespace OpenKh.Game.States

@@ -1,11 +1,6 @@
 using OpenKh.Common;
-using OpenKh.Kh2;
 using OpenKh.Kh2.TextureFooter;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace OpenKh.Tests.kh2

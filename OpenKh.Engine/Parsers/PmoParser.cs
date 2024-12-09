@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using OpenKh.Engine.Motion;
 using OpenKh.Kh2;

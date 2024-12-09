@@ -1,17 +1,8 @@
 using OpenKh.Common;
 using OpenKh.Kh1;
-using OpenKh.Kh2;
-using OpenKh.Bbs;
-using OpenKh.Tools.Common;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using OpenKh.Tools.Common.Imaging;
 
 const string Input = @"D:\kh2\somefile.bar";
 const string Output = @"D:\kh2\modifiedfile.bar";

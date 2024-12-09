@@ -4,7 +4,6 @@ using OpenKh.Kh2.Models.VIF;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
-using System.Reflection;
 using Xe.BinaryMapper;
 using static OpenKh.Kh2.Models.ModelCommon;
 

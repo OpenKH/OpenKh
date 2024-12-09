@@ -1,7 +1,5 @@
 using OpenKh.Kh2Anim.Legacy;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace OpenKh.Kh2Anim.Mset
 {

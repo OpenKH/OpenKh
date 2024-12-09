@@ -1,6 +1,5 @@
 using OpenKh.Kh2.Messages;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Windows;
 using OpenKh.Engine.Renders;
 

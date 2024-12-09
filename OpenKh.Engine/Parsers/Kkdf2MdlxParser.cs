@@ -1,7 +1,5 @@
-using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Ps2;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

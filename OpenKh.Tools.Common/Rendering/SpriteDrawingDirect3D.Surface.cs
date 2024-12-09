@@ -29,7 +29,6 @@
 
 using OpenKh.Engine.Renders;
 using OpenKh.Imaging;
-using SharpDX.D3DCompiler;
 using SharpDX.IO;
 using System;
 using System.Drawing;

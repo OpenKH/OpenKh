@@ -1,7 +1,6 @@
 using OpenKh.Engine;
 using System.Numerics;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
-using static OpenKh.Tools.BbsMapStudio.ImGuiExHelpers;
 
 namespace OpenKh.Tools.BbsMapStudio.Windows
 {

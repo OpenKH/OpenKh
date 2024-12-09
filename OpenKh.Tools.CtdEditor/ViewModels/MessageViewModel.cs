@@ -3,7 +3,6 @@ using OpenKh.Bbs.Messages;
 using OpenKh.Engine.Renders;
 using OpenKh.Tools.CtdEditor.Interfaces;
 using System.Linq;
-using Xe.Drawing;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 

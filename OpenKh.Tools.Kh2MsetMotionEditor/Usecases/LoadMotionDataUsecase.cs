@@ -2,14 +2,10 @@ using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2Anim.Mset;
 using OpenKh.Tools.Kh2MsetMotionEditor.Helpers;
-using OpenKh.Tools.Kh2MsetMotionEditor.Models.BoneDictSpec;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using static OpenKh.Kh2.Motion;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases

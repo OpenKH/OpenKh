@@ -3,11 +3,9 @@ using OpenKh.Command.Bdxio.Utils;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
-using SharpDX.DirectWrite;
 using System;
 using System.IO;
 using System.Windows;
-using Xe.BinaryMapper;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.AI
 {

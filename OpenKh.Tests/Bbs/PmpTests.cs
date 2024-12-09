@@ -2,9 +2,6 @@ using OpenKh.Common;
 using OpenKh.Bbs;
 using System.IO;
 using Xunit;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OpenKh.Tests.Bbs
 {

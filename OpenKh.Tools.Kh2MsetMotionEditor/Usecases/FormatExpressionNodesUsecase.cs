@@ -1,14 +1,7 @@
-using Assimp;
-using OpenKh.Kh2;
 using OpenKh.Tools.Kh2MsetMotionEditor.Helpers.ExpressionNodeSpec;
-using Org.BouncyCastle.Pqc.Crypto.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using static OpenKh.Kh2.Motion;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases

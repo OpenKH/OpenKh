@@ -1,9 +1,6 @@
 using ImGuiNET;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
 
 namespace OpenKh.Tools.Common.CustomImGui
 {

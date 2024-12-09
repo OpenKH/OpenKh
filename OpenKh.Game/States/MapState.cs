@@ -6,7 +6,6 @@ using OpenKh.Engine.MonoGame;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Field;
 using OpenKh.Game.Infrastructure;
-using System;
 using System.Numerics;
 using xna = Microsoft.Xna.Framework;
 

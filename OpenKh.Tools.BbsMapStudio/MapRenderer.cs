@@ -6,7 +6,6 @@ using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Parsers;
 using OpenKh.Bbs;
 using OpenKh.Kh2;
-using OpenKh.Kh2.Ard;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.Models;
 using OpenKh.Tools.BbsMapStudio.Interfaces;

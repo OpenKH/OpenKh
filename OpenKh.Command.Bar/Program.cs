@@ -1,5 +1,4 @@
 using McMaster.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;

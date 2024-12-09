@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.Versioning;
-using System.Text;
 using NLog;
 using OpenKh.Kh2;
 

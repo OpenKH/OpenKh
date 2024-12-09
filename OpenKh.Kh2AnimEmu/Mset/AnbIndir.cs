@@ -1,11 +1,8 @@
-using OpenKh.Kh2Anim.Mset.EmuRunner;
 using OpenKh.Kh2Anim.Mset.Interfaces;
 using OpenKh.Kh2;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace OpenKh.Kh2Anim.Mset
 {

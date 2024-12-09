@@ -1,7 +1,6 @@
 using OpenKh.Engine;
 using System.Numerics;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
-using static OpenKh.Tools.Kh2MsetMotionEditor.ImGuiExHelpers;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.Windows
 {

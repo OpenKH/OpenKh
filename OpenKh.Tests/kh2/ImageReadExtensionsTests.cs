@@ -2,11 +2,8 @@
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Text;
 using Xunit;
 
 namespace OpenKh.Tests.kh2

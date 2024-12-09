@@ -4,12 +4,8 @@ using OpenKh.Command.TexFooter.TypeConverters;
 using OpenKh.Command.TexFooter.Utils;
 using OpenKh.Common;
 using OpenKh.Kh2.TextureFooter;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
-using System.Text;
 using YamlDotNet.Serialization;
 
 namespace OpenKh.Command.TexFooter.Subcommands
