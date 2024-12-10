@@ -1,6 +1,5 @@
 using Assimp;
 using McMaster.Extensions.CommandLineUtils;
-using McMaster.Extensions.CommandLineUtils.Conventions;
 using NLog;
 using OpenKh.Command.AnbMaker.Commands.Interfaces;
 using OpenKh.Command.AnbMaker.Commands.Utils;
@@ -9,13 +8,7 @@ using OpenKh.Command.AnbMaker.Utils;
 using OpenKh.Command.AnbMaker.Utils.Builder;
 using OpenKh.Command.AnbMaker.Utils.Builder.Models;
 using OpenKh.Kh2;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
 using static OpenKh.Command.AnbMaker.Utils.Builder.RawMotionBuilder;
 using static OpenKh.Kh2.Motion;
 

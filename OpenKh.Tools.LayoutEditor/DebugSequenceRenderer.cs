@@ -1,7 +1,6 @@
 using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using System;
-using System.Collections.Generic;
 
 namespace OpenKh.Tools.LayoutEditor
 {

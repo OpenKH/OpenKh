@@ -19,7 +19,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using static OpenKh.Ddd.PmoV4;
 
 namespace OpenKh.Tools.KhModels.View
 {

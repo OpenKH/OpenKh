@@ -1,5 +1,4 @@
 using ModelingToolkit.Objects;
-using OpenKh.AssimpUtils;
 using OpenKh.Engine.Extensions;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Models;
