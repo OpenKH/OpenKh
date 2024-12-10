@@ -1,7 +1,6 @@
 using ImGuiNET;
 using OpenKh.Tools.Kh2MapStudio.Models;
 using System.Numerics;
-using System.Windows;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
 namespace OpenKh.Tools.Kh2MapStudio.Windows
