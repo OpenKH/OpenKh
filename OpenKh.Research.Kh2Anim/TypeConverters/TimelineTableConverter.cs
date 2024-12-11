@@ -1,10 +1,6 @@
-using OpenKh.Kh2;
-using OpenKh.Research.Kh2Anim.Models;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Text;
 using static OpenKh.Kh2.Motion;
 
 namespace OpenKh.Research.Kh2Anim.TypeConverters

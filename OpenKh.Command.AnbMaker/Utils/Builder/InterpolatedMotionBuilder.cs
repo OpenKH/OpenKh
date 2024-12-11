@@ -1,12 +1,7 @@
 using NLog;
 using OpenKh.Command.AnbMaker.Extensions;
 using OpenKh.Command.AnbMaker.Utils.Builder.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using static OpenKh.Kh2.Motion;
 
 namespace OpenKh.Command.AnbMaker.Utils.Builder

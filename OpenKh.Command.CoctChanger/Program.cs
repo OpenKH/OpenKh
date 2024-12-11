@@ -1,5 +1,4 @@
 using McMaster.Extensions.CommandLineUtils;
-using McMaster.Extensions.CommandLineUtils.Conventions;
 using OpenKh.Command.CoctChanger.Utils;
 using OpenKh.Common;
 using OpenKh.Kh2;
@@ -7,13 +6,10 @@ using OpenKh.Kh2.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Numerics;
 using System.Reflection;
-using System.Text;
 
 namespace OpenKh.Command.CoctChanger
 {

@@ -1,11 +1,5 @@
 using OpenKh.Kh2.TextureFooter;
 using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Text;
-using YamlDotNet.Core;
-using YamlDotNet.Serialization;
-using OpenKh.Imaging;
 using OpenKh.Command.TexFooter.Interfaces;
 
 namespace OpenKh.Command.TexFooter.Models

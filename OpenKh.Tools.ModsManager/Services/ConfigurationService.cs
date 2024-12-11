@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using YamlDotNet.Core.Tokens;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 

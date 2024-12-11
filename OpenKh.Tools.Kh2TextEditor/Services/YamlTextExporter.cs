@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using YamlDotNet;
 using YamlDotNet.Serialization.NamingConventions;
 
 namespace OpenKh.Tools.Kh2TextEditor.Services

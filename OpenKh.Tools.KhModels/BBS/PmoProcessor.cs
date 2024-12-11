@@ -1,15 +1,9 @@
-using Assimp;
 using ModelingToolkit.Objects;
 using OpenKh.Bbs;
 using OpenKh.Imaging;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Numerics;
-using System.Windows.Forms;
-using static OpenKh.Ddd.PmoV4_2.Vertex;
 
 namespace OpenKh.Tools.KhModels.BBS
 {

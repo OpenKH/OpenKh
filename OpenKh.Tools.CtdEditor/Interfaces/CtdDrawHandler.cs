@@ -6,7 +6,6 @@ using OpenKh.Tools.Common.Rendering;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Windows.Documents;
 
 namespace OpenKh.Tools.CtdEditor.Interfaces
 {

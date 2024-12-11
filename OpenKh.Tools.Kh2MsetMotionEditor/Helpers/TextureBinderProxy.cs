@@ -2,10 +2,6 @@ using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Tools.Kh2MsetMotionEditor.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.Helpers
 {

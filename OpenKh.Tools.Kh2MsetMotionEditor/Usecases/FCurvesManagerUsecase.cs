@@ -1,7 +1,6 @@
 using ImGuiNET;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2MsetMotionEditor.Helpers;
-using OpenKh.Tools.Kh2MsetMotionEditor.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

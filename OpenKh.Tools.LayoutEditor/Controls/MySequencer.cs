@@ -1,7 +1,6 @@
 using ImGuiNET;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 

@@ -7,15 +7,7 @@ using OpenKh.Command.AnbMaker.Utils.Builder;
 using OpenKh.Command.AnbMaker.Utils.Builder.Models;
 using OpenKh.Command.AnbMaker.Utils.JsonAnimSource;
 using OpenKh.Kh2;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
-using System.Numerics;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenKh.Command.AnbMaker.Commands
 {

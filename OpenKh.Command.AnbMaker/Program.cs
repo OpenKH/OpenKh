@@ -1,10 +1,6 @@
 using McMaster.Extensions.CommandLineUtils;
 using NLog;
 using OpenKh.Command.AnbMaker.Commands;
-using System.Collections;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Numerics;
 using System.Reflection;
 
 namespace OpenKh.Command.AnbMaker

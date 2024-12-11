@@ -1,5 +1,4 @@
 using OpenKh.Common;
-using OpenKh.Kh1;
 using OpenKh.Tools.ModsManager.Interfaces;
 using System.Collections.Generic;
 using System.IO;

@@ -1,12 +1,7 @@
-using OpenKh.Common;
-using OpenKh.Kh1;
 using OpenKh.Kh2;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenKh.Tests
 {

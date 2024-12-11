@@ -5,7 +5,6 @@ using OpenKh.Kh2.TextureFooter;
 using OpenKh.Kh2.Utils;
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;

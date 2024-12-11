@@ -1,5 +1,4 @@
 using OpenKh.Engine.Input;
-using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2;
 using System;
 using System.Numerics;

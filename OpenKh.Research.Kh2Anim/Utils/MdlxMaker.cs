@@ -1,8 +1,5 @@
 using OpenKh.Kh2;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace OpenKh.Research.Kh2Anim.Utils
 {

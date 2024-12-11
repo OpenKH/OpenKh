@@ -1,8 +1,6 @@
 using ImGuiNET;
 using OpenKh.Tools.BbsMapStudio.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
 namespace OpenKh.Tools.BbsMapStudio.Windows

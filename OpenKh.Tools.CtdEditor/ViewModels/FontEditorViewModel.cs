@@ -3,8 +3,6 @@ using OpenKh.Engine.Renders;
 using OpenKh.Tools.Common.Rendering;
 using System;
 using System.Collections.Generic;
-using System.DirectoryServices;
-using System.Drawing;
 using System.Linq;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;

@@ -1,5 +1,4 @@
 using OpenKh.Common;
-using OpenKh.Kh2;
 using OpenKh.Tools.Common.Wpf;
 using System.Collections.Generic;
 using System.IO;

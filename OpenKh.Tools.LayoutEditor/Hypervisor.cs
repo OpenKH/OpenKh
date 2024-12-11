@@ -6,13 +6,10 @@
 */
 
 using System;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace OpenKh.Common
 {
