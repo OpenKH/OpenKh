@@ -12,9 +12,9 @@ using System.Windows;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
-using Ionic.Zip;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.IO.Compression;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
 {
@@ -990,9 +990,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     _client.DownloadFile(new System.Uri(releases.Assets[0].BrowserDownloadUrl), DownPath);
                     try
                     {
-                        using (ZipFile zip = new ZipFile(DownPath))
+                        using (var zip = ZipFile.OpenRead(DownPath))
                         {
-                            zip.ExtractAll(TempExtractionLocation, ExtractExistingFileAction.OverwriteSilently);
+                            zip.ExtractToDirectory(TempExtractionLocation, true);
                         }
                     }
                     catch
