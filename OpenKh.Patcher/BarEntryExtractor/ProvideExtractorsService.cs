@@ -15,6 +15,8 @@ namespace OpenKh.Patcher.BarEntryExtractor
 {
     public class ProvideExtractorsService
     {
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+
         private readonly ISerializer _yamlSer = new SerializerBuilder()
             .Build();
 
@@ -23,7 +25,7 @@ namespace OpenKh.Patcher.BarEntryExtractor
         private Extractor CreateMessageExtractor(
             IEnumerable<string> tags,
             Regex sourceFilePattern,
-            Func<Match, string> languageSelector,
+            string language,
             IMessageDecode decoder
         )
         {
@@ -34,17 +36,24 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     var msgEntries = Msg.Read(barEntry.Stream.FromBegin());
+                    var messages = new List<Dictionary<string, object>>();
+                    foreach (var msgEntry in msgEntries)
+                    {
+                        var readableMessage = MsgSerializer.SerializeText(decoder.Decode(msgEntry.Data));
+                        // The format of the dictionary needs to be matched with the patcher.
+                        // Check the method: OpenKh.Patcher.PatcherProcessor.PatchKh2Msg
+                        messages.Add(
+                            new Dictionary<string, object>
+                            {
+                                { "id", msgEntry.Id },
+                                { language, readableMessage }
+                            }
+                        );
+                    }
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
-                            msgEntries
-                                .Select(
-                                    msgEntry => new IdText(
-                                        msgEntry.Id,
-                                        MsgSerializer.SerializeText(decoder.Decode(msgEntry.Data))
-                                    )
-                                )
+                            messages
                         )
                     );
                 },
@@ -57,16 +66,14 @@ namespace OpenKh.Patcher.BarEntryExtractor
                         Source = CreateSourceFromArgs(
                             new AssetFile
                             {
-                                Name = "sys",
-                                Language = languageSelector(sourceFilePattern.Match(arg.OriginalRelativePath)),
+                                Name = arg.SourceName,
+                                Language = language,
                             }
                         ),
                     }
                 )
             );
         }
-
-        private record IdText(int Id, string Text);
 
         public IEnumerable<Extractor> GetExtractors()
         {
@@ -79,7 +86,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             OpenKh.Kh2.SystemData.Trsr.Read(barEntry.Stream.FromBegin())
@@ -110,7 +116,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             OpenKh.Kh2.SystemData.Item.Read(barEntry.Stream.FromBegin())
@@ -141,7 +146,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             OpenKh.Kh2.Battle.Fmlv.Read(barEntry.Stream.FromBegin())
@@ -172,7 +176,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             OpenKh.Kh2.Battle.Lvup.Read(barEntry.Stream.FromBegin())
@@ -203,7 +206,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             OpenKh.Kh2.Battle.Bons.Read(barEntry.Stream.FromBegin())
@@ -234,7 +236,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             OpenKh.Kh2.Battle.Atkp.Read(barEntry.Stream.FromBegin())
@@ -265,7 +266,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             OpenKh.Kh2.Battle.Plrp.Read(barEntry.Stream.FromBegin())
@@ -296,7 +296,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             OpenKh.Kh2.SystemData.Cmd.Read(barEntry.Stream.FromBegin())
@@ -327,7 +326,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             OpenKh.Kh2.Battle.Enmp.Read(barEntry.Stream.FromBegin())
@@ -358,7 +356,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             OpenKh.Kh2.SystemData.Sklt.Read(barEntry.Stream.FromBegin())
@@ -389,7 +386,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             OpenKh.Kh2.Battle.Przt.Read(barEntry.Stream.FromBegin())
@@ -420,7 +416,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             OpenKh.Kh2.Battle.Magc.Read(barEntry.Stream.FromBegin())
@@ -451,7 +446,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".model",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return barEntry.Stream.ReadAllBytes();
                 }
             ));
@@ -463,42 +457,50 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".tim",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return barEntry.Stream.ReadAllBytes();
                 }
             ));
 
+            foreach (var lang in "us,fr,gr,it,sp".Split(','))
+            {
+                extractors.Add(CreateMessageExtractor(
+                    tags: new[] { "message", "sys.bar", "InternationalSystem" },
+                    sourceFilePattern: new Regex($@"msg/{lang}/sys\.bar"),
+                    language: lang,
+                    decoder: Encoders.InternationalSystem
+                ));
 
-            extractors.Add(CreateMessageExtractor(
-                tags: new[] { "message", "xx.bar", "InternationalSystem" },
-                sourceFilePattern: new Regex(@"msg/(?<language>us|fr|gr|it|sp)/(sys|[a-z]{2})\.bar"),
-                languageSelector: match => match.Groups["language"].Value,
-                decoder: Encoders.InternationalSystem
-            ));
+                extractors.Add(CreateMessageExtractor(
+                    tags: new[] { "message", "xx.bar", "InternationalSystem" },
+                    sourceFilePattern: new Regex($@"msg/{lang}/[a-z]{{2}}\.bar"),
+                    language: lang,
+                    decoder: Encoders.InternationalSystem
+                ));
+            }
 
             extractors.Add(CreateMessageExtractor(
                 tags: new[] { "message", "sys.bar", "TurkishSystem" },
                 sourceFilePattern: new Regex(@"msg/tr/sys\.bar"),
-                languageSelector: match => "tr",
+                language: "tr",
                 decoder: Encoders.TurkishSystem
             ));
             extractors.Add(CreateMessageExtractor(
                 tags: new[] { "message", "xx.bar", "TurkishSystem" },
                 sourceFilePattern: new Regex(@"msg/tr/[a-z]{2}\.bar"),
-                languageSelector: match => "tr",
+                language: "tr",
                 decoder: Encoders.TurkishSystem
             ));
 
             extractors.Add(CreateMessageExtractor(
                 tags: new[] { "message", "sys.bar", "JapaneseSystem" },
                 sourceFilePattern: new Regex(@"msg/jp/sys\.bar"),
-                languageSelector: match => "jp",
+                language: "jp",
                 decoder: Encoders.JapaneseSystem
             ));
             extractors.Add(CreateMessageExtractor(
                 tags: new[] { "message", "xx.bar", "JapaneseEvent" },
                 sourceFilePattern: new Regex(@"msg/jp/[a-z]{2}.bar"),
-                languageSelector: match => "je",
+                language: "je",
                 decoder: Encoders.JapaneseEvent
             ));
 
@@ -510,7 +512,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".bdscript",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     var decoder = new BdxDecoder(
                         read: new MemoryStream(barEntry.Stream.ReadAllBytes(), false),
                         codeRevealer: true,
@@ -544,7 +545,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".script",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         Kh2.Ard.AreaDataScript.Decompile(
                             Kh2.Ard.AreaDataScript.Read(barEntry.Stream.FromBegin())
@@ -575,7 +575,6 @@ namespace OpenKh.Patcher.BarEntryExtractor
                 FileExtension: ".yml",
                 ExtractAsync: async (barEntry) =>
                 {
-                    await Task.Yield();
                     return Encoding.UTF8.GetBytes(
                         _yamlSer.Serialize(
                             Kh2.Ard.SpawnPoint.Read(
@@ -602,5 +601,7 @@ namespace OpenKh.Patcher.BarEntryExtractor
 
             return extractors.AsReadOnly();
         }
+
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     }
 }

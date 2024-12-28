@@ -37,7 +37,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
             else
             {
-                Author = _model.Metadata.OriginalAuthor;
+                Author = _model.Metadata?.OriginalAuthor;
                 Name = Source;
             }
 
@@ -131,7 +131,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string ReportBugUrl => $"https://github.com/{Source}/issues";
         public string FilesToPatch => string.Join('\n', GetFilesToPatch());
 
-        public string Description => _model.Metadata.Description;
+        public string Description => _model.Metadata?.Description;
 
         public string Homepage
         {
@@ -163,7 +163,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         private IEnumerable<string> GetFilesToPatch()
         {
-            foreach (var asset in _model.Metadata.Assets)
+            foreach (var asset in _model.Metadata?.Assets ?? Enumerable.Empty<Patcher.AssetFile>())
             {
                 yield return asset.Name;
                 if (asset.Multi != null)

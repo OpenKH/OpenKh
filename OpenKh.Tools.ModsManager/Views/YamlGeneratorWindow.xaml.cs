@@ -62,11 +62,13 @@ namespace OpenKh.Tools.ModsManager.Views
                     ? await File.ReadAllBytesAsync(modYmlFilePath)
                     : null;
 
-                var createNewModYml = rawInput == null;
-
                 var mod = (rawInput != null)
                     ? Metadata.Read(new MemoryStream(rawInput, false))
                     : new Metadata();
+
+                var createNewModYml = mod == null;
+
+                mod ??= new Metadata(); // The empty yaml file brings null instance.
 
                 mod.Title ??= Path.GetFileName(Path.GetDirectoryName(modYmlFilePath));
                 mod.OriginalAuthor ??= "You";
