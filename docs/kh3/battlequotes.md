@@ -205,6 +205,143 @@ Their type is SQEXSEADSoundBank or SQEXSEADSound.
 
 [To top](#kingdom-hearts-iii-battle-quotes)
 
+### Riku
+
+`/Game/Sound/VOICE/Localization/en/battle/PC/Riku/Battle_Riku.uasset`
+
+| Audio Nr. | Quote                       | Note                    |
+|:---------:|-----------------------------|-------------------------|
+| 000       | "Mickey"                    | Healing (Items, Cure)   |
+| 001       | "Sora"                      | Healing (Items, Cure)   |
+| 002       | "You alright?"              | Healing (Items, Cure)   |
+| 003       | "Be more careful"           | Healing (Items, Cure)   |
+| 004       | "I will be your oblivion"   |                         |
+| 005       | "Back to the shadows, Ansem"|                         |
+| 006       | "Not Good"                  |                         |
+| 007       | "Stay in this"              |                         |
+| 008       | \<Pain Grunt\>              | Being damaged           |
+| 009       | \<Pain Grunt\>              | Being damaged           |
+| 010       | "Ouch"                      | Being damaged           |
+| 011       | \<Pain Grunt\>              | Being damaged           |
+| 012       | \<Pain Grunt\>              | Being damaged           |
+| 013       | \<Pain Grunt\>              | Being damaged           |
+| 014       | \<Pain Grunt\>              | Being damaged           |
+| 015       | \<Pain Grunt\>              | Being damaged           |
+| 016       | \<Pain Grunt\>              | Being damaged           |
+| 017       | \<Pain Grunt\>              | Being damaged           |
+| 018       | \<Scream\>                  | Dying                   |
+| 019       | \<Scream\>                  | Dying                   |
+| 020       | "No, ugh"                   | Dying                   |
+| 021       | "Why now?"                  | Dying                   |
+| 022       | "(hah)"                     | Attack                  |
+| 023       | "(yah)"                     | Attack                  |
+| 024       | "(huah)"                    | Attack                  |
+| 025       | "(hooh)"                    | Attack                  |
+| 026       | "(heh)"                     | Attack                  |
+| 027       | "(rah)"                     | Attack                  |
+| 028       | "(hrah)"                    | Attack                  |
+| 029       | "(hyah)"                    | Attack                  |
+| 030       | "(yaah)"                    | Attack                  |
+| 031       | "(hyeh)"                    | Attack                  |
+| 032       | "(urah)"                    | Attack                  |
+| 033       | "(hurah)"                   | Attack                  |
+| 034       | "Sorry"                     |                         |
+| 035       | "You're done"               |                         |
+| 036       | "Gotcha"                    |                         |
+| 037       | "Bye"                       |                         |
+| 038       | "Take this"                 |                         |
+| 039       | "Heal"                      | Magic                   |
+| 040       | "Fire"                      | Magic                   |
+| 041       | "Burn"                      | Magic                   |
+| 042       | "Thunder"                   | Magic                   |
+| 043       | "Strike"                    | Magic                   |
+| 044       | "Thanks"                    | Being healed            |
+| 045       | "Perfect"                   | Being healed            |
+| 046       | "(hup)"                     |                         |
+| 047       | "(hyeh)"                    |                         |
+| 048       | "(ooh)"                     |                         |
+| 049       | "(huh)"                     |                         |
+| 050       | "(haih)"                    |                         |
+| 051       | \<Grunt\>                   |                         |
+| 052       | \<Grunt\>                   |                         |
+| 053       | "huogh"                     |                         |
+| 054       | "yes"                       |                         |
+| 055       | \<Grunt\>                   |                         |
+| 056       | \<Grunt\>                   |                         |
+| 057       | \<Grunt\>                   | Attack with Mickey      |
+| 058       | \<Grunt\>                   | Attack with Mickey      |
+| 059       | "Gotcha"                    | Attack with Mickey      |
+| 060       | "Bye"                       | Attack with Mickey      |
+
+
+[To top](#kingdom-hearts-iii-battle-quotes)
+
+### Aqua
+
+`/Game/Sound/VOICE/Localization/en/battle/PC/Aqua/Battle_Aqua.uasset`
+
+| Audio Nr. | Quote                       | Note                    |
+|:---------:|-----------------------------|-------------------------|
+| 000       | "Strike"                    | Magic                   |
+| 001       | "Thunder"                   | Magic                   |
+| 002       | "Heh"                       |                         |
+| 003       | "Yep"                       |                         |
+| 004       | \<Grunt\>                   |                         |
+| 005       | \<Grunt\>                   |                         |
+| 006       | "Okay"                      | Healing (Items, Cure)   |
+| 007       | \<Grunt\>                   | Healing (Items, Cure)   |
+| 008       | \<Pain Grunt\>              | Being damaged           |
+| 009       | \<Pain Grunt\>              | Being damaged           |
+| 010       | \<Pain Grunt\>              | Being damaged           |
+| 011       | \<Pain Grunt\>              | Being damaged           |
+| 012       | \<Pain Grunt\>              | Being damaged           |
+| 013       | \<Pain Grunt\>              | Being damaged           |
+| 014       | \<Pain Grunt\>              | Being damaged           |
+| 015       | \<Pain Grunt\>              | Being damaged           |
+| 016       | \<Pain Grunt\>              | Being damaged           |
+| 017       | \<Pain Grunt\>              | Being damaged           |
+| 018       | \<Scream\>                  | Dying                   |
+| 019       | \<Scream\>                  | Dying                   |
+| 020       | "I can't give up"           | Dying                   |
+| 021       | "Is this the end?"          | Dying                   |
+| 022       | "(huyh)"                    | Attack                  |
+| 023       | "(heyh)"                    | Attack                  |
+| 024       | "(huih)"                    | Attack                  |
+| 025       | "(yah)"                     | Attack                  |
+| 026       | "(hah)"                     | Attack                  |
+| 027       | "(rah)"                     | Attack                  |
+| 028       | "(aah)"                     | Attack                  |
+| 029       | "(haih)"                    | Attack                  |
+| 030       | "Farewell"                  |                         |
+| 031       | "You're done"               |                         |
+| 032       | "Come on"                   |                         |
+| 033       | "Enough"                    |                         |
+| 034       | "Go"                        |                         |
+| 035       | "Gotcha"                    |                         |
+| 036       | "That's it"                 |                         |
+| 037       | "Okay"                      |                         |
+| 038       | "How's this"                |                         |
+| 039       | "It ends now"               |                         |
+| 040       | "Heal"                      | Magic                   |
+| 041       | "Fire"                      | Magic                   |
+| 042       | "Burn"                      | Magic                   |
+| 043       | "Ice"                       | Magic                   |
+| 044       | "Freeze"                    | Magic                   |
+| 045       | "Sora"                      | Healing (Items, Cure)   |
+| 046       | "Ven"                       | Healing (Items, Cure)   |
+| 047       | "Haste yourself"            | Healing (Items, Cure)   |
+| 048       | "Hold on"                   | Healing (Items, Cure)   |
+| 049       | "Thank you"                 | Being healed            |
+| 050       | "Owe you one"               | Being healed            |
+| 051       | "Thanks"                    | Being healed            |
+| 052       | "I'm in trouble"            |                         |
+| 053       | "No"                        |                         |
+| 054       | "You will release my friend's heart|                  |
+| 055       | "Stay there"                |                         |
+
+
+[To top](#kingdom-hearts-iii-battle-quotes)
+
 ## Enemy
 `/Game/Sound/VOICE/Localization/en/battle/ENEMY/`
 
@@ -261,7 +398,7 @@ Their type is SQEXSEADSoundBank or SQEXSEADSound.
 | 005       | "There"                          |              |
 | 006       | "Strike"                         |              |
 | 007       | "Anger and Hatred reign supreme" |              |
-| 008       | "Feel the Emptyness"             |              |
+| 008       | "Feel the Emptiness"             |              |
 | 009       | "Insolence"                      |              |
 | 010       | \<hurt sounds\>                  | Damage taken |
 | 011       | \<hurt sounds\>                  | Damage taken |

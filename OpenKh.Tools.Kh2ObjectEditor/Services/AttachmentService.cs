@@ -75,12 +75,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
                 if (!Bar.IsValid(streamMset))
                     throw new Exception("File is not a valid MSET: " + tempMsetPath);
 
-                Bar Attach_MsetBar = Bar.Read(streamMset);
+                BinaryArchive Attach_MsetBar = BinaryArchive.Read(streamMset);
 
                 Attach_MsetEntries = new List<MotionSelector_Wrapper>();
-                for (int i = 0; i < Attach_MsetBar.Count; i++)
+                for (int i = 0; i < Attach_MsetBar.Entries.Count; i++)
                 {
-                    Attach_MsetEntries.Add(new MotionSelector_Wrapper(i, Attach_MsetBar[i]));
+                    Attach_MsetEntries.Add(new MotionSelector_Wrapper(i, Attach_MsetBar.Entries[i]));
                 }
             }
         }

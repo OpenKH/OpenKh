@@ -1,6 +1,5 @@
 using OpenKh.Bbs;
 using OpenKh.Tools.CtdEditor.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xe.Tools.Wpf.Models;

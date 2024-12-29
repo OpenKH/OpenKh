@@ -1,39 +1,118 @@
+using OpenKh.Tools.Kh2ObjectEditor.Services;
+using System.Diagnostics;
 using System.Windows.Controls;
-using OpenKh.Tools.Kh2ObjectEditor.ViewModel;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Views
 {
     public partial class Viewport_Control : UserControl
     {
-        public Viewport_ViewModel ThisVM { get; set; }
+        private bool _isMouseOverDockPanel = false;
 
         public Viewport_Control()
         {
             InitializeComponent();
-            ThisVM = new Viewport_ViewModel();
-            ThisVM.ViewportControl = Viewport;
-            DataContext = ThisVM;
+            DataContext = ViewerService.Instance;
+            ViewerService.Instance.HookViewport(HelixViewport);
         }
 
         private void Button_PreviousFrame(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (!ThisVM.enable_frameCommands)
-                return;
-            ThisVM.previousFrame();
+            PreviousFrame();
         }
 
         private void Button_NextFrame(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (!ThisVM.enable_frameCommands)
-                return;
-            ThisVM.nextFrame();
+            NextFrame();
         }
 
         private void Button_Reload(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (!ThisVM.enable_reload)
+            if (MdlxService.Instance.ModelFile == null) {
                 return;
-            ThisVM.reload();
+            }
+            ViewerService.Instance.Render();
+        }
+
+        private void Slider_DragStarted(object sender, DragStartedEventArgs e)
+        {
+            if (MsetService.Instance.LoadedMotion == null) {
+                return;
+            }
+            ViewerService.Instance.AnimationRunning = false;
+        }
+        private void Slider_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            if (MsetService.Instance.LoadedMotion == null) {
+                return;
+            }
+            ViewerService.Instance.LoadFrame();
+        }
+
+        private void DockPanel_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            _isMouseOverDockPanel = true;
+        }
+
+        private void DockPanel_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            _isMouseOverDockPanel = false;
+        }
+
+        private void Viewport_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Prevent Viewport to use these keys
+            if (e.Key == Key.Left ||
+                e.Key == Key.Right ||
+                e.Key == Key.Up ||
+                e.Key == Key.Down ||
+                e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (!_isMouseOverDockPanel) {
+                return;
+            }
+
+            if (e.Key == Key.Space)
+            {
+                ViewerService.Instance.AnimationRunning = !ViewerService.Instance.AnimationRunning;
+            }
+            else if(e.Key == Key.Left)
+            {
+                PreviousFrame();
+            }
+            else if (e.Key == Key.Right)
+            {
+                NextFrame();
+            }
+        }
+
+        private void PreviousFrame(int frameStep = -1)
+        {
+            if (MsetService.Instance.LoadedMotion == null)
+            {
+                return;
+            }
+            ViewerService.Instance.AnimationRunning = false;
+            ViewerService.Instance.FrameIncrease(frameStep);
+            ViewerService.Instance.LoadFrame();
+        }
+
+        private void NextFrame(int frameStep = 1)
+        {
+            if (MsetService.Instance.LoadedMotion == null)
+            {
+                return;
+            }
+            ViewerService.Instance.AnimationRunning = false;
+            ViewerService.Instance.FrameIncrease(frameStep);
+            ViewerService.Instance.LoadFrame();
         }
     }
 }

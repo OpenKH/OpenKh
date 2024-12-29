@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,7 +18,17 @@ namespace OpenKh.Kh2.SystemData
     /// </summary>
     public class Arif
     {
-        [Data] public uint Flags { get; set; }
+        [Flags]
+        public enum ArifFlags: uint
+        {
+            IsKnownArea = 0x01,
+            IndoorArea = 0x02,
+            Monochrome = 0x04,
+            NoShadow = 0x08,
+            HasGlow = 0x10
+        }
+
+        [Data] public ArifFlags Flags { get; set; } //Originally a uint. Flags are now defined here. YMLs can use either flag names or values
         [Data] public int Reverb { get; set; }
         [Data] public int SoundEffectBank1 { get; set; }
         [Data] public int SoundEffectBank2 { get; set; }

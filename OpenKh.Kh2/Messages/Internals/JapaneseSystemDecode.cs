@@ -29,7 +29,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0x14] = new DataCmdModel(MessageCommand.Delay, 2),
             [0x15] = new DataCmdModel(MessageCommand.CharDelay, 2),
             [0x16] = new SingleDataCmdModel(MessageCommand.Unknown16),
-            [0x17] = null,
+            [0x17] = new DataCmdModel(MessageCommand.DelayAndFade, 2),
             [0x18] = new DataCmdModel(MessageCommand.Unknown18, 2),
             [0x19] = new TableCmdModel(MessageCommand.Table2, JapaneseSystemTable._table2),
             [0x1a] = new TableCmdModel(MessageCommand.Table3, JapaneseSystemTable._table3),

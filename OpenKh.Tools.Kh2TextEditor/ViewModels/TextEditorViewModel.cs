@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 

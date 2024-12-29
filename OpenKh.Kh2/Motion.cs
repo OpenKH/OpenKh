@@ -1,9 +1,6 @@
 using OpenKh.Common;
-using OpenKh.Common.Utils;
-using OpenKh.Kh2.SystemData;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -761,9 +758,9 @@ namespace OpenKh.Kh2
             SCALE_X = 0,
             SCALE_Y = 1,
             SCALE_Z = 2,
-            ROTATATION_X = 3,
-            ROTATATION_Y = 4,
-            ROTATATION_Z = 5,
+            ROTATION_X = 3,
+            ROTATION_Y = 4,
+            ROTATION_Z = 5,
             TRANSLATION_X = 6,
             TRANSLATION_Y = 7,
             TRANSLATION_Z = 8,

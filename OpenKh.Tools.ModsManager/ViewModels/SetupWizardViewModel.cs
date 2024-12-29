@@ -1,7 +1,5 @@
 using Octokit;
 using OpenKh.Common;
-using OpenKh.Kh1;
-using OpenKh.Kh2;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Services;
 using System;
@@ -11,12 +9,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using Xe.IO;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
-using Ionic.Zip;
-using System.Diagnostics;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.IO.Compression;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
 {
@@ -24,6 +22,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
     {
         public ColorThemeService ColorTheme => ColorThemeService.Instance;
         private const int BufferSize = 65536;
+        private readonly GameDataExtractionService _gameDataExtractionService = new GameDataExtractionService();
         private static readonly string PanaceaDllName = "OpenKH.Panacea.dll";
         private static string ApplicationName = Utilities.GetApplicationName();
         private static List<FileDialogFilter> _isoFilter = FileDialogFilterComposer
@@ -38,7 +37,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         const int OpenKHGameEngine = 0;
         const int PCSX2 = 1;
-        const int EpicGames = 2;
+        const int PC = 2;
 
         private int _gameEdition;
         private string _isoLocation;
@@ -46,11 +45,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _pcsx2Location;
         private string _pcReleaseLocation;
         private string _pcReleaseLocationKH3D;
-        private string _pcReleasesSelected;
         private int _gameCollection = 0;
         private string _pcReleaseLanguage;
         private string _gameDataLocation;
-        private bool _isEGSVersion;
         private List<string> LuaScriptPaths = new List<string>();
         private bool _overrideGameDataFound = false;
 
@@ -74,12 +71,21 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged();
             }
         }
+        private Xceed.Wpf.Toolkit.WizardPage _wizardPageAfterLuaBackend;
+        public Xceed.Wpf.Toolkit.WizardPage WizardPageAfterLuaBackend
+        {
+            get => _wizardPageAfterLuaBackend;
+            private set
+            {
+                _wizardPageAfterLuaBackend = value;
+                OnPropertyChanged();
+            }
+        }
         public Xceed.Wpf.Toolkit.WizardPage PageIsoSelection { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageEosInstall { get; internal set; }
-        public Xceed.Wpf.Toolkit.WizardPage PageEosConfig { get; internal set; }
-        public Xceed.Wpf.Toolkit.WizardPage PageLuaBackendInstall { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PageSteamAPITrick { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageRegion { get; internal set; }
-        public Xceed.Wpf.Toolkit.WizardPage PCLaunchOption { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PageGameData { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage LastPage { get; internal set; }
 
         public WizardPageStackService PageStack { get; set; } = new WizardPageStackService();
@@ -136,12 +142,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     OpenKHGameEngine => !string.IsNullOrEmpty(OpenKhGameEngineLocation) && File.Exists(OpenKhGameEngineLocation),
                     PCSX2 => !string.IsNullOrEmpty(Pcsx2Location) && File.Exists(Pcsx2Location),
-                    EpicGames => (!string.IsNullOrEmpty(PcReleaseLocation) &&
+                    PC => (!string.IsNullOrEmpty(PcReleaseLocation) &&
                         Directory.Exists(PcReleaseLocation) &&
-                        File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")))|| 
+                        (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
+                        File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))))||
                         (!string.IsNullOrEmpty(PcReleaseLocationKH3D) &&
                         Directory.Exists(PcReleaseLocationKH3D) &&
-                        File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll"))),
+                        (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
+                        File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll")))),
                     _ => false,
                 };
             }
@@ -157,14 +165,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     OpenKHGameEngine => LastPage,
                     PCSX2 => PageIsoSelection,
-                    EpicGames => PageEosInstall,
+                    PC => PageEosInstall,
                     _ => null,
                 };
                 WizardPageAfterGameData = GameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
                     PCSX2 => PageRegion,
-                    EpicGames => LastPage,
+                    PC => LastPage,
                     _ => null,
                 };
 
@@ -173,6 +181,75 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(OpenKhGameEngineConfigVisibility));
                 OnPropertyChanged(nameof(Pcsx2ConfigVisibility));
                 OnPropertyChanged(nameof(PcReleaseConfigVisibility));
+                OnPropertyChanged(nameof(BothPcReleaseSelected));
+                OnPropertyChanged(nameof(PcRelease1525Selected));
+                OnPropertyChanged(nameof(PcRelease28Selected));
+            }
+        }
+        public int PCReleaseLanguage
+        {
+            get
+            {
+                switch (ConfigurationService.PcReleaseLanguage)
+                {
+                    case "jp":
+                        _pcReleaseLanguage = "jp";
+                        return 1;
+                    default:
+                        _pcReleaseLanguage = "en";
+                        return 0;
+                }
+            }
+            set
+            {
+                switch (value)
+                {
+                    case 1:
+                        ConfigurationService.PcReleaseLanguage = "jp";
+                        _pcReleaseLanguage = "jp";
+                        break;
+                    default:
+                        ConfigurationService.PcReleaseLanguage = "en";
+                        _pcReleaseLanguage = "en";
+                        break;
+                }
+            }
+        }
+
+        public int LaunchOption
+        {
+            get
+            {
+                switch (ConfigurationService.PCVersion)
+                {
+                    case "Steam":
+                        WizardPageAfterLuaBackend = PageSteamAPITrick;
+                        return 1;
+                    case "Other":
+                        WizardPageAfterLuaBackend = PageGameData;
+                        return 2;
+                    default:
+                        WizardPageAfterLuaBackend = PageGameData;
+                        return 0;
+                }
+            }
+            set
+            {
+                switch (value)
+                {
+                    case 1:
+                        ConfigurationService.PCVersion = "Steam";
+                        WizardPageAfterLuaBackend = PageSteamAPITrick;
+                        break;
+                    case 2:
+                        ConfigurationService.PCVersion = "Other";
+                        WizardPageAfterLuaBackend = PageGameData;
+                        break;
+                    default:
+                        ConfigurationService.PCVersion = "EGS";
+                        WizardPageAfterLuaBackend = PageGameData;
+                        break;
+                }
             }
         }
         public RelayCommand SelectOpenKhGameEngineCommand { get; }
@@ -202,7 +279,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public RelayCommand SelectPcReleaseCommand { get; }
-        public Visibility PcReleaseConfigVisibility => GameEdition == EpicGames  ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PcReleaseConfigVisibility => GameEdition == PC  ? Visibility.Visible : Visibility.Collapsed;
         public Visibility BothPcReleaseSelected => PcReleaseSelections == "both" ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PcRelease1525Selected => PcReleaseSelections == "1.5+2.5" ? Visibility.Visible: Visibility.Collapsed;
         public Visibility PcRelease28Selected => PcReleaseSelections == "2.8" ? Visibility.Visible : Visibility.Collapsed;
@@ -233,20 +310,24 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             get
             {
-                if (Directory.Exists(PcReleaseLocation) && File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) &&
-                    Directory.Exists(PcReleaseLocationKH3D) && File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")))
+                if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
+                    File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))) &&
+                    Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
+                    File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == 2)
                 {
-                    return _pcReleasesSelected = "both";
+                    return "both";
                 }
-                else if (Directory.Exists(PcReleaseLocation) && File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")))
+                else if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
+                    File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))) && _gameEdition == 2)
                 {
 
-                    return _pcReleasesSelected = "1.5+2.5";
+                    return "1.5+2.5";
                 }
-                else if (Directory.Exists(PcReleaseLocationKH3D) && File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")))
+                else if (Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
+                    File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == 2)
                 {
 
-                    return _pcReleasesSelected = "2.8";
+                    return "2.8";
                 }
                 return "";
             }
@@ -291,14 +372,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(InstallForPc28));
             }
         }
-        public bool IsEGSVersion
-        {
-            get => _isEGSVersion;
-            set
-            {
-                _isEGSVersion = value;
-            }
-        }
         public bool Extractkh1
         {
             get => ConfigurationService.Extractkh1;
@@ -323,6 +396,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             get => ConfigurationService.Extractkh3d;
             set => ConfigurationService.Extractkh3d = value;
+        }
+        public bool SkipRemastered
+        {
+            get => ConfigurationService.SkipRemastered;
+            set => ConfigurationService.SkipRemastered = value;
         }
         public bool LuaConfigkh1
         {
@@ -410,22 +488,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(GameDataNotFoundVisibility));
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
             }
-              
-        }
-        public string PcReleaseLanguage
-        {
-            get => _pcReleaseLanguage;
-            set
-            {
-                _pcReleaseLanguage = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(PcReleaseLanguage));
-                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
-                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
-                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
-                OnPropertyChanged(nameof(IsGameSelected));
-                OnPropertyChanged(nameof(IsGameDataFound));
-            }
+
         }
 
         public RelayCommand SelectGameDataLocationCommand { get; }
@@ -443,12 +506,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public bool IsNotExtracting { get; private set; }
-        public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) || 
-            (GameEdition == EpicGames && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) || 
-            GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) || 
+        public bool IsGameDataFound => IsNotExtracting && (GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) ||
+            (GameEdition == PC && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) ||
+            GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) ||
             Directory.Exists(Path.Combine(GameDataLocation, "bbs", "message")) ||
-            Directory.Exists(Path.Combine(GameDataLocation, "Recom", "SYS"))))||
-            Directory.Exists(Path.Combine(GameDataLocation, "kh3d","setdata"))||
+            Directory.Exists(Path.Combine(GameDataLocation, "Recom", "SYS"))||
+            Directory.Exists(Path.Combine(GameDataLocation, "kh3d","setdata"))))||
             OverrideGameDataFound);
         public Visibility GameDataNotFoundVisibility => !IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
@@ -477,6 +540,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     return false;
             }
         }
+        public RelayCommand InstallSteamAPIFile {  get; set; }
+        public RelayCommand RemoveSteamAPIFile { get; set; }
         public RelayCommand InstallLuaBackendCommand { get; set; }
         public RelayCommand RemoveLuaBackendCommand { get; set; }
         public Visibility LuaBackendFoundVisibility => IsLuaBackendInstalled ? Visibility.Visible : Visibility.Collapsed;
@@ -512,7 +577,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     // DLL into the right place. So don't bother.
                     PanaceaInstalled = true;
                     return true;
-                }                  
+                }
 
                 byte[] CalculateChecksum(string fileName) =>
                     System.Security.Cryptography.MD5.Create().Using(md5 =>
@@ -556,10 +621,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 else if (File.Exists(PanaceaDestinationLocation) && File.Exists(PanaceaAlternateLocation))
                 {
                     return IsEqual(CalculateChecksum(PanaceaSourceLocation),
-                        CalculateChecksum(PanaceaDestinationLocation)) || 
+                        CalculateChecksum(PanaceaDestinationLocation)) ||
                         IsEqual(CalculateChecksum(PanaceaSourceLocation),
                         CalculateChecksum(PanaceaAlternateLocation));
-                }                
+                }
                 else
                 {
                     PanaceaInstalled = false;
@@ -583,15 +648,26 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 FileDialog.OnFolder(path => PcReleaseLocationKH3D = path));
             SelectGameDataLocationCommand = new RelayCommand(_ =>
                 FileDialog.OnFolder(path => GameDataLocation = path));
-            ExtractGameDataCommand = new RelayCommand(async _ => 
-            { 
+            ExtractGameDataCommand = new RelayCommand(async _ =>
+            {
                 BEGIN:
                 try
                 {
                     await ExtractGameData(IsoLocation, GameDataLocation);
                 }
-
-                catch (IOException _ex)
+                catch (OperationCanceledException)
+                {
+                    // user closed the dialog
+                }
+                catch (GameDataExtractionService.BadConfigurationException _ex)
+                {
+                    MessageBox.Show(
+                        _ex.Message,
+                        "Extraction error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+                catch (Exception _ex)
                 {
                     var _sysMessage = MessageBox.Show(_ex.Message + "\n\nWould you like to try again?", "An Exception was Caught!", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
@@ -599,91 +675,167 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         case MessageBoxResult.Yes:
                             goto BEGIN;
-                            break;
                     }
                 }
             });
             DetectInstallsCommand = new RelayCommand(_ =>
             {
-                // Get ProgramData Folder Location
-                string programDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                string directoryPath = Path.Combine(programDataFolder, "Epic\\EpicGamesLauncher\\Data\\Manifests");
-
-                if (!Directory.Exists(directoryPath))
+                if (ConfigurationService.PCVersion == "EGS")
                 {
-                    MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
-                    return;
-                }
+                    // Get ProgramData Folder Location
+                    string programDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                    string directoryPath = Path.Combine(programDataFolder, "Epic\\EpicGamesLauncher\\Data\\Manifests");
 
-                // Get List of .item Files in C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests\
-                IEnumerable<string> itemFiles = Directory.EnumerateFiles(directoryPath, "*.item");
-
-                if (!itemFiles.Any())
-                {
-                    MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
-                    return;
-                }
-
-                bool installLocationFoundRemix = false;
-                bool installLocationFound3D = false;
-                foreach (string itemFile in itemFiles)
-                {
-                    // Read Each .item File and Locate Install Location For Games
-                    using StreamReader sr = new StreamReader(itemFile);
-                    string line;
-                    if (sr != null)
+                    if (!Directory.Exists(directoryPath))
                     {
-                        while ((line = sr.ReadLine()) is not null)
+                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        return;
+                    }
+
+                    // Get List of .item Files in C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests\
+                    IEnumerable<string> itemFiles = Directory.EnumerateFiles(directoryPath, "*.item");
+
+                    if (!itemFiles.Any())
+                    {
+                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        return;
+                    }
+
+                    bool installLocationFoundRemix = false;
+                    bool installLocationFound3D = false;
+                    foreach (string itemFile in itemFiles)
+                    {
+                        // Read Each .item File and Locate Install Location For Games
+                        using StreamReader sr = new StreamReader(itemFile);
+                        string line;
+                        if (sr != null)
                         {
-                            if (line.Contains("\"LaunchExecutable\": \"KINGDOM HEARTS HD 1.5+2.5 ReMIX.exe\","))
+                            while ((line = sr.ReadLine()) is not null)
                             {
-                                while ((line = sr.ReadLine()) is not null)
+                                if (line.Contains("\"LaunchExecutable\": \"KINGDOM HEARTS HD 1.5+2.5 ReMIX.exe\","))
                                 {
-                                    if (line.Contains("\"InstallLocation\": \""))
+                                    while ((line = sr.ReadLine()) is not null)
                                     {
-                                        installLocationFoundRemix = true;
-                                        int startIndex = line.IndexOf("\": \"") + 4;
-                                        int endIndex = line.IndexOf("\",");
-                                        string parsedText = line[startIndex..endIndex];
-                                        parsedText = parsedText.Replace("\\\\", "\\");
-                                        PcReleaseLocation = parsedText;
+                                        if (line.Contains("\"InstallLocation\": \""))
+                                        {
+                                            installLocationFoundRemix = true;
+                                            int startIndex = line.IndexOf("\": \"") + 4;
+                                            int endIndex = line.IndexOf("\",");
+                                            string parsedText = line[startIndex..endIndex];
+                                            parsedText = parsedText.Replace("\\\\", "\\");
+                                            PcReleaseLocation = parsedText;
+                                        }
+                                    }
+                                }
+                                else if (line.Contains("\"LaunchExecutable\": \"KINGDOM HEARTS HD 2.8 Final Chapter Prologue.exe\","))
+                                {
+                                    while ((line = sr.ReadLine()) is not null)
+                                    {
+                                        if (line.Contains("\"InstallLocation\": \""))
+                                        {
+                                            installLocationFound3D = true;
+                                            int startIndex = line.IndexOf("\": \"") + 4;
+                                            int endIndex = line.IndexOf("\",");
+                                            string parsedText = line[startIndex..endIndex];
+                                            parsedText = parsedText.Replace("\\\\", "\\");
+                                            PcReleaseLocationKH3D = parsedText;
+                                        }
                                     }
                                 }
                             }
-                            else if (line.Contains("\"LaunchExecutable\": \"KINGDOM HEARTS HD 2.8 Final Chapter Prologue.exe\","))
+                        }
+                    }
+                    if (!installLocationFoundRemix && !installLocationFound3D)
+                    {
+                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                    }
+                    else if (!installLocationFoundRemix && installLocationFound3D)
+                    {
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                    }
+                    else if (installLocationFoundRemix && !installLocationFound3D)
+                    {
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING", "Success", MessageBoxButton.OK);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                    }
+                }
+                else if (ConfigurationService.PCVersion == "Steam")
+                {
+                    // Get ProgramFilesX86 Location
+                    string programDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+                    string directoryPath = Path.Combine(programDataFolder, "Steam\\steamapps");
+
+                    if (!Directory.Exists(directoryPath))
+                    {
+                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        return;
+                    }
+
+                    if (!Directory.Exists(directoryPath))
+                    {
+                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        return;
+                    }
+
+                    bool installLocationFoundRemix = false;
+                    bool installLocationFound3D = false;
+                    // Read the entire content of the VDF file
+                    string vdfContent = File.ReadAllText(Path.Combine(directoryPath, "libraryfolders.vdf"));
+                    // Define a regular expression to match "path" values
+                    Regex regex = new Regex(@"""path""\s*""([^""]*)""", RegexOptions.IgnoreCase);
+                    // MatchCollection to store all matches found
+                    MatchCollection matches = regex.Matches(vdfContent);
+                    // Iterate through matches and print out the "path" values
+                    if (Directory.Exists(directoryPath))
+                    {
+                        foreach (Match match in matches)
+                        {
+                            string pathValue = match.Groups[1].Value; // Group 1 is the path raw, without the key
+                            Console.WriteLine($"Path: {pathValue}");
+                            string parsedText = pathValue.Replace(@"\\", @"\");
+                            string commonGamesDirectory = Path.Combine(parsedText, "steamapps\\common");
+                            if (Directory.Exists(commonGamesDirectory))
                             {
-                                while ((line = sr.ReadLine()) is not null)
+                                string kH1525Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS -HD 1.5+2.5 ReMIX-");
+                                string kH28Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS HD 2.8 Final Chapter Prologue");
+                                if (Directory.Exists(kH1525Path))
                                 {
-                                    if (line.Contains("\"InstallLocation\": \""))
-                                    {
-                                        installLocationFound3D = true;
-                                        int startIndex = line.IndexOf("\": \"") + 4;
-                                        int endIndex = line.IndexOf("\",");
-                                        string parsedText = line[startIndex..endIndex];
-                                        parsedText = parsedText.Replace("\\\\", "\\");
-                                        PcReleaseLocationKH3D = parsedText;
-                                    }
-                                } 
+                                    installLocationFoundRemix = true;
+                                    PcReleaseLocation = kH1525Path;
+                                }
+                                if (Directory.Exists(kH28Path))
+                                {
+                                    installLocationFound3D = true;
+                                    PcReleaseLocationKH3D = kH28Path;
+                                }
                             }
                         }
                     }
-                }
-                if (!installLocationFoundRemix && !installLocationFound3D)
-                {
-                    MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
-                }
-                else if (!installLocationFoundRemix && installLocationFound3D)
-                {
-                    MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
-                }
-                else if (installLocationFoundRemix && !installLocationFound3D)
-                {
-                    MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING", "Success", MessageBoxButton.OK);
+                    if (!installLocationFoundRemix && !installLocationFound3D)
+                    {
+                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                    }
+                    else if (!installLocationFoundRemix && installLocationFound3D)
+                    {
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                    }
+                    else if (installLocationFoundRemix && !installLocationFound3D)
+                    {
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING", "Success", MessageBoxButton.OK);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                    MessageBox.Show("Launcher \"Other\" does not support auto detect game installation. If you wish to use this feature select either EGS or Steam on the dropdown above", "Unsupported", MessageBoxButton.OK);
                 }
+
             });
             InstallPanaceaCommand = new RelayCommand(AlternateName =>
             {
@@ -772,7 +924,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                     OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                     OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
-                    PanaceaInstalled = true;                    
+                    PanaceaInstalled = true;
                 }
             });
             RemovePanaceaCommand = new RelayCommand(_ =>
@@ -791,7 +943,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     PanaceaDestinationLocation = Path.Combine(PcReleaseLocationKH3D, "DBGHELP.dll");
                     PanaceaAlternateLocation = Path.Combine(PcReleaseLocationKH3D, "version.dll");
                     PanaceaDependenciesLocation = Path.Combine(PcReleaseLocationKH3D, "dependencies");
-                }                
+                }
                 else if (PanaceaDestinationLocation == null || PanaceaAlternateLocation == null || PanaceaDestinationLocation == null)
                 {
                     MessageBox.Show(
@@ -822,7 +974,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
-                PanaceaInstalled = false;                
+                PanaceaInstalled = false;
             });
             InstallLuaBackendCommand = new RelayCommand(installed =>
             {
@@ -832,20 +984,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     var releases = gitClient.Repository.Release.GetLatest(owner: "Sirius902", name: "LuaBackend").Result;
                     string DownPath = Path.GetTempPath() + "LuaBackend" + Path.GetExtension(releases.Assets[0].Name);
                     string TempExtractionLocation = Path.GetTempPath() + "LuaBackend";
+                    #pragma warning disable SYSLIB0014 // Type or member is obsolete
                     var _client = new WebClient();
+                    #pragma warning restore SYSLIB0014 // Type or member is obsolete
                     _client.DownloadFile(new System.Uri(releases.Assets[0].BrowserDownloadUrl), DownPath);
                     try
                     {
-                        using (ZipFile zip = new ZipFile(DownPath))
+                        using (var zip = ZipFile.OpenRead(DownPath))
                         {
-                            zip.ExtractAll(TempExtractionLocation, ExtractExistingFileAction.OverwriteSilently);
+                            zip.ExtractToDirectory(TempExtractionLocation, true);
                         }
                     }
                     catch
                     {
                         MessageBox.Show(
                                 $"Unable to extract \"{Path.GetFileName(DownPath)}\" as it is not a zip file. You may have to install it manually.",
-                                "Run error", MessageBoxButton.OK, MessageBoxImage.Error);                        
+                                "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                         File.Delete(DownPath);
                         File.Delete(TempExtractionLocation);
                         return;
@@ -858,7 +1012,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     else
                     {
                         DestinationCollection = PcReleaseLocationKH3D;
-                    }                    
+                    }
                     if (DestinationCollection == null)
                     {
                         MessageBox.Show(
@@ -1079,12 +1233,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             OnPropertyChanged(nameof(LuaBackendFoundVisibility));
                             OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
                         }
-                    }                                                    
+                    }
                 }
             });
             RemoveLuaBackendCommand = new RelayCommand(_ =>
             {
-                
+
                 if (GameCollection == 0 && PcReleaseLocation == null || GameCollection == 1 && PcReleaseLocationKH3D == null)
                 {
                     MessageBox.Show(
@@ -1113,386 +1267,194 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
                 }
             });
+            InstallSteamAPIFile = new RelayCommand(_ =>
+            {
+                if (GameCollection == 0)
+                {
+                    if (Directory.Exists(ConfigurationService.PcReleaseLocation))
+                    {
+                        File.WriteAllText(Path.Combine(ConfigurationService.PcReleaseLocation, "steam_appid.txt"), "2552430");
+                        ConfigurationService.SteamAPITrick1525 = true;
+                    }
+                }
+                else if (GameCollection == 1)
+                {
+                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                    {
+                        File.WriteAllText(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "steam_appid.txt"), "2552440");
+                        ConfigurationService.SteamAPITrick28 = true;
+                    }
+                }
+            });
+            RemoveSteamAPIFile = new RelayCommand(_ =>
+            {
+                if (GameCollection == 0)
+                {
+                    if (File.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "steam_appid.txt")))
+                    {
+                        File.Delete(Path.Combine(ConfigurationService.PcReleaseLocation, "steam_appid.txt"));
+                        ConfigurationService.SteamAPITrick1525 = false;
+                    }
+                }
+                else if (GameCollection == 1)
+                {
+                    if (File.Exists(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "steam_appid.txt")))
+                    {
+                        File.Delete(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "steam_appid.txt"));
+                        ConfigurationService.SteamAPITrick28 = false;
+                    }
+                }
+            });
         }
 
         private async Task ExtractGameData(string isoLocation, string gameDataLocation)
         {
-            switch (GameEdition)
+            void MarkStarted()
             {
+                IsNotExtracting = false;
+                ExtractionProgress = 0;
+                OnPropertyChanged(nameof(IsNotExtracting));
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(ProgressBarVisibility));
+                OnPropertyChanged(nameof(ExtractionCompleteVisibility));
+                OnPropertyChanged(nameof(ExtractionProgress));
+            }
 
-                default:
+            void MarkSuccessful()
+            {
+                IsNotExtracting = true;
+                ExtractionProgress = 1.0f;
+                OnPropertyChanged(nameof(IsNotExtracting));
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+                OnPropertyChanged(nameof(ProgressBarVisibility));
+                OnPropertyChanged(nameof(ExtractionCompleteVisibility));
+                OnPropertyChanged(nameof(ExtractionProgress));
+            }
+
+            void MarkFailure()
+            {
+                IsNotExtracting = true;
+                OnPropertyChanged(nameof(IsNotExtracting));
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(ProgressBarVisibility));
+                OnPropertyChanged(nameof(ExtractionCompleteVisibility));
+                OnPropertyChanged(nameof(ExtractionProgress));
+            }
+
+            Action<float> CreateOnProgressProcessor()
+            {
+                var lastProgress = 0f;
+
+                return progress =>
                 {
-                    var fileBlocks = File.OpenRead(isoLocation).Using(stream =>
+                    if (progress == 0)
                     {
-                        var bufferedStream = new BufferedStream(stream);
-                        var idxBlock = IsoUtility.GetFileOffset(bufferedStream, "KH2.IDX;1");
-                        var imgBlock = IsoUtility.GetFileOffset(bufferedStream, "KH2.IMG;1");
-                        return (idxBlock, imgBlock);
-                    });
+                        System.Windows.Application.Current.Dispatcher.Invoke(() => MarkStarted());
+                    }
+                    else if (progress == 1)
+                    {
+                        System.Windows.Application.Current.Dispatcher.Invoke(() => MarkSuccessful());
+                    }
+                    else
+                    {
+                        if (0.01f <= progress - lastProgress)
+                        {
+                            lastProgress = progress;
 
-                    if (fileBlocks.idxBlock == -1 || fileBlocks.imgBlock == -1)
+                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                ExtractionProgress = progress;
+                                OnPropertyChanged(nameof(ExtractionProgress));
+                            });
+                        }
+                    }
+                };
+            }
+
+            try
+            {
+                switch (GameEdition)
+                {
+                    default:
                     {
-                        MessageBox.Show(
-                            $"Unable to find the files KH2.IDX and KH2.IMG in the ISO at '{isoLocation}'. The extraction will stop.",
-                            "Extraction error",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error);
-                        return;
+                        await _gameDataExtractionService.ExtractKh2Ps2EditionAsync(
+                            isoLocation: isoLocation,
+                            gameDataLocation: gameDataLocation,
+                            onProgress: CreateOnProgressProcessor()
+                        );
+                        break;
                     }
 
-                    IsNotExtracting = false;
-                    ExtractionProgress = 0;
-                    OnPropertyChanged(nameof(IsNotExtracting));
-                    OnPropertyChanged(nameof(IsGameDataFound));
-                    OnPropertyChanged(nameof(ProgressBarVisibility));
-                    OnPropertyChanged(nameof(ExtractionCompleteVisibility));
-                    OnPropertyChanged(nameof(ExtractionProgress));
-
-                    await Task.Run(() =>
+                    case PC:
                     {
-                        using var isoStream = File.OpenRead(isoLocation);
+                        var langFolder = ConfigurationService.PCVersion == "Steam" ? "dt" : _pcReleaseLanguage == "jp" ? "jp" : "en";
 
-                        var idxOffset = fileBlocks.idxBlock * 0x800L;
-                        var idx = Idx.Read(new SubStream(isoStream, idxOffset, isoStream.Length - idxOffset));
+                        await _gameDataExtractionService.ExtractKhPcEditionAsync(
+                            gameDataLocation: gameDataLocation,
+                            onProgress: CreateOnProgressProcessor(),
+                            getKhFilePath: fileName
+                                => Path.Combine(
+                                    _pcReleaseLocation,
+                                    "Image",
+                                    langFolder,
+                                    fileName
+                                ),
+                            getKh3dFilePath: fileName
+                                => Path.Combine(
+                                    _pcReleaseLocationKH3D,
+                                    "Image",
+                                    langFolder,
+                                    fileName
+                                ),
+                            extractkh1: ConfigurationService.Extractkh1,
+                            extractkh2: ConfigurationService.Extractkh2,
+                            extractbbs: ConfigurationService.Extractbbs,
+                            extractrecom: ConfigurationService.Extractrecom,
+                            extractkh3d: ConfigurationService.Extractkh3d,
+                            ifRetry: async ex =>
+                            {
+                                var delayedResult = new TaskCompletionSource<bool>();
 
-                        var imgOffset = fileBlocks.imgBlock * 0x800L;
-                        var imgStream = new SubStream(isoStream, imgOffset, isoStream.Length - imgOffset);
-                        var img = new Img(imgStream, idx, true);
+                                await System.Windows.Application.Current.Dispatcher.InvokeAsync(
+                                    () =>
+                                    {
+                                        var selection = MessageBox.Show(ex.Message + "\n\nWould you like to retry again?", "An Exception was Caught!", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
 
-                        var fileCount = img.Entries.Count;
-                        var fileProcessed = 0;
-                        foreach (var fileEntry in img.Entries)
-                        {
-                            var fileName = IdxName.Lookup(fileEntry) ?? $"@{fileEntry.Hash32:08X}_{fileEntry.Hash16:04X}";
-                            using var stream = img.FileOpen(fileEntry);
-                            var fileDestination = Path.Combine(gameDataLocation,"kh2", fileName);
-                            var directoryDestination = Path.GetDirectoryName(fileDestination);
-                            if (!Directory.Exists(directoryDestination))
-                                Directory.CreateDirectory(directoryDestination);
-                            File.Create(fileDestination).Using(dstStream => stream.CopyTo(dstStream, BufferSize));
+                                        switch (selection)
+                                        {
+                                            case MessageBoxResult.Yes:
+                                                delayedResult.SetResult(true);
+                                                return;
+                                            case MessageBoxResult.No:
+                                                delayedResult.SetResult(false);
+                                                return;
+                                            default:
+                                                delayedResult.SetException(ex);
+                                                return;
+                                        }
+                                    }
+                                )
+                                    .Task;
 
-                            fileProcessed++;
-                            ExtractionProgress = (float)fileProcessed / fileCount;
-                            OnPropertyChanged(nameof(ExtractionProgress));
-                        }
-
-                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            IsNotExtracting = true;
-                            ExtractionProgress = 1.0f;
-                            OnPropertyChanged(nameof(IsNotExtracting));
-                            OnPropertyChanged(nameof(IsGameDataFound));
-                            OnPropertyChanged(nameof(GameDataNotFoundVisibility));
-                            OnPropertyChanged(nameof(GameDataFoundVisibility));
-                            OnPropertyChanged(nameof(ProgressBarVisibility));
-                            OnPropertyChanged(nameof(ExtractionCompleteVisibility));
-                            OnPropertyChanged(nameof(ExtractionProgress));
-                        });
-                    });
+                                return await delayedResult.Task;
+                            },
+                            cancellationToken: Abort
+                        );
+                        break;
+                    }
                 }
-                break;
-
-                case EpicGames:
-                {
-                    IsNotExtracting = false;
-                    ExtractionProgress = 0;
-                    OnPropertyChanged(nameof(IsNotExtracting));
-                    OnPropertyChanged(nameof(IsGameDataFound));
-                    OnPropertyChanged(nameof(ProgressBarVisibility));
-                    OnPropertyChanged(nameof(ExtractionCompleteVisibility));
-                    OnPropertyChanged(nameof(ExtractionProgress));
-
-                    await Task.Run(() =>
-                    {
-                        var _nameListkh1 = new string[]
-                        {
-                            "first",
-                            "second",
-                            "third",
-                            "fourth",
-                            "fifth"
-                        };
-                        var _nameListkh2 = new string[]
-                        {
-                            "first",
-                            "second",
-                            "third",
-                            "fourth",
-                            "fifth",
-                            "sixth"
-                        };
-                        var _nameListbbs = new string[]
-                        {
-                            "first",
-                            "second",
-                            "third",
-                            "fourth"
-                        };
-                        var _nameListkh3d = new string[]
-                        {
-                            "first",
-                            "second",
-                            "third",
-                            "fourth"
-                        };
-
-                        var _totalFiles = 0;
-                        var _procTotalFiles = 0;
-
-                        if (ConfigurationService.Extractkh1)
-                        {
-                            for (int i = 0; i < 5; i++)
-                            {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"), System.IO.FileMode.Open);
-                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
-                                _totalFiles += _hedFile.Count();
-                            }
-                        }                       
-                        if (ConfigurationService.Extractkh2)
-                        {
-                            for (int i = 0; i < 6; i++)
-                            {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"), System.IO.FileMode.Open);
-                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
-                                _totalFiles += _hedFile.Count();
-                            }
-                        }
-                        if (ConfigurationService.Extractbbs)
-                        {
-                            for (int i = 0; i < 4; i++)
-                            {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".hed"), System.IO.FileMode.Open);
-                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
-                                _totalFiles += _hedFile.Count();
-                            }
-                        }
-                        if (ConfigurationService.Extractrecom)
-                        {
-                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"), System.IO.FileMode.Open);
-                            var _hedFile = OpenKh.Egs.Hed.Read(_stream);
-                            _totalFiles += _hedFile.Count();
-                        }
-                        if (ConfigurationService.Extractkh3d)
-                        {
-                            for (int i = 0; i < 4; i++)
-                            {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocationKH3D, "Image", _pcReleaseLanguage, "kh3d_" + _nameListbbs[i] + ".hed"), System.IO.FileMode.Open);
-                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
-                                _totalFiles += _hedFile.Count();
-                            }
-                        }
-
-                        if (ConfigurationService.Extractkh1)
-                        {
-                            for (int i = 0; i < 5; i++)
-                            {
-                                var outputDir = Path.Combine(gameDataLocation, "kh1");
-                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"));
-                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".pkg"));
-
-                                foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
-                                {
-                                    var hash = OpenKh.Egs.Helpers.ToString(entry.MD5);
-                                    if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var fileName))
-                                        fileName = $"{hash}.dat";
-
-                                    var outputFileName = Path.Combine(outputDir, fileName);
-
-                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileName);
-
-                                    var hdAsset = new OpenKh.Egs.EgsHdAsset(img.SetPosition(entry.Offset));
-
-                                    File.Create(outputFileName).Using(stream => stream.Write(hdAsset.OriginalData));
-
-                                    outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
-
-                                    foreach (var asset in hdAsset.Assets)
-                                    {
-                                        var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
-                                        OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
-
-                                        var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
-                                        File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
-                                    }
-                                    _procTotalFiles++;
-
-                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
-                                    OnPropertyChanged(nameof(ExtractionProgress));
-                                }
-                            }
-                        }                                           
-                        if(ConfigurationService.Extractkh2)
-                        {
-                            for (int i = 0; i < 6; i++)
-                            {
-                                var outputDir = Path.Combine(gameDataLocation, "kh2");
-                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"));
-                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".pkg"));
-
-                                foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
-                                {
-                                    var hash = OpenKh.Egs.Helpers.ToString(entry.MD5);
-                                    if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var fileName))
-                                        fileName = $"{hash}.dat";
-
-                                    var outputFileName = Path.Combine(outputDir, fileName);
-
-                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileName);
-
-                                    var hdAsset = new OpenKh.Egs.EgsHdAsset(img.SetPosition(entry.Offset));
-
-                                    File.Create(outputFileName).Using(stream => stream.Write(hdAsset.OriginalData));
-
-                                    outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
-
-                                    foreach (var asset in hdAsset.Assets)
-                                    {
-                                        var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
-                                        OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
-
-                                        var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
-                                        File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
-                                    }
-                                    _procTotalFiles++;
-
-                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
-                                    OnPropertyChanged(nameof(ExtractionProgress));
-                                }
-                            }
-                        }                                              
-                        if(ConfigurationService.Extractbbs)
-                        {
-                            for (int i = 0; i < 4; i++)
-                            {
-                                var outputDir = Path.Combine(gameDataLocation, "bbs");
-                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".hed"));
-                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".pkg"));
-
-                                foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
-                                {
-                                    var hash = OpenKh.Egs.Helpers.ToString(entry.MD5);
-                                    if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var fileName))
-                                        fileName = $"{hash}.dat";
-
-                                    var outputFileName = Path.Combine(outputDir, fileName);
-
-                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileName);
-
-                                    var hdAsset = new OpenKh.Egs.EgsHdAsset(img.SetPosition(entry.Offset));
-
-                                    File.Create(outputFileName).Using(stream => stream.Write(hdAsset.OriginalData));
-
-                                    outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
-
-                                    foreach (var asset in hdAsset.Assets)
-                                    {
-                                        var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
-                                        OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
-
-                                        var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
-                                        File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
-                                    }
-                                    _procTotalFiles++;
-
-                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
-                                    OnPropertyChanged(nameof(ExtractionProgress));
-                                }
-                            }
-                        }
-                        if (ConfigurationService.Extractrecom)
-                        {
-                            for (int i = 0; i < 1; i++)
-                            {
-                                var outputDir = Path.Combine(gameDataLocation, "Recom");
-                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"));
-                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.pkg"));
-
-                                foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
-                                {
-                                    var hash = OpenKh.Egs.Helpers.ToString(entry.MD5);
-                                    if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var fileName))
-                                        fileName = $"{hash}.dat";
-
-                                    var outputFileName = Path.Combine(outputDir, fileName);
-
-                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileName);
-
-                                    var hdAsset = new OpenKh.Egs.EgsHdAsset(img.SetPosition(entry.Offset));
-
-                                    File.Create(outputFileName).Using(stream => stream.Write(hdAsset.OriginalData));
-
-                                    outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
-
-                                    foreach (var asset in hdAsset.Assets)
-                                    {
-                                        var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
-                                        OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
-
-                                        var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
-                                        File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
-                                    }
-                                    _procTotalFiles++;
-
-                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
-                                    OnPropertyChanged(nameof(ExtractionProgress));
-                                }
-                            }
-                        }
-                        if (ConfigurationService.Extractkh3d)
-                        {
-                            for (int i = 0; i < 4; i++)
-                            {
-                                var outputDir = Path.Combine(gameDataLocation, "kh3d");
-                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocationKH3D, "Image", _pcReleaseLanguage, "kh3d_" + _nameListkh3d[i] + ".hed"));
-                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocationKH3D, "Image", _pcReleaseLanguage, "kh3d_" + _nameListkh3d[i] + ".pkg"));
-
-                                foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
-                                {
-                                    var hash = OpenKh.Egs.Helpers.ToString(entry.MD5);
-                                    if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var fileName))
-                                        fileName = $"{hash}.dat";
-
-                                    var outputFileName = Path.Combine(outputDir, fileName);
-
-                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileName);
-
-                                    var hdAsset = new OpenKh.Egs.EgsHdAsset(img.SetPosition(entry.Offset));
-
-                                    File.Create(outputFileName).Using(stream => stream.Write(hdAsset.OriginalData));
-
-                                    outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
-
-                                    foreach (var asset in hdAsset.Assets)
-                                    {
-                                        var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
-                                        OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
-
-                                        var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
-                                        File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
-                                    }
-                                    _procTotalFiles++;
-
-                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
-                                    OnPropertyChanged(nameof(ExtractionProgress));
-                                }
-                            }
-                        }
-                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            IsNotExtracting = true;
-                            ExtractionProgress = 1.0f;
-                            OnPropertyChanged(nameof(IsNotExtracting));
-                            OnPropertyChanged(nameof(IsGameDataFound));
-                            OnPropertyChanged(nameof(GameDataNotFoundVisibility));
-                            OnPropertyChanged(nameof(GameDataFoundVisibility));
-                            OnPropertyChanged(nameof(ProgressBarVisibility));
-                            OnPropertyChanged(nameof(ExtractionCompleteVisibility));
-                            OnPropertyChanged(nameof(ExtractionProgress));
-                        });
-                    });
-                }
-                break;
+            }
+            catch
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() => MarkFailure());
+                throw;
             }
         }
+
+        private CancellationTokenSource _abort = new CancellationTokenSource();
+        public CancellationToken Abort => _abort.Token;
+        public void SetAborted() => _abort.Cancel();
     }
 }

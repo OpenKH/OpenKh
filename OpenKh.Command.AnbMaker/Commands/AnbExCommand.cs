@@ -7,14 +7,7 @@ using OpenKh.Command.AnbMaker.Utils.Builder;
 using OpenKh.Command.AnbMaker.Utils.Builder.Models;
 using OpenKh.Command.AnbMaker.Utils.JsonAnimSource;
 using OpenKh.Kh2;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Numerics;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenKh.Command.AnbMaker.Commands
 {
@@ -29,6 +22,7 @@ namespace OpenKh.Command.AnbMaker.Commands
 
         [Argument(1, Description = "anb output")]
         public string Output { get; set; }
+        public string OutputMset { get; set; }
 
         [Option(Description = "specify root armature node name", ShortName = "r")]
         public string RootName { get; set; }
@@ -56,7 +50,7 @@ namespace OpenKh.Command.AnbMaker.Commands
             var logger = LogManager.GetLogger("InterpolatedMotionMaker");
 
             Output = Path.GetFullPath(Output ?? Path.GetFileNameWithoutExtension(InputModel) + ".anb");
-
+            OutputMset = Path.GetFullPath(OutputMset ?? Path.GetFileNameWithoutExtension(InputModel) + ".mset");
             Console.WriteLine($"Writing to: {Output}");
 
             IEnumerable<BasicSourceMotion> parms;
@@ -117,12 +111,33 @@ namespace OpenKh.Command.AnbMaker.Commands
                             Type = Bar.EntryType.Motion,
                             Name = "A999",
                             Stream = motionStream,
+                        },
+                        new Bar.Entry
+                        {
+                            Type = Bar.EntryType.MotionTriggers,
+                            Name = "A999",
+                            Stream = new MemoryStream()  // Replace null with MemoryStream containing "0"
                         }
                     }
                 );
 
+                var msetBarStream = new MemoryStream();
+                Bar.Write(
+                msetBarStream,
+                    new Bar.Entry[]
+                    {
+                        new Bar.Entry
+                        {
+                            Type = Bar.EntryType.Anb,
+                            Name = "A999",
+                            Stream = anbBarStream
+                        }
+                    }
+               );
+
                 File.WriteAllBytes(Output, anbBarStream.ToArray());
                 File.WriteAllBytes(Output + ".raw", motionStream.ToArray());
+                File.WriteAllBytes(OutputMset, msetBarStream.ToArray());
 
                 logger.Debug($"Motion data generation successful");
 

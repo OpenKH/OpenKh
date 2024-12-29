@@ -4,13 +4,11 @@ using OpenKh.Kh2;
 using OpenKh.Kh2Anim.Mset;
 using OpenKh.Research.Kh2Anim.Models;
 using OpenKh.Research.Kh2Anim.Utils;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace OpenKh.Research.Kh2Anim.Subcommands

@@ -9,13 +9,10 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="{Binding Title}" d:Title="OpenKH Mods Manager set-up"
-        Height="480" Width="400" ResizeMode="NoResize">
+        Height="500" Width="400" ResizeMode="NoResize">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
-        <Style TargetType="CheckBox">
-            <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
-        </Style>
         <Style TargetType="xctk:WizardPage">
             <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
             <Setter Property="Background" Value="{Binding ColorTheme.BackgroundColor}"/>
@@ -31,9 +28,8 @@
         CurrentPage="{Binding ElementName=PageGameEdition}"
         PageChanged="Wizard_PageChanged"
         Finish="Wizard_Finish" Background="{Binding ColorTheme.BackgroundColor}">
-
         <xctk:WizardPage
-            x:Name="IntroPage" 
+            x:Name="IntroPage"
             Title="Welcome to OpenKH Mods Manager"
             PageType="Exterior"
             Description="This set-up will guide you through the basic configuration of this tool, allowing you to install and play mods from the best modders in the Kingdom Hearts community."
@@ -48,71 +44,88 @@
             Description="Selected the preferred edition to launch the game"
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding WizardPageAfterIntro}">
-            <StackPanel>
-                <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
-                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
-                    <ComboBoxItem>OpenKH Game Engine</ComboBoxItem>
-                    <ComboBoxItem>PlayStation 2 using PCSX2 emulator</ComboBoxItem>
-                    <ComboBoxItem>PC Release via Epic Game Store</ComboBoxItem>
-                </ComboBox>
-                <StackPanel Visibility="{Binding OpenKhGameEngineConfigVisibility}">
-                    <TextBlock Margin="0 0 0 3">Please select the location of OpenKH Game Engine</TextBlock>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding OpenKhGameEngineLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectOpenKhGameEngineCommand}">
-                            <Image Source="{StaticResource FolderOpen_16x}"/>
-                        </Button>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3">NOTE: The engine is work in progress and might show inaccuracy.</TextBlock>
-                </StackPanel>
-                <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
-                    <TextBlock Margin="0 0 0 3">Please select the location of PCSX2 emulator</TextBlock>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding Pcsx2Location, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcsx2Command}">
-                            <Image Source="{StaticResource FolderOpen_16x}"/>
-                        </Button>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3">NOTE: Only PCSX2 up to 1.6.0 and PCSX2-EX are supported.</TextBlock>
-                </StackPanel>
-                <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
+                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
+                        <ComboBoxItem>OpenKH Game Engine</ComboBoxItem>
+                        <ComboBoxItem>PlayStation 2 using PCSX2 emulator</ComboBoxItem>
+                        <ComboBoxItem>PC Release</ComboBoxItem>
+                    </ComboBox>
+                    <StackPanel Visibility="{Binding OpenKhGameEngineConfigVisibility}">
+                        <TextBlock Margin="0 0 0 3">Please select the location of OpenKH Game Engine</TextBlock>
+                        <Grid Margin="0 0 0 3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding OpenKhGameEngineLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectOpenKhGameEngineCommand}">
+                                <Image Source="{StaticResource FolderOpen_16x}"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0 0 0 3">NOTE: The engine is work in progress and might show inaccuracy.</TextBlock>
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
+                        <TextBlock Margin="0 0 0 3">Please select the location of PCSX2 emulator</TextBlock>
+                        <Grid Margin="0 0 0 3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding Pcsx2Location, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcsx2Command}">
+                                <Image Source="{StaticResource FolderOpen_16x}"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0 0 0 3">NOTE: Only PCSX2 up to 1.6.0 and PCSX2-EX are supported.</TextBlock>
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    Select if you have the Japanese version or the Global version.
+                        </TextBlock>
+                        <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding PCReleaseLanguage}">
+                            <ComboBoxItem>Global</ComboBoxItem>
+                            <ComboBoxItem>Japanese</ComboBoxItem>
+                        </ComboBox>
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    Select the launcher you use for the supported Kingdom Hearts games.
+                        </TextBlock>
+                        <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding LaunchOption}">
+                            <ComboBoxItem>Epic Games Store</ComboBoxItem>
+                            <ComboBoxItem>Steam</ComboBoxItem>
+                            <ComboBoxItem>Other</ComboBoxItem>
+                        </ComboBox>
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         Mod Manager supports both the 1.5+2.5 collection and KH3D from the 2.8 collection choose the filepath for at least one of the collections.
-                    </TextBlock>
-                    <Button Margin="0 10 0 10" Command="{Binding DetectInstallsCommand}">Detect Installations</Button>
-                    <TextBlock Margin="0 0 0 3">Folder location of the PC release of 1.5+2.5</TextBlock>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding PcReleaseLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseCommand}">
-                            <Image Source="{StaticResource FolderOpen_16x}"/>
-                        </Button>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3">Folder location of the PC release of 2.8</TextBlock>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding PcReleaseLocationKH3D, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseKH3DCommand}">
-                            <Image Source="{StaticResource FolderOpen_16x}"/>
-                        </Button>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">NOTE: Always be sure to use a supported version or risk breaking compatibility</TextBlock>
+                        </TextBlock>
+                        <Button Margin="0 10 0 10" Command="{Binding DetectInstallsCommand}">Detect Installations</Button>
+                        <TextBlock Margin="0 0 0 3">Folder location of the PC release of 1.5+2.5</TextBlock>
+                        <Grid Margin="0 0 0 3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding PcReleaseLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseCommand}">
+                                <Image Source="{StaticResource FolderOpen_16x}"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0 0 0 3">Folder location of the PC release of 2.8</TextBlock>
+                        <Grid Margin="0 0 0 3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding PcReleaseLocationKH3D, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseKH3DCommand}">
+                                <Image Source="{StaticResource FolderOpen_16x}"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">NOTE: Always be sure to use a supported version or risk breaking compatibility</TextBlock>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="PageIsoSelection"
@@ -121,31 +134,33 @@
             Description="Do not worry, you can change this option later"
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageGameData}">
-            <StackPanel>
-                <TextBlock>Supported games:</TextBlock>
-                <StackPanel Margin="10 3 0 10">
-                    <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix, PC)</TextBlock>
-                </StackPanel>
-                <TextBlock Margin="0 0 0 3">Please select the location of the PlayStation 2 ISO Image.</TextBlock>
-                <Grid Margin="0 0 0 3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="20"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{Binding IsoLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectIsoCommand}">
-                        <Image Source="{StaticResource FolderOpen_16x}"/>
-                    </Button>
-                </Grid>
-                <TextBlock TextWrapping="Wrap" Visibility="{Binding GameRecognizedVisibility}">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock>Supported games:</TextBlock>
+                    <StackPanel Margin="10 3 0 10">
+                        <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix, PC)</TextBlock>
+                    </StackPanel>
+                    <TextBlock Margin="0 0 0 3">Please select the location of the PlayStation 2 ISO Image.</TextBlock>
+                    <Grid Margin="0 0 0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding IsoLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectIsoCommand}">
+                            <Image Source="{StaticResource FolderOpen_16x}"/>
+                        </Button>
+                    </Grid>
+                    <TextBlock TextWrapping="Wrap" Visibility="{Binding GameRecognizedVisibility}">
                     <Run>A copy of </Run>
                     <Run Text="{Binding GameName}" d:Text="Some KH game"/>
                     <Run> was successfully recognized!</Run>
-                </TextBlock>
-                <TextBlock TextWrapping="Wrap" Visibility="{Binding GameNotRecognizedVisibility}">
+                    </TextBlock>
+                    <TextBlock TextWrapping="Wrap" Visibility="{Binding GameNotRecognizedVisibility}">
                     It was not possible to recognize the game of the ISO you provided. Be sure that the game is within the list of supported games.
-                </TextBlock>
-            </StackPanel>
+                    </TextBlock>
+                </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="PageGameData"
@@ -158,73 +173,83 @@
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding WizardPageAfterGameData}"
             IsEnabled="{Binding IsNotExtracting}">
-            <StackPanel>
-                <TextBlock Margin="0,0,0,3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">
-                        OpenKH can extract all games in the 1.5 + 2.5 collection and KH3D from the 2.8 collection. Check the games below you wish to extract.
-                        If you do not see the game you want to use Mod Manager for please go back to the Game Edition page and make sure you selected the correct filepath.
-                        Size values are rounded up.
-                </TextBlock>
-                <StackPanel Visibility="{Binding BothPcReleaseSelected}">
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding Extractkh1}" Content="KH1-13GB" Margin="0 0 10 4"/>
-                        <CheckBox IsChecked="{Binding Extractkh2}" Content="KH2-25GB" Margin="0 0 10 4"/>
-                        <CheckBox IsChecked="{Binding Extractbbs}" Content="BBS-10GB" Margin="0 0 10 4"/>
-                        <CheckBox IsChecked="{Binding Extractrecom}" Content="ReCoM-10GB" Margin="0 0 10 4"/>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Margin="0,0,0,3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">
+                            OpenKH can extract all games in the 1.5 + 2.5 collection and KH3D from the 2.8 collection. Check the games below you wish to extract.
+                            If you do not see the game you want to use Mod Manager for please go back to the Game Edition page and make sure you selected the correct filepath.
+                            Size values are rounded up.
+                    </TextBlock>
+                    <StackPanel Visibility="{Binding BothPcReleaseSelected}">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Extractkh1}" Content="KH1-23GB" Margin="0 0 6 4"/>
+                            <CheckBox IsChecked="{Binding Extractkh2}" Content="KH2-43GB" Margin="0 0 6 4"/>
+                            <CheckBox IsChecked="{Binding Extractbbs}" Content="BBS-19GB" Margin="0 0 6 4"/>
+                            <CheckBox IsChecked="{Binding Extractrecom}" Content="ReCoM-14GB" Margin="0 0 6 4"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Extractkh3d}" Content="KH3D-51GB" Margin="0 0 6 4"/>
+                        </StackPanel>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding Extractkh3d}" Content="KH3D-32GB" Margin="0 0 10 4"/>
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding PcRelease1525Selected}">
+                        <CheckBox IsChecked="{Binding Extractkh1}" Content="KH1-23GB" Margin="0 0 6 4"/>
+                        <CheckBox IsChecked="{Binding Extractkh2}" Content="KH2-43GB" Margin="0 0 6 4"/>
+                        <CheckBox IsChecked="{Binding Extractbbs}" Content="BBS-19GB" Margin="0 0 6 4"/>
+                        <CheckBox IsChecked="{Binding Extractrecom}" Content="ReCoM-14GB" Margin="0 0 6 4"/>
                     </StackPanel>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Visibility="{Binding PcRelease1525Selected}">
-                    <CheckBox IsChecked="{Binding Extractkh1}" Content="KH1-13GB" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding Extractkh2}" Content="KH2-25GB" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding Extractbbs}" Content="BBS-10GB" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding Extractrecom}" Content="ReCoM-10GB" Margin="0 0 10 4"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Visibility="{Binding PcRelease28Selected}">
-                    <CheckBox IsChecked="{Binding Extractkh3d}" Content="KH3D-32GB" Margin="0 0 10 4"/>
-                </StackPanel>
-                <TextBlock Margin="0 0 0 3">Extraction folder location:</TextBlock>
-                <Grid Margin="0 0 0 3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="20"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{Binding GameDataLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectGameDataLocationCommand}">
-                        <Image Source="{StaticResource FolderOpen_16x}"/>
-                    </Button>
-                </Grid>
-                <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
-                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
-                    It seems you do not have your Kingdom Hearts II copy extracted.
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding PcRelease28Selected}">
+                        <CheckBox IsChecked="{Binding Extractkh3d}" Content="KH3D-51GB" Margin="0 0 6 4"/>
+                    </StackPanel>
+                    <TextBlock Margin="0 0 0 3">Extraction folder location:</TextBlock>
+                    <Grid Margin="0 0 0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding GameDataLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectGameDataLocationCommand}">
+                            <Image Source="{StaticResource FolderOpen_16x}"/>
+                        </Button>
+                    </Grid>
+                    <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
+                        <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
+                        It seems you do not have your Kingdom Hearts II copy extracted.
+                        </TextBlock>
+                        <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
+                        You already have your Kingdom Hearts II copy extracted.
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
+                        <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
+                            You do not have any extracted data from a supported game.
+                        </TextBlock>
+                        <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
+                            You already have extracted data from a supported game.
+                        </TextBlock>
+                    </StackPanel>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding Pcsx2ConfigVisibility}">
+                        Press the button below to initialize the game extraction. It will take between 5 and 15 minutes based on the speed of your hard drive.
                     </TextBlock>
-                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
-                    You already have your Kingdom Hearts II copy extracted.
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">
+                        Press the button below to initialize the game extraction. Depending on the speed of your storage, if its a hard drive or an SSD, and how many games selected to extract extraction time may vary a lot.
                     </TextBlock>
-                </StackPanel>
-                <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
-                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
-                        You do not have any extracted data from a supported game.
+                    <Button Margin="0 0 0 6" Width="120" Height="22" HorizontalAlignment="Left" Command="{Binding ExtractGameDataCommand}">Extract game data</Button>
+                    <ProgressBar Margin="0 0 0 6" Height="22" Visibility="{Binding ProgressBarVisibility}" Minimum="0" Maximum="1" Value="{Binding ExtractionProgress}"/>
+                    <TextBlock Margin="0 0 0 3" Visibility="{Binding ExtractionCompleteVisibility}">
+                        The extraction of the game's data succeded!
                     </TextBlock>
-                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
-                        You already have extracted data from a supported game.
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">
+                            <Run Foreground="Red">WARNING</Run>
+                            If you do not extract a games data only Lua Scripts will function properly. Only check the box below if you will only be installing Lua Scripts in Mods Manager.
                     </TextBlock>
-                </StackPanel>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    Press the button below to initialize the game extraction. It will take between 5 and 15 minutes based on the speed of your hard drive.
-                </TextBlock>
-                <Button Margin="0 0 0 6" Width="120" Height="22" HorizontalAlignment="Left" Command="{Binding ExtractGameDataCommand}">Extract game data</Button>
-                <ProgressBar Margin="0 0 0 6" Height="22" Visibility="{Binding ProgressBarVisibility}" Minimum="0" Maximum="1" Value="{Binding ExtractionProgress}"/>
-                <TextBlock Margin="0 0 0 3" Visibility="{Binding ExtractionCompleteVisibility}">
-                    The extraction of the game's data succeded!
-                </TextBlock>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">               
+                    <CheckBox IsChecked="{Binding OverrideGameDataFound}" Content="Skip Game Extraction" Visibility="{Binding PcReleaseConfigVisibility}" Margin="0 0 0 4"/>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding PcReleaseConfigVisibility}">
                         <Run Foreground="Red">WARNING</Run>
-                        If you do not extract a games data only Lua Scripts will function properly. Only check the box below if you will only be installing Lua Scripts in Mods Manager.
-                </TextBlock>
-                <CheckBox IsChecked="{Binding OverrideGameDataFound}" Content="Skip Game Extraction" Visibility="{Binding PcReleaseConfigVisibility}" Margin="0 0 0 4"/>
-            </StackPanel>
+                        If you do not have the space to extract the remastered files for each game (which are about 80% of the sizes listed above) you can check the box below to skip extracting them. Some mods may have visual issues because of this but for those with limited storage space on their computer this should help reduce the space required to extract said games.
+                    </TextBlock>
+                    <CheckBox Visibility="{Binding PcReleaseConfigVisibility}" IsChecked="{Binding SkipRemastered}" Content="Skip Extracting Remastered Files"/>
+                </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="PageRegion"
@@ -234,25 +259,26 @@
             CanSelectNextPage="{Binding IsGameDataFound}"
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=LastPage}">
-            <StackPanel>
-                <TextBlock>Region</TextBlock>
-                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding RegionId}">
-                    <ComboBoxItem>Use game default region</ComboBoxItem>
-                    <ComboBoxItem>Japanese (text JP, menu JP, voice JP)</ComboBoxItem>
-                    <ComboBoxItem>English (text US, menu US, voice US)</ComboBoxItem>
-                    <ComboBoxItem>English (text US, menu UK, voice US)</ComboBoxItem>
-                    <ComboBoxItem>Italian (text IT, menu IT, voice IT)</ComboBoxItem>
-                    <ComboBoxItem>Spanish (text SP, menu SP, voice SP)</ComboBoxItem>
-                    <ComboBoxItem>German (text GR, menu GR, voice GR)</ComboBoxItem>
-                    <ComboBoxItem>French (text FR, menu FR, voice FR)</ComboBoxItem>
-                    <ComboBoxItem>Final Mix (text JP, menu FM, voice US)</ComboBoxItem>
-                </ComboBox>
-
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock>Region</TextBlock>
+                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding RegionId}">
+                        <ComboBoxItem>Use game default region</ComboBoxItem>
+                        <ComboBoxItem>Japanese (text JP, menu JP, voice JP)</ComboBoxItem>
+                        <ComboBoxItem>English (text US, menu US, voice US)</ComboBoxItem>
+                        <ComboBoxItem>English (text US, menu UK, voice US)</ComboBoxItem>
+                        <ComboBoxItem>Italian (text IT, menu IT, voice IT)</ComboBoxItem>
+                        <ComboBoxItem>Spanish (text SP, menu SP, voice SP)</ComboBoxItem>
+                        <ComboBoxItem>German (text GR, menu GR, voice GR)</ComboBoxItem>
+                        <ComboBoxItem>French (text FR, menu FR, voice FR)</ComboBoxItem>
+                        <ComboBoxItem>Final Mix (text JP, menu FM, voice US)</ComboBoxItem>
+                    </ComboBox>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                     Forces to load the internal configuration to a specific region. This allows to effectively load files from other languages, swap the O and X buttons and use the font table in a different way.
                     Do not worry if some region files are not found as the Mods Manager has a fallback mechanic.
-                </TextBlock>
-            </StackPanel>
+                    </TextBlock>
+                </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
 
         <xctk:WizardPage
@@ -262,54 +288,56 @@
             Description="Install automatic mod loading support into the game's folder."
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageLuaBackendInstall}">
-            <StackPanel>
-                <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
-                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
-                    <ComboBoxItem>KINGDOM HEARTS HD 1.5+2.5 ReMIX</ComboBoxItem>
-                    <ComboBoxItem>KINGDOM HEARTS HD 2.8 Final Chapter Prologue</ComboBoxItem>
-                </ComboBox>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
-                        modifying the game files.
-                        The file is named 'DBGHELP.dll' for Windows and 'version.dll' for Linux and it can be found in your game's install folder.
-                        Panacea will run every time you start the game and attempt to load built mods. To uninstall Panacea, click Remove Panacea button.
-                </TextBlock>
-                <StackPanel Visibility="{Binding PanaceaNotInstalledVisibility}">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
+                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
+                        <ComboBoxItem>KINGDOM HEARTS HD 1.5+2.5 ReMIX</ComboBoxItem>
+                        <ComboBoxItem>KINGDOM HEARTS HD 2.8 Final Chapter Prologue</ComboBoxItem>
+                    </ComboBox>
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        It seems you do not have Panacea installed or you are running a different version than the one
-                        compatible with this version of Mods Manager. We need your permission to install it into the game's folder.
-                        If you choose not to install, you may need to use one of the Build and Patch options to apply mods
-                        to your game.
+                            Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
+                            modifying the game files.
+                            The file is named 'DBGHELP.dll' for Windows and 'version.dll' for Linux and it can be found in your game's install folder.
+                            Panacea will run every time you start the game and attempt to load built mods. To uninstall Panacea, click Remove Panacea button.
                     </TextBlock>
-                    <Button
-                        Margin="0 0 0 6"
-                        Content="Install Panacea for Windows"
-                        HorizontalAlignment="Left"
-                        Width="205"
-                        Command="{Binding InstallPanaceaCommand}" CommandParameter="false"/>
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        <Run Foreground="Red">WARNING</Run>
-                        linux support is still a WIP. While it does currently work it is a lot of extra setup.
-                    </TextBlock>
-                    <Button
-                        Margin="0 0 0 6"
-                        Content="Install Panacea for Linux"
-                        HorizontalAlignment="Left"
-                        Width="205"
-                        Command="{Binding InstallPanaceaCommand}" CommandParameter="true"/>
+                    <StackPanel Visibility="{Binding PanaceaNotInstalledVisibility}">
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                            It seems you do not have Panacea installed or you are running a different version than the one
+                            compatible with this version of Mods Manager. We need your permission to install it into the game's folder.
+                            If you choose not to install, you may need to use one of the Build and Patch options to apply mods
+                            to your game.
+                        </TextBlock>
+                        <Button
+                            Margin="0 0 0 6"
+                            Content="Install Panacea for Windows"
+                            HorizontalAlignment="Left"
+                            Width="205"
+                            Command="{Binding InstallPanaceaCommand}" CommandParameter="false"/>
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                            <Run Foreground="Red">WARNING</Run>
+                            linux support is still a WIP. While it does currently work it is a lot of extra setup.
+                        </TextBlock>
+                        <Button
+                            Margin="0 0 0 6"
+                            Content="Install Panacea for Linux"
+                            HorizontalAlignment="Left"
+                            Width="205"
+                            Command="{Binding InstallPanaceaCommand}" CommandParameter="true"/>
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding PanaceaInstalledVisibility}">
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                            OpenKH Panacea is installed!
+                        </TextBlock>
+                        <Button
+                            Margin="0 0 0 6"
+                            Content="Remove Panacea"
+                            HorizontalAlignment="Left"
+                            Width="160"
+                            Command="{Binding RemovePanaceaCommand}"/>
+                    </StackPanel>
                 </StackPanel>
-                <StackPanel Visibility="{Binding PanaceaInstalledVisibility}">
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        OpenKH Panacea is installed!
-                    </TextBlock>
-                    <Button
-                        Margin="0 0 0 6"
-                        Content="Remove Panacea"
-                        HorizontalAlignment="Left"
-                        Width="160"
-                        Command="{Binding RemovePanaceaCommand}"/>
-                </StackPanel>
-            </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="PageLuaBackendInstall"
@@ -317,52 +345,60 @@
             Title="Install Lua Backend"
             Description="Lua Backend allows you to use Lua Scripts with the PC version of Kingdom Hearts."
             PreviousPage="{Binding PageStack.Back}"
-            NextPage="{Binding ElementName=PCLaunchOption}">
-            <StackPanel>
-                <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
-                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
-                    <ComboBoxItem>KINGDOM HEARTS HD 1.5+2.5 ReMIX</ComboBoxItem>
-                    <ComboBoxItem>KINGDOM HEARTS HD 2.8 Final Chapter Prologue</ComboBoxItem>
-                </ComboBox>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding LuaBackendNotFoundVisibility}">
+            NextPage="{Binding WizardPageAfterLuaBackend}">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
+                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
+                        <ComboBoxItem>KINGDOM HEARTS HD 1.5+2.5 ReMIX</ComboBoxItem>
+                        <ComboBoxItem>KINGDOM HEARTS HD 2.8 Final Chapter Prologue</ComboBoxItem>
+                    </ComboBox>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding LuaBackendNotFoundVisibility}">
                 It seems you have not installed Lua Backend for use with Panacea. If you wish to do this press the button below. Also if you wish to have OpenKH configure it so Lua Backend can load scripts installed in Mod Manager check the games below.
-                </TextBlock>
-                <TextBlock Margin="0 0 0 6" Visibility="{Binding LuaBackendFoundVisibility}" TextWrapping="Wrap">
+                    </TextBlock>
+                    <TextBlock Margin="0 0 0 6" Visibility="{Binding LuaBackendFoundVisibility}" TextWrapping="Wrap">
                 Lua Backend is installed! for use with Panacea. If you have not already and wish to configure it so it runs scripts from mods installed into OpenKH check the games below and press the configure button.
-                </TextBlock>
-                <StackPanel Orientation="Horizontal" Visibility="{Binding InstallForPc1525}">
-                    <CheckBox IsChecked="{Binding LuaConfigkh1}" Content="KH1" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding LuaConfigkh2}" Content="KH2" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding LuaConfigbbs}" Content="BBS" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding LuaConfigrecom}" Content="ReCoM" Margin="0 0 10 4"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Visibility="{Binding InstallForPc28}">
-                    <CheckBox IsChecked="{Binding LuaConfigkh3d}" Content="KH3D" Margin="0 0 10 4"/>
-                </StackPanel>
-                <Button Margin="0 0 0 6" Content="Install and Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="false" Visibility="{Binding LuaBackendNotFoundVisibility}"/>
-                <Button Margin="0 0 0 6" Content="Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="true" Visibility="{Binding LuaBackendFoundVisibility}"/>
-                <TextBlock Margin="0 2 0 10" Visibility="{Binding LuaBackendFoundVisibility}" TextWrapping="Wrap">
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding InstallForPc1525}">
+                        <CheckBox IsChecked="{Binding LuaConfigkh1}" Content="KH1" Margin="0 0 10 4"/>
+                        <CheckBox IsChecked="{Binding LuaConfigkh2}" Content="KH2" Margin="0 0 10 4"/>
+                        <CheckBox IsChecked="{Binding LuaConfigbbs}" Content="BBS" Margin="0 0 10 4"/>
+                        <CheckBox IsChecked="{Binding LuaConfigrecom}" Content="ReCoM" Margin="0 0 10 4"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding InstallForPc28}">
+                        <CheckBox IsChecked="{Binding LuaConfigkh3d}" Content="KH3D" Margin="0 0 10 4"/>
+                    </StackPanel>
+                    <Button Margin="0 0 0 6" Content="Install and Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="false" Visibility="{Binding LuaBackendNotFoundVisibility}"/>
+                    <Button Margin="0 0 0 6" Content="Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="true" Visibility="{Binding LuaBackendFoundVisibility}"/>
+                    <TextBlock Margin="0 2 0 10" Visibility="{Binding LuaBackendFoundVisibility}" TextWrapping="Wrap">
                 If you wish to uninstall Lua Backend completely press the button below.
-                </TextBlock>
-                <Button Margin="0 0 0 6" Content="Uninstall Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveLuaBackendCommand}" Visibility="{Binding LuaBackendFoundVisibility}"/>
-            </StackPanel>
+                    </TextBlock>
+                    <Button Margin="0 0 0 6" Content="Uninstall Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveLuaBackendCommand}" Visibility="{Binding LuaBackendFoundVisibility}"/>
+                </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
-            x:Name="PCLaunchOption"
+            x:Name="PageSteamAPITrick"
             PageType="Interior"
-            Title="Launch Option"            
-            Description="Configure Mods Manager to launch Kingdom Hearts"
+            Title="Launch Games Directly (Steam)"
+            Description="Steam allows you to launch the exes directly through a one line text file located in the games install folder."
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageGameData}">
-            <StackPanel>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    OpenKH Mods Manager has the ability to launch Kingdom Hearts directly. Leave the box below checked to have Mods Manager launch the game via Epic Games.
-                </TextBlock>
-                <CheckBox
-                    Margin="0 0 0 10"
-                    IsChecked="{Binding IsEGSVersion}"
-                    Content="Launch via Epic Games"/>
-            </StackPanel>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
+                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
+                        <ComboBoxItem>KINGDOM HEARTS HD 1.5+2.5 ReMIX</ComboBoxItem>
+                        <ComboBoxItem>KINGDOM HEARTS HD 2.8 Final Chapter Prologue</ComboBoxItem>
+                    </ComboBox>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                   <Run Foreground="Red">WARNING</Run>
+                    Steam must be running otherwise the game will fail to start. It will start to open then crash for seemingly no reason. Make sure steam is open if using this.
+                    </TextBlock>
+                    <Button Margin="0 0 0 6" Content="Create steam__appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding InstallSteamAPIFile}"/>
+                    <Button Margin="0 0 0 6" Content="Delete steam__appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveSteamAPIFile}"/>
+                </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="LastPage"

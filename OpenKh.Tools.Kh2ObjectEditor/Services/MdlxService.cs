@@ -53,6 +53,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
                         break;
                 }
             }
+
+            ViewerService.Instance.Render();
         }
 
         public void SaveModel()

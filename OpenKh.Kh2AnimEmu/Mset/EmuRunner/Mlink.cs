@@ -2,14 +2,8 @@
 //#define AllowRec1
 //#define Allow_DEB_eeram01
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
-using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Collections;
-using System.Xml;
 using System.IO.Compression;
 using OpenKh.Kh2AnimEmu;
 

@@ -1,12 +1,7 @@
 using NLog;
 using OpenKh.Command.AnbMaker.Extensions;
 using OpenKh.Command.AnbMaker.Utils.Builder.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using static OpenKh.Kh2.Motion;
 
 namespace OpenKh.Command.AnbMaker.Utils.Builder
@@ -132,21 +127,21 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
 
                         new ChannelProvider
                         {
-                            type = Channel.ROTATATION_X,
+                            type = Channel.ROTATION_X,
                             jointFlags = JointFlags.HasRotation,
                             keys = hit.RotationXKeys,
                             fixValue = it => it,
                         },
                         new ChannelProvider
                         {
-                            type = Channel.ROTATATION_Y,
+                            type = Channel.ROTATION_Y,
                             jointFlags = JointFlags.HasRotation,
                             keys = hit.RotationYKeys,
                             fixValue = it => it,
                         },
                         new ChannelProvider
                         {
-                            type = Channel.ROTATATION_Z,
+                            type = Channel.ROTATION_Z,
                             jointFlags = JointFlags.HasRotation,
                             keys = hit.RotationZKeys,
                             fixValue = it => it,
@@ -174,6 +169,8 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                             fixValue = FixPosValue,
                         },
                     };
+
+                    fixRotations(channels);
 
                     var jointFlag = JointFlags.None;
 
@@ -234,9 +231,9 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                     initialPoseDict[new InitialPoseKey(boneIdx, Channel.SCALE_X)] = FixScalingValue(scale.X);
                     initialPoseDict[new InitialPoseKey(boneIdx, Channel.SCALE_Y)] = FixScalingValue(scale.Y);
                     initialPoseDict[new InitialPoseKey(boneIdx, Channel.SCALE_Z)] = FixScalingValue(scale.Z);
-                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.ROTATATION_X)] = rotation.X;
-                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.ROTATATION_Y)] = rotation.Y;
-                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.ROTATATION_Z)] = rotation.Z;
+                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.ROTATION_X)] = rotation.X;
+                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.ROTATION_Y)] = rotation.Y;
+                    initialPoseDict[new InitialPoseKey(boneIdx, Channel.ROTATION_Z)] = rotation.Z;
                     initialPoseDict[new InitialPoseKey(boneIdx, Channel.TRANSLATION_X)] = FixPosValue(translation.X);
                     initialPoseDict[new InitialPoseKey(boneIdx, Channel.TRANSLATION_Y)] = FixPosValue(translation.Y);
                     initialPoseDict[new InitialPoseKey(boneIdx, Channel.TRANSLATION_Z)] = FixPosValue(translation.Z);
@@ -385,6 +382,47 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                     diff = left.Type.CompareTo(right.Type);
                 }
                 return diff;
+            }
+        }
+
+        // Fix by Some1fromthedark
+        private float unwrapAngle(float previous_angle, float current_angle)
+        {
+            float diff = current_angle - previous_angle;
+            if (diff < -Math.PI)
+            {
+                while (diff < -Math.PI)
+                {
+                    current_angle += (float)(2 * Math.PI);
+                    diff = current_angle - previous_angle;
+                }
+            }
+            else if (diff > Math.PI)
+            {
+                while (Math.PI < diff)
+                {
+                    current_angle -= (float)(2 * Math.PI);
+                    diff = current_angle - previous_angle;
+                }
+            }
+            return current_angle;
+        }
+
+        private void fixRotations(ChannelProvider[] channels)
+        {
+            foreach (ChannelProvider channel in channels)
+            {
+                if (channel.type == Channel.ROTATION_X ||
+                    channel.type == Channel.ROTATION_Y ||
+                    channel.type == Channel.ROTATION_Z)
+                {
+                    float previousAngle = 0;
+                    foreach (var k in channel.keys)
+                    {
+                        k.Value = unwrapAngle(previousAngle, k.Value);
+                        previousAngle = k.Value;
+                    }
+                }
             }
         }
     }

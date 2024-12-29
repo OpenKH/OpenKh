@@ -17,7 +17,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
         public Pax PaxFile { get; set; } // 979
         // Wd (32, BGM Instrument Data) - 734
         // Seb (31) - 734
-        public Imgd ImgdFile { get; set; } // 220
+        public Imgd ImgdFace { get; set; } // 220 (face + comd)
+        public Imgd ImgdCommand { get; set; }
         // Seqd (25) - 220
         // IopVoice (34) - 144
         // Event (22) - 349
@@ -49,7 +50,14 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
                         PaxFile = new Pax(barEntry.Stream);
                         break;
                     case Bar.EntryType.Imgd:
-                        ImgdFile = Imgd.Read(barEntry.Stream);
+                        if(barEntry.Name == "face")
+                        {
+                            ImgdFace = Imgd.Read(barEntry.Stream);
+                        }
+                        else if(barEntry.Name == "comd")
+                        {
+                            ImgdCommand = Imgd.Read(barEntry.Stream);
+                        }
                         break;
                     case Bar.EntryType.Seqd:
                         //SqdFile = Sqd.Read(barEntry.Stream);
@@ -70,7 +78,18 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
                         barEntry.Stream = PaxFile.getAsStream();
                         break;
                     case Bar.EntryType.Imgd:
-                        //barEntry.Stream = ;
+                        if (barEntry.Name == "face")
+                        {
+                            MemoryStream memStream = new MemoryStream();
+                            ImgdFace.Write(memStream);
+                            barEntry.Stream = memStream;
+                        }
+                        else if (barEntry.Name == "comd")
+                        {
+                            MemoryStream memStream = new MemoryStream();
+                            ImgdCommand.Write(memStream);
+                            barEntry.Stream = memStream;
+                        }
                         break;
                     case Bar.EntryType.Seqd:
                         //barEntry.Stream = ;

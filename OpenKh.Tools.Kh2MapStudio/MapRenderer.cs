@@ -339,57 +339,69 @@ namespace OpenKh.Tools.Kh2MapStudio
                 }
 
                 if (CurrentSpawnPoint != null)
-                {
-                    foreach (var spawnPoint in CurrentSpawnPoint.SpawnPoints)
+                    if (CurrentSpawnPoint != null)
                     {
-                        foreach (var entity in spawnPoint.Entities)
+                        foreach (var spawnPoint in CurrentSpawnPoint.SpawnPoints)
                         {
-                            _shader.SetModelView(Matrix4x4.CreateRotationX(entity.RotationX) *
-                                Matrix4x4.CreateRotationY(entity.RotationY) *
-                                Matrix4x4.CreateRotationZ(entity.RotationZ) *
-                                Matrix4x4.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ));
-                            RenderMeshNew(pass, CurrentSpawnPoint.ObjEntryCtrl[entity.ObjectId], true);
-                        }
-
-                        _graphics.RasterizerState = new RasterizerState()
-                        {
-                            CullMode = CullMode.None
-                        };
-                        _shader.SetRenderTexture(pass, _whiteTexture);
-                        foreach (var item in spawnPoint.EventActivators)
-                        {
-                            _shader.SetModelView(Matrix4x4.CreateRotationX(item.RotationX) *
-                                Matrix4x4.CreateRotationY(item.RotationY) *
-                                Matrix4x4.CreateRotationZ(item.RotationZ) *
-                                Matrix4x4.CreateScale(item.ScaleX, item.ScaleY, item.ScaleZ) *
-                                Matrix4x4.CreateTranslation(item.PositionX, -item.PositionY, -item.PositionZ));
-                            pass.Apply();
-
-                            var color = new xna.Color(1f, 0f, 0f, .5f);
-                            float opacity = 0.3f;
-                            var vertices = new PositionColoredTextured[]
+                            foreach (var entity in spawnPoint.Entities)
                             {
-                                new PositionColoredTextured(-1, -1, -1, 0, 0, 1f, 0f, 0f, opacity),
-                                new PositionColoredTextured(+1, -1, -1, 0, 0, 1f, 0f, 0f, opacity),
-                                new PositionColoredTextured(+1, +1, -1, 0, 0, 1f, 0f, 0f, opacity),
-                                new PositionColoredTextured(-1, +1, -1, 0, 0, 1f, 0f, 0f, opacity),
-                                new PositionColoredTextured(-1, -1, +1, 0, 0, 1f, 0f, 0f, opacity),
-                                new PositionColoredTextured(+1, -1, +1, 0, 0, 1f, 0f, 0f, opacity),
-                                new PositionColoredTextured(+1, +1, +1, 0, 0, 1f, 0f, 0f, opacity),
-                                new PositionColoredTextured(-1, +1, +1, 0, 0, 1f, 0f, 0f, opacity),
+                                _shader.SetModelView(Matrix4x4.CreateRotationX(entity.RotationX) *
+                                    Matrix4x4.CreateRotationY(entity.RotationY) *
+                                    Matrix4x4.CreateRotationZ(entity.RotationZ) *
+                                    Matrix4x4.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ));
+                                RenderMeshNew(pass, CurrentSpawnPoint.ObjEntryCtrl[entity.ObjectId], true);
+                            }
+
+                            _graphics.RasterizerState = new RasterizerState()
+                            {
+                                CullMode = CullMode.None
                             };
-                            var indices = new int[]
+                            _shader.SetRenderTexture(pass, _whiteTexture);
+                            foreach (var item in spawnPoint.EventActivators)
                             {
+                                _shader.SetModelView(Matrix4x4.CreateRotationX(item.RotationX) *
+                                    Matrix4x4.CreateRotationY(item.RotationY) *
+                                    Matrix4x4.CreateRotationZ(item.RotationZ) *
+                                    Matrix4x4.CreateScale(item.ScaleX, item.ScaleY, item.ScaleZ) *
+                                    Matrix4x4.CreateTranslation(item.PositionX, -item.PositionY, -item.PositionZ));
+                                pass.Apply();
+
+                                var color = new xna.Color(1f, 0f, 0f, .5f);
+                                //float opacity = 0.3f;
+                                var opacity = (float)(EditorSettings.OpacityLevel);
+                                var RedValue = (float)(EditorSettings.RedValue);
+                                var GreenValue = (float)(EditorSettings.GreenValue);
+                                var BlueValue = (float)(EditorSettings.BlueValue);
+                                var opacityEntrance = (float)(EditorSettings.OpacityEntranceLevel);
+                                var RedValueEntrance = (float)(EditorSettings.RedValueEntrance);
+                                var GreenValueEntrance = (float)(EditorSettings.GreenValueEntrance);
+                                var BlueValueEntrance = (float)(EditorSettings.BlueValueEntrance);
+                                var vertices = new PositionColoredTextured[]
+                                {
+                                //Order of constructing vertices matters. It's currently constructed "Side to side", lets see if we can construct it "Front to back"
+                                new PositionColoredTextured(-1, -1, -1, 0, 0, RedValue, GreenValue, BlueValue, opacity), //Vertex 1 (1-4 are the right-side vertices)
+                                new PositionColoredTextured(+1, -1, -1, 0, 0, RedValueEntrance, GreenValueEntrance, BlueValueEntrance, opacityEntrance), //Vertex 2 (Good with Vertex 7)
+                                new PositionColoredTextured(+1, +1, -1, 0, 0, RedValueEntrance, GreenValueEntrance, BlueValueEntrance, opacityEntrance), //Vertex 3 (Good with Vertex 7)
+                                //(3-6 represent the bottom-left & top-right vertices, connecting.)
+                                new PositionColoredTextured(-1, +1, -1, 0, 0, RedValue, GreenValue, BlueValue, opacity), //Vertex 4
+                                new PositionColoredTextured(-1, -1, +1, 0, 0, RedValue, GreenValue, BlueValue, opacity), //Vertex 5 (5-8 are the left-side vertices)
+                                new PositionColoredTextured(+1, -1, +1, 0, 0, RedValueEntrance, GreenValueEntrance, BlueValueEntrance, opacityEntrance), //Vertex 6 Good with Vertex 7...
+                                new PositionColoredTextured(+1, +1, +1, 0, 0, RedValueEntrance, GreenValueEntrance, BlueValueEntrance, opacityEntrance), //Vertex 7
+                                new PositionColoredTextured(-1, +1, +1, 0, 0, RedValue, GreenValue, BlueValue, opacity), //Vertex 8
+
+                                };
+                                var indices = new int[]
+                                {
                                 0, 1, 3, 3, 1, 2,
                                 1, 5, 2, 2, 5, 6,
                                 5, 4, 6, 6, 4, 7,
                                 4, 0, 7, 7, 0, 3,
                                 3, 2, 7, 7, 2, 6,
                                 4, 5, 0, 0, 5, 1
-                            };
-                            _graphics.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, 8, indices, 0, 12, MeshLoader.PositionColoredTexturedVertexDeclaration);
+                                };
+                                _graphics.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, 8, indices, 0, 12, MeshLoader.PositionColoredTexturedVertexDeclaration);
+                            }
                         }
-                    }
                 }
             });
         }

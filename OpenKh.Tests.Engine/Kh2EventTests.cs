@@ -1,7 +1,6 @@
 using NSubstitute;
 using OpenKh.Game.Events;
 using OpenKh.Game.Field;
-using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2.Ard;
 using System.Collections.Generic;
 using System.Linq;

@@ -69,6 +69,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
                 try
                 {
                     ThisVM.replaceImage(item.Id);
+                    loadImage(item.Id);
                 }
                 catch (System.Exception exc)
                 {

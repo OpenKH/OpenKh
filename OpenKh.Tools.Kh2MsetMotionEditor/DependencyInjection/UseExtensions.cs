@@ -13,13 +13,9 @@ using OpenKh.Tools.Kh2MsetMotionEditor.Usecases.ImGuiWindows;
 using OpenKh.Tools.Kh2MsetMotionEditor.Usecases.InsideTools;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.DependencyInjection
 {

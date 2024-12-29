@@ -1,7 +1,6 @@
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2MdlxEditor.Utils;
 using System.Collections.ObjectModel;
-using System.Windows;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
 {

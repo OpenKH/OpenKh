@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace OpenKh.Kh2Anim.Mset
 {
     public class T3

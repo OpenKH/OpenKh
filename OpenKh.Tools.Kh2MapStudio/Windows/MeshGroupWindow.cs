@@ -35,12 +35,18 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
             {
                 ForTreeNode($"Mesh Rendering Group {i}##{index}", () =>
                 {
+                    // if (ImGui.SmallButton("Apply changes")) //Adds the button ONLY for the entire group.
+                    // meshGroup.Invalidate();
                     var group = meshGroup.Map.vifPacketRenderingGroup[i];
                     for (var j = 0; j < group.Length; j++)
                     {
+                        //if (ImGui.SmallButton("Apply changes")) //Adds the button for EACH group.
+                        //    meshGroup.Invalidate();
                         var meshIndex = group[j];
                         ForTreeNode($"Index {j}, Mesh {meshIndex}##{index}", () =>
                         {
+                            if (ImGui.SmallButton("Apply changes")) //Adds the button for EACH group.
+                                meshGroup.Invalidate();
                             var vifPacket = meshGroup.Map.Chunks[meshIndex];
                             ForEdit("Texture",
                                 () => vifPacket.TextureId,
@@ -59,6 +65,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                             ForEdit("Priority", () => vifPacket.Priority, x => vifPacket.Priority = x);
                             ForEdit("Draw priority", () => vifPacket.DrawPriority, x => vifPacket.DrawPriority = x);
                             ForEdit("Alpha flag", () => vifPacket.TransparencyFlag, x => vifPacket.TransparencyFlag = x);
+                            ForEdit("UV Scroll Index", () => vifPacket.UVScrollIndex, x => vifPacket.UVScrollIndex = x);
                             ImGui.Text("DMA per VIF dump:");
                             ImGui.Text(string.Join(",", vifPacket.DmaPerVif.Select(x => $"{x}")));
                         });

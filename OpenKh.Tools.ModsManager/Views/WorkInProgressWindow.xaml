@@ -8,7 +8,7 @@
         Title="{Binding DialogTitle}" d:Title="Installing mod..." Height="120" Width="300" SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <StackPanel Margin="10">
         <TextBlock Margin="0 0 0 10" d:Text="Installing the mod XYZ">
-            <Run Text="{Binding OperationName}"/> 
+            <Run Text="{Binding OperationName}"/>
         </TextBlock>
         <ProgressBar Margin="0 0 0 10" Height="20" IsIndeterminate="{Binding ProgressUnknown}" Value="{Binding ProgressValue}" Maximum="1" d:IsIndeterminate="True" />
         <Button HorizontalAlignment="Center" Command="{Binding Cancel}" IsEnabled="{Binding CancelEnabled}">Cancel</Button>

@@ -1,11 +1,9 @@
 using OpenKh.Kh2;
-using OpenKh.Tools.Kh2ObjectEditor.Modules.Motions;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
-using OpenKh.Tools.Kh2ObjectEditor.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace OpenKh.Tools.Kh2ObjectEditor.Views
+namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
 {
     public partial class MotionTriggers_Control : UserControl
     {
@@ -20,7 +18,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
 
         private void Button_SaveTriggers(object sender, RoutedEventArgs e)
         {
-            MsetService.Instance.SaveMotion();
+            ThisVM.saveMotion();
         }
         private void Button_CreateTriggers(object sender, RoutedEventArgs e)
         {
@@ -31,6 +29,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
 
             MsetService.Instance.LoadedMotion.MotionTriggerFile = new MotionTrigger();
             MsetService.Instance.SaveMotion();
+            ThisVM.loadLists();
         }
     }
 }

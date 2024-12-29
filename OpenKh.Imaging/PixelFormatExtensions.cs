@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace OpenKh.Imaging
+﻿namespace OpenKh.Imaging
 {
     public static class PixelFormatExtensions
     {

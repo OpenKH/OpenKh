@@ -1,13 +1,7 @@
 using OpenKh.Common;
-using OpenKh.Imaging;
-
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Numerics;
 using Xe.BinaryMapper;
-using System.Linq;
-using System.Text;
 using OpenKh.Common.Utils;
 
 namespace OpenKh.Bbs

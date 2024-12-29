@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace OpenKh.Kh2.TextureFooter
+﻿namespace OpenKh.Kh2.TextureFooter
 {
     public enum TextureFrameControl
     {

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Drawing;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 
@@ -8,7 +7,6 @@ using SharpShell.Attributes;
 using SharpShell.SharpContextMenu;
 
 using OpenKh.Kh2;
-using OpenKh.Imaging;
 using System.Collections.Generic;
 
 namespace OpenKh.WinShell.IMZUtilities

@@ -13,11 +13,22 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
         public static bool Run(List<BobDescriptor> bobDescs, int bobCount) => ForHeader("BOB descriptors", () =>
         {
             var bobToRemove = -1;
+            if (ImGui.SmallButton("Add a new BOB descriptor"))
+                bobDescs.Add(new BobDescriptor());
             for (int i = 0; i < bobDescs.Count; i++)
             {
                 var desc = bobDescs[i];
-                if (ImGui.CollapsingHeader($"BOB descriptor##{i}"))
+                ImGui.Indent(20.0f);
+                var headerLabel = $"BOB descriptor #{i}";
+                if (desc.BobIndex >= 0 && desc.BobIndex < bobCount)
                 {
+                    headerLabel += $" (Model #{desc.BobIndex})";
+                }
+                ImGui.PushID(i);
+                if (ImGui.CollapsingHeader(headerLabel))
+                {
+                    if (ImGui.SmallButton("Remove this BOB descriptor"))
+                        bobToRemove = i;
                     if (ImGui.BeginCombo("BOB model", bobCount > 0 ?
                         $"BOB #{desc.BobIndex}" : "No bob exists in this map"))
                     {
@@ -73,17 +84,13 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                     ForEdit("Unk5c", () => desc.Unknown5c, x => desc.Unknown5c = x);
                     ForEdit("Unk60", () => desc.Unknown60, x => desc.Unknown60 = x);
                     ForEdit("Unk64", () => desc.Unknown64, x => desc.Unknown64 = x);
-
-                    if (ImGui.SmallButton("Remove this BOB descriptor"))
-                        bobToRemove = i;
                 }
+                ImGui.PopID();
+                ImGui.Unindent(20.0f);
             }
 
             if (bobToRemove >= 0)
                 bobDescs.RemoveAt(bobToRemove);
-
-            if (ImGui.SmallButton("Add a new BOB descriptor"))
-                bobDescs.Add(new BobDescriptor());
         });
     }
 }

@@ -1,7 +1,6 @@
 using OpenKh.Common;
 using System;
 using System.IO;
-using Xe.BinaryMapper;
 
 namespace OpenKh.Egs
 {

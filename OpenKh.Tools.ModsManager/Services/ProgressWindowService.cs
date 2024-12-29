@@ -1,11 +1,7 @@
 using OpenKh.Tools.ModsManager.Views;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Media.Animation;
 using Xe.Tools.Wpf.Commands;
 
 namespace OpenKh.Tools.ModsManager.Services

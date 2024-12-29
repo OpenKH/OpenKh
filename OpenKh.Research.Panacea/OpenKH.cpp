@@ -72,11 +72,12 @@ void Hook()
     Hook(pfn_Axa_AxaResourceMan_SetResourceItem, "\x48\x89\x5C\x24\x00\x55\x56\x57\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x49\x8B\xF0\x8B\xFA\x48\x8B", "xxxx?xxxxxx????xxx????xxxxxxx????xxxxxxx");
     Hook(pfn_Axa_PackageMan_GetFileInfo, "\x40\x53\x55\x56\x48\x83\xEC\x50\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x44\x24\x00\x44\x8B\x05", "xxxxxxxxxxx????xxxxxxx?xxx");
     Hook(pfn_Axa_CalcHash, "\x40\x53\x56\x57\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x8B\xFA\x48\x8B\xD9\x48\x8D\x54\x24", "xxxxxxx????xxx????xxxxxxx????xxxxxxxxx");
-    Hook(pfn_Axa_SetReplacePath, "\x4C\x8D\x81\x60\x02\x00\x00\x4C\x8B\xCA\x48\x8D\x15\x00\x00\x00\x00\x48\x8D\x0D", "xxxxxxxxxxxxx????xxx");
+    Hook(pfn_Axa_SetReplacePath, "\x4C\x8D\x81\x00\x00\x00\x00\x4C\x8B\xCA\x48\x8D\x15\x00\x00\x00\x00\x48\x8D\x0D", "xxx????xxxxxx????xxx");
     Hook(pfn_Axa_FreeAllPackages, "\x48\x89\x6C\x24\x00\x56\x48\x83\xEC\x20\x8B\x05\x00\x00\x00\x00\x33\xED\x8B\xF5", "xxxx?xxxxxxx????xxxx");
     Hook(pfn_Axa_CFileMan_GetRemasteredCount, "\x48\x63\x05\x00\x00\x00\x00\x48\x8D\x0D\x00\x00\x00\x00\x48\x8B\x04\xC1\x8B\x80", "xxx????xxx????xxxxxx");
     Hook(pfn_Axa_CFileMan_GetRemasteredEntry, "\x48\x63\x05\x00\x00\x00\x00\x4C\x8D\x0D\x00\x00\x00\x00\x4D\x8B\x0C\xC1\x4D\x8B", "xxx????xxx????xxxxxx");
     Hook(pfn_Axa_PackageFile_GetRemasteredAsset, "\x40\x53\x56\x48\x83\xEC\x28\x48\x8B\xD9\x48\x8B\xF2\x48\x8B\x89", "xxxxxxxxxxxxxxxx");
+    Hook(pfn_Axa_PackageFile_OpenFileImpl, "\x40\x53\x55\x56\x57\x41\x57\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x48", "xxxxxxxxxx????xxx????xxxxxxx????x");
     Hook(pfn_Axa_AxaSoundStream__threadProc, "\x48\x8B\xC4\x57\x48\x83\xEC\x60\x48\xC7\x40\x00\x00\x00\x00\x00\x48\x89\x58\x10\x48\x89\x68\x18\x48\x89\x70\x20\x48\x8B\xD9\x33\xED\x83\xB9", "xxxxxxxxxxx?????xxxxxxxxxxxxxxxxxxx");
     Hook(pfn_Axa_OpenFile, "\x40\x53\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x8B\xDA\x48\x8B\xD1\x48\x8D\x4C\x24", "xxxxx????xxx????xxxxxxx????xxxxxxxxx");
     Hook(pfn_Axa_DebugPrint, "\x48\x89\x54\x24\x00\x4C\x89\x44\x24\x00\x4C\x89\x4C\x24\x00\xC3", "xxxx?xxxx?xxxx?x");
@@ -101,6 +102,8 @@ void Hook()
 
 int QuickLaunch = 0;
 __int64 (*LaunchGame)(int game);
+__int64 (*LaunchGameEpic)(int game);
+__int64 (*LaunchGameSteam)(int game);
 void QuickBootHook()
 {
     LaunchGame(QuickLaunch);
@@ -114,6 +117,7 @@ std::wstring OpenKH::m_ExtractPath = L"";
 bool OpenKH::m_ShowConsole = false;
 bool OpenKH::m_DebugLog = false;
 bool OpenKH::m_EnableCache = true;
+bool OpenKH::m_SoundDebug = false;
 bool QuickMenu = false;
 const uint8_t quickmenupat[] = { 0xB1, 0x01, 0x90 };
 const std::wstring gamefolders[] = {
@@ -155,8 +159,13 @@ void OpenKH::Initialize()
                 Hook(framefunc, "\x40\x57\x48\x83\xEC\x40\x48\xC7\x44\x24\x00\x00\x00\x00\x00\x48\x89\x5C\x24\x00\x48\x8B\xD9\x8B\x41\x34", "xxxxxxxxxx?????xxxx?xxxxxx");
             else
                 Hook(framefunc, "\x40\x57\x48\x83\xEC\x40\x48\xC7\x44\x24\x00\x00\x00\x00\x00\x48\x89\x5C\x24\x00\x48\x8B\xF9\x83\x79\x34\x00", "xxxxxxxxxx?????xxxx?xxxxxxx");
-            Hook(LaunchGame, "\x40\x53\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x8B\xD9", "xxxxx????xxx????xxxxxxx????xx");
+            Hook(LaunchGameEpic, "\x40\x53\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x8B\xD9", "xxxxx????xxx????xxxxxxx????xx");
+            Hook(LaunchGameSteam, "\x48\x89\x5C\x24\x00\x57\x48\x83\xEC\x30\x45\x33\xC9\x48\x8D\x05\x00\x00\x00\x00\x33\xD2", "xxxx?xxxxxxxxxxx????xx");
             FindAllFuncs();
+            if (LaunchGameSteam)
+                LaunchGame = LaunchGameSteam;
+            else
+                LaunchGame = LaunchGameEpic;
             intptr_t m_pReplaceFunc = (intptr_t)QuickBootHook;
             unsigned char Patch[]
             {
@@ -197,6 +206,8 @@ void OpenKH::Initialize()
                 fputs("debug_log=true\n", f);
             if (m_EnableCache)
                 fputs("enable_cache=true\n", f);
+            if (m_SoundDebug)
+                fputs("sound_debug=true\n", f);
             if (QuickMenu)
                 fputs("quick_menu=true\n", f);
             fclose(f);
@@ -228,7 +239,7 @@ void OpenKH::Initialize()
         m_DevPath.append(gamefolders[(int)m_GameID]);
     if (m_ExtractPath.size() > 0)
         m_ExtractPath.append(gamefolders[(int)m_GameID]);
-
+    
     Hook();
     Panacea::Initialize();
     
@@ -286,6 +297,8 @@ void OpenKH::ReadSettings(const char* filename)
             parseBool(value, m_DebugLog);
         else if (!strncmp(key, "enable_cache", sizeof(buf)))
             parseBool(value, m_EnableCache);
+        else if (!strncmp(key, "sound_debug", sizeof(buf)))
+            parseBool(value, m_SoundDebug);
         else if (!strncmp(key, "quick_launch", sizeof(buf)))
         {
             if (!_stricmp(value, "kh1") || !_stricmp(value, "kh3d"))

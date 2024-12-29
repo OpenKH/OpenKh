@@ -14,7 +14,7 @@
         </Grid.ColumnDefinitions>
 
         <ScrollViewer Grid.Column="0">
-            <Canvas>
+            <Canvas Name="TexAnimCanvas">
                 <Canvas.Background>
                     <DrawingBrush TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
                         <DrawingBrush.Drawing>
@@ -23,9 +23,9 @@
                     </DrawingBrush>
                 </Canvas.Background>
                 <Image Name="ImageFrame"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Stretch="Uniform"/>
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       Stretch="Uniform"/>
             </Canvas>
         </ScrollViewer>
 

@@ -11,7 +11,6 @@ using OpenKh.Tools.LayoutEditor.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Numerics;

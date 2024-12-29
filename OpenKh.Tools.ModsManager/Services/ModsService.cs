@@ -152,10 +152,9 @@ namespace OpenKh.Tools.ModsManager.Services
                         break;
                     case MessageBoxResult.No:
                         throw new ModAlreadyExistsExceptions(modName);
-                        break;
                 }
             }
-               
+
             Directory.CreateDirectory(modPath);
 
             var entryExtractCount = 0;
@@ -309,10 +308,9 @@ namespace OpenKh.Tools.ModsManager.Services
                         break;
                     case MessageBoxResult.No:
                         throw new ModAlreadyExistsExceptions(repositoryName);
-                        break;
                 }
             }
-                
+
             Directory.CreateDirectory(modPath);
 
             progressOutput?.Invoke($"Mod found, initializing cloning process");
@@ -362,7 +360,6 @@ namespace OpenKh.Tools.ModsManager.Services
                         break;
                     case MessageBoxResult.No:
                         throw new ModAlreadyExistsExceptions(modName);
-                        break;
                 }
             }
             Directory.CreateDirectory(modPath);
@@ -384,13 +381,13 @@ namespace OpenKh.Tools.ModsManager.Services
                     switch (_lineLead)
                     {
                         case "LUAGUI_NAME":
-                            modName = _lineGib;
+                            modName = "\"" + _lineGib + "\"";
                             break;
                         case "LUAGUI_AUTH":
-                            modAuthor = _lineGib;
+                            modAuthor = "\"" + _lineGib + "\"";
                             break;
                         case "LUAGUI_DESC":
-                            modDescription = _lineGib;
+                            modDescription = "\"" + _lineGib + "\"";
                             break;
                     }
 
@@ -428,7 +425,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     Metadata = File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read),
                     IsEnabled = enabledMods.Contains(modName)
                 };
-            }            
+            }
         }
 
         public static async IAsyncEnumerable<ModUpdateModel> FetchUpdates()
@@ -484,7 +481,8 @@ namespace OpenKh.Tools.ModsManager.Services
                     ConfigurationService.GameEdition,
                     fastMode,
                     packageMap,
-                    ConfigurationService.LaunchGame);
+                    ConfigurationService.LaunchGame,
+                    ConfigurationService.PcReleaseLanguage);
             }
 
             using var packageMapWriter = new StreamWriter(Path.Combine(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame), "patch-package-map.txt"));

@@ -9,21 +9,21 @@ namespace OpenKh.Kh2
     {
 		public class Texture
 		{
-			private short shTexDbp;
-            private short shCltDbp;
+			public short shTexDbp;
+            public short shCltDbp;
             private short shDbw;
-            private short format; //shDpsm
+            public short format; //shDpsm; 0x13 => 8bpp + 256 palette; 0x14 => 4bpp + 16 palette
             private short shX;
             private short shY;
             private short width;
             private short height;
-            private uint unTex0L;
-			private uint unTex0H;
-            private int unClutStart;
-            private short shTexVramSize;
-            private short shCltVramSize;
-            public byte[] Data { get; }
-            public byte[] Palette { get; }
+            public uint unTex0L;
+            public uint unTex0H;
+            private int unClutStart; // W x H
+            private short shTexVramSize; // 64 (unclut / 256)
+            private short shCltVramSize; // 4
+            public byte[] Data { get; set; }
+            public byte[] Palette { get; set; }
 
             public Texture()
 			{
@@ -46,8 +46,16 @@ namespace OpenKh.Kh2
                 shTexVramSize = textureStream.ReadInt16();
                 shCltVramSize = textureStream.ReadInt16();
 
-                Data = textureStream.ReadBytes(width * height);
-                Palette = textureStream.ReadBytes(0x100 * sizeof(int));
+                if(format == 0x14) // 16 color palette
+                {
+                    Data = textureStream.ReadBytes((width * height) / 2);
+                    Palette = textureStream.ReadBytes(0x10 * sizeof(int));
+                }
+                else // 0x0, 0x13; 256 color palette
+                {
+                    Data = textureStream.ReadBytes(width * height);
+                    Palette = textureStream.ReadBytes(0x100 * sizeof(int));
+                }
             }
 
             internal Texture(BinaryReader reader)
@@ -67,8 +75,16 @@ namespace OpenKh.Kh2
 				shTexVramSize = reader.ReadInt16();
                 shCltVramSize = reader.ReadInt16();
 
-                Data = reader.ReadBytes(width * height);
-				Palette = reader.ReadBytes(0x100 * sizeof(int));
+                if(format == 0x14) // 16 color palette
+                {
+                    Data = reader.ReadBytes((width * height) / 2);
+                    Palette = reader.ReadBytes(0x10 * sizeof(int));
+                }
+                else // 0x0, 0x13; 256 color palette
+                {
+                    Data = reader.ReadBytes(width * height);
+                    Palette = reader.ReadBytes(0x100 * sizeof(int));
+                }
 			}
 
 			internal void Write(BinaryWriter writer)
@@ -120,8 +136,23 @@ namespace OpenKh.Kh2
             }
 
             public Size Size => new Size(width, height);
+            public int PaletteSize
+            {
+                get
+                {
+                    if (format == 0x13) {
+                        return 256;
+                    }
+                    else if (format == 0x14) {
+                        return 16;
+                    }
+                    else {
+                        throw new Exception("Unsupported palette format");
+                    }
+                }
+            }
 
-			public byte[] GetBitmap()
+            public byte[] GetBitmap()
 			{
 				var swizzled = 0;
 
@@ -146,9 +177,9 @@ namespace OpenKh.Kh2
 				for (int i = 0; i < dst.Length; i += 4)
 				{
 					var index = Ps2.Repl(src[i / 4]);
-					dst[i + 0] = (byte)Math.Max(0, palette[index * 4 + 2] * 2 - 1);
-					dst[i + 1] = (byte)Math.Max(0, palette[index * 4 + 1] * 2 - 1);
-					dst[i + 2] = (byte)Math.Max(0, palette[index * 4 + 0] * 2 - 1);
+					dst[i + 0] = (byte)Math.Max(0, (int)palette[index * 4 + 2]);
+					dst[i + 1] = (byte)Math.Max(0, (int)palette[index * 4 + 1]);
+					dst[i + 2] = (byte)Math.Max(0, (int)palette[index * 4 + 0]);
 					dst[i + 3] = (byte)Math.Max(0, palette[index * 4 + 3] * 2 - 1);
 				}
 
@@ -164,13 +195,13 @@ namespace OpenKh.Kh2
 					dst[i + 0] = palette[index * 4 + 0];
 					dst[i + 1] = palette[index * 4 + 1];
 					dst[i + 2] = palette[index * 4 + 2];
-					dst[i + 3] = palette[index * 4 + 3];
+					dst[i + 3] = (byte)(palette[index * 4 + 3] * 2 - 1);
 
 					index = src[i / 8] >> 4;
 					dst[i + 4] = palette[index * 4 + 0];
 					dst[i + 5] = palette[index * 4 + 1];
 					dst[i + 6] = palette[index * 4 + 2];
-					dst[i + 7] = palette[index * 4 + 3];
+					dst[i + 7] = (byte)(palette[index * 4 + 3] * 2 - 1);
 				}
 
 				return dst;

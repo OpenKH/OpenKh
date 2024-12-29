@@ -2,11 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using OpenKh.Common;
 using OpenKh.Imaging;
-using OpenKh.Kh2;
-using static System.Drawing.Imaging.PixelFormat;
 
 namespace OpenKh.Kh2.Utils
 {
