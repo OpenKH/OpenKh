@@ -1,4 +1,6 @@
 using OpenKh.Bbs;
+using OpenKh.Engine.Renders;
+using OpenKh.Tools.CtdEditor.Helpers;
 using OpenKh.Tools.CtdEditor.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,19 +40,39 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             set => _ctd.FileID = value;
         }
 
-        public CtdViewModel(IDrawHandler drawHandler) :
-            this(drawHandler, new Ctd())
+        #region MessageConverter
+        private MessageConverter _messageConverter = MessageConverter.Default;
+        public MessageConverter MessageConverter
+        {
+            get => _messageConverter;
+            set
+            {
+                _messageConverter = value;
+                OnPropertyChanged(nameof(MessageConverter));
+
+                foreach (var item in Items)
+                {
+                    item.MessageConverter = value;
+                }
+            }
+        }
+        #endregion
+
+        public ISpriteDrawing DrawingContext => _drawHandler.DrawingContext;
+
+        public CtdViewModel(IDrawHandler drawHandler, MessageConverter messageConverter) :
+            this(drawHandler, new Ctd(), messageConverter)
         {
         }
 
-        public CtdViewModel(IDrawHandler drawHandler, Ctd ctd) :
-            this(drawHandler, ctd, ctd.Messages)
+        public CtdViewModel(IDrawHandler drawHandler, Ctd ctd, MessageConverter messageConverter) :
+            this(drawHandler, ctd, ctd.Messages, messageConverter)
         {
             _drawHandler = drawHandler;
         }
 
-        private CtdViewModel(IDrawHandler drawHandler, Ctd ctd, IEnumerable<Ctd.Message> messages) :
-            base(messages.Select(x => new MessageViewModel(drawHandler, ctd, x)))
+        private CtdViewModel(IDrawHandler drawHandler, Ctd ctd, IEnumerable<Ctd.Message> messages, MessageConverter messageConverter) :
+            base(messages.Select(x => new MessageViewModel(drawHandler, ctd, x, messageConverter)))
         {
             _ctd = ctd;
         }
@@ -67,7 +89,9 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
                 Data = new byte[0],
                 LayoutIndex = 0,
                 WaitFrames = 0
-            });
+            },
+                MessageConverter
+            );
 
         private void PerformFiltering()
         {

@@ -4,7 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.CtdEditor.Views"
+        xmlns:ViewModels="clr-namespace:OpenKh.Tools.CtdEditor.ViewModels"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=ViewModels:MainViewModel}"
+        Closed="Window_Closed"
         Title="{Binding Title}" Height="384" Width="750">
     <Grid>
         <Grid.RowDefinitions>
@@ -29,6 +32,14 @@
                           Command="{Binding OpenFontCommand}"/>
                 <MenuItem Header="_Edit font"
                           Command="{Binding OpenFontEditorCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Encoding">
+                <MenuItem Header="International"
+                          IsChecked="{Binding UseInternationalEncoding}"
+                          Command="{Binding UseInternationalEncodingCommand}"/>
+                <MenuItem Header="Japanese"
+                          IsChecked="{Binding UseJapaneseEncoding}"
+                          Command="{Binding UseJapaneseEncodingCommand}"/>
             </MenuItem>
             <MenuItem Header="_Layouts">
                 <MenuItem Header="_Edit layouts"

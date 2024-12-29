@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using OpenKh.Tools.CtdEditor.Helpers;
 using OpenKh.Tools.CtdEditor.ViewModels;
 using OpenKh.Tools.CtdEditor.Views;
 using System;
@@ -33,6 +35,19 @@ namespace OpenKh.Tools.CtdEditor
             {
                 CrashHandler(e.Exception, "TaskScheduler");
                 e.SetObserved();
+            };
+
+            var services = new ServiceCollection();
+            services.AddCtdEditor();
+
+            var resolver = services.BuildServiceProvider();
+
+            var mainWindow = resolver.GetRequiredService<MainWindow>();
+            mainWindow.Show();
+            mainWindow.Closed += (s, e) =>
+            {
+                resolver.Dispose();
+                Shutdown();
             };
         }
 
