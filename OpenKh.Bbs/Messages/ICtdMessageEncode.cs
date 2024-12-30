@@ -1,7 +1,7 @@
-﻿namespace OpenKh.Bbs.Messages
+namespace OpenKh.Bbs.Messages
 {
     public interface ICtdMessageEncode
     {
-        byte[] FromText(string text);
+        byte[] FromText(string text, CtdFromTextOptions opts = null);
     }
 }

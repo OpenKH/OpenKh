@@ -101,8 +101,8 @@ namespace OpenKh.Bbs
 
             public string Text
             {
-                get => CtdEncoders.International.ToText(Data);
-                set => Data = CtdEncoders.International.FromText(value);
+                get => CtdEncoders.Unified.ToText(Data);
+                set => Data = CtdEncoders.Unified.FromText(value);
             }
 
             public override string ToString() =>
