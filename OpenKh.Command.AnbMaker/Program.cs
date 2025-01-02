@@ -13,6 +13,7 @@ namespace OpenKh.Command.AnbMaker
     [Subcommand(typeof(DumpNodeTreeCommand))]
     [Subcommand(typeof(DumpSrtCommand))]
     [Subcommand(typeof(RenderNodeTreeCommand))]
+    [Subcommand(typeof(DumpMdlxSrtCommand))]
     internal class Program
     {
         private static string GetVersion()
