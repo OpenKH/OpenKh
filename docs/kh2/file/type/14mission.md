@@ -7,37 +7,36 @@ ID 1 for example is used by the game almost anytime Sora game-overs from a battl
 
 | Offset | Type   | Description
 |--------|--------|------------
-| 0 	 | uint32 | File type (2)
-| 4 	 | uint32 | Entry Count
+| 00 	 | uint32 | File type (2)
+| 04 	 | uint32 | Count
+| 08     | Entry[Count]  | Entries
 
 ## Data
 Entries are 64 bytes long, though there seem to be parts that are unused or unknown.
 | Offset | Type   | Description
 |--------|--------|------------
 | 0x00 	 | uint16 | ID 
-| 0x02 	 | uint16 | Number of Options
-| 0x04 	 | uint16 | Option 1 Function
+| 0x02 	 | uchar | Choice Num
+| 0x03 	 | uchar | Choice Default
+| 0x04 	 | uint16 | Option 1 Id
 | 0x06 	 | uint16 | Option 1 TextId
-| 0x08 	 | uint16 | Option 2 Function
+| 0x08 	 | uint16 | Option 2 Id
 | 0x0A 	 | uint16 | Option 2 TextId
-| 0x0C 	 | uint16 | Option 3 Function
+| 0x0C 	 | uint16 | Option 3 Id
 | 0x0E 	 | uint16 | Option 3 TextId
-| 0x10 	 | uint16 | Option 4 Function
+| 0x10 	 | uint16 | Option 4 Id
 | 0x12 	 | uint16 | Option 4 TextId
-| 0x14 	 | uint16 | Pause Effect
-| 0x16 	 | uint16 | Pause Effect (2)
-| 0x18 	 | uint16 | Unknown
-| 0x1A 	 | uint16 | Unknown
-| 0x1C 	 | uint16 | Unknown
-| 0x1E 	 | uint16 | Unknown
-| 0x20 	 | uint16 | Unknown
-| 0x22 	 | uint16 | Unknown
-| 0x24   | uint8  | Bitflag 1
-| 0x25   | uint8  | Bitflag 2
-| 0x26   | uint8  | Bitflag 3
+| 0x14 	 | int16 | Base Sequence
+| 0x16 	 | int16 | Title Sequence
+| 0x18 	 | int32 | Information 
+| 0x1C 	 | uint32 | EntryId
+| 0x20 	 | int32 | Task
+| 0x24   | uint8  | Pause Mode
+| 0x25   | uint8  | Flag
+| 0x26   | uint8  | Sound Pause
 | 0x27   | uint8  | Padding (0x19)
 
-## Functions
+## Option IDs
 Functions are pre-defined.
 Attempting to add Retry or Quit to forced fights will cause the game to crash.
 | Value  | Description
@@ -55,7 +54,7 @@ Attempting to add Retry or Quit to forced fights will cause the game to crash.
 | 0x11 	 | Save
 | 0x13 	 | Return to Menu
 
-## Pause Effects
+## Base Sequence
 | Value  | Description
 |--------|------------
 | 0x00 	 | Slight fade on-pause
@@ -63,14 +62,14 @@ Attempting to add Retry or Quit to forced fights will cause the game to crash.
 | 0x02 	 | Completely whitens the screen on-pause.
 | 0x03 	 | Fades from white to black on-pause.
 
-## Pause Effects (2)
+## Title Sequence
 | Value  | Description
 |--------|------------
 | 0x0F 	 | Show Pause Animation
 | 0x0D 	 | Positions Pause & Options Downwards
 | 0xFF 	 | No Pause Animation
 
-## Bitflag 1
+## Pause Mode
 | Value  | Description
 |--------|------------
 | 0x00 	 | Do not show additional text in-battle
@@ -78,7 +77,7 @@ Attempting to add Retry or Quit to forced fights will cause the game to crash.
 | 0x02 	 | ???
 | 0x04 	 | ???
 
-## Bitflag 2
+## Flag
 | Value  | Description
 |--------|------------
 | 0x00 	 | ???
@@ -86,7 +85,7 @@ Attempting to add Retry or Quit to forced fights will cause the game to crash.
 | 0x02 	 | ???
 | 0x04 	 | ???
 
-## Bitflag 3
+## Sound Pause
 | Value  | Description
 |--------|------------
 | 0x00 	 | ???
