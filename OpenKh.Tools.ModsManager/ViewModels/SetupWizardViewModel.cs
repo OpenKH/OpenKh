@@ -636,6 +636,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public SetupWizardViewModel()
         {
             IsNotExtracting = true;
+            if (ConfigurationService.PCVersion == "Steam")
+            {
+                WizardPageAfterLuaBackend = PageSteamAPITrick;
+            }
+            else
+            {
+                WizardPageAfterLuaBackend = PageGameData;
+            }
             SelectIsoCommand = new RelayCommand(_ =>
                 FileDialog.OnOpen(fileName => IsoLocation = fileName, _isoFilter));
             SelectOpenKhGameEngineCommand = new RelayCommand(_ =>
