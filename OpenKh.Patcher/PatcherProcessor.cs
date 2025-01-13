@@ -291,14 +291,14 @@ namespace OpenKh.Patcher
                                     {
                                         if (Language != "jp")
                                         {
-                                            if (!context.GetOriginalAssetPath(assetFile.Source[0].Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Source[0].Name).Contains("/jp/"))
+                                            if (!context.GetOriginalAssetPath(assetFile.Source[0].Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Source[0].Name).Contains("/jp/") && (assetFile.Multi == null || assetFile.Name == name))
                                             {
                                                 Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
                                             }
                                         }
                                         else
                                         {
-                                            if (!globalFilePaths.Any(x => context.GetOriginalAssetPath(assetFile.Source[0].Name).Contains(x)))
+                                            if (!globalFilePaths.Any(x => context.GetOriginalAssetPath(assetFile.Source[0].Name).Contains(x)) && (assetFile.Multi == null || assetFile.Name == name))
                                             {
                                                 Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
                                             }
