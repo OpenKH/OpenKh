@@ -888,6 +888,24 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         File.Copy(PanaceaSourceLocation, PanaceaAlternateLocation, true);
                         File.Delete(PanaceaDestinationLocation);
                     }
+                    if (Directory.Exists(ConfigurationService.PcReleaseLocation))
+                    {
+                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
+                            new string[]
+                            {
+                                $"mod_path={ConfigurationService.GameModPath}",
+                                $"show_console={false}",
+                            });
+                    }
+                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                    {
+                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
+                            new string[]
+                            {
+                                $"mod_path={ConfigurationService.GameModPath}",
+                                $"show_console={false}",
+                            });
+                    }
                     try
                     {
                         File.Copy(Path.Combine(AppContext.BaseDirectory, "avcodec-vgmstream-59.dll"), Path.Combine(PanaceaDependenciesLocation, "avcodec-vgmstream-59.dll"), true);
@@ -926,6 +944,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
                         File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
                         File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
+                        File.Delete(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"));
+                        File.Delete(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"));
                         PanaceaInstalled = false;
                         return;
                     }
@@ -978,6 +998,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
                     File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
                     File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
+                    File.Delete(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"));
+                    File.Delete(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"));
                 }
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));

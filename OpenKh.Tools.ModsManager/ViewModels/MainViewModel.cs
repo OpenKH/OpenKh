@@ -493,28 +493,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
                     ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
-
-                    const int EpicGamesPC = 2;
-                    if (ConfigurationService.GameEdition == EpicGamesPC &&
-                        Directory.Exists(ConfigurationService.PcReleaseLocation))
-                    {
-                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
-                            new string[]
-                            {
-                                $"mod_path={ConfigurationService.GameModPath}",
-                                $"show_console={false}",
-                            });
-                    }
-                    if (ConfigurationService.GameEdition == EpicGamesPC &&
-                        Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
-                    {
-                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
-                            new string[]
-                            {
-                                $"mod_path={ConfigurationService.GameModPath}",
-                                $"show_console={false}",
-                            });
-                    }
                     if (ConfigurationService.GameEdition == 2)
                     {
                         PC = true;

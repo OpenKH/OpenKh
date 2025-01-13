@@ -291,22 +291,22 @@ namespace OpenKh.Patcher
                                     {
                                         if (Language != "jp")
                                         {
-                                            if (!context.GetOriginalAssetPath(name).Contains(".a.fm") && !context.GetOriginalAssetPath(name).Contains("/jp/"))
+                                            if (!context.GetOriginalAssetPath(assetFile.Source[0].Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Source[0].Name).Contains("/jp/"))
                                             {
-                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
                                             }
                                         }
                                         else
                                         {
-                                            if (!globalFilePaths.Any(x => context.GetOriginalAssetPath(name).Contains(x)))
+                                            if (!globalFilePaths.Any(x => context.GetOriginalAssetPath(assetFile.Source[0].Name).Contains(x)))
                                             {
-                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
                                             }
                                         }
                                     }
                                     else
                                     {
-                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
+                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
                                     }
                                 }
                                 else
