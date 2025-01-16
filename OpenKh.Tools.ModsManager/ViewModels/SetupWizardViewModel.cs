@@ -809,12 +809,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             {
                                 string kH1525Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS -HD 1.5+2.5 ReMIX-");
                                 string kH28Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS HD 2.8 Final Chapter Prologue");
-                                if (Directory.Exists(kH1525Path))
+                                if (File.Exists(Path.Combine(kH1525Path, "steam_api64.dll")))
                                 {
                                     installLocationFoundRemix = true;
                                     PcReleaseLocation = kH1525Path;
                                 }
-                                if (Directory.Exists(kH28Path))
+                                if (File.Exists(Path.Combine(kH28Path, "steam_api64.dll")))
                                 {
                                     installLocationFound3D = true;
                                     PcReleaseLocationKH3D = kH28Path;
