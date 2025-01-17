@@ -527,13 +527,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (PcReleaseLocation != null && GameCollection == 0)
                 {
                     return File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.dll")) &&
-                        File.Exists(Path.Combine(PcReleaseLocation, "lua54.dll")) &&
                         File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
                 }
                 else if (PcReleaseLocationKH3D != null && GameCollection == 1)
                 {
                     return File.Exists(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.dll")) &&
-                        File.Exists(Path.Combine(PcReleaseLocationKH3D, "lua54.dll")) &&
                         File.Exists(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"));
                 }
                 else
@@ -1063,7 +1061,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     else
                     {
                         File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "LuaBackend.dll"), true);
-                        File.Move(Path.Combine(TempExtractionLocation, "lua54.dll"), Path.Combine(DestinationCollection, "lua54.dll"), true);
                         File.Move(Path.Combine(TempExtractionLocation, "LuaBackend.toml"), Path.Combine(DestinationCollection, "LuaBackend.toml"), true);
                         string config = File.ReadAllText(Path.Combine(DestinationCollection, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
                         if (LuaScriptPaths.Contains("kh1") && GameCollection == 0)
@@ -1289,13 +1286,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     if (GameCollection == 0)
                     {
                         File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.dll"));
-                        File.Delete(Path.Combine(PcReleaseLocation, "lua54.dll"));
                         File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
                     }
                     else if (GameCollection == 1)
                     {
                         File.Delete(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.dll"));
-                        File.Delete(Path.Combine(PcReleaseLocationKH3D, "lua54.dll"));
                         File.Delete(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"));
                     }
                     OnPropertyChanged(nameof(IsLuaBackendInstalled));
