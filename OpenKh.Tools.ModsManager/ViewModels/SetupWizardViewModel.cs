@@ -726,12 +726,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     {
                                         if (line.Contains("\"InstallLocation\": \""))
                                         {
-                                            installLocationFoundRemix = true;
                                             int startIndex = line.IndexOf("\": \"") + 4;
                                             int endIndex = line.IndexOf("\",");
                                             string parsedText = line[startIndex..endIndex];
                                             parsedText = parsedText.Replace("\\\\", "\\");
                                             PcReleaseLocation = parsedText;
+                                            if (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")))
+                                            {
+                                                installLocationFoundRemix = true;
+                                            }
                                         }
                                     }
                                 }
@@ -741,12 +744,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     {
                                         if (line.Contains("\"InstallLocation\": \""))
                                         {
-                                            installLocationFound3D = true;
                                             int startIndex = line.IndexOf("\": \"") + 4;
                                             int endIndex = line.IndexOf("\",");
                                             string parsedText = line[startIndex..endIndex];
                                             parsedText = parsedText.Replace("\\\\", "\\");
                                             PcReleaseLocationKH3D = parsedText;
+                                            if (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")))
+                                            {
+                                                installLocationFound3D = true;
+                                            }
                                         }
                                     }
                                 }
