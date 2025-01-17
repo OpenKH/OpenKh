@@ -1060,35 +1060,41 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     else
                     {
-                        File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "LuaBackend.dll"), true);
-                        File.Move(Path.Combine(TempExtractionLocation, "LuaBackend.toml"), Path.Combine(DestinationCollection, "LuaBackend.toml"), true);
-                        string config = File.ReadAllText(Path.Combine(DestinationCollection, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
-                        if (LuaScriptPaths.Contains("kh1") && GameCollection == 0)
+                        if(File.Exists((Path.Combine(TempExtractionLocation, "DBGHELP.dll"))))
                         {
-                            int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));
+                            File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "LuaBackend.dll"), true);
                         }
-                        if (LuaScriptPaths.Contains("kh2") && GameCollection == 0)
+                        if (File.Exists(Path.Combine(TempExtractionLocation, "LuaBackend.toml")))
                         {
-                            int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
+                            File.Move(Path.Combine(TempExtractionLocation, "LuaBackend.toml"), Path.Combine(DestinationCollection, "LuaBackend.toml"), true);
+                            string config = File.ReadAllText(Path.Combine(DestinationCollection, "LuaBackend.toml")).Replace("\\", "/").Replace("\\\\", "/");
+                            if (LuaScriptPaths.Contains("kh1") && GameCollection == 0)
+                            {
+                                int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
+                                config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));
+                            }
+                            if (LuaScriptPaths.Contains("kh2") && GameCollection == 0)
+                            {
+                                int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
+                                config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
+                            }
+                            if (LuaScriptPaths.Contains("bbs") && GameCollection == 0)
+                            {
+                                int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
+                                config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
+                            }
+                            if (LuaScriptPaths.Contains("Recom") && GameCollection == 0)
+                            {
+                                int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
+                                config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
+                            }
+                            if (LuaScriptPaths.Contains("kh3d") && GameCollection == 1)
+                            {
+                                int index = config.IndexOf("true }", config.IndexOf("[kh3d]")) + 6;
+                                config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}").Replace("\\", "/"));
+                            }
+                            File.WriteAllText(Path.Combine(DestinationCollection, "LuaBackend.toml"), config);
                         }
-                        if (LuaScriptPaths.Contains("bbs") && GameCollection == 0)
-                        {
-                            int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
-                        }
-                        if (LuaScriptPaths.Contains("Recom") && GameCollection == 0)
-                        {
-                            int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
-                        }
-                        if (LuaScriptPaths.Contains("kh3d") && GameCollection == 1)
-                        {
-                            int index = config.IndexOf("true }", config.IndexOf("[kh3d]")) + 6;
-                            config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}").Replace("\\", "/"));
-                        }
-                        File.WriteAllText(Path.Combine(DestinationCollection, "LuaBackend.toml"), config);
                         File.Delete(DownPath);
                         Directory.Delete(TempExtractionLocation);
                         OnPropertyChanged(nameof(IsLuaBackendInstalled));
