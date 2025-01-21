@@ -133,7 +133,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
             using var zipFile = ZipFile.OpenRead(fileName);
 
-            var isModPatch = fileName.Contains(".kh2pcpatch") || fileName.Contains(".kh1pcpatch") || fileName.Contains(".compcpatch") || fileName.Contains(".bbspcpatch") || fileName.Contains(".dddpcpatch") ? true : false;
+            var isModPatch = fileName.ToLower().Contains(".kh2pcpatch") || fileName.ToLower().Contains(".kh1pcpatch") || fileName.ToLower().Contains(".compcpatch") || fileName.ToLower().Contains(".bbspcpatch") || fileName.ToLower().Contains(".dddpcpatch") ? true : false;
             var isValidMod = zipFile.GetEntry(ModMetadata) != null || isModPatch;
 
             if (!isValidMod)
@@ -196,31 +196,31 @@ namespace OpenKh.Tools.ModsManager.Services
             if (isModPatch)
             {
                 var _yamlGen = new Metadata();
-                if (fileName.Contains(".kh2pcpatch"))
+                if (fileName.ToLower().Contains(".kh2pcpatch"))
                 {
                     _yamlGen.Title = modName + " (KH2PCPATCH)";
                     _yamlGen.Game = "kh2";
                     _yamlGen.Description = "This is an automatically generated metadata for this KH2PCPATCH Modification.";
                 }
-                else if (fileName.Contains(".kh1pcpatch"))
+                else if (fileName.ToLower().Contains(".kh1pcpatch"))
                 {
                     _yamlGen.Title = modName + " (KH1PCPATCH)";
                     _yamlGen.Game = "kh1";
                     _yamlGen.Description = "This is an automatically generated metadata for this KH1PCPATCH Modification.";
                 }
-                else if (fileName.Contains(".compcpatch"))
+                else if (fileName.ToLower().Contains(".compcpatch"))
                 {
                     _yamlGen.Title = modName + " (COMPCPATCH)";
                     _yamlGen.Game = "Recom";
                     _yamlGen.Description = "This is an automatically generated metadata for this COMPCPATCH Modification.";
                 }
-                else if (fileName.Contains(".bbspcpatch"))
+                else if (fileName.ToLower().Contains(".bbspcpatch"))
                 {
                     _yamlGen.Title = modName + " (BBSPCPATCH)";
                     _yamlGen.Game = "bbs";
                     _yamlGen.Description = "This is an automatically generated metadata for this BBSPCPATCH Modification.";
                 }
-                else if (fileName.Contains(".dddpcpatch"))
+                else if (fileName.ToLower().Contains(".dddpcpatch"))
                 {
                     _yamlGen.Title = modName + " (DDDPCPATCH)";
                     _yamlGen.Game = "kh3d";
