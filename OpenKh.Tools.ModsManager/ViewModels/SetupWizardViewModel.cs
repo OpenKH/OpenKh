@@ -40,14 +40,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         const int PC = 2;
 
         private int _gameEdition;
-        private string _isoLocation;
-        private string _openKhGameEngineLocation;
-        private string _pcsx2Location;
-        private string _pcReleaseLocation;
-        private string _pcReleaseLocationKH3D;
+        private string _isoLocation = ConfigurationService.IsoLocation;
+        private string _openKhGameEngineLocation = ConfigurationService.OpenKhGameEngineLocation;
+        private string _pcsx2Location = ConfigurationService.Pcsx2Location;
+        private string _pcReleaseLocation = ConfigurationService.PcReleaseLocation;
+        private string _pcReleaseLocationKH3D = ConfigurationService.PcReleaseLocationKH3D;
         private int _gameCollection = 0;
-        private string _pcReleaseLanguage;
-        private string _gameDataLocation;
+        private string _pcReleaseLanguage = ConfigurationService.PcReleaseLanguage;
+        private string _gameDataLocation = ConfigurationService.GameDataLocation;
         private List<string> LuaScriptPaths = new List<string>();
         private bool _overrideGameDataFound = false;
 
@@ -110,6 +110,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     var game = GameService.DetectGameId(_isoLocation);
                     GameId = game?.Id;
                     GameName = game?.Name;
+                    ConfigurationService.IsoLocation = _isoLocation;
                 }
                 else
                 {
@@ -157,19 +158,37 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public int GameEdition
         {
-            get => _gameEdition;
-            set
+            get
             {
-                _gameEdition = value;
-                ConfigurationService.GameEdition = _gameEdition;
-                WizardPageAfterIntro = GameEdition switch
+                _gameEdition = ConfigurationService.GameEdition;
+                WizardPageAfterIntro = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
                     PCSX2 => PageIsoSelection,
                     PC => PageEosInstall,
                     _ => null,
                 };
-                WizardPageAfterGameData = GameEdition switch
+                WizardPageAfterGameData = _gameEdition switch
+                {
+                    OpenKHGameEngine => LastPage,
+                    PCSX2 => PageRegion,
+                    PC => LastPage,
+                    _ => null,
+                };
+                return _gameEdition;
+            }
+            set
+            {
+                _gameEdition = value;
+                ConfigurationService.GameEdition = _gameEdition;
+                WizardPageAfterIntro = _gameEdition switch
+                {
+                    OpenKHGameEngine => LastPage,
+                    PCSX2 => PageIsoSelection,
+                    PC => PageEosInstall,
+                    _ => null,
+                };
+                WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
                     PCSX2 => PageRegion,
@@ -191,13 +210,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             get
             {
-                switch (ConfigurationService.PcReleaseLanguage)
+                switch (_pcReleaseLanguage)
                 {
                     case "jp":
-                        _pcReleaseLanguage = "jp";
                         return 1;
                     default:
-                        _pcReleaseLanguage = "en";
                         return 0;
                 }
             }
@@ -275,6 +292,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _pcsx2Location = value;
+                ConfigurationService.Pcsx2Location = _pcsx2Location;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameSelected));
             }
@@ -506,6 +524,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _gameDataLocation = value;
+                ConfigurationService.GameDataLocation = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameDataFound));
                 OnPropertyChanged(nameof(GameDataNotFoundVisibility));
@@ -698,41 +717,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public SetupWizardViewModel()
         {
             IsNotExtracting = true;
-            if (ConfigurationService.PCVersion == "Steam")
-            {
-                WizardPageAfterLuaBackend = PageSteamAPITrick;
-            }
-            else
-            {
-                WizardPageAfterLuaBackend = PageGameData;
-            }
-            ConfigurationService.GameDataLocation = ConfigurationService.GameDataLocation;
-            GameDataLocation = ConfigurationService.GameDataLocation;
             SelectIsoCommand = new RelayCommand(_ =>
-            {
-                FileDialog.OnOpen(fileName => IsoLocation = fileName, _isoFilter);
-                ConfigurationService.IsoLocation = IsoLocation;
-
-            });
+                FileDialog.OnOpen(fileName => IsoLocation = fileName, _isoFilter));
             SelectOpenKhGameEngineCommand = new RelayCommand(_ =>
-            {
-                FileDialog.OnOpen(fileName => OpenKhGameEngineLocation = fileName, _openkhGeFilter);
-                ConfigurationService.OpenKhGameEngineLocation = OpenKhGameEngineLocation;
-            });
+                FileDialog.OnOpen(fileName => OpenKhGameEngineLocation = fileName, _openkhGeFilter));
             SelectPcsx2Command = new RelayCommand(_ =>
-            {
-                FileDialog.OnOpen(fileName => Pcsx2Location = fileName, _pcsx2Filter);
-                ConfigurationService.Pcsx2Location = Pcsx2Location;
-            });
+                FileDialog.OnOpen(fileName => Pcsx2Location = fileName, _pcsx2Filter));
             SelectPcReleaseCommand = new RelayCommand(_ =>
                 FileDialog.OnFolder(path => PcReleaseLocation = path));
             SelectPcReleaseKH3DCommand = new RelayCommand(_ =>
                 FileDialog.OnFolder(path => PcReleaseLocationKH3D = path));
             SelectGameDataLocationCommand = new RelayCommand(_ =>
-            {
-                FileDialog.OnFolder(path => GameDataLocation = path);
-                ConfigurationService.GameDataLocation = GameDataLocation;
-            });
+                FileDialog.OnFolder(path => GameDataLocation = path));
             ExtractGameDataCommand = new RelayCommand(async _ =>
             {
                 BEGIN:

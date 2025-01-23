@@ -469,18 +469,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }, _ => IsRunning);
             WizardCommand = new RelayCommand(_ =>
             {
-                var dialog = new SetupWizardWindow()
-                {
-                    ConfigGameEdition = ConfigurationService.GameEdition,
-                    ConfigGameDataLocation = ConfigurationService.GameDataLocation,
-                    ConfigIsoLocation = ConfigurationService.IsoLocation,
-                    ConfigOpenKhGameEngineLocation = ConfigurationService.OpenKhGameEngineLocation,
-                    ConfigPcsx2Location = ConfigurationService.Pcsx2Location,
-                    ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation,
-                    ConfigPcReleaseLocationKH3D = ConfigurationService.PcReleaseLocationKH3D,
-                    ConfigRegionId = ConfigurationService.RegionId,
-                    ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
-                };
+                var dialog = new SetupWizardWindow();
                 if (dialog.ShowDialog() == true)
                 {
                     if (ConfigurationService.GameEdition == 2)
