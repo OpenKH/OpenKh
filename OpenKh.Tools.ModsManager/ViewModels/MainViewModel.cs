@@ -470,7 +470,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             WizardCommand = new RelayCommand(_ =>
             {
                 var dialog = new SetupWizardWindow();
-                if (dialog.ShowDialog() == true)
+                if (dialog.ShowDialog() != null)
                 {
                     if (ConfigurationService.GameEdition == 2)
                     {
