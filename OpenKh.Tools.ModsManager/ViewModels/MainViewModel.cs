@@ -483,16 +483,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 };
                 if (dialog.ShowDialog() == true)
                 {
-                    ConfigurationService.GameEdition = dialog.ConfigGameEdition;
-                    ConfigurationService.GameDataLocation = dialog.ConfigGameDataLocation;
-                    ConfigurationService.IsoLocation = dialog.ConfigIsoLocation;
-                    ConfigurationService.OpenKhGameEngineLocation = dialog.ConfigOpenKhGameEngineLocation;
-                    ConfigurationService.Pcsx2Location = dialog.ConfigPcsx2Location;
-                    ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
-                    ConfigurationService.PcReleaseLocationKH3D = dialog.ConfigPcReleaseLocationKH3D;
-                    ConfigurationService.RegionId = dialog.ConfigRegionId;
-                    ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
-                    ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
                     if (ConfigurationService.GameEdition == 2)
                     {
                         PC = true;
