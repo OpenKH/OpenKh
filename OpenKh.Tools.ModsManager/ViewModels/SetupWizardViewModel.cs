@@ -40,14 +40,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         const int PC = 2;
 
         private int _gameEdition;
-        private string _isoLocation;
-        private string _openKhGameEngineLocation;
-        private string _pcsx2Location;
-        private string _pcReleaseLocation;
-        private string _pcReleaseLocationKH3D;
+        private string _isoLocation = ConfigurationService.IsoLocation;
+        private string _openKhGameEngineLocation = ConfigurationService.OpenKhGameEngineLocation;
+        private string _pcsx2Location = ConfigurationService.Pcsx2Location;
+        private string _pcReleaseLocation = ConfigurationService.PcReleaseLocation;
+        private string _pcReleaseLocationKH3D = ConfigurationService.PcReleaseLocationKH3D;
         private int _gameCollection = 0;
-        private string _pcReleaseLanguage;
-        private string _gameDataLocation;
+        private string _pcReleaseLanguage = ConfigurationService.PcReleaseLanguage;
+        private string _gameDataLocation = ConfigurationService.GameDataLocation;
         private List<string> LuaScriptPaths = new List<string>();
         private bool _overrideGameDataFound = false;
 
@@ -110,6 +110,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     var game = GameService.DetectGameId(_isoLocation);
                     GameId = game?.Id;
                     GameName = game?.Name;
+                    ConfigurationService.IsoLocation = _isoLocation;
                 }
                 else
                 {
@@ -157,18 +158,37 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public int GameEdition
         {
-            get => _gameEdition;
-            set
+            get
             {
-                _gameEdition = value;
-                WizardPageAfterIntro = GameEdition switch
+                _gameEdition = ConfigurationService.GameEdition;
+                WizardPageAfterIntro = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
                     PCSX2 => PageIsoSelection,
                     PC => PageEosInstall,
                     _ => null,
                 };
-                WizardPageAfterGameData = GameEdition switch
+                WizardPageAfterGameData = _gameEdition switch
+                {
+                    OpenKHGameEngine => LastPage,
+                    PCSX2 => PageRegion,
+                    PC => LastPage,
+                    _ => null,
+                };
+                return _gameEdition;
+            }
+            set
+            {
+                _gameEdition = value;
+                ConfigurationService.GameEdition = _gameEdition;
+                WizardPageAfterIntro = _gameEdition switch
+                {
+                    OpenKHGameEngine => LastPage,
+                    PCSX2 => PageIsoSelection,
+                    PC => PageEosInstall,
+                    _ => null,
+                };
+                WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
                     PCSX2 => PageRegion,
@@ -190,13 +210,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             get
             {
-                switch (ConfigurationService.PcReleaseLanguage)
+                switch (_pcReleaseLanguage)
                 {
                     case "jp":
-                        _pcReleaseLanguage = "jp";
                         return 1;
                     default:
-                        _pcReleaseLanguage = "en";
                         return 0;
                 }
             }
@@ -260,6 +278,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _openKhGameEngineLocation = value;
+                ConfigurationService.OpenKhGameEngineLocation = _openKhGameEngineLocation;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameSelected));
             }
@@ -273,12 +292,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _pcsx2Location = value;
+                ConfigurationService.Pcsx2Location = _pcsx2Location;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameSelected));
             }
         }
 
         public RelayCommand SelectPcReleaseCommand { get; }
+        public RelayCommand SelectPcReleaseKH3DCommand { get; }
         public Visibility PcReleaseConfigVisibility => GameEdition == PC  ? Visibility.Visible : Visibility.Collapsed;
         public Visibility BothPcReleaseSelected => PcReleaseSelections == "both" ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PcRelease1525Selected => PcReleaseSelections == "1.5+2.5" ? Visibility.Visible: Visibility.Collapsed;
@@ -291,6 +312,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _pcReleaseLocation = value;
+                ConfigurationService.PcReleaseLocation = _pcReleaseLocation;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
@@ -303,6 +325,32 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PcRelease1525Selected));
                 OnPropertyChanged(nameof(PcRelease28Selected));
                 OnPropertyChanged(nameof(InstallForPc1525));
+                OnPropertyChanged(nameof(SteamAPIFileFound));
+                OnPropertyChanged(nameof(SteamAPIFileNotFound));
+            }
+        }
+
+        public string PcReleaseLocationKH3D
+        {
+            get => _pcReleaseLocationKH3D;
+            set
+            {
+                _pcReleaseLocationKH3D = value;
+                ConfigurationService.PcReleaseLocationKH3D = _pcReleaseLocationKH3D;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
+                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
+                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
+                OnPropertyChanged(nameof(IsGameSelected));
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(LuaBackendFoundVisibility));
+                OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
+                OnPropertyChanged(nameof(BothPcReleaseSelected));
+                OnPropertyChanged(nameof(PcRelease1525Selected));
+                OnPropertyChanged(nameof(PcRelease28Selected));
+                OnPropertyChanged(nameof(InstallForPc28));
+                OnPropertyChanged(nameof(SteamAPIFileFound));
+                OnPropertyChanged(nameof(SteamAPIFileNotFound));
             }
         }
 
@@ -348,28 +396,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
-            }
-        }
-
-        public RelayCommand SelectPcReleaseKH3DCommand { get; }
-        public string PcReleaseLocationKH3D
-        {
-            get => _pcReleaseLocationKH3D;
-            set
-            {
-                _pcReleaseLocationKH3D = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
-                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
-                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
-                OnPropertyChanged(nameof(IsGameSelected));
-                OnPropertyChanged(nameof(IsGameDataFound));
-                OnPropertyChanged(nameof(LuaBackendFoundVisibility));
-                OnPropertyChanged(nameof(LuaBackendNotFoundVisibility));
-                OnPropertyChanged(nameof(BothPcReleaseSelected));
-                OnPropertyChanged(nameof(PcRelease1525Selected));
-                OnPropertyChanged(nameof(PcRelease28Selected));
-                OnPropertyChanged(nameof(InstallForPc28));
             }
         }
         public bool Extractkh1
@@ -498,6 +524,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _gameDataLocation = value;
+                ConfigurationService.GameDataLocation = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameDataFound));
                 OnPropertyChanged(nameof(GameDataNotFoundVisibility));
@@ -519,7 +546,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility ExtractionCompleteVisibility => ExtractionProgress == 1f ? Visibility.Visible : Visibility.Collapsed;
         public RelayCommand ExtractGameDataCommand { get; set; }
         public float ExtractionProgress { get; set; }
-        public int RegionId { get; set; }
+        public int RegionId
+        {
+            get
+            {
+                return ConfigurationService.RegionId;
+            }
+            set
+            {
+                ConfigurationService.RegionId = value;
+            }
+        }
         public bool IsLuaBackendInstalled
         {
             get
@@ -538,12 +575,40 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     return false;
             }
         }
+        public bool IsSteamAPIFileInstalled
+        {
+            get
+            {
+                if (PcReleaseLocation != null && GameCollection == 0 && ConfigurationService.PCVersion == "Steam")
+                {
+                    if (File.Exists(Path.Combine(PcReleaseLocation, "steam_appid.txt")))
+                    {
+                        ConfigurationService.SteamAPITrick1525 = true;
+                        return true;
+                    }
+                    return false;
+                }
+                else if (PcReleaseLocationKH3D != null && GameCollection == 1)
+                {
+                    if (File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_appid.txt")))
+                    {
+                        ConfigurationService.SteamAPITrick28 = true;
+                        return true;
+                    }
+                    return false;
+                }
+                else
+                return false;
+            }
+        }
         public RelayCommand InstallSteamAPIFile {  get; set; }
         public RelayCommand RemoveSteamAPIFile { get; set; }
         public RelayCommand InstallLuaBackendCommand { get; set; }
         public RelayCommand RemoveLuaBackendCommand { get; set; }
         public Visibility LuaBackendFoundVisibility => IsLuaBackendInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility LuaBackendNotFoundVisibility => IsLuaBackendInstalled ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility SteamAPIFileFound => IsSteamAPIFileInstalled ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility SteamAPIFileNotFound => IsSteamAPIFileInstalled ? Visibility.Collapsed : Visibility.Visible;
         public RelayCommand InstallPanaceaCommand { get; }
         public RelayCommand DetectInstallsCommand { get; }
         public RelayCommand RemovePanaceaCommand { get; }
@@ -559,6 +624,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     // Won't be able to find the source location
                     PanaceaInstalled = false;
+                    ConfigurationService.PanaceaInstalled = PanaceaInstalled;
                     return false;
                 }
 
@@ -566,6 +632,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     // Won't be able to find the source location
                     PanaceaInstalled = false;
+                    ConfigurationService.PanaceaInstalled = PanaceaInstalled;
                     return false;
                 }
 
@@ -574,6 +641,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     // While debugging it is most likely to not have the compiled
                     // DLL into the right place. So don't bother.
                     PanaceaInstalled = true;
+                    ConfigurationService.PanaceaInstalled = PanaceaInstalled;
                     return true;
                 }
 
@@ -586,9 +654,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         if (left[i] != right[i])
                         {
                             PanaceaInstalled = false;
+                            ConfigurationService.PanaceaInstalled = PanaceaInstalled;
                             return false;
                         }
                     PanaceaInstalled = true;
+                    ConfigurationService.PanaceaInstalled = PanaceaInstalled;
                     return true;
                 }
                 string PanaceaDestinationLocation = null;
@@ -606,26 +676,39 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                 if (File.Exists(PanaceaDestinationLocation) && !File.Exists(PanaceaAlternateLocation))
                 {
-                    return IsEqual(
-                        CalculateChecksum(PanaceaSourceLocation),
-                        CalculateChecksum(PanaceaDestinationLocation));
+                    if(IsEqual(CalculateChecksum(PanaceaSourceLocation),CalculateChecksum(PanaceaDestinationLocation)))
+                    {
+                        PanaceaInstalled = true;
+                        ConfigurationService.PanaceaInstalled = PanaceaInstalled;
+                        return true;
+                    }
+                    return false;
                 }
                 else if (File.Exists(PanaceaAlternateLocation) && !File.Exists(PanaceaDestinationLocation))
                 {
-                    return IsEqual(
-                        CalculateChecksum(PanaceaSourceLocation),
-                        CalculateChecksum(PanaceaAlternateLocation));
+                    if (IsEqual(CalculateChecksum(PanaceaSourceLocation),CalculateChecksum(PanaceaAlternateLocation)))
+                    {
+                        PanaceaInstalled = true;
+                        ConfigurationService.PanaceaInstalled = PanaceaInstalled;
+                        return true;
+                    }
+                    return false;
                 }
                 else if (File.Exists(PanaceaDestinationLocation) && File.Exists(PanaceaAlternateLocation))
                 {
-                    return IsEqual(CalculateChecksum(PanaceaSourceLocation),
-                        CalculateChecksum(PanaceaDestinationLocation)) ||
-                        IsEqual(CalculateChecksum(PanaceaSourceLocation),
-                        CalculateChecksum(PanaceaAlternateLocation));
+                    if (IsEqual(CalculateChecksum(PanaceaSourceLocation),CalculateChecksum(PanaceaDestinationLocation)) ||
+                        IsEqual(CalculateChecksum(PanaceaSourceLocation),CalculateChecksum(PanaceaAlternateLocation)))
+                    {
+                        PanaceaInstalled = true;
+                        ConfigurationService.PanaceaInstalled = PanaceaInstalled;
+                        return true;
+                    }
+                    return false;
                 }
                 else
                 {
                     PanaceaInstalled = false;
+                    ConfigurationService.PanaceaInstalled = PanaceaInstalled;
                     return false;
                 }
             }
@@ -634,14 +717,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public SetupWizardViewModel()
         {
             IsNotExtracting = true;
-            if (ConfigurationService.PCVersion == "Steam")
-            {
-                WizardPageAfterLuaBackend = PageSteamAPITrick;
-            }
-            else
-            {
-                WizardPageAfterLuaBackend = PageGameData;
-            }
             SelectIsoCommand = new RelayCommand(_ =>
                 FileDialog.OnOpen(fileName => IsoLocation = fileName, _isoFilter));
             SelectOpenKhGameEngineCommand = new RelayCommand(_ =>
@@ -759,15 +834,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     if (!installLocationFoundRemix && !installLocationFound3D)
                     {
-                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        MessageBox.Show("No Game Install Locations Found\nThis may be caused by missing files in the game install folder. If you have an installation verify your game files through Epic Games Store to get the missing files and try again." +
+                            "\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
                     }
                     else if (!installLocationFoundRemix && installLocationFound3D)
                     {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\n(This may be caused by missing files in the game install folder. If you have an installation verify your game files through Epic Games Store to get the missing files and try again.)" +
+                            "\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
                     }
                     else if (installLocationFoundRemix && !installLocationFound3D)
                     {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING", "Success", MessageBoxButton.OK);
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING" +
+                            "\n(This may be caused by missing files in the game install folder. If you have an installation verify your game files through Epic Games Store to get the missing files and try again.)", "Success", MessageBoxButton.OK);
                     }
                     else
                     {
@@ -828,15 +906,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     if (!installLocationFoundRemix && !installLocationFound3D)
                     {
-                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        MessageBox.Show("No Game Install Locations Found\nThis may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again." +
+                            "\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
                     }
                     else if (!installLocationFoundRemix && installLocationFound3D)
                     {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING (This may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again.)" +
+                            "\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
                     }
                     else if (installLocationFoundRemix && !installLocationFound3D)
                     {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING", "Success", MessageBoxButton.OK);
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING" +
+                            "(This may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again.)", "Success", MessageBoxButton.OK);
                     }
                     else
                     {
@@ -951,12 +1032,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         File.Delete(Path.Combine(PcReleaseLocation, "panacea_settings.txt"));
                         File.Delete(Path.Combine(PcReleaseLocationKH3D, "panacea_settings.txt"));
                         PanaceaInstalled = false;
+                        ConfigurationService.PanaceaInstalled = PanaceaInstalled;
                         return;
                     }
                     OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                     OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                     OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
                     PanaceaInstalled = true;
+                    ConfigurationService.PanaceaInstalled = PanaceaInstalled;
                 }
             });
             RemovePanaceaCommand = new RelayCommand(_ =>
@@ -1009,6 +1092,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
                 PanaceaInstalled = false;
+                ConfigurationService.PanaceaInstalled = PanaceaInstalled;
             });
             InstallLuaBackendCommand = new RelayCommand(installed =>
             {
@@ -1322,6 +1406,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         ConfigurationService.SteamAPITrick28 = true;
                     }
                 }
+                OnPropertyChanged(nameof(SteamAPIFileFound));
+                OnPropertyChanged(nameof(SteamAPIFileNotFound));
             });
             RemoveSteamAPIFile = new RelayCommand(_ =>
             {
@@ -1341,6 +1427,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         ConfigurationService.SteamAPITrick28 = false;
                     }
                 }
+                OnPropertyChanged(nameof(SteamAPIFileFound));
+                OnPropertyChanged(nameof(SteamAPIFileNotFound));
             });
         }
 

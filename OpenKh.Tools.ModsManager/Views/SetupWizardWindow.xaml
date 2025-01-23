@@ -395,8 +395,8 @@
                    <Run Foreground="Red">WARNING</Run>
                     Steam must be running otherwise the game will fail to start. It will start to open then crash for seemingly no reason. Make sure steam is open if using this.
                     </TextBlock>
-                    <Button Margin="0 0 0 6" Content="Create steam__appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding InstallSteamAPIFile}"/>
-                    <Button Margin="0 0 0 6" Content="Delete steam__appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveSteamAPIFile}"/>
+                    <Button Margin="0 0 0 6" Content="Create steam__appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding InstallSteamAPIFile}" Visibility="{Binding SteamAPIFileNotFound}"/>
+                    <Button Margin="0 0 0 6" Content="Delete steam__appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveSteamAPIFile}" Visibility="{Binding SteamAPIFileFound}"/>
                 </StackPanel>
             </ScrollViewer>
         </xctk:WizardPage>
