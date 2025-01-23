@@ -838,15 +838,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     if (!installLocationFoundRemix && !installLocationFound3D)
                     {
-                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        MessageBox.Show("No Game Install Locations Found\nThis may be caused by missing files in the game install folder. If you have an installation verify your game files through Epic Games Store to get the missing files and try again." +
+                            "\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
                     }
                     else if (!installLocationFoundRemix && installLocationFound3D)
                     {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\n(This may be caused by missing files in the game install folder. If you have an installation verify your game files through Epic Games Store to get the missing files and try again.)" +
+                            "\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
                     }
                     else if (installLocationFoundRemix && !installLocationFound3D)
                     {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING", "Success", MessageBoxButton.OK);
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING" +
+                            "\n(This may be caused by missing files in the game install folder. If you have an installation verify your game files through Epic Games Store to get the missing files and try again.)", "Success", MessageBoxButton.OK);
                     }
                     else
                     {
@@ -907,15 +910,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     if (!installLocationFoundRemix && !installLocationFound3D)
                     {
-                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        MessageBox.Show("No Game Install Locations Found\nThis may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again." +
+                            "\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
                     }
                     else if (!installLocationFoundRemix && installLocationFound3D)
                     {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING (This may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again.)" +
+                            "\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
                     }
                     else if (installLocationFoundRemix && !installLocationFound3D)
                     {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING", "Success", MessageBoxButton.OK);
+                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING" +
+                            "(This may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again.)", "Success", MessageBoxButton.OK);
                     }
                     else
                     {
