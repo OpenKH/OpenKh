@@ -892,18 +892,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         File.Copy(PanaceaSourceLocation, PanaceaAlternateLocation, true);
                         File.Delete(PanaceaDestinationLocation);
                     }
-                    if (Directory.Exists(ConfigurationService.PcReleaseLocation))
+                    if (Directory.Exists(PcReleaseLocation))
                     {
-                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
+                        File.WriteAllLines(Path.Combine(PcReleaseLocation, "panacea_settings.txt"),
                             new string[]
                             {
                                 $"mod_path={ConfigurationService.GameModPath}",
                                 $"show_console={false}",
                             });
                     }
-                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                    if (Directory.Exists(PcReleaseLocationKH3D))
                     {
-                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
+                        File.WriteAllLines(Path.Combine(PcReleaseLocationKH3D, "panacea_settings.txt"),
                             new string[]
                             {
                                 $"mod_path={ConfigurationService.GameModPath}",
@@ -948,8 +948,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
                         File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
                         File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
-                        File.Delete(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"));
-                        File.Delete(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "panacea_settings.txt"));
+                        File.Delete(Path.Combine(PcReleaseLocationKH3D, "panacea_settings.txt"));
                         PanaceaInstalled = false;
                         return;
                     }
@@ -1002,8 +1002,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
                     File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
                     File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
-                    File.Delete(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"));
-                    File.Delete(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"));
+                    File.Delete(Path.Combine(PcReleaseLocation, "panacea_settings.txt"));
+                    File.Delete(Path.Combine(PcReleaseLocationKH3D, "panacea_settings.txt"));
                 }
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
@@ -1308,17 +1308,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 if (GameCollection == 0)
                 {
-                    if (Directory.Exists(ConfigurationService.PcReleaseLocation))
+                    if (Directory.Exists(PcReleaseLocation))
                     {
-                        File.WriteAllText(Path.Combine(ConfigurationService.PcReleaseLocation, "steam_appid.txt"), "2552430");
+                        File.WriteAllText(Path.Combine(PcReleaseLocation, "steam_appid.txt"), "2552430");
                         ConfigurationService.SteamAPITrick1525 = true;
                     }
                 }
                 else if (GameCollection == 1)
                 {
-                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                    if (Directory.Exists(PcReleaseLocationKH3D))
                     {
-                        File.WriteAllText(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "steam_appid.txt"), "2552440");
+                        File.WriteAllText(Path.Combine(PcReleaseLocationKH3D, "steam_appid.txt"), "2552440");
                         ConfigurationService.SteamAPITrick28 = true;
                     }
                 }
@@ -1327,17 +1327,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 if (GameCollection == 0)
                 {
-                    if (File.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "steam_appid.txt")))
+                    if (File.Exists(Path.Combine(PcReleaseLocation, "steam_appid.txt")))
                     {
-                        File.Delete(Path.Combine(ConfigurationService.PcReleaseLocation, "steam_appid.txt"));
+                        File.Delete(Path.Combine(PcReleaseLocation, "steam_appid.txt"));
                         ConfigurationService.SteamAPITrick1525 = false;
                     }
                 }
                 else if (GameCollection == 1)
                 {
-                    if (File.Exists(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "steam_appid.txt")))
+                    if (File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_appid.txt")))
                     {
-                        File.Delete(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "steam_appid.txt"));
+                        File.Delete(Path.Combine(PcReleaseLocationKH3D, "steam_appid.txt"));
                         ConfigurationService.SteamAPITrick28 = false;
                     }
                 }
