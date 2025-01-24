@@ -101,7 +101,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string GameName { get; set; }
         public string IsoLocation
         {
-            get => _isoLocation;
+            get
+            {
+                if (File.Exists(_isoLocation))
+                {
+                    var game = GameService.DetectGameId(_isoLocation);
+                    GameId = game?.Id;
+                    GameName = game?.Name;
+                }
+                return _isoLocation;
+            }
             set
             {
                 _isoLocation = value;
