@@ -298,7 +298,6 @@
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                             Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
                             modifying the game files.
-                            The file is named 'DBGHELP.dll' for Windows and 'version.dll' for Linux and it can be found in your game's install folder.
                             Panacea will run every time you start the game and attempt to load built mods. To uninstall Panacea, click Remove Panacea button.
                     </TextBlock>
                     <StackPanel Visibility="{Binding PanaceaNotInstalledVisibility}">
@@ -310,20 +309,10 @@
                         </TextBlock>
                         <Button
                             Margin="0 0 0 6"
-                            Content="Install Panacea for Windows"
+                            Content="Install Panacea"
                             HorizontalAlignment="Left"
                             Width="205"
-                            Command="{Binding InstallPanaceaCommand}" CommandParameter="false"/>
-                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                            <Run Foreground="Red">WARNING</Run>
-                            linux support is still a WIP. While it does currently work it is a lot of extra setup.
-                        </TextBlock>
-                        <Button
-                            Margin="0 0 0 6"
-                            Content="Install Panacea for Linux"
-                            HorizontalAlignment="Left"
-                            Width="205"
-                            Command="{Binding InstallPanaceaCommand}" CommandParameter="true"/>
+                            Command="{Binding InstallPanaceaCommand}"/>
                     </StackPanel>
                     <StackPanel Visibility="{Binding PanaceaInstalledVisibility}">
                         <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
