@@ -93,7 +93,7 @@ Commands table.
 | 38 	 | ushort | Reaction Count
 | 40 	 | ushort | Dist Range
 | 42 	 | ushort | Score
-| 44 	 | ushort | [Disable Form](#disable form)(BitFlags)
+| 44 	 | ushort | [Disable Form (BitFlags)](#disable-form)
 | 46 	 | byte | Group
 | 47 	 | byte | Reserve
 
