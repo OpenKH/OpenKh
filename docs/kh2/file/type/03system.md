@@ -172,14 +172,14 @@ Commands table.
 | 0x20 | Anti Sora
 | 0x40 | Lion King Sora
 | 0x80 | Little Mermaid Sora
-| 0x100 | Unkown
+| 0x100 | Unknown
 | 0x200 | Dual Wield Roxas
 | 0x400 | Card/Dice/Carpet Escape Sora (Minigame Soras Except Lightcycle) and Mickey Mouse
-| 0x800 | Unkown
-| 0x1000 | Unkown
-| 0x2000 | Unkown
-| 0x4000 | Unkown
-| 0x5000 | Unkown
+| 0x800 | Unknown
+| 0x1000 | Unknown
+| 0x2000 | Unknown
+| 0x4000 | Unknown
+| 0x5000 | Unknown
 
 ---
 
