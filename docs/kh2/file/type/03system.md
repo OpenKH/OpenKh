@@ -93,7 +93,7 @@ Commands table.
 | 38 	 | ushort | Reaction Count
 | 40 	 | ushort | Dist Range
 | 42 	 | ushort | Score
-| 44 	 | ushort | Disable Form
+| 44 	 | ushort | [Disable Form (BitFlags)](#disable-form)
 | 46 	 | byte | Group
 | 47 	 | byte | Reserve
 
@@ -159,6 +159,27 @@ Commands table.
 | 0 | Null
 | 1 | Idle
 | 2 | Jump
+
+#### Disable Form
+
+| Id | Description |
+|----|-------------|
+| 0x1 | Roxas and Non-Minigame Base Soras
+| 0x2 | Valor Sora
+| 0x4 | Wisdom Sora
+| 0x8 | Limit Sora (Also has a dedicated Flag)
+| 0x10 | Master Sora
+| 0x20 | Anti Sora
+| 0x40 | Lion King Sora
+| 0x80 | Little Mermaid Sora
+| 0x100 | Unknown
+| 0x200 | Dual Wield Roxas
+| 0x400 | Card/Dice/Carpet Escape Sora (Minigame Soras Except Lightcycle) and Mickey Mouse
+| 0x800 | Unknown
+| 0x1000 | Unknown
+| 0x2000 | Unknown
+| 0x4000 | Unknown
+| 0x5000 | Unknown
 
 ---
 
