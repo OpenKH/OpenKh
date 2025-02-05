@@ -532,7 +532,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand SelectGameDataLocationCommand { get; }
         public string GameDataLocation
         {
-            get => _gameDataLocation;
+            get => ConfigurationService.GameDataLocation = _gameDataLocation;
             set
             {
                 _gameDataLocation = value;
