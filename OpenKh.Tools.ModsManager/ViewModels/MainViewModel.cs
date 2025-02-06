@@ -436,10 +436,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
             PatchCommand = new RelayCommand(async (fastMode) =>
             {
-                ResetLogWindow();
-                await BuildPatches(Convert.ToBoolean(fastMode));
-                await PatchGame(Convert.ToBoolean(fastMode));
-                CloseAllWindows();
+                try
+                {
+                    ResetLogWindow();
+                    await BuildPatches(Convert.ToBoolean(fastMode));
+                    await PatchGame(Convert.ToBoolean(fastMode));
+                    CloseAllWindows();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    return;
+                }
             }, _ => !IsBuilding);
 
             RunCommand = new RelayCommand(async _ =>

@@ -884,12 +884,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         return;
                     }
 
-                    if (!Directory.Exists(directoryPath))
-                    {
-                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
-                        return;
-                    }
-
                     bool installLocationFoundRemix = false;
                     bool installLocationFound3D = false;
                     // Read the entire content of the VDF file
@@ -897,60 +891,70 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     try
                     {
                         vdfContent = File.ReadAllText(Path.Combine(directoryPath, "libraryfolders.vdf"));
+
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show(ex.Message + "\nPlease Manually Browse To Your Game Install Directory");
                         return;
                     }
-                    // Define a regular expression to match "path" values
-                    Regex regex = new Regex(@"""path""\s*""([^""]*)""", RegexOptions.IgnoreCase);
-                    // MatchCollection to store all matches found
-                    MatchCollection matches = regex.Matches(vdfContent);
-                    // Iterate through matches and print out the "path" values
-                    if (Directory.Exists(directoryPath))
+                    try
                     {
-                        foreach (Match match in matches)
+                        // Define a regular expression to match "path" values
+                        Regex regex = new Regex(@"""path""\s*""([^""]*)""", RegexOptions.IgnoreCase);
+                        // MatchCollection to store all matches found
+                        MatchCollection matches = regex.Matches(vdfContent);
+                        // Iterate through matches and print out the "path" values
+                        if (Directory.Exists(directoryPath))
                         {
-                            string pathValue = match.Groups[1].Value; // Group 1 is the path raw, without the key
-                            Console.WriteLine($"Path: {pathValue}");
-                            string parsedText = pathValue.Replace(@"\\", @"\");
-                            string commonGamesDirectory = Path.Combine(parsedText, "steamapps\\common");
-                            if (Directory.Exists(commonGamesDirectory))
+                            foreach (Match match in matches)
                             {
-                                string kH1525Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS -HD 1.5+2.5 ReMIX-");
-                                string kH28Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS HD 2.8 Final Chapter Prologue");
-                                if (File.Exists(Path.Combine(kH1525Path, "steam_api64.dll")))
+                                string pathValue = match.Groups[1].Value; // Group 1 is the path raw, without the key
+                                Console.WriteLine($"Path: {pathValue}");
+                                string parsedText = pathValue.Replace(@"\\", @"\");
+                                string commonGamesDirectory = Path.Combine(parsedText, "steamapps\\common");
+                                if (Directory.Exists(commonGamesDirectory))
                                 {
-                                    installLocationFoundRemix = true;
-                                    PcReleaseLocation = kH1525Path;
-                                }
-                                if (File.Exists(Path.Combine(kH28Path, "steam_api64.dll")))
-                                {
-                                    installLocationFound3D = true;
-                                    PcReleaseLocationKH3D = kH28Path;
+                                    string kH1525Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS -HD 1.5+2.5 ReMIX-");
+                                    string kH28Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS HD 2.8 Final Chapter Prologue");
+                                    if (File.Exists(Path.Combine(kH1525Path, "steam_api64.dll")))
+                                    {
+                                        installLocationFoundRemix = true;
+                                        PcReleaseLocation = kH1525Path;
+                                    }
+                                    if (File.Exists(Path.Combine(kH28Path, "steam_api64.dll")))
+                                    {
+                                        installLocationFound3D = true;
+                                        PcReleaseLocationKH3D = kH28Path;
+                                    }
                                 }
                             }
                         }
+                        if (!installLocationFoundRemix && !installLocationFound3D)
+                        {
+                            MessageBox.Show("No Game Install Locations Found\nThis may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again." +
+                                "\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        }
+                        else if (!installLocationFoundRemix && installLocationFound3D)
+                        {
+                            MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING (This may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again.)" +
+                                "\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                        }
+                        else if (installLocationFoundRemix && !installLocationFound3D)
+                        {
+                            MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING" +
+                                "(This may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again.)", "Success", MessageBoxButton.OK);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                        }
+
                     }
-                    if (!installLocationFoundRemix && !installLocationFound3D)
+                    catch (Exception ex)
                     {
-                        MessageBox.Show("No Game Install Locations Found\nThis may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again." +
-                            "\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
-                    }
-                    else if (!installLocationFoundRemix && installLocationFound3D)
-                    {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING (This may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again.)" +
-                            "\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
-                    }
-                    else if (installLocationFoundRemix && !installLocationFound3D)
-                    {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING" +
-                            "(This may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again.)", "Success", MessageBoxButton.OK);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                        MessageBox.Show(ex.Message);
+                        return;
                     }
                 }
                 else
