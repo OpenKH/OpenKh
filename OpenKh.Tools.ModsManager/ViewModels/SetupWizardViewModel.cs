@@ -891,7 +891,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     try
                     {
                         vdfContent = File.ReadAllText(Path.Combine(directoryPath, "libraryfolders.vdf"));
-
                     }
                     catch (Exception ex)
                     {
