@@ -7,20 +7,20 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     
-    <DockPanel Background="White">
+    <DockPanel>
 
         <!-- FILTERS AND OTHER CONTROLS -->
         <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10">
             <Label FontWeight="Bold">Filters</Label>
             <StackPanel Orientation="Horizontal">
-                <Label>Name:</Label>
-                <TextBox Name="FilterName" Text="{Binding FilterName}" Width="80" VerticalContentAlignment="Center" PreviewKeyDown="FilterName_PreviewKeyDown"></TextBox>
+                <Label VerticalAlignment="Center" Margin="0,0,5,0">Name:</Label>
+                <TextBox Name="FilterName" Text="{Binding FilterName}" Width="80" VerticalContentAlignment="Center" PreviewKeyDown="FilterName_PreviewKeyDown" TextChanged="FilterName_TextChanged" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Label>Has Moveset:</Label>
-                <CheckBox IsChecked="{Binding FilterHasMset}" VerticalAlignment="Center"/>
+                <Label VerticalAlignment="Center" Margin="0,0,5,0">Has Moveset:</Label>
+                <CheckBox IsChecked="{Binding FilterHasMset}" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
             </StackPanel>
-            <Button Width="100" HorizontalAlignment="Left" Click="Button_ApplyFilters">Apply filters</Button>
+            <!-- <Button Width="100" HorizontalAlignment="Left" Click="Button_ApplyFilters">Apply filters</Button> -->
         </StackPanel>
 
         <!-- OBJECT LIST -->
@@ -28,11 +28,8 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Grid.Column="0" Text="{Binding Path=FileName}"/>
-                        <CheckBox Grid.Column="1" Focusable="False" IsHitTestVisible="False"  IsChecked="{Binding Path=HasMset}" BorderThickness="0" VerticalAlignment="Center" >
-                            <CheckBox.Background>
-                                <SolidColorBrush Opacity="0"/>
-                            </CheckBox.Background>
+                        <TextBlock Grid.Column="0" Margin="0,0,5,0" Text="{Binding Path=FileName}" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="1" Focusable="False" IsHitTestVisible="False"  IsChecked="{Binding Path=HasMset}" VerticalAlignment="Center" >
                         </CheckBox>
                     </StackPanel>
                 </DataTemplate>

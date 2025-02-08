@@ -39,5 +39,23 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
                 ThisVM.applyFilters();
             }
         }
+
+        private void FilterName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ThisVM.FilterName = FilterName.Text;
+            ThisVM.applyFilters();
+        }
+
+        private void CheckBox_Checked(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ThisVM.FilterHasMset = true;
+            ThisVM.applyFilters();
+        }
+
+        private void CheckBox_Unchecked(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ThisVM.FilterHasMset = false;
+            ThisVM.applyFilters();
+        }
     }
 }

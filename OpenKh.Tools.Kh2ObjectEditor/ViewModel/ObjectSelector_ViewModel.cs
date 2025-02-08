@@ -34,6 +34,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
         public ObjectSelector_ViewModel()
         {
+            FilterName = "";
             Objects = new List<ObjectSelector_Wrapper>();
             ObjectsView = new ObservableCollection<ObjectSelector_Wrapper>();
             applyFilters();
@@ -77,39 +78,52 @@ namespace OpenKh.Tools.Kh2ObjectEditor.ViewModel
 
             foreach(ObjectSelector_Wrapper iObject in Objects)
             {
+                if (FilterHasMset && !iObject.HasMset)
+                    continue;
+            
+                if(FilterName != "")
+                {
+                    string iObjectDescription = iObject.GetDescription();
+                    if (!iObject.FileName.ToLower().Contains(FilterName.ToLower()) &&
+                        !iObjectDescription.ToLower().Contains(FilterName.ToLower()))
+                    {
+                            continue;
+                    }
+                }
+            
                 ObjectsView.Add(iObject);
             }
 
-            for (int i = ObjectsView.Count - 1; i >= 0; i--)
-            {
-                ObjectSelector_Wrapper iObject = ObjectsView[i];
-                if (applyMsetFilter)
-                {
-                    if (!iObject.HasMset)
-                    {
-                        ObjectsView.RemoveAt(i);
-                        continue;
-                    }
-                }
-                if (applyNameFilter)
-                {
-                    if (!iObject.FileName.ToLower().Contains(FilterName.ToLower()))
-                    {
-                        ObjectsView.RemoveAt(i);
-                        continue;
-                    }
-                }
-                if (applyDescriptionFilter)
-                {
-                    string searchCriteria = FilterName.ToLower().Substring(1);
-                    string iObjectDescription = iObject.GetDescription();
-                    if (!iObjectDescription.ToLower().Contains(searchCriteria.ToLower()))
-                    {
-                        ObjectsView.RemoveAt(i);
-                        continue;
-                    }
-                }
-            }
+            //for (int i = ObjectsView.Count - 1; i >= 0; i--)
+            //{
+            //    ObjectSelector_Wrapper iObject = ObjectsView[i];
+            //    if (applyMsetFilter)
+            //    {
+            //        if (!iObject.HasMset)
+            //        {
+            //            ObjectsView.RemoveAt(i);
+            //            continue;
+            //        }
+            //    }
+            //    if (applyNameFilter)
+            //    {
+            //        if (!iObject.FileName.ToLower().Contains(FilterName.ToLower()))
+            //        {
+            //            ObjectsView.RemoveAt(i);
+            //            continue;
+            //        }
+            //    }
+            //    if (applyDescriptionFilter)
+            //    {
+            //        string searchCriteria = FilterName.ToLower().Substring(1);
+            //        string iObjectDescription = iObject.GetDescription();
+            //        if (!iObjectDescription.ToLower().Contains(searchCriteria.ToLower()))
+            //        {
+            //            ObjectsView.RemoveAt(i);
+            //            continue;
+            //        }
+            //    }
+            //}
         }
 
         private void subscribe_FolderLoaded()

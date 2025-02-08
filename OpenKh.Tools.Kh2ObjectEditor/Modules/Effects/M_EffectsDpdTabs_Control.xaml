@@ -8,33 +8,33 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <TabControl Grid.Column="0">
-            <TabItem>
+            <TabItem Width="60">
                 <TabItem.Header>
                     <Label>Textures</Label>
                 </TabItem.Header>
                 <ContentControl Name="Tab_Textures"/>
             </TabItem>
-            <TabItem>
+            <TabItem Width="60">
                 <TabItem.Header>
                     <Label>Models</Label>
                 </TabItem.Header>
                 <Label>Unimplemented</Label>
                 <!--<ContentControl Name="Tab_Models"/>-->
             </TabItem>
-            <TabItem>
+            <TabItem Width="60">
                 <TabItem.Header>
                     <Label>Shapes</Label>
                 </TabItem.Header>
                 <Label>Unimplemented</Label>
                 <!--<ContentControl Name="Tab_Shapes"/>-->
             </TabItem>
-            <TabItem>
+            <TabItem Width="60">
                 <TabItem.Header>
                     <Label>VSF</Label>
                 </TabItem.Header>
                 <ContentControl Name="Tab_Vsf"/>
             </TabItem>
-            <TabItem>
+            <TabItem Width="60">
                 <TabItem.Header>
                     <Label>Data</Label>
                 </TabItem.Header>

@@ -2,6 +2,7 @@ using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Services;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using static OpenKh.Kh2.MotionTrigger;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
@@ -13,8 +14,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
         public ObservableCollection<RangeTrigger> RangeTriggerList { get; set; }
         public ObservableCollection<FrameTrigger> FrameTriggerList { get; set; }
 
-        public static Dictionary<byte,string> RangeTriggerOptions { get; set; }
-        public static Dictionary<byte, string> FrameTriggerOptions { get; set; }
+        public List<string> RangeTriggerOptions2 => TriggerDictionary.Range.Values.ToList();
+        public List<string> FrameTriggerOptions2 => TriggerDictionary.Frame.Values.ToList();
 
         public bool HasNoTriggers
         {
@@ -27,7 +28,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
         public MotionTriggers_VM() { }
         public MotionTriggers_VM(AnimationBinary animBinary)
         {
-            loadOptions();
             AnimBinary = animBinary;
 
             RangeTriggerList = new ObservableCollection<RangeTrigger>();
@@ -64,12 +64,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
                 AnimBinary.MotionTriggerFile.FrameTriggerList.Add(trigger);
             }
             MsetService.Instance.SaveMotion();
-        }
-
-        private void loadOptions()
-        {
-            RangeTriggerOptions = TriggerDictionary.Range;
-            FrameTriggerOptions = TriggerDictionary.Frame;
         }
     }
 }

@@ -32,7 +32,7 @@
         <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
 
         <!-- MOTION LIST -->
-        <DockPanel Background="White" Grid.Column="2">
+        <DockPanel Grid.Column="2">
             <Grid DockPanel.Dock="Top" Background="PaleVioletRed">
                 <Button Width="100" HorizontalAlignment="Center" Click="Button_TEST" Margin="10">TEST</Button>
             </Grid>
@@ -40,14 +40,13 @@
             <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10">
                 <Label FontWeight="Bold">Filters</Label>
                 <StackPanel Orientation="Horizontal">
-                    <Label>Name:</Label>
-                    <TextBox Name="FilterName" Text="{Binding FilterName}" Width="100" VerticalContentAlignment="Center" PreviewKeyDown="FilterName_PreviewKeyDown"></TextBox>
+                    <Label VerticalAlignment="Center" Margin="0,0,5,0">Name:</Label>
+                    <TextBox Name="FilterName" Text="{Binding FilterName}" Width="100" VerticalContentAlignment="Center" PreviewKeyDown="FilterName_PreviewKeyDown" TextChanged="FilterName_TextChanged"></TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Label>Hide Dummies:</Label>
-                    <CheckBox IsChecked="{Binding FilterHideDummies}" VerticalAlignment="Center"/>
+                    <Label VerticalAlignment="Center" Margin="0,0,5,0">Hide Dummies:</Label>
+                    <CheckBox IsChecked="{Binding FilterHideDummies}" VerticalAlignment="Center" Checked="HideDummies_Checked" Unchecked="HideDummies_Unchecked"/>
                 </StackPanel>
-                <Button Width="100" HorizontalAlignment="Right" Click="Button_ApplyFilters">Apply filters</Button>
             </StackPanel>
 
             <!-- Motion list -->

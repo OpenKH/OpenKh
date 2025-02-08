@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Collisions
 {
@@ -12,12 +13,11 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Collisions
     {
         public ObservableCollection<ObjectCollision> Collisions { get; set; }
 
-        public static Dictionary<byte, string> CollisionTypeOptions { get; set; }
-        public static Dictionary<byte, string> CollisionShapeOptions { get; set; }
+        public List<string> CollisionShapeOptions => CollisionShapeConverter.CollisionShapes.Values.ToList();
+        public List<string> CollisionTypeOptions => CollisionTypeConverter.CollisionTypes.Values.ToList();
 
         public M_Collisions_VM()
         {
-            loadOptions();
             Collisions = new ObservableCollection<ObjectCollision>();
             reloadCollisions();
         }
@@ -87,12 +87,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Collisions
         {
             MdlxService.Instance.CollisionFile.EntryList.RemoveAt(index);
             reloadCollisions();
-        }
-
-        private void loadOptions()
-        {
-            CollisionTypeOptions = CollisionTypeConverter.CollisionTypes;
-            CollisionShapeOptions = CollisionShapeConverter.CollisionShapes;
         }
 
         // Tests the collisions ingame.

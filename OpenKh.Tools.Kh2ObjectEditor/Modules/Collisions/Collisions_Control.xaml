@@ -50,35 +50,23 @@
                 <DataGridTemplateColumn Header="Shape">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Shape, Converter={StaticResource CollisionShapeConverter}}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                    <DataGridTemplateColumn.CellEditingTemplate>
-                        <DataTemplate>
-                            <ComboBox SelectedValue="{Binding Shape}"
-                                      SelectedValuePath="Key"
-                                      DisplayMemberPath="Value"
+                            <ComboBox HorizontalAlignment="Stretch"
+                                      SelectedItem="{Binding Shape, Converter={StaticResource CollisionShapeConverter}, Mode=TwoWay}"
                                       ItemsSource="{Binding DataContext.CollisionShapeOptions, RelativeSource={RelativeSource AncestorType=UserControl}}" />
                         </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
+
                 <DataGridTemplateColumn Header="Type">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Type, Converter={StaticResource CollisionTypeConverter}}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                    <DataGridTemplateColumn.CellEditingTemplate>
-                        <DataTemplate>
-                            <ComboBox SelectedValue="{Binding Type}"
-                                      SelectedValuePath="Key"
-                                      DisplayMemberPath="Value"
+                            <ComboBox HorizontalAlignment="Stretch"
+                                      SelectedItem="{Binding Type, Converter={StaticResource CollisionTypeConverter}, Mode=TwoWay}"
                                       ItemsSource="{Binding DataContext.CollisionTypeOptions, RelativeSource={RelativeSource AncestorType=UserControl}}" />
                         </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
+
                 <DataGridTextColumn Binding="{Binding Path=Bone}" Header="Bone" />
                 <DataGridTextColumn Binding="{Binding Path=PositionX}" Header="PositionX" />
                 <DataGridTextColumn Binding="{Binding Path=PositionY}" Header="PositionY" />

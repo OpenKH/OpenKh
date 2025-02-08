@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <DockPanel Background="LightGray" MouseEnter="DockPanel_MouseEnter" MouseLeave="DockPanel_MouseLeave" PreviewKeyDown="Window_KeyDown">
+    <DockPanel Background="DarkGray" MouseEnter="DockPanel_MouseEnter" MouseLeave="DockPanel_MouseLeave" PreviewKeyDown="Window_KeyDown">
         <StackPanel DockPanel.Dock="Bottom" Margin="10">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Label Content="{Binding MotionMinFrame}" Width="50" HorizontalContentAlignment="Center"/>
@@ -24,9 +24,9 @@
             
             <ContentControl HorizontalAlignment="Center" Height="30">
                 <StackPanel Orientation="Horizontal">
-                    <Button Click="Button_PreviousFrame" Width="20">&lt;</Button>
-                    <Label Content="{Binding CurrentFrame}" Width="50" HorizontalContentAlignment="Center"></Label>
-                    <Button Click="Button_NextFrame" Width="20">&gt;</Button>
+                    <Button VerticalAlignment="Center" Click="Button_PreviousFrame" Width="20" Padding="0">&lt;</Button>
+                    <Label VerticalAlignment="Center" Content="{Binding CurrentFrame}" Width="50" HorizontalContentAlignment="Center"></Label>
+                    <Button VerticalAlignment="Center" Click="Button_NextFrame" Width="20" Padding="0">&gt;</Button>
                 </StackPanel>
             </ContentControl>
             <Grid>

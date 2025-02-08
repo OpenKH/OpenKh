@@ -18,7 +18,7 @@
         <!-- <local:ModuleMotions_Control/> -->
 
         <!-- Side menu -->
-        <StackPanel Grid.Column="1" Background="White">
+        <StackPanel Grid.Column="1">
             <Label Visibility="Visible" x:Name="TabModel" MouseLeftButtonUp="TabClick_Model">Model</Label>
             <Label Visibility="Visible" x:Name="TabTextures" MouseLeftButtonUp="TabClick_Textures">Textures</Label>
             <Label Visibility="Visible" x:Name="TabUI" MouseLeftButtonUp="TabClick_UI">UI</Label>
