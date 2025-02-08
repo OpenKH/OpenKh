@@ -8,7 +8,7 @@
         Title="KH2 Object Editor" Height="900" Width="1600">
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top" Height="20">
+        <Menu DockPanel.Dock="Top" Height="50" >
             <MenuItem Header="TEST" Visibility="Collapsed">
                 <MenuItem Header="Check App Context" Click="Menu_Test"/>
                 <MenuItem Header="Run Code" Click="Menu_Test_RunCode"/>
