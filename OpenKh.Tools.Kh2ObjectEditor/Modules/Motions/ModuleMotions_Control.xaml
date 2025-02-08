@@ -38,13 +38,13 @@
             </Grid>
             <!-- Filters -->
             <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10">
-                <Label FontWeight="Bold">Filters</Label>
+                <Label Foreground="White" FontWeight="Bold">Filters</Label>
                 <StackPanel Orientation="Horizontal">
-                    <Label VerticalAlignment="Center" Margin="0,0,5,0">Name:</Label>
+                    <Label Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0">Name:</Label>
                     <TextBox Name="FilterName" Text="{Binding FilterName}" Width="100" VerticalContentAlignment="Center" PreviewKeyDown="FilterName_PreviewKeyDown" TextChanged="FilterName_TextChanged"></TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Label VerticalAlignment="Center" Margin="0,0,5,0">Hide Dummies:</Label>
+                    <Label Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0">Hide Dummies:</Label>
                     <CheckBox IsChecked="{Binding FilterHideDummies}" VerticalAlignment="Center" Checked="HideDummies_Checked" Unchecked="HideDummies_Unchecked"/>
                 </StackPanel>
             </StackPanel>
