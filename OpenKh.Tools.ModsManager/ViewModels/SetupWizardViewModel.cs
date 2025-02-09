@@ -1236,6 +1236,51 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     int index = config.IndexOf("true }", config.IndexOf("[kh3d]")) + 6;
                                     config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}").Replace("\\", "/"));
                                 }
+                                if (ConfigurationService.PCVersion == "Steam")
+                                {
+                                    int indexEGS = 0;
+                                    int indexSteam = 0;
+                                    //KH3D
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 2.8 Final Chapter Prologue\"", config.IndexOf("[kh3d]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 2.8 Final Chapter Prologue\"", config.IndexOf("[kh3d]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //ReCoM
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[recom]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[recom]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //BBS
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[bbs]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[bbs]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //KH2
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh2]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh2]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //KH1
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh1]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh1]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                }
                                 File.WriteAllText(Path.Combine(DestinationCollection, "LuaBackend.toml"), config);
                             }
                             File.Delete(DownPath);
@@ -1408,6 +1453,51 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                         config = config.Insert(index, "scripts = [{ path = \"scripts/kh3d/\", relative = true }" +
                                             ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
+                                    }
+                                }
+                                if (ConfigurationService.PCVersion == "Steam")
+                                {
+                                    int indexEGS = 0;
+                                    int indexSteam = 0;
+                                    //KH3D
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 2.8 Final Chapter Prologue\"", config.IndexOf("[kh3d]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 2.8 Final Chapter Prologue\"", config.IndexOf("[kh3d]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //ReCoM
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[recom]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[recom]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //BBS
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[bbs]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[bbs]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //KH2
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh2]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh2]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //KH1
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh1]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh1]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
                                     }
                                 }
                                 File.WriteAllText(Path.Combine(DestinationCollection, "LuaBackend.toml"), config);
