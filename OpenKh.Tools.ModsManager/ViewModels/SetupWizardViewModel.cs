@@ -884,12 +884,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         return;
                     }
 
-                    if (!Directory.Exists(directoryPath))
-                    {
-                        MessageBox.Show("No Game Install Locations Found\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
-                        return;
-                    }
-
                     bool installLocationFoundRemix = false;
                     bool installLocationFound3D = false;
                     // Read the entire content of the VDF file
@@ -903,54 +897,63 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         MessageBox.Show(ex.Message + "\nPlease Manually Browse To Your Game Install Directory");
                         return;
                     }
-                    // Define a regular expression to match "path" values
-                    Regex regex = new Regex(@"""path""\s*""([^""]*)""", RegexOptions.IgnoreCase);
-                    // MatchCollection to store all matches found
-                    MatchCollection matches = regex.Matches(vdfContent);
-                    // Iterate through matches and print out the "path" values
-                    if (Directory.Exists(directoryPath))
+                    try
                     {
-                        foreach (Match match in matches)
+                        // Define a regular expression to match "path" values
+                        Regex regex = new Regex(@"""path""\s*""([^""]*)""", RegexOptions.IgnoreCase);
+                        // MatchCollection to store all matches found
+                        MatchCollection matches = regex.Matches(vdfContent);
+                        // Iterate through matches and print out the "path" values
+                        if (Directory.Exists(directoryPath))
                         {
-                            string pathValue = match.Groups[1].Value; // Group 1 is the path raw, without the key
-                            Console.WriteLine($"Path: {pathValue}");
-                            string parsedText = pathValue.Replace(@"\\", @"\");
-                            string commonGamesDirectory = Path.Combine(parsedText, "steamapps\\common");
-                            if (Directory.Exists(commonGamesDirectory))
+                            foreach (Match match in matches)
                             {
-                                string kH1525Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS -HD 1.5+2.5 ReMIX-");
-                                string kH28Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS HD 2.8 Final Chapter Prologue");
-                                if (File.Exists(Path.Combine(kH1525Path, "steam_api64.dll")))
+                                string pathValue = match.Groups[1].Value; // Group 1 is the path raw, without the key
+                                Console.WriteLine($"Path: {pathValue}");
+                                string parsedText = pathValue.Replace(@"\\", @"\");
+                                string commonGamesDirectory = Path.Combine(parsedText, "steamapps\\common");
+                                if (Directory.Exists(commonGamesDirectory))
                                 {
-                                    installLocationFoundRemix = true;
-                                    PcReleaseLocation = kH1525Path;
-                                }
-                                if (File.Exists(Path.Combine(kH28Path, "steam_api64.dll")))
-                                {
-                                    installLocationFound3D = true;
-                                    PcReleaseLocationKH3D = kH28Path;
+                                    string kH1525Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS -HD 1.5+2.5 ReMIX-");
+                                    string kH28Path = Path.Combine(commonGamesDirectory, @"KINGDOM HEARTS HD 2.8 Final Chapter Prologue");
+                                    if (File.Exists(Path.Combine(kH1525Path, "steam_api64.dll")))
+                                    {
+                                        installLocationFoundRemix = true;
+                                        PcReleaseLocation = kH1525Path;
+                                    }
+                                    if (File.Exists(Path.Combine(kH28Path, "steam_api64.dll")))
+                                    {
+                                        installLocationFound3D = true;
+                                        PcReleaseLocationKH3D = kH28Path;
+                                    }
                                 }
                             }
                         }
+                        if (!installLocationFoundRemix && !installLocationFound3D)
+                        {
+                            MessageBox.Show("No Game Install Locations Found\nThis may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again." +
+                                "\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
+                        }
+                        else if (!installLocationFoundRemix && installLocationFound3D)
+                        {
+                            MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING (This may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again.)" +
+                                "\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                        }
+                        else if (installLocationFoundRemix && !installLocationFound3D)
+                        {
+                            MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING" +
+                                "(This may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again.)", "Success", MessageBoxButton.OK);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                        }
+
                     }
-                    if (!installLocationFoundRemix && !installLocationFound3D)
+                    catch (Exception ex)
                     {
-                        MessageBox.Show("No Game Install Locations Found\nThis may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again." +
-                            "\nPlease Manually Browse To Your Game Install Directory", "Failure", MessageBoxButton.OK);
-                    }
-                    else if (!installLocationFoundRemix && installLocationFound3D)
-                    {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: MISSING (This may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again.)" +
-                            "\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
-                    }
-                    else if (installLocationFoundRemix && !installLocationFound3D)
-                    {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: MISSING" +
-                            "(This may be caused by missing files in the game install folder. If you have an installation verify your game files through Steam to get the missing files and try again.)", "Success", MessageBoxButton.OK);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Kingdom Hearts HD 1.5+2.5: FOUND\nKingdom Hearts HD 2.8: FOUND", "Success", MessageBoxButton.OK);
+                        MessageBox.Show(ex.Message);
+                        return;
                     }
                 }
                 else
@@ -1126,8 +1129,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
                         File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
                         File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
-                        File.Delete(Path.Combine(PcReleaseLocation, "panacea_settings.txt"));
-                        File.Delete(Path.Combine(PcReleaseLocationKH3D, "panacea_settings.txt"));
+                        if (GameCollection == 0 && PcReleaseLocation != null)
+                        {
+                            File.Delete(Path.Combine(PcReleaseLocation, "panacea_settings.txt"));
+                        }
+                        if (GameCollection == 1 && PcReleaseLocationKH3D != null)
+                        {
+                            File.Delete(Path.Combine(PcReleaseLocationKH3D, "panacea_settings.txt"));
+                        }
                     }
                     OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                     OnPropertyChanged(nameof(PanaceaInstalledVisibility));
@@ -1232,6 +1241,51 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 {
                                     int index = config.IndexOf("true }", config.IndexOf("[kh3d]")) + 6;
                                     config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}").Replace("\\", "/"));
+                                }
+                                if (ConfigurationService.PCVersion == "Steam")
+                                {
+                                    int indexEGS = 0;
+                                    int indexSteam = 0;
+                                    //KH3D
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 2.8 Final Chapter Prologue\"", config.IndexOf("[kh3d]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 2.8 Final Chapter Prologue\"", config.IndexOf("[kh3d]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //ReCoM
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[recom]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[recom]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //BBS
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[bbs]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[bbs]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //KH2
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh2]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh2]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //KH1
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh1]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh1]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
                                 }
                                 File.WriteAllText(Path.Combine(DestinationCollection, "LuaBackend.toml"), config);
                             }
@@ -1407,6 +1461,51 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                             ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
                                     }
                                 }
+                                if (ConfigurationService.PCVersion == "Steam")
+                                {
+                                    int indexEGS = 0;
+                                    int indexSteam = 0;
+                                    //KH3D
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 2.8 Final Chapter Prologue\"", config.IndexOf("[kh3d]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 2.8 Final Chapter Prologue\"", config.IndexOf("[kh3d]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //ReCoM
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[recom]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[recom]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //BBS
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[bbs]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[bbs]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //KH2
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh2]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh2]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                    //KH1
+                                    indexEGS = config.IndexOf("game_docs = \"KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh1]"));
+                                    indexSteam = config.IndexOf("# game_docs = \"My Games/KINGDOM HEARTS HD 1.5+2.5 ReMIX\"", config.IndexOf("[kh1]"));
+                                    if (indexEGS > 0 && indexSteam > 0)
+                                    {
+                                        config = config.Remove(indexSteam, 2);
+                                        config = config.Insert(indexEGS, "# ");
+                                    }
+                                }
                                 File.WriteAllText(Path.Combine(DestinationCollection, "LuaBackend.toml"), config);
                                 OnPropertyChanged(nameof(IsLuaBackendInstalled));
                                 OnPropertyChanged(nameof(LuaBackendFoundVisibility));
@@ -1494,7 +1593,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     if (GameCollection == 0)
                     {
-                        if (File.Exists(Path.Combine(PcReleaseLocation, "steam_appid.txt")))
+                        if (PcReleaseLocation != null && File.Exists(Path.Combine(PcReleaseLocation, "steam_appid.txt")))
                         {
                             File.Delete(Path.Combine(PcReleaseLocation, "steam_appid.txt"));
                             ConfigurationService.SteamAPITrick1525 = false;
@@ -1502,7 +1601,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     else if (GameCollection == 1)
                     {
-                        if (File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_appid.txt")))
+                        if (PcReleaseLocationKH3D != null && File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_appid.txt")))
                         {
                             File.Delete(Path.Combine(PcReleaseLocationKH3D, "steam_appid.txt"));
                             ConfigurationService.SteamAPITrick28 = false;
