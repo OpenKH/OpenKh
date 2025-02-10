@@ -17,7 +17,7 @@
             <Canvas.Background>
                 <DrawingBrush TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
                     <DrawingBrush.Drawing>
-                        <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#80000000"/>
+                        <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#10000000"/>
                     </DrawingBrush.Drawing>
                 </DrawingBrush>
             </Canvas.Background>

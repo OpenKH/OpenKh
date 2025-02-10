@@ -35,19 +35,13 @@
                         <DataGridTemplateColumn Header="Trigger">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Trigger, Converter={StaticResource RangeTriggerConverter}}" />
+                                    <ComboBox HorizontalAlignment="Stretch"
+                                      SelectedItem="{Binding Trigger, Converter={StaticResource RangeTriggerConverter}, Mode=TwoWay}"
+                                      ItemsSource="{Binding DataContext.RangeTriggerOptions2, RelativeSource={RelativeSource AncestorType=UserControl}}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate>
-                                    <ComboBox SelectedValue="{Binding Trigger}"
-                                      SelectedValuePath="Key"
-                                      DisplayMemberPath="Value"
-                                      ItemsSource="{Binding DataContext.RangeTriggerOptions, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
                         </DataGridTemplateColumn>
-                        
+
                         <DataGridTextColumn Binding="{Binding Path=StartFrame}" Header="Start Frame" />
                         <DataGridTextColumn Binding="{Binding Path=EndFrame}" Header="End Frame" />
                         <DataGridTextColumn Binding="{Binding Path=ParamSize}" Header="Param Size"/>
@@ -77,19 +71,13 @@
                         <DataGridTemplateColumn Header="Trigger">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Trigger, Converter={StaticResource FrameTriggerConverter}}" />
+                                    <ComboBox HorizontalAlignment="Stretch"
+                                      SelectedItem="{Binding Trigger, Converter={StaticResource FrameTriggerConverter}, Mode=TwoWay}"
+                                      ItemsSource="{Binding DataContext.FrameTriggerOptions2, RelativeSource={RelativeSource AncestorType=UserControl}}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate>
-                                    <ComboBox SelectedValue="{Binding Trigger}"
-                                      SelectedValuePath="Key"
-                                      DisplayMemberPath="Value"
-                                      ItemsSource="{Binding DataContext.FrameTriggerOptions, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
                         </DataGridTemplateColumn>
-                        
+
                         <DataGridTextColumn Binding="{Binding Path=Frame}" Header="Frame" />
                         <DataGridTextColumn Binding="{Binding Path=ParamSize}" Header="ParamSize"/>
                         <DataGridTextColumn Binding="{Binding Path=Param1}" Header="Param 1" />

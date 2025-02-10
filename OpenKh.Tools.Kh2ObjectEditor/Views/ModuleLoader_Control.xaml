@@ -18,14 +18,14 @@
         <!-- <local:ModuleMotions_Control/> -->
 
         <!-- Side menu -->
-        <StackPanel Grid.Column="1" Background="White">
-            <Label Visibility="Visible" x:Name="TabModel" MouseLeftButtonUp="TabClick_Model">Model</Label>
-            <Label Visibility="Visible" x:Name="TabTextures" MouseLeftButtonUp="TabClick_Textures">Textures</Label>
-            <Label Visibility="Visible" x:Name="TabUI" MouseLeftButtonUp="TabClick_UI">UI</Label>
-            <Label Visibility="Visible" x:Name="TabCollisions" MouseLeftButtonUp="TabClick_Collisions">Collisions</Label>
-            <Label Visibility="Visible" x:Name="TabMotions" MouseLeftButtonUp="TabClick_Motions">Motions</Label>
-            <Label Visibility="Visible" x:Name="TabParticles" MouseLeftButtonUp="TabClick_Particles">Particles</Label>
-            <Label Visibility="Visible" x:Name="TabAI" MouseLeftButtonUp="TabClick_AI">AI</Label>
+        <StackPanel Grid.Column="1">
+            <Label Foreground="White" Visibility="Visible" x:Name="TabModel" MouseLeftButtonUp="TabClick_Model">Model</Label>
+            <Label Foreground="White" Visibility="Visible" x:Name="TabTextures" MouseLeftButtonUp="TabClick_Textures">Textures</Label>
+            <Label Foreground="White" Visibility="Visible" x:Name="TabUI" MouseLeftButtonUp="TabClick_UI">UI</Label>
+            <Label Foreground="White" Visibility="Visible" x:Name="TabCollisions" MouseLeftButtonUp="TabClick_Collisions">Collisions</Label>
+            <Label Foreground="White" Visibility="Visible" x:Name="TabMotions" MouseLeftButtonUp="TabClick_Motions">Motions</Label>
+            <Label Foreground="White" Visibility="Visible" x:Name="TabParticles" MouseLeftButtonUp="TabClick_Particles">Particles</Label>
+            <Label Foreground="White" Visibility="Visible" x:Name="TabAI" MouseLeftButtonUp="TabClick_AI">AI</Label>
             <!-- 
             <Image x:Name="sideModel" Visibility="Collapsed" Height="50" Source="../Assets/IconModelW.png" MouseLeftButtonUp="Side_Model"></Image>
             <Image x:Name="sideTexture" Visibility="Collapsed" Height="50" Source="../Assets/IconTextureW.png" MouseLeftButtonUp="Side_Texture"></Image>

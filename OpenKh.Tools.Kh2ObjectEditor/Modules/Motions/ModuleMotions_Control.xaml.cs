@@ -269,5 +269,24 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
                 ThisVM.applyFilters();
             }
         }
+
+        private void FilterName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+            ThisVM.FilterName = FilterName.Text;
+            ThisVM.applyFilters();
+        }
+
+        private void HideDummies_Checked(object sender, RoutedEventArgs e)
+        {
+            ThisVM.FilterHideDummies = true;
+            ThisVM.applyFilters();
+        }
+
+        private void HideDummies_Unchecked(object sender, RoutedEventArgs e)
+        {
+            ThisVM.FilterHideDummies = false;
+            ThisVM.applyFilters();
+        }
     }
 }

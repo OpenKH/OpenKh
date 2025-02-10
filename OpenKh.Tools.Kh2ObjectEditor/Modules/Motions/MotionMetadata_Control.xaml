@@ -56,7 +56,7 @@
                 <Label Foreground="White" VerticalAlignment="Center">Bound MaxW:</Label>
                 <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMaxW}"></TextBox>
             </StackPanel>
-            <Button Margin="10,0,10,0" Padding="5,0,5,0" Height="40px" Width="100px" HorizontalAlignment="Left" Click="Button_SaveTriggers">Save Metadata</Button>
+            <Button Margin="10,0,10,0" Padding="5,0,5,0" Height="40px" Width="120" HorizontalAlignment="Left" Click="Button_SaveTriggers">Save Metadata</Button>
         </StackPanel>
     </DockPanel>
 </UserControl>
