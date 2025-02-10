@@ -1129,8 +1129,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         File.Delete(Path.Combine(PanaceaDependenciesLocation, "libspeex-1.dll"));
                         File.Delete(Path.Combine(PanaceaDependenciesLocation, "libvorbis.dll"));
                         File.Delete(Path.Combine(PanaceaDependenciesLocation, "swresample-vgmstream-4.dll"));
-                        File.Delete(Path.Combine(PcReleaseLocation, "panacea_settings.txt"));
-                        File.Delete(Path.Combine(PcReleaseLocationKH3D, "panacea_settings.txt"));
+                        if (GameCollection == 0 && PcReleaseLocation != null)
+                        {
+                            File.Delete(Path.Combine(PcReleaseLocation, "panacea_settings.txt"));
+                        }
+                        if (GameCollection == 1 && PcReleaseLocationKH3D != null)
+                        {
+                            File.Delete(Path.Combine(PcReleaseLocationKH3D, "panacea_settings.txt"));
+                        }
                     }
                     OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                     OnPropertyChanged(nameof(PanaceaInstalledVisibility));
@@ -1587,7 +1593,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     if (GameCollection == 0)
                     {
-                        if (File.Exists(Path.Combine(PcReleaseLocation, "steam_appid.txt")))
+                        if (PcReleaseLocation != null && File.Exists(Path.Combine(PcReleaseLocation, "steam_appid.txt")))
                         {
                             File.Delete(Path.Combine(PcReleaseLocation, "steam_appid.txt"));
                             ConfigurationService.SteamAPITrick1525 = false;
@@ -1595,7 +1601,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     else if (GameCollection == 1)
                     {
-                        if (File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_appid.txt")))
+                        if (PcReleaseLocationKH3D != null && File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_appid.txt")))
                         {
                             File.Delete(Path.Combine(PcReleaseLocationKH3D, "steam_appid.txt"));
                             ConfigurationService.SteamAPITrick28 = false;
