@@ -232,9 +232,9 @@ There is a total of 30 operation codes for the spawn script. The parser can be f
 - 1a: [VisibilityOn](#visibilityon)
 - 1b: [VisibilityOff](#visibilityoff)
 - 1c: [If](#if)
-- 1d: [unknown](#unknown1d)
+- 1d: [Recov](#recov)
 - 1e: [BattleLevel](#battlelevel)
-- 1f: [unknown](#unknown1f)
+- 1f: [Gacha](#gacha)
 
 #### Spawn
 
@@ -385,7 +385,7 @@ It seems to do something with `01c60550`. It is only used 3 times in `hb13` by `
 
 Conditionals for the script based on the entrance. Used most often in the Coliseum.
 
-#### Unknown1d
+#### Recov
 
 Determines Sora and the party's stats upon entering the room. The game will only check if Sora is using a form or summon when entering a room. Healing will refill items and reverting will refill Sora's drive gauge.
 
@@ -402,7 +402,7 @@ Determines Sora and the party's stats upon entering the room. The game will only
 
 Override the battle level of the playing map. Usually used for special boss battle only.
 
-#### Unknown1f
+#### Gacha
 
 Spawn based on Bulky Vendor RNG. Very similar to [Unknown03](#unknown03)
 
