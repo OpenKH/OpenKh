@@ -10,7 +10,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="160" />
         </Grid.ColumnDefinitions>
 
         <Canvas Grid.Row="0">
