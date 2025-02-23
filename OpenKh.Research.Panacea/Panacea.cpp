@@ -435,35 +435,95 @@ void GetTM2Offsets(void* addr, int baseoff, std::vector<int>& entries)
     }
 }
 
-void GetDPDOffsets(void* addr, int baseoff, std::vector<int>& entries)
+void GetDPDOffsets(void* addr, int baseoff, std::vector<int>& entries) //Process texture offsets from given memory address, 'addr' and stores results in entries.
 {
     int* off = (int*)addr;
-    if (*off++ == 0x96)
+    if (*off++ == 0x96) //Magic number check.
     {
-        off += *off + 1;
-        int texcnt = *off++;
-        std::map<int, int> offsets;
-        for (int t = 0; t < texcnt; ++t)
+        off += *off + 1; //Read the next integer *off as a "SkipCount"
+        int texcnt = *off++; //Read number of textures
+        printf("Texture count: %p\n", texcnt); // Verify texture count
+
+        std::vector<std::pair<short, int>> textures; // To store texture offsets and their first two bytes. First entry stores firstTwoBytes, second stores texture offset
+
+        for (int t = 0; t < texcnt; ++t) //Iterates over textures.
         {
-            int texoff = *off++;
-            int* off2 = (int*)((char*)addr + texoff);
-            if (off2[2] == 0)
+            int texoff = *off++; //Reads texoff from off.
+            printf("Processing texture %d at offset: %p\n", t, texoff);
+
+            int* off2 = (int*)((char*)addr + texoff); //Converts texoff into an absolute address; if null, skip to the next texture.
+            if (!off2)
             {
-                int val = off2[0];
-                auto found = offsets.find(val);
-                if (found == offsets.end())
-                {
-                    offsets[val] = texoff + 0x20;
-                }
-                else
-                {
-                    found->second++;
-                    offsets[val + t] = found->second + 1;
-                }
+                printf("Invalid texture offset: %p\n", texoff);
+                continue;
+            }
+
+            short firstTwoBytes = off2[0]; // Extract first two bytes from firstTwoBytes, gets us the order the game loads the textures in memory.
+            printf("First two bytes of texture %d: %p\n", t, firstTwoBytes);
+
+            textures.push_back(std::make_pair(firstTwoBytes, texoff)); //Log the extracted bytes, store them in textures.
+        }
+
+        // Print before sorting
+        printf("Before sorting:\n");
+        for (const auto& t : textures)
+        {
+            printf("Offset: %p Order: %p\n", t.second, t.first);
+        }
+
+        // Sort textures by the first two bytes
+        std::sort(textures.begin(), textures.end(), [](const std::pair<short, int>& a, const std::pair<short, int>& b) {
+            return a.first < b.first; //Sorts the textures by their first two bytes.
+            });
+
+        // Print after sorting
+        printf("After sorting:\n");
+        for (const auto& t : textures)
+        {
+            printf("Offset: %p Order: %p\n", t.second, t.first);
+        }
+
+        std::map<int, int> offsets; //Now this logic applies AFTER sorting.
+
+        for (int t = 0; t < textures.size(); ++t)
+        {
+            int texoff = textures[t].second;
+            int* off2 = (int*)((char*)addr + texoff);
+            if (!off2)
+            {
+                printf("Invalid texture offset during processing: %p\n", texoff);
+                continue;
+            }
+
+            short val = off2[0];
+            printf("Processing offset: %p with value: %p\n", texoff, val);
+
+            auto found = offsets.find(val);
+            if (found == offsets.end())
+            {
+                offsets[val] = texoff + 0x20;
+                printf("New offset entry: %p -> %p\n", val, offsets[val]);
+            }
+            else
+            {
+                printf("Before updating offset entry: %p -> %p\n", val, offsets[val]);
+                offsets[val] = found->second;  // Keep using val, not val + t
+                printf("Updating offset entry: %p -> %p\n", val, offsets[val]);
+            }
+
+            // Check if this texture should be combined with the previous one
+            if (t > 0 && textures[t].first == textures[t - 1].first)
+            {
+                // Adjust previous entry
+                printf("Combining texture %d with previous\n", t);
+                entries.back() = offsets[val] + baseoff + 0x20000000;
+            }
+            else
+            {
+                printf("Adding new texture entry: %p\n", offsets[val] + baseoff + 0x20000000);
+                entries.push_back(offsets[val] + baseoff + 0x20000000);
             }
         }
-        for (auto& i : offsets)
-            entries.push_back(i.second + baseoff + 0x20000000);
     }
 }
 
