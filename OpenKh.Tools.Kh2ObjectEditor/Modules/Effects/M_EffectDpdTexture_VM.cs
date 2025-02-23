@@ -23,22 +23,31 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 
         public void loadWrappers()
         {
-            if (ThisDpd?.TexturesList == null || ThisDpd.TexturesList.Count < 0)
+            if (ThisDpd?.TexturesList == null || ThisDpd.TexturesList.Count <= 0)
                 return;
 
             TextureWrappers.Clear();
-            for (int i = 0; i < ThisDpd.TexturesList.Count; i++)
-            {
-                DpdTextureWrapper wrapper = new DpdTextureWrapper();
-                wrapper.Id = i;
-                wrapper.Name = "Texture " + i;
-                wrapper.Texture = ThisDpd.TexturesList[i];
-                wrapper.SizeX = wrapper.Texture.Size.Width;
-                wrapper.SizeY = wrapper.Texture.Size.Height;
 
+            // Sort textures based on shTexDbp
+            var sortedTextures = ThisDpd.TexturesList
+                .Select((texture, index) => new DpdTextureWrapper
+                {
+                    Id = index,
+                    Name = $"Texture {index} (ORDER: 0x{texture.shTexDbp:X})",
+                    Texture = texture,
+                    SizeX = texture.Size.Width,
+                    SizeY = texture.Size.Height
+                })
+                .OrderBy(wrapper => wrapper.Texture.shTexDbp) // Sort by shTexDbp in ascending order
+                .ToList();
+
+            // Add each sorted wrapper to the ObservableCollection
+            foreach (var wrapper in sortedTextures)
+            {
                 TextureWrappers.Add(wrapper);
             }
         }
+
 
         public BitmapSource getTexture(int index)
         {
