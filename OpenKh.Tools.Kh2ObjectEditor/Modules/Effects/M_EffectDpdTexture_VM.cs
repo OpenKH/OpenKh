@@ -28,26 +28,40 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 
             TextureWrappers.Clear();
 
-            // Sort textures based on shTexDbp
-            var sortedTextures = ThisDpd.TexturesList
+            // Group textures by their shTexDbp value
+            var groupedTextures = ThisDpd.TexturesList
                 .Select((texture, index) => new DpdTextureWrapper
                 {
                     Id = index,
-                    Name = $"Texture {index} (ORDER: 0x{texture.shTexDbp:X})",
                     Texture = texture,
                     SizeX = texture.Size.Width,
-                    SizeY = texture.Size.Height
+                    SizeY = texture.Size.Height,
                 })
-                .OrderBy(wrapper => wrapper.Texture.shTexDbp) // Sort by shTexDbp in ascending order
+                .GroupBy(wrapper => wrapper.Texture.shTexDbp)  // Group by shTexDbp value
+                .OrderBy(group => group.Key)  // Optional: sort groups by shTexDbp (ascending)
                 .ToList();
 
-            // Add each sorted wrapper to the ObservableCollection
-            foreach (var wrapper in sortedTextures)
+            // Now process each group and update the name accordingly
+            foreach (var group in groupedTextures)
             {
-                TextureWrappers.Add(wrapper);
+                var firstWrapper = group.First();  // Get the first texture in the group
+
+                foreach (var wrapper in group)
+                {
+                    // If it's the first texture, keep its original name
+                    if (wrapper.Id == firstWrapper.Id)
+                    {
+                        wrapper.Name = $"Texture {wrapper.Id}";
+                    }
+                    else
+                    {
+                        // For the rest of the textures, mark them as "COMBO with {firstWrapper.Id}"
+                        wrapper.Name = $"Texture {wrapper.Id} (COMBO with {firstWrapper.Id})";
+                    }
+                    TextureWrappers.Add(wrapper);
+                }
             }
         }
-
 
         public BitmapSource getTexture(int index)
         {
