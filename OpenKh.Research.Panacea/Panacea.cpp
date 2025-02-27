@@ -560,14 +560,18 @@ void GetRAWOffsets(void* addr, void* endaddr, int baseoff, std::vector<int>& ent
         int GsinfoOff = off[6];
         int dataOffset = off[7];
 
-        //get all the image data offsets from the CLUT Transfer Info blocks
+		//New addition.
+        std::vector<int> baseTextureOffsets;
+        std::map<int, std::vector<int>> texaMapping; // Stores TEXA textures per TexIndex
+
+		//get all the image data offsets from the CLUT Transfer Info blocks
         int* PicOffsets = new int[TextureInfoCount];
         for (int t = 0; t < TextureInfoCount; t++)
             PicOffsets[t] = *(int*)((char*)addr + (CLUTTransinfoOff + 0x90) + (t * 0x90) + 116);
 
-        //first loop to get number of pixel format 8 textures
-        //this is needed to calculate the correct HD link offsets because for some reason
-        //Pixel format 4 textures need to be adjusted by Pixel8 image count * 16
+		//first loop to get number of pixel format 8 textures
+		//this is needed to calculate the correct HD link offsets because for some reason
+		//Pixel format 4 textures need to be adjusted by Pixel8 image count * 16
         int Modifier = 0;
         for (int m = 0; m < GSInfoCount; m++)
         {
@@ -576,10 +580,9 @@ void GetRAWOffsets(void* addr, void* endaddr, int baseoff, std::vector<int>& ent
             if (PSM != 20)
                 Modifier += 1;
         }
-
-        //second loop to get actual offsets
-        //We need to keep track of how many of each type of texture we find
-        //to correctly aclculate the the game expects for the HD link offsets.
+		//second loop to get actual offsets
+		//We need to keep track of how many of each type of texture we find
+		//to correctly aclculate the the game expects for the HD link offsets.
         int Pxl4Count = 0;
         int Pxl8Count = 0;
         for (int p = 0; p < GSInfoCount; p++)
@@ -600,18 +603,36 @@ void GetRAWOffsets(void* addr, void* endaddr, int baseoff, std::vector<int>& ent
                 FinalOffset += (Pxl8Count * 0x10);
                 Pxl8Count += 1;
             }
-            entries.push_back(FinalOffset);
+            baseTextureOffsets.push_back(FinalOffset);
         }
 
         delete[] PicOffsets;
 
+        // Scan for TEXA and store them in a map.
         char* texa = std::search((char*)addr, (char*)endaddr, TEXA, TEXA + 4);
         while (texa != endaddr)
         {
-            int imageToApplyTo = *(short*)(texa + 0x0A);
+            int imageToApplyTo = *(short*)(texa + 0x0A); // TexIndex
             int texaOffset = *(int*)(texa + 0x28);
-            entries.push_back((int)(baseoff + (texa - (char*)addr) + texaOffset + 0x08 + (imageToApplyTo * 0x10LL) + 0x20000000));
+
+            int texaFinalOffset = baseoff + (texa - (char*)addr) + texaOffset + 0x08 + (imageToApplyTo * 0x10LL) + 0x20000000;
+
+            texaMapping[imageToApplyTo].push_back(texaFinalOffset);
+
             texa = std::search(texa + 4, (char*)endaddr, TEXA, TEXA + 4);
+        }
+
+        // Insert textures in the correct order with TEXA textures immediately after their corresponding base texture
+        for (size_t i = 0; i < baseTextureOffsets.size(); i++)
+        {
+            entries.push_back(baseTextureOffsets[i]);
+            if (texaMapping.find(i) != texaMapping.end())
+            {
+                for (int texaOffset : texaMapping[i])
+                {
+                    entries.push_back(texaOffset);
+                }
+            }
         }
     }
 }
