@@ -95,6 +95,35 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
             }
         }
 
+        public void ExportAllTextures()
+        {
+            if (TextureWrappers == null || TextureWrappers.Count == 0)
+            {
+                System.Windows.Forms.MessageBox.Show("No textures to export.", "Export Error",
+                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                return;
+            }
+
+            System.Windows.Forms.FolderBrowserDialog fbd = new System.Windows.Forms.FolderBrowserDialog();
+            fbd.Description = "Select folder to export all textures";
+            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string exportPath = fbd.SelectedPath;
+
+                for (int i = 0; i < TextureWrappers.Count; i++)
+                {
+                    Dpd.Texture texture = TextureWrappers[i].Texture;
+                    MtMaterial mat = GetMaterial(texture);
+
+                    string filePath = System.IO.Path.Combine(exportPath, $"Effect_{i}.png");
+                    mat.ExportAsPng(filePath);
+                }
+
+                System.Windows.Forms.MessageBox.Show("All textures exported successfully!", "Export Complete",
+                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+            }
+        }
+        
         // Must have the same width and height and palette size
         public void ReplaceTexture(int index)
         {
