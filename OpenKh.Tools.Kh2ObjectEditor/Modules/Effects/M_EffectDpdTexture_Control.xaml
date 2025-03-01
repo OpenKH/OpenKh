@@ -10,7 +10,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="160" />
         </Grid.ColumnDefinitions>
 
         <Canvas Grid.Row="0">
@@ -34,6 +34,7 @@
             <ListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Export as PNG" Click="EffectImage_Export"/>
+                    <MenuItem Header="Export all as PNG" Click="EffectImage_ExportAll"/>
                     <MenuItem Header="Replace with PNG" Click="EffectImage_Replace"/>
                 </ContextMenu>
             </ListView.ContextMenu>

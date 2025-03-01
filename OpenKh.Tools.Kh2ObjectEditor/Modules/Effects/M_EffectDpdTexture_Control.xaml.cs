@@ -40,7 +40,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
                 ThisVM.ExportTexture(List_Textures.SelectedIndex);
             }
         }
-
+        
+        public void EffectImage_ExportAll(object sender, RoutedEventArgs e)
+        {
+            ThisVM.ExportAllTextures();
+        }
+        
         public void EffectImage_Replace(object sender, RoutedEventArgs e)
         {
             if (List_Textures.SelectedItem != null)

@@ -1,8 +1,10 @@
 using ModelingToolkit.Objects;
 using OpenKh.Kh2;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 
@@ -23,29 +25,112 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 
         public void loadWrappers()
         {
-            if (ThisDpd?.TexturesList == null || ThisDpd.TexturesList.Count < 0)
+            if (ThisDpd?.TexturesList == null || ThisDpd.TexturesList.Count <= 0)
                 return;
 
             TextureWrappers.Clear();
-            for (int i = 0; i < ThisDpd.TexturesList.Count; i++)
-            {
-                DpdTextureWrapper wrapper = new DpdTextureWrapper();
-                wrapper.Id = i;
-                wrapper.Name = "Texture " + i;
-                wrapper.Texture = ThisDpd.TexturesList[i];
-                wrapper.SizeX = wrapper.Texture.Size.Width;
-                wrapper.SizeY = wrapper.Texture.Size.Height;
 
-                TextureWrappers.Add(wrapper);
+            // Group textures by their shTexDbp value
+            var groupedTextures = ThisDpd.TexturesList
+                .Select((texture, index) => new DpdTextureWrapper
+                {
+                    Id = index,
+                    Texture = texture,
+                    SizeX = texture.Size.Width,
+                    SizeY = texture.Size.Height,
+                })
+                .GroupBy(wrapper => wrapper.Texture.shTexDbp)  // Group by shTexDbp value
+                .OrderBy(group => group.Key)  // Optional: sort groups by shTexDbp (ascending)
+                .ToList();
+
+            // Now process each group and update the name accordingly
+            foreach (var group in groupedTextures)
+            {
+                var firstWrapper = group.First();  // Get the first texture in the group
+
+                foreach (var wrapper in group)
+                {
+                    // If it's the first texture, keep its original name
+                    if (wrapper.Id == firstWrapper.Id)
+                    {
+                        wrapper.Name = $"Texture {wrapper.Id}";
+                    }
+                    else
+                    {
+                        // For the rest of the textures, mark them as "COMBO with {firstWrapper.Id}"
+                        wrapper.Name = $"Texture {wrapper.Id} (COMBO with {firstWrapper.Id})";
+                    }
+                    TextureWrappers.Add(wrapper);
+                }
             }
         }
 
         public BitmapSource getTexture(int index)
         {
-            Dpd.Texture texture = TextureWrappers[index].Texture;
+            var group = TextureWrappers
+                .Where(t => t.Texture.shTexDbp == TextureWrappers[index].Texture.shTexDbp)
+                .ToList();
 
-            MtMaterial mat = GetMaterial(texture);
-            return mat.GetAsBitmapImage();
+            if (group.Count == 1)
+            {
+                //if only one texture in the group, return as normal
+                MtMaterial mat = GetMaterial(group[0].Texture);
+                return mat.GetAsBitmapImage();
+            }
+
+            //get max width/height for combo texture
+            int maxWidth = group.Max(t => t.SizeX + t.Texture.shX);
+            int maxHeight = group.Max(t => t.SizeY + t.Texture.shY);
+
+            //blank bitmap for combined image
+            Bitmap combinedBitmap = new Bitmap(maxWidth, maxHeight);
+            using (Graphics g = Graphics.FromImage(combinedBitmap))
+            {
+                g.Clear(System.Drawing.Color.Transparent);
+
+                //adjust each texture position based on shX and shY values
+                foreach (var wrapper in group)
+                {
+                    MtMaterial mat = GetMaterial(wrapper.Texture);
+                    Bitmap img = mat.DiffuseTextureBitmap;
+                    g.DrawImage(img, wrapper.Texture.shX, wrapper.Texture.shY);
+                }
+            }
+
+            //new bitmap to include individual texture at the top, and a combined view below.
+            int individualHeight = group.Max(t => t.SizeY);
+            int combinedHeight = maxHeight + individualHeight + 64;  //64px space between textures
+
+            //make final bitmap
+            Bitmap finalBitmap = new Bitmap(maxWidth, combinedHeight);
+            using (Graphics g = Graphics.FromImage(finalBitmap))
+            {
+                g.Clear(System.Drawing.Color.Transparent);
+
+                //draw individual texture above
+                var selectedTextureWrapper = group.FirstOrDefault(t => t == TextureWrappers[index]);
+
+
+                //get material for final texture
+                MtMaterial selectedMat = GetMaterial(selectedTextureWrapper.Texture);
+                Bitmap selectedImg = selectedMat.DiffuseTextureBitmap;
+
+
+                //now draw the individual texture
+                g.DrawImage(selectedImg, selectedTextureWrapper.Texture.shX, selectedTextureWrapper.Texture.shY);
+
+                //prepare the combined texture
+                int offsetY = individualHeight + 64;  //offset it 64px down
+
+                g.DrawImage(combinedBitmap, 0, offsetY);
+            }
+
+            return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                finalBitmap.GetHbitmap(),
+                IntPtr.Zero,
+                System.Windows.Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions()
+            );
         }
 
         public static byte SwapBits34(byte x)
@@ -58,20 +143,109 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 
         public void ExportTexture(int index)
         {
+            Dpd.Texture selectedTexture = TextureWrappers[index].Texture;
+
+            //find all textures with the same shTexDbp
+            var groupedTextures = TextureWrappers
+                .Where(wrapper => wrapper.Texture.shTexDbp == selectedTexture.shTexDbp)
+                .OrderBy(wrapper => wrapper.Id)
+                .ToList();
+
+            if (groupedTextures.Count == 1)
+            {
+                //if single texture, export normally
+                ExportSingleTexture(index);
+                return;
+            }
+
+            //prompt export path
+            System.Windows.Forms.FolderBrowserDialog fbd = new System.Windows.Forms.FolderBrowserDialog();
+            fbd.Description = "Select folder to export combined textures";
+            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string exportPath = fbd.SelectedPath;
+                ExportCombinedTexture(groupedTextures, exportPath);
+            }
+        }
+
+
+        private void ExportSingleTexture(int index)
+        {
             Dpd.Texture texture = TextureWrappers[index].Texture;
             MtMaterial mat = GetMaterial(texture);
 
-            System.Windows.Forms.SaveFileDialog sfd;
-            sfd = new System.Windows.Forms.SaveFileDialog();
-            sfd.Title = "Export image as PNG";
-            sfd.FileName = "Effect_" + index + ".png";
-            sfd.ShowDialog();
-            if (sfd.FileName != "")
+            SaveFileDialog sfd = new SaveFileDialog
+            {
+                Title = "Export image as PNG",
+                FileName = $"Effect_{index}.png",
+                Filter = "PNG Files|*.png"
+            };
+
+            if (sfd.ShowDialog() == DialogResult.OK)
             {
                 mat.ExportAsPng(sfd.FileName);
             }
         }
 
+        private void ExportCombinedTexture(List<DpdTextureWrapper> groupedTextures, string exportPath)
+        {
+            //get max width and height based on shX, shY, SizeX, & SizeY
+            int maxWidth = groupedTextures.Max(wrapper => wrapper.Texture.shX + wrapper.SizeX);
+            int maxHeight = groupedTextures.Max(wrapper => wrapper.Texture.shY + wrapper.SizeY);
+
+            //crete a new combined image
+            Bitmap combinedBitmap = new Bitmap(maxWidth, maxHeight);
+            using (Graphics g = Graphics.FromImage(combinedBitmap))
+            {
+                g.Clear(System.Drawing.Color.Transparent); //transparent background
+
+                //draw each texture in its correct position using shX and shY as coordinates
+                foreach (var wrapper in groupedTextures)
+                {
+                    MtMaterial mat = GetMaterial(wrapper.Texture);
+                    Bitmap textureBitmap = mat.DiffuseTextureBitmap;
+
+                    //draw the texture at the appropriate position based on its shX, shY
+                    g.DrawImage(textureBitmap, wrapper.Texture.shX, wrapper.Texture.shY);
+                }
+            }
+
+            //generate a file name based on the shTexDbp value
+            string fileName = $"Effect_Combined_{groupedTextures.First().Texture.shTexDbp}.png";
+            string filePath = System.IO.Path.Combine(exportPath, fileName);
+            combinedBitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+        public void ExportAllTextures()
+        {
+            if (TextureWrappers == null || TextureWrappers.Count == 0)
+            {
+                System.Windows.Forms.MessageBox.Show("No textures to export.", "Export Error",
+                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                return;
+            }
+
+            System.Windows.Forms.FolderBrowserDialog fbd = new System.Windows.Forms.FolderBrowserDialog();
+            fbd.Description = "Select folder to export all textures";
+            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string exportPath = fbd.SelectedPath;
+
+                //group textures by shTexDbp value
+                var groupedTextures = TextureWrappers
+                    .GroupBy(wrapper => wrapper.Texture.shTexDbp)
+                    .ToList();
+
+                foreach (var group in groupedTextures)
+                {
+                    ExportCombinedTexture(group.ToList(), exportPath);
+                }
+
+                System.Windows.Forms.MessageBox.Show("All textures exported successfully!", "Export Complete",
+                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+            }
+        }
+        
         // Must have the same width and height and palette size
         public void ReplaceTexture(int index)
         {
