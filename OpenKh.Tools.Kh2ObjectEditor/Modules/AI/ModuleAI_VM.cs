@@ -55,18 +55,26 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.AI
         {
             var ascii = BdxAsciiModel.ParseText(BdxDecoded);
 
-            var decoder = new BdxEncoder(
-                header: new YamlDotNet.Serialization.DeserializerBuilder()
-                    .Build()
-                    .Deserialize<BdxHeader>(
-                        ascii.Header ?? ""
-                    ),
-                script: ascii.GetLineNumberRetainedScriptBody(),
-                scriptName: null,
-                loadScript: null
-            );
-
-            BdxStreamOut = decoder.Content;
+            
+            try
+            {
+                var decoder = new BdxEncoder(
+                    header: new YamlDotNet.Serialization.DeserializerBuilder()
+                        .Build()
+                        .Deserialize<BdxHeader>(
+                            ascii.Header ?? ""
+                        ),
+                    script: ascii.GetLineNumberRetainedScriptBody(),
+                    scriptName: null,
+                    loadScript: null
+                );
+                BdxStreamOut = decoder.Content;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "ERROR", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
 
             BdxStream = new MemoryStream(BdxStreamOut);
             BdxStream.Position = 0;
