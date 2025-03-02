@@ -791,6 +791,8 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
             GetTM2Offsets(addr, 0, assetoffs);
         else if (!_wcsicmp(ext, L".pax"))
             GetPAXOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".dpd"))
+            GetDPDOffsets(addr, 0, assetoffs);
         else if (!_wcsicmp(ext, L".2dd")
             || !_wcsicmp(ext, L".2ld")
             || !_wcsicmp(ext, L".a.fm")
