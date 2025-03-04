@@ -69,6 +69,8 @@ namespace OpenKh.Command.MapGen.Models
 
         public bool disableBSPCollisionBuilder { get; set; }
 
+        public bool disableBSPCollisionBuilder2 { get; set; }
+
         public byte? maxColorIntensity { get; set; }
 
         public byte? maxAlpha { get; set; }
