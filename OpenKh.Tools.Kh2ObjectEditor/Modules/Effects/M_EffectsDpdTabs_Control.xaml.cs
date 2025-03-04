@@ -19,6 +19,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
                 return;
 
             Tab_Textures.Content = new M_EffectDpdTexture_Control(ThisDpd);
+            Tab_Vsf.Content = new M_EffectDpdVoiceList_Control(ThisDpd);
         }
     }
 }

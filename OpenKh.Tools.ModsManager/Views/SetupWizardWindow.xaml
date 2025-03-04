@@ -28,7 +28,6 @@
         CurrentPage="{Binding ElementName=PageGameEdition}"
         PageChanged="Wizard_PageChanged"
         Finish="Wizard_Finish" Background="{Binding ColorTheme.BackgroundColor}">
-
         <xctk:WizardPage
             x:Name="IntroPage"
             Title="Welcome to OpenKH Mods Manager"
@@ -135,31 +134,33 @@
             Description="Do not worry, you can change this option later"
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageGameData}">
-            <StackPanel>
-                <TextBlock>Supported games:</TextBlock>
-                <StackPanel Margin="10 3 0 10">
-                    <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix, PC)</TextBlock>
-                </StackPanel>
-                <TextBlock Margin="0 0 0 3">Please select the location of the PlayStation 2 ISO Image.</TextBlock>
-                <Grid Margin="0 0 0 3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="20"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{Binding IsoLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectIsoCommand}">
-                        <Image Source="{StaticResource FolderOpen_16x}"/>
-                    </Button>
-                </Grid>
-                <TextBlock TextWrapping="Wrap" Visibility="{Binding GameRecognizedVisibility}">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock>Supported games:</TextBlock>
+                    <StackPanel Margin="10 3 0 10">
+                        <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix, PC)</TextBlock>
+                    </StackPanel>
+                    <TextBlock Margin="0 0 0 3">Please select the location of the PlayStation 2 ISO Image.</TextBlock>
+                    <Grid Margin="0 0 0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding IsoLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectIsoCommand}">
+                            <Image Source="{StaticResource FolderOpen_16x}"/>
+                        </Button>
+                    </Grid>
+                    <TextBlock TextWrapping="Wrap" Visibility="{Binding GameRecognizedVisibility}">
                     <Run>A copy of </Run>
                     <Run Text="{Binding GameName}" d:Text="Some KH game"/>
                     <Run> was successfully recognized!</Run>
-                </TextBlock>
-                <TextBlock TextWrapping="Wrap" Visibility="{Binding GameNotRecognizedVisibility}">
+                    </TextBlock>
+                    <TextBlock TextWrapping="Wrap" Visibility="{Binding GameNotRecognizedVisibility}">
                     It was not possible to recognize the game of the ISO you provided. Be sure that the game is within the list of supported games.
-                </TextBlock>
-            </StackPanel>
+                    </TextBlock>
+                </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="PageGameData"
@@ -258,25 +259,26 @@
             CanSelectNextPage="{Binding IsGameDataFound}"
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=LastPage}">
-            <StackPanel>
-                <TextBlock>Region</TextBlock>
-                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding RegionId}">
-                    <ComboBoxItem>Use game default region</ComboBoxItem>
-                    <ComboBoxItem>Japanese (text JP, menu JP, voice JP)</ComboBoxItem>
-                    <ComboBoxItem>English (text US, menu US, voice US)</ComboBoxItem>
-                    <ComboBoxItem>English (text US, menu UK, voice US)</ComboBoxItem>
-                    <ComboBoxItem>Italian (text IT, menu IT, voice IT)</ComboBoxItem>
-                    <ComboBoxItem>Spanish (text SP, menu SP, voice SP)</ComboBoxItem>
-                    <ComboBoxItem>German (text GR, menu GR, voice GR)</ComboBoxItem>
-                    <ComboBoxItem>French (text FR, menu FR, voice FR)</ComboBoxItem>
-                    <ComboBoxItem>Final Mix (text JP, menu FM, voice US)</ComboBoxItem>
-                </ComboBox>
-
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock>Region</TextBlock>
+                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding RegionId}">
+                        <ComboBoxItem>Use game default region</ComboBoxItem>
+                        <ComboBoxItem>Japanese (text JP, menu JP, voice JP)</ComboBoxItem>
+                        <ComboBoxItem>English (text US, menu US, voice US)</ComboBoxItem>
+                        <ComboBoxItem>English (text US, menu UK, voice US)</ComboBoxItem>
+                        <ComboBoxItem>Italian (text IT, menu IT, voice IT)</ComboBoxItem>
+                        <ComboBoxItem>Spanish (text SP, menu SP, voice SP)</ComboBoxItem>
+                        <ComboBoxItem>German (text GR, menu GR, voice GR)</ComboBoxItem>
+                        <ComboBoxItem>French (text FR, menu FR, voice FR)</ComboBoxItem>
+                        <ComboBoxItem>Final Mix (text JP, menu FM, voice US)</ComboBoxItem>
+                    </ComboBox>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                     Forces to load the internal configuration to a specific region. This allows to effectively load files from other languages, swap the O and X buttons and use the font table in a different way.
                     Do not worry if some region files are not found as the Mods Manager has a fallback mechanic.
-                </TextBlock>
-            </StackPanel>
+                    </TextBlock>
+                </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
 
         <xctk:WizardPage
@@ -286,54 +288,45 @@
             Description="Install automatic mod loading support into the game's folder."
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageLuaBackendInstall}">
-            <StackPanel>
-                <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
-                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
-                    <ComboBoxItem>KINGDOM HEARTS HD 1.5+2.5 ReMIX</ComboBoxItem>
-                    <ComboBoxItem>KINGDOM HEARTS HD 2.8 Final Chapter Prologue</ComboBoxItem>
-                </ComboBox>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
-                        modifying the game files.
-                        The file is named 'DBGHELP.dll' for Windows and 'version.dll' for Linux and it can be found in your game's install folder.
-                        Panacea will run every time you start the game and attempt to load built mods. To uninstall Panacea, click Remove Panacea button.
-                </TextBlock>
-                <StackPanel Visibility="{Binding PanaceaNotInstalledVisibility}">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
+                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
+                        <ComboBoxItem>KINGDOM HEARTS HD 1.5+2.5 ReMIX</ComboBoxItem>
+                        <ComboBoxItem>KINGDOM HEARTS HD 2.8 Final Chapter Prologue</ComboBoxItem>
+                    </ComboBox>
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        It seems you do not have Panacea installed or you are running a different version than the one
-                        compatible with this version of Mods Manager. We need your permission to install it into the game's folder.
-                        If you choose not to install, you may need to use one of the Build and Patch options to apply mods
-                        to your game.
+                            Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
+                            modifying the game files.
+                            Panacea will run every time you start the game and attempt to load built mods. To uninstall Panacea, click Remove Panacea button.
                     </TextBlock>
-                    <Button
-                        Margin="0 0 0 6"
-                        Content="Install Panacea for Windows"
-                        HorizontalAlignment="Left"
-                        Width="205"
-                        Command="{Binding InstallPanaceaCommand}" CommandParameter="false"/>
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        <Run Foreground="Red">WARNING</Run>
-                        linux support is still a WIP. While it does currently work it is a lot of extra setup.
-                    </TextBlock>
-                    <Button
-                        Margin="0 0 0 6"
-                        Content="Install Panacea for Linux"
-                        HorizontalAlignment="Left"
-                        Width="205"
-                        Command="{Binding InstallPanaceaCommand}" CommandParameter="true"/>
+                    <StackPanel Visibility="{Binding PanaceaNotInstalledVisibility}">
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                            It seems you do not have Panacea installed or you are running a different version than the one
+                            compatible with this version of Mods Manager. We need your permission to install it into the game's folder.
+                            If you choose not to install, you may need to use one of the Build and Patch options to apply mods
+                            to your game.
+                        </TextBlock>
+                        <Button
+                            Margin="0 0 0 6"
+                            Content="Install Panacea"
+                            HorizontalAlignment="Left"
+                            Width="205"
+                            Command="{Binding InstallPanaceaCommand}"/>
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding PanaceaInstalledVisibility}">
+                        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                            OpenKH Panacea is installed!
+                        </TextBlock>
+                        <Button
+                            Margin="0 0 0 6"
+                            Content="Remove Panacea"
+                            HorizontalAlignment="Left"
+                            Width="160"
+                            Command="{Binding RemovePanaceaCommand}"/>
+                    </StackPanel>
                 </StackPanel>
-                <StackPanel Visibility="{Binding PanaceaInstalledVisibility}">
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        OpenKH Panacea is installed!
-                    </TextBlock>
-                    <Button
-                        Margin="0 0 0 6"
-                        Content="Remove Panacea"
-                        HorizontalAlignment="Left"
-                        Width="160"
-                        Command="{Binding RemovePanaceaCommand}"/>
-                </StackPanel>
-            </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="PageLuaBackendInstall"
@@ -342,34 +335,36 @@
             Description="Lua Backend allows you to use Lua Scripts with the PC version of Kingdom Hearts."
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding WizardPageAfterLuaBackend}">
-            <StackPanel>
-                <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
-                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
-                    <ComboBoxItem>KINGDOM HEARTS HD 1.5+2.5 ReMIX</ComboBoxItem>
-                    <ComboBoxItem>KINGDOM HEARTS HD 2.8 Final Chapter Prologue</ComboBoxItem>
-                </ComboBox>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding LuaBackendNotFoundVisibility}">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
+                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
+                        <ComboBoxItem>KINGDOM HEARTS HD 1.5+2.5 ReMIX</ComboBoxItem>
+                        <ComboBoxItem>KINGDOM HEARTS HD 2.8 Final Chapter Prologue</ComboBoxItem>
+                    </ComboBox>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Visibility="{Binding LuaBackendNotFoundVisibility}">
                 It seems you have not installed Lua Backend for use with Panacea. If you wish to do this press the button below. Also if you wish to have OpenKH configure it so Lua Backend can load scripts installed in Mod Manager check the games below.
-                </TextBlock>
-                <TextBlock Margin="0 0 0 6" Visibility="{Binding LuaBackendFoundVisibility}" TextWrapping="Wrap">
+                    </TextBlock>
+                    <TextBlock Margin="0 0 0 6" Visibility="{Binding LuaBackendFoundVisibility}" TextWrapping="Wrap">
                 Lua Backend is installed! for use with Panacea. If you have not already and wish to configure it so it runs scripts from mods installed into OpenKH check the games below and press the configure button.
-                </TextBlock>
-                <StackPanel Orientation="Horizontal" Visibility="{Binding InstallForPc1525}">
-                    <CheckBox IsChecked="{Binding LuaConfigkh1}" Content="KH1" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding LuaConfigkh2}" Content="KH2" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding LuaConfigbbs}" Content="BBS" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding LuaConfigrecom}" Content="ReCoM" Margin="0 0 10 4"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Visibility="{Binding InstallForPc28}">
-                    <CheckBox IsChecked="{Binding LuaConfigkh3d}" Content="KH3D" Margin="0 0 10 4"/>
-                </StackPanel>
-                <Button Margin="0 0 0 6" Content="Install and Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="false" Visibility="{Binding LuaBackendNotFoundVisibility}"/>
-                <Button Margin="0 0 0 6" Content="Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="true" Visibility="{Binding LuaBackendFoundVisibility}"/>
-                <TextBlock Margin="0 2 0 10" Visibility="{Binding LuaBackendFoundVisibility}" TextWrapping="Wrap">
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding InstallForPc1525}">
+                        <CheckBox IsChecked="{Binding LuaConfigkh1}" Content="KH1" Margin="0 0 10 4"/>
+                        <CheckBox IsChecked="{Binding LuaConfigkh2}" Content="KH2" Margin="0 0 10 4"/>
+                        <CheckBox IsChecked="{Binding LuaConfigbbs}" Content="BBS" Margin="0 0 10 4"/>
+                        <CheckBox IsChecked="{Binding LuaConfigrecom}" Content="ReCoM" Margin="0 0 10 4"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding InstallForPc28}">
+                        <CheckBox IsChecked="{Binding LuaConfigkh3d}" Content="KH3D" Margin="0 0 10 4"/>
+                    </StackPanel>
+                    <Button Margin="0 0 0 6" Content="Install and Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="false" Visibility="{Binding LuaBackendNotFoundVisibility}"/>
+                    <Button Margin="0 0 0 6" Content="Configure Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding InstallLuaBackendCommand}" CommandParameter="true" Visibility="{Binding LuaBackendFoundVisibility}"/>
+                    <TextBlock Margin="0 2 0 10" Visibility="{Binding LuaBackendFoundVisibility}" TextWrapping="Wrap">
                 If you wish to uninstall Lua Backend completely press the button below.
-                </TextBlock>
-                <Button Margin="0 0 0 6" Content="Uninstall Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveLuaBackendCommand}" Visibility="{Binding LuaBackendFoundVisibility}"/>
-            </StackPanel>
+                    </TextBlock>
+                    <Button Margin="0 0 0 6" Content="Uninstall Lua Backend" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveLuaBackendCommand}" Visibility="{Binding LuaBackendFoundVisibility}"/>
+                </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="PageSteamAPITrick"
@@ -378,19 +373,21 @@
             Description="Steam allows you to launch the exes directly through a one line text file located in the games install folder."
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageGameData}">
-            <StackPanel>
-                <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
-                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
-                    <ComboBoxItem>KINGDOM HEARTS HD 1.5+2.5 ReMIX</ComboBoxItem>
-                    <ComboBoxItem>KINGDOM HEARTS HD 2.8 Final Chapter Prologue</ComboBoxItem>
-                </ComboBox>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Margin="0 0 0 3">Game Collection</TextBlock>
+                    <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameCollection}">
+                        <ComboBoxItem>KINGDOM HEARTS HD 1.5+2.5 ReMIX</ComboBoxItem>
+                        <ComboBoxItem>KINGDOM HEARTS HD 2.8 Final Chapter Prologue</ComboBoxItem>
+                    </ComboBox>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                    <Run Foreground="Red">WARNING</Run>
                     Steam must be running otherwise the game will fail to start. It will start to open then crash for seemingly no reason. Make sure steam is open if using this.
-                </TextBlock>
-                <Button Margin="0 0 0 6" Content="Create steam__appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding InstallSteamAPIFile}"/>
-                <Button Margin="0 0 0 6" Content="Delete steam__appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveSteamAPIFile}"/>
-            </StackPanel>
+                    </TextBlock>
+                    <Button Margin="0 0 0 6" Content="Create steam__appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding InstallSteamAPIFile}" Visibility="{Binding SteamAPIFileNotFound}"/>
+                    <Button Margin="0 0 0 6" Content="Delete steam__appid.txt" HorizontalAlignment="Left" Width="200" Command="{Binding RemoveSteamAPIFile}" Visibility="{Binding SteamAPIFileFound}"/>
+                </StackPanel>
+            </ScrollViewer>
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="LastPage"

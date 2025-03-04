@@ -1,31 +1,10 @@
-using OpenKh.Command.Bdxio.Utils;
-using OpenKh.Common;
-using OpenKh.Kh2;
-using OpenKh.Kh2.Messages;
-using OpenKh.Patcher;
-using OpenKh.Patcher.BarEntryExtractor;
-using OpenKh.Tools.Common.Wpf;
-using OpenKh.Tools.ModsManager.Models.ViewHelper;
 using OpenKh.Tools.ModsManager.Services;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Reactive.Concurrency;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
-using System.Xml.Linq;
 using Xe.Tools;
-using Xe.Tools.Wpf.Commands;
-using YamlDotNet.Serialization;
 
 namespace OpenKh.Tools.ModsManager.Views
 {

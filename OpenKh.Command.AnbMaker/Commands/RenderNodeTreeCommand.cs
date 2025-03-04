@@ -2,13 +2,8 @@ using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Command.AnbMaker.Extensions;
 using OpenKh.Common;
 using SkiaSharp;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenKh.Command.AnbMaker.Commands
 {

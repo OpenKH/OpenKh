@@ -32,8 +32,8 @@
         <DockPanel Grid.Column="2">
             <!-- Filters -->
             <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
-                <Button Width="100" Click="Button_MoveTextureUp">^</Button>
-                <Button Width="100" Click="Button_MoveTextureDown">V</Button>
+                <Button Width="100" Click="Button_MoveTextureUp">Move Up</Button>
+                <Button Width="100" Click="Button_MoveTextureDown">Move Down</Button>
             </StackPanel>
 
             <ListView x:Name="List_Textures" ItemsSource="{Binding Textures}" SelectedItem="{Binding SelectedMesh}" MouseDoubleClick="list_doubleCLick">

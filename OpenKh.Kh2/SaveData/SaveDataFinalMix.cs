@@ -14,7 +14,6 @@
 */
 
 using OpenKh.Common;
-using System;
 using System.IO;
 using System.Linq;
 using Xe.BinaryMapper;

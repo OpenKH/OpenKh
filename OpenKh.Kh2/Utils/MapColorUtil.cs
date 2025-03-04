@@ -1,8 +1,6 @@
 using OpenKh.Kh2.Models.MapColorModel;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Xe.BinaryMapper;
 using Xe.Graphics;
 

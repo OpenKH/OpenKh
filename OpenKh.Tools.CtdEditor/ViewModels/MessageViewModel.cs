@@ -1,9 +1,9 @@
 using OpenKh.Bbs;
 using OpenKh.Bbs.Messages;
 using OpenKh.Engine.Renders;
+using OpenKh.Tools.CtdEditor.Helpers;
 using OpenKh.Tools.CtdEditor.Interfaces;
 using System.Linq;
-using Xe.Drawing;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 
@@ -11,23 +11,23 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 {
     public class MessageViewModel : BaseNotifyPropertyChanged
     {
-        private readonly IDrawHandler _drawHandler;
         private readonly Ctd _ctd;
 
         public MessageViewModel(
             IDrawHandler drawHandler,
             Ctd ctd,
-            Ctd.Message message)
+            Ctd.Message message,
+            MessageConverter messageConverter)
         {
-            _drawHandler = drawHandler;
             _ctd = ctd;
             Message = message;
+            MessageConverter = messageConverter;
 
             DrawHandler = new RelayCommand(_ =>
             {
                 var layout = _ctd.Layouts[Message.LayoutIndex];
-                _drawHandler.DrawHandler(CtdEncoders.International, Message, layout);
-                _drawHandler.DrawingContext.Flush();
+                drawHandler.DrawHandler(CtdEncoders.Unified, Message, layout);
+                drawHandler.DrawingContext.Flush();
             });
         }
 
@@ -45,14 +45,29 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         public string Text
         {
-            get => Message.Text;
+            get => MessageConverter.ToText(Message.Data);
             set
             {
-                Message.Text = value;
+                Message.Data = MessageConverter.FromText(value);
                 OnPropertyChanged(nameof(Title));
                 OnPropertyChanged(nameof(TextDump));
             }
         }
+
+        #region MessageConverter
+        private MessageConverter _messageConverter = null;
+        public MessageConverter MessageConverter
+        {
+            get => _messageConverter;
+            set
+            {
+                _messageConverter = value;
+                OnPropertyChanged(nameof(Text));
+                OnPropertyChanged(nameof(Title));
+                OnPropertyChanged(nameof(MessageConverter));
+            }
+        }
+        #endregion
 
         public ushort LayoutID
         {
@@ -68,7 +83,6 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         public string Title => $"{Id}: {Text}";
 
-        public ISpriteDrawing DrawingContext => _drawHandler.DrawingContext;
         public RelayCommand DrawHandler { get; }
 
         public override string ToString() => Title;

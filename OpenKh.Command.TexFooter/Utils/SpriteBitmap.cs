@@ -1,11 +1,8 @@
 using OpenKh.Command.TexFooter.Interfaces;
 using OpenKh.Imaging;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace OpenKh.Command.TexFooter.Utils
 {

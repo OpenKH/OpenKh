@@ -22,7 +22,7 @@
         
         
         <ScrollViewer>
-            <TextBox x:Name="DecodedTextBlock" Background="White" Foreground="Black" Text="{Binding BdxDecoded}" Width="auto" Height="auto"/>
+            <TextBox x:Name="DecodedTextBlock" Text="{Binding BdxDecoded}" Width="auto" Height="auto"/>
         </ScrollViewer>
         
     </DockPanel>

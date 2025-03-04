@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:OpenKh.Tools.CtdEditor.Views"
         xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
         xmlns:controls1="clr-namespace:OpenKh.Tools.Common.Wpf.Controls;assembly=OpenKh.Tools.Common.Wpf"
+        xmlns:ViewModels="clr-namespace:OpenKh.Tools.CtdEditor.ViewModels"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance ViewModels:FontEditorViewModel}"
         Title="Font window" Height="250" Width="400" ResizeMode="NoResize">
     <Window.Resources>
         <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />

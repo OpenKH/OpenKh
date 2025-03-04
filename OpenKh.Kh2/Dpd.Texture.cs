@@ -13,8 +13,8 @@ namespace OpenKh.Kh2
             public short shCltDbp;
             private short shDbw;
             public short format; //shDpsm; 0x13 => 8bpp + 256 palette; 0x14 => 4bpp + 16 palette
-            private short shX;
-            private short shY;
+            public short shX;
+            public short shY;
             private short width;
             private short height;
             public uint unTex0L;

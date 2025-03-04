@@ -10,44 +10,44 @@
     <Grid  Background="#1d1d1d">
         <StackPanel Margin="30">
             <StackPanel Orientation="Horizontal">
-                <Label Content="Polygon count:" Foreground="White"/>
+                <Label VerticalAlignment="Center" Margin="0,0,5,0" Foreground="White">Polygon count:</Label>
                 <Label Content="{Binding Path=Header.PolygonCount}" Foreground="White"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Label Content="Texture:" Foreground="White"/>
-                <TextBox Width="30" Text="{Binding Path=Header.TextureIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White" VerticalAlignment="Center"/>
+                <Label VerticalAlignment="Center" Margin="0,0,5,0" Foreground="White">Texture:</Label>
+                <TextBox Width="70" Text="{Binding Path=Header.TextureIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White" VerticalAlignment="Center"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <CheckBox IsChecked="{Binding Path=Header.DrawAlphaPhase, Mode=TwoWay}" VerticalAlignment="Center"/>
-                <Label Content="DrawAlphaPhase" Foreground="White"/>
+                <Label VerticalAlignment="Center" Content="DrawAlphaPhase" Foreground="White"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <CheckBox IsChecked="{Binding Path=Header.Alpha, Mode=TwoWay}" VerticalAlignment="Center"/>
-                <Label Content="Alpha" Foreground="White"/>
+                <Label VerticalAlignment="Center" Content="Alpha" Foreground="White"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <CheckBox IsChecked="{Binding Path=Header.Multi, Mode=TwoWay}" VerticalAlignment="Center"/>
-                <Label Content="Multi" Foreground="White"/>
+                <Label VerticalAlignment="Center" Content="Multi" Foreground="White"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <CheckBox IsChecked="{Binding Path=Header.AlphaEx, Mode=TwoWay}" VerticalAlignment="Center"/>
-                <Label Content="AlphaEx" Foreground="White"/>
+                <Label VerticalAlignment="Center" Content="AlphaEx" Foreground="White"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <CheckBox IsChecked="{Binding Path=Header.AlphaAdd, Mode=TwoWay}" VerticalAlignment="Center"/>
-                <Label Content="AlphaAdd" Foreground="White"/>
+                <Label VerticalAlignment="Center" Content="AlphaAdd" Foreground="White"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <CheckBox IsChecked="{Binding Path=Header.AlphaSub, Mode=TwoWay}" VerticalAlignment="Center"/>
-                <Label Content="AlphaSub" Foreground="White"/>
+                <Label VerticalAlignment="Center" Content="AlphaSub" Foreground="White"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <CheckBox IsChecked="{Binding Path=Header.Specular, Mode=TwoWay}" VerticalAlignment="Center"/>
-                <Label Content="Specular" Foreground="White"/>
+                <Label VerticalAlignment="Center" Content="Specular" Foreground="White"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <CheckBox IsChecked="{Binding Path=Header.NoLight, Mode=TwoWay}" VerticalAlignment="Center"/>
-                <Label Content="NoLight" Foreground="White"/>
+                <Label VerticalAlignment="Center" Content="NoLight" Foreground="White"/>
             </StackPanel>
         </StackPanel>
     </Grid>

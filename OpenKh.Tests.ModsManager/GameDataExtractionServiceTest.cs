@@ -1,6 +1,4 @@
 using OpenKh.Tools.ModsManager.Services;
-using System.Threading;
-using Xunit;
 
 namespace OpenKh.Tests.ModsManager
 {

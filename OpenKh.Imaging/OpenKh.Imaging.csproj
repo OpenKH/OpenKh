@@ -10,7 +10,7 @@
 
     <PackageReference Include="System.Memory" Version="4.5.5" />
     <PackageReference Include="Crc32.NET" Version="1.2.0" />
-    <PackageReference Include="DotNetZip" Version="1.16.0" />
+    <PackageReference Include="Iconic.Zlib.Netstandard" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

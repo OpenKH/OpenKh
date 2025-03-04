@@ -1,9 +1,6 @@
 using OpenKh.Engine;
 using OpenKh.Kh2.SystemData;
 using OpenKh.Tools.Kh2SystemEditor.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OpenKh.Tools.Kh2SystemEditor.Models.Export
 {

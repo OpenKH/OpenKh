@@ -1,7 +1,6 @@
 using OpenKh.Tools.ModsManager.Services;
 using OpenKh.Tools.ModsManager.ViewModels;
 using System.Windows;
-using System.Windows.Controls;
 using Xe.Tools.Wpf.Commands;
 
 namespace OpenKh.Tools.ModsManager.Views

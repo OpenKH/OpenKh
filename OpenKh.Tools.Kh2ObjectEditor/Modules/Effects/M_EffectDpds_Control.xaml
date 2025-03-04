@@ -10,7 +10,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="50" />
+            <ColumnDefinition Width="70" />
         </Grid.ColumnDefinitions>
 
         <ContentControl x:Name="DpdFrame"/>

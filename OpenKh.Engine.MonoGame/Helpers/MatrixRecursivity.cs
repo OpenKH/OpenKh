@@ -1,10 +1,6 @@
 using OpenKh.Engine.Parsers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenKh;
 using System.Numerics;
 
 namespace OpenKh.Engine.Monogame.Helpers

@@ -9,7 +9,7 @@ namespace OpenKh.Kh2
     {
         public int VsfNo { get; set; }
         public int ModelNumber { get; set; }
-        List<ushort> Indices { get; set; }
+        public List<ushort> Indices { get; set; }
 
         public DpdVsf(Stream vsfStream)
         {

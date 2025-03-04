@@ -436,10 +436,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
             PatchCommand = new RelayCommand(async (fastMode) =>
             {
-                ResetLogWindow();
-                await BuildPatches(Convert.ToBoolean(fastMode));
-                await PatchGame(Convert.ToBoolean(fastMode));
-                CloseAllWindows();
+                try
+                {
+                    ResetLogWindow();
+                    await BuildPatches(Convert.ToBoolean(fastMode));
+                    await PatchGame(Convert.ToBoolean(fastMode));
+                    CloseAllWindows();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    return;
+                }
             }, _ => !IsBuilding);
 
             RunCommand = new RelayCommand(async _ =>
@@ -469,52 +477,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }, _ => IsRunning);
             WizardCommand = new RelayCommand(_ =>
             {
-                var dialog = new SetupWizardWindow()
+                var dialog = new SetupWizardWindow();
+                if (dialog.ShowDialog() != null)
                 {
-                    ConfigGameEdition = ConfigurationService.GameEdition,
-                    ConfigGameDataLocation = ConfigurationService.GameDataLocation,
-                    ConfigIsoLocation = ConfigurationService.IsoLocation,
-                    ConfigOpenKhGameEngineLocation = ConfigurationService.OpenKhGameEngineLocation,
-                    ConfigPcsx2Location = ConfigurationService.Pcsx2Location,
-                    ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation,
-                    ConfigPcReleaseLocationKH3D = ConfigurationService.PcReleaseLocationKH3D,
-                    ConfigRegionId = ConfigurationService.RegionId,
-                    ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    ConfigurationService.GameEdition = dialog.ConfigGameEdition;
-                    ConfigurationService.GameDataLocation = dialog.ConfigGameDataLocation;
-                    ConfigurationService.IsoLocation = dialog.ConfigIsoLocation;
-                    ConfigurationService.OpenKhGameEngineLocation = dialog.ConfigOpenKhGameEngineLocation;
-                    ConfigurationService.Pcsx2Location = dialog.ConfigPcsx2Location;
-                    ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
-                    ConfigurationService.PcReleaseLocationKH3D = dialog.ConfigPcReleaseLocationKH3D;
-                    ConfigurationService.RegionId = dialog.ConfigRegionId;
-                    ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
-                    ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
-
-                    const int EpicGamesPC = 2;
-                    if (ConfigurationService.GameEdition == EpicGamesPC &&
-                        Directory.Exists(ConfigurationService.PcReleaseLocation))
-                    {
-                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
-                            new string[]
-                            {
-                                $"mod_path={ConfigurationService.GameModPath}",
-                                $"show_console={false}",
-                            });
-                    }
-                    if (ConfigurationService.GameEdition == EpicGamesPC &&
-                        Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
-                    {
-                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
-                            new string[]
-                            {
-                                $"mod_path={ConfigurationService.GameModPath}",
-                                $"show_console={false}",
-                            });
-                    }
                     if (ConfigurationService.GameEdition == 2)
                     {
                         PC = true;
@@ -522,6 +487,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     else
                         PC = false;
+                    ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
                 }
             });
 

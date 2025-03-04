@@ -1,10 +1,8 @@
 using OpenKh.Command.TexFooter.Interfaces;
-using OpenKh.Imaging;
 using OpenKh.Kh2.TextureFooter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace OpenKh.Command.TexFooter.Models
 {

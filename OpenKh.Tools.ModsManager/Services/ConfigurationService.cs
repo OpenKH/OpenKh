@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using YamlDotNet.Core.Tokens;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -48,7 +47,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public string pcVersion { get; internal set; } = "EGS";
             public bool steamAPITrick1525 {  get; internal set; } = false;
             public bool steamAPITrick28 { get; internal set; } = false;
-            public List<string> GamesToExtract { get; internal set; } = new List<string> { "kh2" };
+            public List<string> GamesToExtract { get; internal set; } = new List<string>();
             public bool SkipRemastered { get; internal set; } = false;
             public string LaunchGame { get; internal set; } = "kh2";
             public bool DarkMode { get; internal set; } = true;

@@ -1,5 +1,4 @@
 using Binarysharp.MSharp;
-using Binarysharp.MSharp.Native;
 using ImGuiNET;
 using OpenKh.Kh2;
 using System;
@@ -10,8 +9,6 @@ using System.Text;
 using System.Windows;
 using OpenKh.Common;
 using System.IO;
-
-using OpenKh.Tools.LayoutEditor;
 
 namespace OpenKh.Tools.LayoutEditor.Dialogs
 {

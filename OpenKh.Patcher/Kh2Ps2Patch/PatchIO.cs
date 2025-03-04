@@ -1,4 +1,3 @@
-using OpenKh.Common;
 using OpenKh.Patcher.Kh2Ps2Patch.BlockSystem;
 using System;
 using System.Buffers.Binary;
@@ -6,8 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using YamlDotNet.Core;
 
 namespace OpenKh.Patcher.Kh2Ps2Patch
 {

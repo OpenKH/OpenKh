@@ -1,12 +1,7 @@
 using OpenKh.Command.TexFooter.Subcommands;
-using OpenKh.Common;
-using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using Xunit;
 
 namespace OpenKh.Tests.Commands

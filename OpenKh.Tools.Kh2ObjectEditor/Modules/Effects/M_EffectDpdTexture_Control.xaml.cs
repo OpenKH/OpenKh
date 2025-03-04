@@ -29,7 +29,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
 
         private void List_Textures_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            loadImage(List_Textures.SelectedIndex);
+            if (List_Textures.SelectedItem != null)
+                loadImage(List_Textures.SelectedIndex);
         }
 
         public void EffectImage_Export(object sender, RoutedEventArgs e)
@@ -39,7 +40,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
                 ThisVM.ExportTexture(List_Textures.SelectedIndex);
             }
         }
-
+        
+        public void EffectImage_ExportAll(object sender, RoutedEventArgs e)
+        {
+            ThisVM.ExportAllTextures();
+        }
+        
         public void EffectImage_Replace(object sender, RoutedEventArgs e)
         {
             if (List_Textures.SelectedItem != null)

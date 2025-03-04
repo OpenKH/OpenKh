@@ -5,7 +5,6 @@ using OpenKh.Kh2.Messages;
 using OpenKh.Command.Bdxio.Models;
 using OpenKh.Command.Bdxio.Utils;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -80,7 +79,23 @@ namespace OpenKh.Patcher
             "Recom",
         };
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null, string Language = "en", bool Tests = false)
+        /// <param name="platform">(GameEdition) 0=OpenKH, 1=PCSX2-EX, 2=PC</param>
+        /// <param name="fastMode">If true, always the first package file (kh1_first, bbs_first, kh2_first or such) is selected.</param>
+        /// <param name="Tests">If true, always invoke context.CopyOriginalFile</param>
+        /// <param name="LaunchGame">(GameId) "kh1", "kh2", "bbs", "Recom", "kh3d"</param>
+        /// <param name="Language">en, jp</param>
+        public void Patch(
+            string originalAssets,
+            string outputDir,
+            Metadata metadata,
+            string modBasePath,
+            int platform = 1,
+            bool fastMode = false,
+            IDictionary<string, string> packageMap = null,
+            string LaunchGame = null,
+            string Language = "en",
+            bool Tests = false
+        )
         {
 
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
@@ -91,6 +106,8 @@ namespace OpenKh.Patcher
                     throw new Exception("No assets found.");
                 if (metadata.Game != null && GamesList.Contains(metadata.Game.ToLower()) && metadata.Game.ToLower() != LaunchGame.ToLower())
                     return;
+
+                var exclusiveLock = new object();
 
                 metadata.Assets.AsParallel().ForAll(assetFile =>
                 {
@@ -176,7 +193,10 @@ namespace OpenKh.Patcher
                         if (packageMap != null && packageMapLocation.Length > 0)
                         {
                             // Protect against multiple mods having the same file where one uses forward slash and one uses backslash
-                            packageMap[name.Replace("\\", "/")] = packageMapLocation;
+                            lock (exclusiveLock)
+                            {
+                                packageMap[name.Replace("\\", "/")] = packageMapLocation;
+                            }
                         }
 
                         context.EnsureDirectoryExists(dstFile);
@@ -199,10 +219,34 @@ namespace OpenKh.Patcher
                             //If copying a file from the mod (NOT Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
                             //If copying a file from the users extraction (Type: internal) make sure it exists (doesnt check if the location its going normally exists) OR
                             //Ignore if its from a test
-                            if ((assetFile.Method != "copy" && assetFile.Method != "imd" && (File.Exists(context.GetOriginalAssetPath(assetFile.Name)) || multi)) ||
-                            ((assetFile.Method == "copy" || assetFile.Method == "imd") && assetFile.Source[0].Type != "internal" && File.Exists(context.GetSourceModAssetPath(assetFile.Source[0].Name))) ||
-                            ((assetFile.Method == "copy" || assetFile.Method == "imd") && assetFile.Source[0].Type == "internal" && (File.Exists(context.GetOriginalAssetPath(assetFile.Source[0].Name)) || multi)) ||
-                            Tests)
+
+                            var needToCopyOriginalFile =
+                                (false
+                                || (true
+                                    && assetFile.Method != "copy"
+                                    && assetFile.Method != "imd"
+                                    && (false
+                                        || File.Exists(context.GetOriginalAssetPath(assetFile.Name))
+                                        || multi
+                                    )
+                                )
+                                || (true
+                                    && (assetFile.Method == "copy" || assetFile.Method == "imd")
+                                    && assetFile.Source[0].Type != "internal"
+                                    && File.Exists(context.GetSourceModAssetPath(assetFile.Source[0].Name))
+                                )
+                                || (true
+                                    && (assetFile.Method == "copy" || assetFile.Method == "imd")
+                                    && assetFile.Source[0].Type == "internal"
+                                    && (false
+                                        || File.Exists(context.GetOriginalAssetPath(assetFile.Source[0].Name))
+                                        || multi
+                                    )
+                                )
+                                || Tests
+                                );
+
+                            if (needToCopyOriginalFile)
                             {
                                 context.CopyOriginalFile(name, dstFile);
 
@@ -214,6 +258,8 @@ namespace OpenKh.Patcher
                             }
                             else
                             {
+                                // The following codes are for validation purposes only.
+
                                 List<string> globalFilePaths = new List<string> { ".a.fr", ".a.gr", ".a.it", ".a.sp", ".a.us", "/fr/", "/gr/", "/it/", "/sp/", "/us/" };
                                 if (assetFile.Method != "copy" && assetFile.Method != "imd")
                                 {
@@ -221,22 +267,22 @@ namespace OpenKh.Patcher
                                     {
                                         if (Language != "jp")
                                         {
-                                            if (!context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
+                                            if (!context.GetOriginalAssetPath(name).Contains(".a.fm") && !context.GetOriginalAssetPath(name).Contains("/jp/"))
                                             {
-                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
                                             }
                                         }
                                         else
                                         {
-                                            if (!globalFilePaths.Any(x=>context.GetOriginalAssetPath(assetFile.Name).Contains(x)))
+                                            if (!globalFilePaths.Any(x => context.GetOriginalAssetPath(name).Contains(x)))
                                             {
-                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
                                             }
                                         }
                                     }
                                     else
                                     {
-                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
                                     }
                                 }
                                 else if (assetFile.Source[0].Type == "internal")
@@ -245,22 +291,22 @@ namespace OpenKh.Patcher
                                     {
                                         if (Language != "jp")
                                         {
-                                            if (!context.GetOriginalAssetPath(assetFile.Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Name).Contains("/jp/"))
+                                            if (!context.GetOriginalAssetPath(assetFile.Source[0].Name).Contains(".a.fm") && !context.GetOriginalAssetPath(assetFile.Source[0].Name).Contains("/jp/") && (assetFile.Multi == null || assetFile.Name == name))
                                             {
-                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
                                             }
                                         }
                                         else
                                         {
-                                            if (!globalFilePaths.Any(x => context.GetOriginalAssetPath(assetFile.Name).Contains(x)))
+                                            if (!globalFilePaths.Any(x => context.GetOriginalAssetPath(assetFile.Source[0].Name).Contains(x)) && (assetFile.Multi == null || assetFile.Name == name))
                                             {
-                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
                                             }
                                         }
                                     }
                                     else
                                     {
-                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Name) + " Skipping. \nPlease check your game extraction.");
+                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
                                     }
                                 }
                                 else

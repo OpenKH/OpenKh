@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.CtdEditor.Views"
              xmlns:controls="clr-namespace:OpenKh.Tools.Common.Wpf.Controls;assembly=OpenKh.Tools.Common.Wpf"
+             xmlns:ViewModels="clr-namespace:OpenKh.Tools.CtdEditor.ViewModels"
              mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=ViewModels:CtdViewModel}"
              d:DesignHeight="350" d:DesignWidth="600">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -84,9 +86,10 @@
                 Text="{Binding TextDump, Mode=OneWay}" IsReadOnly="True"/>
 
             <controls:DrawPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                Drawing="{Binding DrawingContext}"
+                Drawing="{Binding DataContext.DrawingContext,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:CtdView}}}"
                 DrawBegin="{Binding DrawHandler}"
-                />
+                >
+            </controls:DrawPanel>
         </Grid>
     </Grid>
 </UserControl>

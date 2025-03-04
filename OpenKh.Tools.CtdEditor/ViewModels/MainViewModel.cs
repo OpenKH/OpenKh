@@ -1,6 +1,7 @@
 using OpenKh.Bbs;
 using OpenKh.Common;
 using OpenKh.Tools.Common.Wpf;
+using OpenKh.Tools.CtdEditor.Helpers;
 using OpenKh.Tools.CtdEditor.Interfaces;
 using OpenKh.Tools.CtdEditor.Views;
 using System;
@@ -17,56 +18,113 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 {
     public class MainViewModel : BaseNotifyPropertyChanged
     {
-        private static string ApplicationName = Utilities.GetApplicationName();
-        private static readonly IEnumerable<FileDialogFilter> CtdFilter = FileDialogFilterComposer.Compose()
-            .AddExtensions("CTD message", "ctd")
-            .AddAllFiles();
-        private static readonly IEnumerable<FileDialogFilter> FontArcFilter = FileDialogFilterComposer.Compose()
-            .AddExtensions("Font archive", "arc")
-            .AddAllFiles();
-
-        private readonly CtdDrawHandler _drawHandler = new CtdDrawHandler();
-        private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
-        private string _fileName;
-        private CtdViewModel _ctdViewModel;
+        private readonly CtdDrawHandler _drawHandler;
         private FontsArc _fonts;
 
-        public string Title => $"{Path.GetFileName(FileName) ?? "untitled"} | {ApplicationName}";
+        public MainViewModel(
+            CtdDrawHandler drawHandler)
+        {
+            _drawHandler = drawHandler;
+        }
 
+        #region Title
+        private string _title = "";
+        public string Title
+        {
+            get => _title;
+            set
+            {
+                _title = value;
+                OnPropertyChanged(nameof(Title));
+            }
+        }
+        #endregion
+
+        #region FileName
+        private string _fileName = "";
         public string FileName
         {
             get => _fileName;
             set
             {
                 _fileName = value;
-                OnPropertyChanged(nameof(Title));
+                OnPropertyChanged(nameof(FileName));
             }
         }
+        #endregion
 
-        public string FontName { get; set; }
+        #region FontName
+        private string _fontName = "";
+        public string FontName
+        {
+            get => _fontName;
+            set
+            {
+                _fontName = value;
+                OnPropertyChanged(nameof(FontName));
+            }
+        }
+        #endregion
 
-        public RelayCommand OpenCommand { get; }
-        public RelayCommand SaveCommand { get; }
-        public RelayCommand SaveAsCommand { get; }
-        public RelayCommand ExitCommand { get; }
-        public RelayCommand AboutCommand { get; }
+        public RelayCommand OpenCommand { get; set; }
+        public RelayCommand SaveCommand { get; set; }
+        public RelayCommand SaveAsCommand { get; set; }
+        public RelayCommand ExitCommand { get; set; }
+        public RelayCommand AboutCommand { get; set; }
 
-        public RelayCommand OpenFontCommand { get; }
-        public RelayCommand OpenFontEditorCommand { get; }
-        public RelayCommand OpenLayoutEditorCommand { get; }
+        public RelayCommand OpenFontCommand { get; set; }
+        public RelayCommand OpenFontEditorCommand { get; set; }
+        public RelayCommand OpenLayoutEditorCommand { get; set; }
 
+        public RelayCommand UseInternationalEncodingCommand { get; set; }
+        public RelayCommand UseJapaneseEncodingCommand { get; set; }
+
+        #region UseInternationalEncoding
+        private bool _useInternationalEncoding = true;
+        public bool UseInternationalEncoding
+        {
+            get => _useInternationalEncoding;
+            set
+            {
+                _useInternationalEncoding = value;
+                OnPropertyChanged(nameof(UseInternationalEncoding));
+            }
+        }
+        #endregion
+
+        #region UseJapaneseEncoding
+        private bool _useJapaneseEncoding = false;
+        public bool UseJapaneseEncoding
+        {
+            get => _useJapaneseEncoding;
+            set
+            {
+                _useJapaneseEncoding = value;
+                OnPropertyChanged(nameof(UseJapaneseEncoding));
+            }
+        }
+        #endregion
+
+
+        #region CtdViewModel
+        private CtdViewModel _ctdViewModel = null;
         public CtdViewModel CtdViewModel
         {
             get => _ctdViewModel;
-            private set { _ctdViewModel = value; OnPropertyChanged(); }
+            set
+            {
+                _ctdViewModel = value;
+                OnPropertyChanged(nameof(CtdViewModel));
+            }
         }
+        #endregion
 
         public Ctd Ctd
         {
             get => CtdViewModel?.Ctd;
             set
             {
-                CtdViewModel = new CtdViewModel(_drawHandler, value);
+                CtdViewModel = new CtdViewModel(_drawHandler, value, _messageConverter);
                 OnPropertyChanged(nameof(OpenLayoutEditorCommand));
             }
         }
@@ -82,107 +140,26 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             }
         }
 
+        #region MessageConverter
+        private MessageConverter _messageConverter = MessageConverter.Default;
+        public MessageConverter MessageConverter
+        {
+            get => _messageConverter;
+            set
+            {
+                _messageConverter = value;
+                OnPropertyChanged(nameof(MessageConverter));
+
+                if (CtdViewModel != null)
+                    CtdViewModel.MessageConverter = value;
+            }
+        }
+        #endregion
+
         public MainViewModel()
         {
-            OpenCommand = new RelayCommand(x =>
-                FileDialog.OnOpen(fileName => OpenFile(fileName), CtdFilter), x => true);
-
-            SaveCommand = new RelayCommand(x =>
-            {
-                if (!string.IsNullOrEmpty(FileName))
-                {
-                    SaveFile(FileName, FileName);
-                }
-                else
-                {
-                    SaveAsCommand.Execute(x);
-                }
-            }, x => true);
-
-            SaveAsCommand = new RelayCommand(x =>
-                FileDialog.OnSave(fileName => SaveFile(FileName, fileName), CtdFilter), x => true);
-
-            ExitCommand = new RelayCommand(x =>
-            {
-                Window.Close();
-            }, x => true);
-
-            OpenFontCommand = new RelayCommand(x =>
-                FileDialog.OnOpen(fileName => OpenFontFile(fileName), FontArcFilter),
-                x => CtdViewModel != null);
-
-            OpenFontEditorCommand = new RelayCommand(x =>
-                new FontWindow()
-                {
-                    DataContext = new FontEditorViewModel(Fonts)
-                }.ShowDialog(),
-                x => Fonts != null);
-
-            OpenLayoutEditorCommand = new RelayCommand(x =>
-                new LayoutWindow()
-                {
-                    DataContext = new LayoutEditorViewModel(Ctd)
-                }.ShowDialog(),
-                x => Ctd != null
-            );
-
-            AboutCommand = new RelayCommand(x =>
-            {
-                var about = new AboutDialog(Assembly.GetExecutingAssembly());
-                about.Author = "Open KH Team";
-                about.AuthorWebsite = "https://www.openkh.dev";
-                about.ShowDialog();
-            }, x => true);
-
-            CtdViewModel = new CtdViewModel(_drawHandler);
-
-            string[] args = Environment.GetCommandLineArgs();
-            for (int a = 0; a < args.Length; a++)
-            {
-                if (string.Equals(args[a], "--font", StringComparison.InvariantCultureIgnoreCase)
-                    || string.Equals(args[a], "-f", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    a++;
-                    OpenFontFile(args[a]);
-                }
-                else if (string.Equals(args[a], "--message", StringComparison.InvariantCultureIgnoreCase)
-                    || string.Equals(args[a], "-m", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    a++;
-                    OpenFile(args[a]);                       
-                }
-            }
+            CtdViewModel = new CtdViewModel(_drawHandler, MessageConverter.Default);
         }
-
-        private bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
-        {
-            if (!Ctd.IsValid(stream))
-            {
-                MessageBox.Show(Window, $"{Path.GetFileName(fileName)} is not a valid CTD file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-
-            Ctd = Ctd.Read(stream);
-            FileName = fileName;
-            return true;
-        });
-
-        private void SaveFile(string previousFileName, string fileName)
-        {
-            File.Create(fileName).Using(stream =>
-            {
-                Ctd.Write(stream);
-            });
-        }
-
-        private void OpenFontFile(string fileName) => File.OpenRead(fileName).Using(stream =>
-        {
-            if (!Arc.IsValid(stream))
-                throw new Exception("Not a valid ARC file");
-
-            Fonts = FontsArc.Read(stream);
-            FontName = fileName;
-        });
 
     }
 }

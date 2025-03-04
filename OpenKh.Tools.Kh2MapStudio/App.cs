@@ -1,17 +1,14 @@
 using Assimp;
 using ImGuiNET;
 using Microsoft.Xna.Framework.Input;
-using OpenKh.Engine;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.CustomImGui;
-using OpenKh.Tools.Kh2MapStudio.Models;
 using OpenKh.Tools.Kh2MapStudio.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Reflection;
 using System.Windows;
 using Xe.Tools.Wpf.Dialogs;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;

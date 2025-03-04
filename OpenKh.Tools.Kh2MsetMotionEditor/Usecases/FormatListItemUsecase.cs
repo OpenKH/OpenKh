@@ -1,10 +1,5 @@
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2MsetMotionEditor.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static OpenKh.Kh2.Motion;
 
 namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
