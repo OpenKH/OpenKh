@@ -84,6 +84,11 @@ namespace OpenKh.Command.MapGen.Models
         public byte floorLevel { get; set; }
 
         /// <summary>
+        /// Group value for Collision. Used with MapVisibility to turn on/off map meshes and collision.
+        /// </summary>
+        public byte group { get; set; }
+        
+        /// <summary>
         /// Collision.Attributes for camera collision. Still unknown. Such as 0x000003F0
         /// </summary>
         public int cameraFlags { get; set; }
