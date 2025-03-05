@@ -701,22 +701,27 @@ namespace OpenKh.Patcher
                                 }
                                 else
                                 {
-                                    if (item.InsertBefore == 0) // Default case, append
-                                    {
-                                        itemList.Items.Add(item);
-                                    }
-                                    else
+                                    if (item.InsertBefore != 0) // Prioritize InsertBefore
                                     {
                                         var index = itemList.Items.FindIndex(x => x.Id == item.InsertBefore);
                                         if (index >= 0)
                                         {
                                             itemList.Items.Insert(index, item);
-                                        }
-                                        else
-                                        {
-                                            itemList.Items.Add(item); // If not found, append
+                                            continue;
                                         }
                                     }
+                                    else if (item.InsertAfter != 0) // If InsertBefore not set, check InsertAfter
+                                    {
+                                        var index = itemList.Items.FindIndex(x => x.Id == item.InsertAfter);
+                                        if (index >= 0)
+                                        {
+                                            itemList.Items.Insert(index + 1, item);
+                                            continue;
+                                        }
+                                    }
+
+                                    // Default case: append
+                                    itemList.Items.Add(item);
                                 }
                             }
                         }
