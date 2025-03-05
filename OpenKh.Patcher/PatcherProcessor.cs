@@ -689,6 +689,7 @@ namespace OpenKh.Patcher
                     case "item":
                         var itemList = Kh2.SystemData.Item.Read(stream);
                         var moddedItem = deserializer.Deserialize<Kh2.SystemData.Item>(sourceText);
+
                         if (moddedItem.Items != null)
                         {
                             foreach (var item in moddedItem.Items)
@@ -700,10 +701,26 @@ namespace OpenKh.Patcher
                                 }
                                 else
                                 {
-                                    itemList.Items.Add(item);
+                                    if (item.InsertBefore == 0) // Default case, append
+                                    {
+                                        itemList.Items.Add(item);
+                                    }
+                                    else
+                                    {
+                                        var index = itemList.Items.FindIndex(x => x.Id == item.InsertBefore);
+                                        if (index >= 0)
+                                        {
+                                            itemList.Items.Insert(index, item);
+                                        }
+                                        else
+                                        {
+                                            itemList.Items.Add(item); // If not found, append
+                                        }
+                                    }
                                 }
                             }
                         }
+
                         if (moddedItem.Stats != null)
                         {
                             foreach (var item in moddedItem.Stats)
@@ -719,6 +736,7 @@ namespace OpenKh.Patcher
                                 }
                             }
                         }
+
                         itemList.Write(stream.SetPosition(0));
                         break;
 
