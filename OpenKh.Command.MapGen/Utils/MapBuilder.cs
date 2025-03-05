@@ -722,7 +722,7 @@ namespace OpenKh.Command.MapGen.Utils
                     break;
                 }
                 default:
-                    throw new NotSupportedException();
+                    throw new NotSupportedException("ERROR! Non-triangulated mesh detected! Try triangulating your mesh and re-attempting.");
             }
         }
 
