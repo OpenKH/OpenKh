@@ -15,6 +15,16 @@ namespace OpenKh.Kh2
         public int TriggerIndex { get; set; }
         public string TriggerName { get; set; }
 
+        public AnimationBinary(Motion.InterpolatedMotion motionFile, MotionTrigger motionTriggerFile, int motionIndex, string motionName, int triggerIndex, string triggerName)
+        {
+            MotionFile = motionFile;
+            MotionTriggerFile = motionTriggerFile;
+            MotionIndex = motionIndex;
+            MotionName = motionName;
+            TriggerIndex = triggerIndex;
+            TriggerName = triggerName;
+        }
+
         public AnimationBinary(Stream stream)
         {
             Bar barFile = Bar.Read(stream);
