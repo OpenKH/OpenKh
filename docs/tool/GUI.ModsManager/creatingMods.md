@@ -315,6 +315,12 @@ Asset Example
     source:
       - name: FmlvList.yml
         type: fmlv
+  - name: atkp
+    method: listpatch
+    type: List
+    source:
+      - name: AtkpList.yml
+        type: atkp
 ```
 
 ### `trsr` Source Example
