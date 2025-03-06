@@ -38,9 +38,9 @@ namespace OpenKh.Command.KHAnimationConverter
                     {
                         string anbFileName = $"anim-{i:0000}.anb";
                         string anbFilePath = Path.Join(filePath, anbFileName);
-                        using (FileStream fs = new(anbFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                        using (FileStream fs = new FileStream(anbFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
                         {
-                            using (BinaryWriter bw = new(fs))
+                            using (BinaryWriter bw = new BinaryWriter(fs))
                             {
 
                                 AnimationBinary anb = file.anbs[i];
@@ -84,7 +84,7 @@ namespace OpenKh.Command.KHAnimationConverter
 
         public static List<AnimationBinary> PAMtoANBs(Pam pam, float anbFramerate=60f)
         {
-            List<AnimationBinary> anbs = [];
+            List<AnimationBinary> anbs = new List<AnimationBinary>();
             // Maps PAM Channels to ANB Channels
             List<short> pamChannelsToAnbChannels = new List<short>([6, 7, 8, 3, 4, 5, 0, 1, 2]);
             float pamToanbTranslationScaleFactor = 100f;
@@ -94,11 +94,13 @@ namespace OpenKh.Command.KHAnimationConverter
                 Pam.AnimationEntry animEntry = animInfo.AnimEntry;
 
                 if (animEntry.AnimationOffset == 0)
+                {
                     continue;
+                }
 
                 // Create the subfiles that make up an anb
                 Motion.InterpolatedMotion im = Motion.InterpolatedMotion.CreateEmpty();
-                MotionTrigger mt = new()
+                MotionTrigger mt = new MotionTrigger()
                 {
                     FrameTriggerList = new List<MotionTrigger.FrameTrigger>(),
                     RangeTriggerList = new List<MotionTrigger.RangeTrigger>()
@@ -132,7 +134,7 @@ namespace OpenKh.Command.KHAnimationConverter
                 for (int j = 0; j < boneCount; j++)
                 {
                     Pam.BoneChannel boneChannel = boneChannels[j];
-                    List<Pam.AnimationData> channels = [
+                    List<Pam.AnimationData> channels = new List<Pam.AnimationData> {
                         boneChannel.TranslationX,
                         boneChannel.TranslationY,
                         boneChannel.TranslationZ,
@@ -142,7 +144,7 @@ namespace OpenKh.Command.KHAnimationConverter
                         boneChannel.ScaleX,
                         boneChannel.ScaleY,
                         boneChannel.ScaleZ
-                    ];
+                    };
 
                     Motion.Joint joint = new Motion.Joint()
                     {
@@ -208,7 +210,7 @@ namespace OpenKh.Command.KHAnimationConverter
                             // Check if this is an initial pose
                             if (keyframesCount == 1)
                             {
-                                Motion.InitialPose initialPose = new()
+                                Motion.InitialPose initialPose = new Motion.InitialPose()
                                 {
                                     BoneId = (short)j,
                                     Channel = anbChannel,
@@ -235,7 +237,7 @@ namespace OpenKh.Command.KHAnimationConverter
                 for (int j = 0; j < boneCount; j++)
                 {
                     Pam.BoneChannel boneChannel = boneChannels[j];
-                    List<Pam.AnimationData> channels = [
+                    List<Pam.AnimationData> channels = new List<Pam.AnimationData> {
                         boneChannel.TranslationX,
                         boneChannel.TranslationY,
                         boneChannel.TranslationZ,
@@ -245,7 +247,7 @@ namespace OpenKh.Command.KHAnimationConverter
                         boneChannel.ScaleX,
                         boneChannel.ScaleY,
                         boneChannel.ScaleZ
-                    ];
+                    };
                     
                     for (int k = 0; k < channels.Count; k++)
                     {
@@ -270,7 +272,7 @@ namespace OpenKh.Command.KHAnimationConverter
                                 short keyframeIndex = (short)((keysListUnique.IndexOf(anbKeyframeID) * 4) | 1);
                                 short valueIndex = (short)valuesListUnique.IndexOf(anbChannelValue);
 
-                                Motion.Key key = new()
+                                Motion.Key key = new Motion.Key()
                                 {
                                     Type_Time = keyframeIndex,
                                     ValueId = valueIndex,
@@ -354,7 +356,7 @@ namespace OpenKh.Command.KHAnimationConverter
                 mt.FrameTriggerList.Add(ft);
 
                 // Create the anb from the interpolated motion and motion trigger
-                AnimationBinary anb = new(im, mt, 0, "OpKH", 0, "OpKH");
+                AnimationBinary anb = new AnimationBinary(im, mt, 0, "OpKH", 0, "OpKH");
                 anbs.Add(anb);
             }
 
@@ -496,8 +498,8 @@ namespace OpenKh.Command.KHAnimationConverter
             Output_Format_ID = Output_Format_ID.ToLower();
 
             Stream inputStream = File.OpenRead(Input_Path);
-            KHFormat input = new();
-            KHFormat output = new();
+            KHFormat input = new KHFormat();
+            KHFormat output = new KHFormat();
 
             Console.WriteLine($"Reading from {Input_Path}");
             // TODO - Support other input formats
