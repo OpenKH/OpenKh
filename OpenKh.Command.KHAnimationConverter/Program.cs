@@ -37,7 +37,7 @@ namespace OpenKh.Command.KHAnimationConverter
                     for (int i = 0; i < file.anbs.Count; i++)
                     {
                         string anbFileName = $"anim-{i:0000}.anb";
-                        string anbFilePath = Path.Join([filePath, anbFileName]);
+                        string anbFilePath = Path.Join(filePath, anbFileName);
                         using (FileStream fs = new(anbFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
                         {
                             using (BinaryWriter bw = new(fs))
