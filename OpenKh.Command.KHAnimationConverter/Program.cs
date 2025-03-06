@@ -86,7 +86,7 @@ namespace OpenKh.Command.KHAnimationConverter
         {
             List<AnimationBinary> anbs = [];
             // Maps PAM Channels to ANB Channels
-            List<short> pamChannelsToAnbChannels = [6, 7, 8, 3, 4, 5, 0, 1, 2];
+            List<short> pamChannelsToAnbChannels = new List<short>([6, 7, 8, 3, 4, 5, 0, 1, 2]);
             float pamToanbTranslationScaleFactor = 100f;
             for (int i = 0; i < pam.header.AnimationCount; i++)
             {
@@ -100,8 +100,8 @@ namespace OpenKh.Command.KHAnimationConverter
                 Motion.InterpolatedMotion im = Motion.InterpolatedMotion.CreateEmpty();
                 MotionTrigger mt = new()
                 {
-                    FrameTriggerList = [],
-                    RangeTriggerList = []
+                    FrameTriggerList = new List<MotionTrigger.FrameTrigger>(),
+                    RangeTriggerList = new List<MotionTrigger.RangeTrigger>()
                 };
 
                 Pam.AnimationHeader animHeader = animInfo.AnimHeader;
@@ -109,8 +109,8 @@ namespace OpenKh.Command.KHAnimationConverter
 
                 int keysCount = 0;
 
-                List<short> keysList = [];
-                List<float> valuesList = [];
+                List<short> keysList = new List<short>();
+                List<float> valuesList = new List<float>();
 
                 int boneCount = animHeader.BoneCount;
                 float pamFramerate = animHeader.Framerate;
@@ -144,13 +144,13 @@ namespace OpenKh.Command.KHAnimationConverter
                         boneChannel.ScaleZ
                     ];
 
-                    Motion.Joint joint = new()
+                    Motion.Joint joint = new Motion.Joint()
                     {
                         JointId = (short)j
                     };
                     im.Joints.Add(joint);
 
-                    List<float> prevBoneChannelValues = [ float.NaN, float.NaN, float.NaN ];
+                    List<float> prevBoneChannelValues = new List<float>() { float.NaN, float.NaN, float.NaN };
 
                     for (int k = 0; k < channels.Count; k++)
                     {
@@ -167,7 +167,7 @@ namespace OpenKh.Command.KHAnimationConverter
                         // Check if this is an fcurve (vs an initial pose)
                         if (keyframesCount > 1)
                         {
-                            Motion.FCurve fcurve = new()
+                            Motion.FCurve fcurve = new Motion.FCurve()
                             {
                                 JointId = (short)j,
                                 Channel = (byte)anbChannel,
@@ -328,7 +328,7 @@ namespace OpenKh.Command.KHAnimationConverter
                 }
 
                 // Create the motion triggers
-                MotionTrigger.RangeTrigger rt = new()
+                MotionTrigger.RangeTrigger rt = new MotionTrigger.RangeTrigger()
                 {
                     StartFrame = 0,
                     EndFrame = -1,
@@ -336,7 +336,7 @@ namespace OpenKh.Command.KHAnimationConverter
                     ParamSize = 0
                 };
                 mt.RangeTriggerList.Add(rt);
-                MotionTrigger.FrameTrigger ft = new()
+                MotionTrigger.FrameTrigger ft = new MotionTrigger.FrameTrigger()
                 {
                     Frame = 56,
                     Trigger = 19,
@@ -344,7 +344,7 @@ namespace OpenKh.Command.KHAnimationConverter
                     Param1 = 9
                 };
                 mt.FrameTriggerList.Add(ft);
-                ft = new()
+                ft = new MotionTrigger.FrameTrigger()
                 { 
                     Frame = 112,
                     Trigger = 19,
