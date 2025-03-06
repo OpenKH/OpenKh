@@ -82,11 +82,11 @@ namespace OpenKh.Command.KHAnimationConverter
             return status;
         }
 
-        public static List<AnimationBinary> PAMtoANBs(Pam pam, float anbFramerate=60f)
+        public static List<AnimationBinary> PAMtoANBs(Pam pam, float anbFramerate = 60f)
         {
             List<AnimationBinary> anbs = new List<AnimationBinary>();
             // Maps PAM Channels to ANB Channels
-            List<short> pamChannelsToAnbChannels = new List<short>([6, 7, 8, 3, 4, 5, 0, 1, 2]);
+            List<short> pamChannelsToAnbChannels = new List<short>(){6, 7, 8, 3, 4, 5, 0, 1, 2};
             float pamToanbTranslationScaleFactor = 100f;
             for (int i = 0; i < pam.header.AnimationCount; i++)
             {
@@ -190,8 +190,7 @@ namespace OpenKh.Command.KHAnimationConverter
                             float anbChannelValue = pamChannelValue;
                             if (3 <= anbChannel && anbChannel <= 5)
                             {
-                                // Normalize to range 0 - 2*PI (We probably don't want to actually do this
-                                //anbChannelValue = (float)Math.Atan2(Math.Sin(anbChannelValue), Math.Cos(anbChannelValue));
+                                // Check if there was a previous value
                                 if (l > 0)
                                 {
                                     float prevChannelValue = prevBoneChannelValues[anbChannel - 3];
