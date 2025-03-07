@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace OpenKh.Command.KHAnimationConverter
 {
-    class KHFormat
+    public class KHFormat
     {
         public Pam pam;
         public List<AnimationBinary> anbs;
