@@ -66,6 +66,23 @@ namespace OpenKh.Command.MapGen.Utils
                 )
                     .GetBuilt();
             }
+            else if (config.disableBSPCollisionBuilder2)
+            {
+                logger.Debug($"Running flatten doct builder.");
+
+                doctBuilt = new FlattenDoctBuilder(
+                    new BSPNodeSplitter(
+                        singleFaces
+                            .Where(it => !it.matDef.nodraw),
+                        new BSPNodeSplitter.Option
+                        {
+                            PartitionSize = config.doctPartitionSize,
+                        }
+                    ),
+                    matDef => 0
+                )
+                    .GetBuilt();
+            }
             else
             {
                 logger.Debug($"Running hierarchical doct builder.");
@@ -705,7 +722,7 @@ namespace OpenKh.Command.MapGen.Utils
                     break;
                 }
                 default:
-                    throw new NotSupportedException();
+                    throw new NotSupportedException("ERROR! Non-triangulated mesh detected! Try triangulating your mesh and re-attempting.");
             }
         }
 

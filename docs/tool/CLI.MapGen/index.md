@@ -17,11 +17,13 @@ TOC
   - [uvscList](#uvsclist)
   - [disableTriangleStripsOptimization](#disabletrianglestripsoptimization)
   - [disableBSPCollisionBuilder](#disablebspcollisionbuilder)
+  - [disableBSPCollisionBuilder2](#disablebspcollisionbuilder2)
   - [ignore](#ignore)
   - [nodraw](#nodraw)
   - [noclip](#noclip)
   - [fromFile](#fromfile)
   - [surfaceFlags](#surfaceflags)
+  - [group](#group)
   - [maxColorIntensity](#maxcolorintensity)
   - [maxAlpha](#maxalpha)
   - [transparentFlag](#transparentflag)
@@ -230,6 +232,13 @@ disableTriangleStripsOptimization: true
 disableBSPCollisionBuilder: true
 ```
 
+### disableBSPCollisionBuilder2
+
+```yml
+# Alternate version of Disable BSP collision builder. Splits faces into their own mesh.
+disableBSPCollisionBuilder2: true
+```
+
 ### ignore
 
 ```yml
@@ -304,6 +313,17 @@ Hit_RTN: 0x8
 Nohit_Floor: 0x10
 Unk: 0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0, 0xE0, 0x100, 0x120, 0x140, 0x160
 ```
+
+### group
+```yml
+# Specify `group` to this material.
+# Only usable on collision meshes, when using the disableBSPCollisionBuilder2 option.
+# When used, this will assign a group value to faces with this material.
+# This can turn the collision on or off depending on the value used for MapVisibility in the ARD.
+- name: 'floor'
+  group: 1
+```
+
 
 ### maxColorIntensity
 
