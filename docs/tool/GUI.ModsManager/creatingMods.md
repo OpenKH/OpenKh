@@ -315,6 +315,12 @@ Asset Example
     source:
       - name: FmlvList.yml
         type: fmlv
+  - name: atkp
+    method: listpatch
+    type: List
+    source:
+      - name: AtkpList.yml
+        type: atkp
 ```
 
 ### `trsr` Source Example
@@ -382,6 +388,7 @@ Items:
   Picture: 1
   Icon1: 9
   Icon2: 0
+  InsertBefore: 7 #This will insert the item ID before the item ID you specify here. Defaults to 0, which will append to the item list instead. You can alternatively use InsertAfter. 
 ```
 ### `sklt` Source Example
 ```

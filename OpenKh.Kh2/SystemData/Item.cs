@@ -59,6 +59,8 @@ namespace OpenKh.Kh2.SystemData
             [Data] public short Picture { get; set; }
             [Data] public byte Icon1 { get; set; }
             [Data] public byte Icon2 { get; set; }
+            public ushort InsertBefore { get; set; } = 0; // Default to 0, meaning append. Only used for Mod Manager.
+            public ushort InsertAfter {get; set; } = 0;
         }
 
         public class Stat
