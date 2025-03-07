@@ -56,7 +56,7 @@ The damage effects' values on MSET files point to this table.
 | 8 	 | uint8 | Team (Deal damage to: 0/1/2 Enemies, 3/4/5 Enemies and allies...)
 | 9 	 | uint8 | Element (0 phys, 1 fire, 2 blizz, 3 thun...)
 | 10 	 | uint8 | Enemy Reaction (Whether an enemy is flinched, knocked...)
-| 11 	 | uint8 | Effect on hit (0 none, other values = different effects)
+| 11 	 | uint8 | Effect on hit\*
 | 12 	 | int16 | Knockback Strength 1 (Distance depends on enemy weight)
 | 14 	 | int16 | Knockback Strength 2 (Distance depends on enemy weight)
 | 16 	 | int16 | ???
@@ -81,6 +81,11 @@ The damage effects' values on MSET files point to this table.
 | 45 	 | uint8 | Random Effect
 | 46 	 | uint8 | [Kind](#kind)
 | 47 	 | uint8 | HP drain (Adds on normal state, reduces when in a form)
+
+\* Effect on Hit is a bitmask that corresponds to the value of the objects PAX's "Category" value. Most attacks use 0, which displays no extra effects on hit.
+However attacks like projectiles typically display extra effects on-hit, so this value is used in these cases. </br>
+Example: If the PAX's "Category" value has a value of 1, use a value of 1 for Effect On Hit, which corresponds to bitmask 0x01. If the PAX's "Category" value has a value of 3, use a value of 0x4 for Effect On Hit, which corresopnds to bitmask 0x04. </br>
+Additionally, the upper four bytes in "Category" also correspond to when the Effect on Hit will activate. </br> 0x01 activates on-hit with an enemy. </br> 0x02 activates on wall-hit. </br> 0x10 activates on colliding with a "Guard" hitbox. </br> 0x100 activates on hitting the ground.
 
 #### Type
 

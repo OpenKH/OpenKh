@@ -6,7 +6,7 @@ Mission file. They are located in `msn/{language}/` and describe how a certain m
 
 This is the entry point of the file. It is a binary-type file and it's name is always `{WORLD_ID}{MAP_INDEX}`. Example: for the file `EH21_MS101`, where `EH` is the [world](../../worlds.md) and `21` is the map index, the mission name is called `EH21`.
 
-This file is splitted into two parts: The first `0x1C` bytes are the [header](#header). This length is always fixed. After that comes a block of variable length which contains [opcodes](#opcodes).
+This file is splitted into two parts: The first `0x1C` bytes are the [header](#header). This length is always fixed. After that comes a block of variable length which contains [opcodes](#opcodes). This is terminated by a 0x00 int.
 
 ### Header
 
@@ -16,10 +16,10 @@ This file is splitted into two parts: The first `0x1C` bytes are the [header](#h
 | 0x02   | uint16 | Id (used in [ARD](ard.md))
 | 0x04   | uint16 | [Flags](#flags)
 | 0x06   | uint16 | Information Bar Text Id (loaded from `msg\{LANGUAGE}\{WORLD_ID}.bar`)
-| 0x08   | byte/BitArray | Pause Menu Controller
+| 0x08   | byte/BitArray | [Pause Menu Controller ID](14mission.md)
 | 0x09   | byte | Padding
 | 0x0A   | uint16 | Pause Menu Information Text Id (loaded from `msg\{LANGUAGE}\{WORLD_ID}.bar`)
-| 0x0C   | BitArray | Boolean Flag Array [5]
+| 0x0C   | byte | Entry number in BAR to SEQD file for "Help" screen
 | 0x0D   | byte | [Bonus Reward](00battle.md#bons)
 | 0x0E   | byte | Antiform Multiplier
 | 0x0F   | byte | Padding
@@ -120,6 +120,7 @@ Intro to missions. Either camera transitions or content from a SEQD.
 | 02     | ushort | Object Id which camera will focus on
 
 Used 227 times.
+Generally uses Actor Object Id's instead of specific ones. I.e, it will use Id 566 for the PLAYER actor, instead of Id 84 for Base Sora.
 
 #### CameraComplete
 
@@ -142,16 +143,20 @@ Used 88 times.
 | 08     | int   | Min value
 | 0C     | byte  | Entry number in BAR to SEQD file. If no file is present the timer will be invisible.
 | 0D     | byte  |
-| 0E     | byte  |
-| 0F     | byte  |
+| 0E     | byte  | Position
+| 0F     | byte  | Type
 
 If `Initial value` >= `Max value` the timer will count down. Otherwise it will count up.
+If `Position` is 0, the gauge will appear on the left-side of the screen.
+If `Position` is 1, the gauge will appear on the right-side of the screen.
+If `Position` is 2, the gauge will appear in the center of the screen.
+`Timer` may also use `Type`, but it is currently unknown how.
 
 Used 78 times.
 
 #### Counter
 
-Is used to count for example Struggle orbs, enemies, medals in Olympus Cups etc.
+This is used to count for example Struggle orbs, enemies, medals in Olympus Cups etc. Takes 4 arguments. The order of counters will determine their position on the screen, with earlier entries getting the top-most position.
 
 | Offset | Type  | Description
 |--------|-------|------------
@@ -160,18 +165,31 @@ Is used to count for example Struggle orbs, enemies, medals in Olympus Cups etc.
 | 08     | int   | Min value
 | 0C     | byte  | Entry number in BAR to SEQD file. If no file is present the counter will be invisible.
 | 0D     | byte  |
-| 0E     | byte  |
-| 0F     | byte  |
+| 0E     | byte  | Position
+| 0F     | byte  | Type
 
 Used 208 times.
+`Type` determines if the current counter should display an overall record, or a current count.
+Ex. If `Type` is 0x01, then the gauge will show the highest recorded value achieved by the player. If `Type` is 0x00, then the gauge will start from 0 and count for the current mission.
 
 #### Gauge
 
 Used 55 times.
 
 #### ComboCounter
+This is used to count the number of times a player has hit an enemy.
+| Offset | Type  | Description
+|--------|-------|------------
+| 00     | int   | Initial value
+| 04     | int   | Max value
+| 08     | int   | Min value
+| 0C     | byte  | Entry number in BAR to SEQD file. If no file is present the counter will be invisible.
+| 0D     | byte  |
+| 0E     | byte  | Position
+| 0F     | byte  | Type
 
 Used 40 times.
+`Type` may crash if set to 1, though there may be instances it gets used. It is currently unknown how.
 
 #### MissionScore
 
@@ -193,10 +211,13 @@ Used 10 times.
 
 #### DriveRefillRatio
 
-Defines how fast the drive gauge fills/drains.
+Defines how fast the drive gauge fills/drains, and also determines if Sora can use other Drive Forms when alone. 
+| Offset | Type  | Description
+|--------|-------|------------
+| 00     | float | Refill Multiplier
 
 Used 10 times.
-
+Refill Multiplier cannot be equal to 1, otherwise Sora will not have access to other forms when alone.
 
 #### AddDrive
 
@@ -212,19 +233,19 @@ Used 42 times.
 
 Present for most of the mission files, it is a PAX file that it is always named `miss`.
 
-Its purpose is currently unknown.
+Its purpose is to play distortion effects for different cuts used by the Camera.
 
-## Animation loader
+## Event files
 
-A mission file can contain between 0 and multiple animation loaders. Their names are usually `0a`, `1a`.
+A mission file can contain between 0 and multiple Event files. Their names are usually `0a`, `1a`.
 
-Its purpose is currently unknonw.
+Its purpose seems to be defining how the camera should move before the battle starts. 
 
 ## Sequences
 
 Most of the missions have a pair of IMGD and SEQD. The most common file names is `ct_e`, `st_h`, `ed_h`, `gh_h`, `cb_e`, `ed_t`, `ti_e`, `st_t` and many others.
 
-How they are used is unknown and the meaning of their file names is currently unknonw.
+How they are used is unknown and the meaning of their file names is currently unknown.
 
 ## Boss script
 
