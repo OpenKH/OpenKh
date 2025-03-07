@@ -1237,7 +1237,7 @@ namespace OpenKh.Egs
 
             TextureCount += GSInfoCount;
 
-            //get all the image data offsets from the CLUT Transfer Info blocks
+            // Get all the image data offsets from the CLUT Transfer Info blocks
             Dictionary<int, int> PicOffsets = new Dictionary<int, int>();
             for (int t = 0; t < TextureInfoCount; t++)
             {
@@ -1245,9 +1245,9 @@ namespace OpenKh.Egs
                 PicOffsets.Add(t, ms.ReadInt32());
             }
 
-            //first loop to get number of pixel format 8 textures
-            //this is needed to calculate the correct HD link offsets because for some reason
-            //Pixel format 4 textures need to be adjusted by Pixel8 image count * 16
+            // First loop to get the number of pixel format 8 textures
+            // This is needed to calculate the correct HD link offsets because for some reason
+            // Pixel format 4 textures need to be adjusted by Pixel8 image count * 16
             int Modifier = 0;
             for (int m = 0; m < GSInfoCount; m++)
             {
@@ -1258,11 +1258,15 @@ namespace OpenKh.Egs
                     Modifier += 1;
             }
 
-            //second loop to get actual offsets
-            //We need to keep track of how many of each type of texture we find
-            //to correctly calculate what the game expects for the HD link offsets.
+            // Second loop to get actual offsets
+            // We need to keep track of how many of each type of texture we find
+            // to correctly calculate what the game expects for the HD link offsets.
             int Pxl4Count = 0;
             int Pxl8Count = 0;
+
+            // Store base texture offsets
+            List<int> baseTextureOffsets = new List<int>();
+
             for (int p = 0; p < GSInfoCount; p++)
             {
                 ms.Seek(OffsetDataOff + p, SeekOrigin.Begin);
@@ -1275,35 +1279,59 @@ namespace OpenKh.Egs
                 int FinalOffset = AssetOffset + PicOffsets[CurrentKey] + 0x20000000;
                 if (PSM == 20)
                 {
-                    Offsets.Add(FinalOffset + Pxl4Count + (Modifier * 0x10));
+                    FinalOffset += Pxl4Count + (Modifier * 0x10);
                     Pxl4Count += 1;
                 }
                 else
                 {
-                    Offsets.Add(FinalOffset + (Pxl8Count * 0x10));
+                    FinalOffset += (Pxl8Count * 0x10);
                     Pxl8Count += 1;
                 }
+
+                baseTextureOffsets.Add(FinalOffset);
             }
 
+            // Scan for TEXA textures and store them in a map
+            Dictionary<int, List<int>> texaMapping = new Dictionary<int, List<int>>();
             int index = Helpers.IndexOfByteArray(AssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), 0);
             while (index > -1)
             {
                 ms.Seek(index + 0x0a, SeekOrigin.Begin);
                 int imageToApplyTo = (int)ms.ReadInt16();
-            
-                ms.Seek(0x1c, SeekOrigin.Current);
+
+                ms.Seek(index + 0x28, SeekOrigin.Begin);
                 int texaOffset = ms.ReadInt32();
-                int offset = index + texaOffset + 0x08 + (imageToApplyTo * 0x10) + 0x20000000;
-                Offsets.Add(AssetOffset + offset);
-            
+                int texaFinalOffset = AssetOffset + index + texaOffset + 0x08 + (imageToApplyTo * 0x10) + 0x20000000;
+
+                if (!texaMapping.ContainsKey(imageToApplyTo))
+                {
+                    texaMapping[imageToApplyTo] = new List<int>();
+                }
+                texaMapping[imageToApplyTo].Add(texaFinalOffset);
+
                 TextureCount++;
                 index = Helpers.IndexOfByteArray(AssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), index + 1);
+            }
+
+            // Insert textures in the correct order with TEXA textures immediately after their corresponding base texture
+            for (int i = 0; i < baseTextureOffsets.Count; i++)
+            {
+                Offsets.Add(baseTextureOffsets[i]);
+                if (texaMapping.ContainsKey(i))
+                {
+                    foreach (int texaOffset in texaMapping[i])
+                    {
+                        Offsets.Add(texaOffset);
+                    }
+                }
             }
 
             if (AssetOffset == 0)
             {
                 for (int i = 0; i < Offsets.Count; i++)
+                {
                     Helpers.ScanPrint($"RAW texture found! | Suggested HD Texture name: -{i}.dds");
+                }
             }
         }
     }

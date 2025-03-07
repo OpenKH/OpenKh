@@ -438,32 +438,61 @@ void GetTM2Offsets(void* addr, int baseoff, std::vector<int>& entries)
 void GetDPDOffsets(void* addr, int baseoff, std::vector<int>& entries)
 {
     int* off = (int*)addr;
-    if (*off++ == 0x96)
+    if (*off++ == 0x96) //Magic number check.
     {
         off += *off + 1;
-        int texcnt = *off++;
-        std::map<int, int> offsets;
-        for (int t = 0; t < texcnt; ++t)
+        int texcnt = *off++; //Read number of textures
+
+        std::vector<std::pair<short, int>> textures; // To store texture offsets and their first two bytes. First entry stores firstTwoBytes, second stores texture offset
+
+        for (int t = 0; t < texcnt; ++t) //Iterates over textures.
         {
-            int texoff = *off++;
+            int texoff = *off++; //Reads texoff from off.
+
+            int* off2 = (int*)((char*)addr + texoff); //Converts texoff into an absolute address; if null, skip to the next texture.
+
+            short firstTwoBytes = off2[0]; // Extract first two bytes from firstTwoBytes.
+
+            textures.push_back(std::make_pair(firstTwoBytes, texoff)); //Log the extracted bytes, store them in textures.
+        }
+
+        // Sort textures by the first two bytes
+        std::sort(textures.begin(), textures.end(), [](const std::pair<short, int>& a, const std::pair<short, int>& b) {
+            return a.first < b.first; //Sorts the textures by their first two bytes.
+            });
+
+
+        std::map<int, int> offsets; //Now this logic applies AFTER sorting.
+
+        for (int t = 0; t < textures.size(); ++t)
+        {
+            int texoff = textures[t].second;
             int* off2 = (int*)((char*)addr + texoff);
-            if (off2[2] == 0)
+
+            short val = off2[0];
+
+            auto found = offsets.find(val);
+            if (found == offsets.end())
             {
-                int val = off2[0];
-                auto found = offsets.find(val);
-                if (found == offsets.end())
-                {
-                    offsets[val] = texoff + 0x20;
-                }
-                else
-                {
-                    found->second++;
-                    offsets[val + t] = found->second + 1;
-                }
+                offsets[val] = texoff + 0x20;
+            }
+            else
+            {
+                // Instead of ++, properly increment by the expected stride
+                offsets[val] = found->second;  // Keep using val, not val + t
+            }
+
+            // Check if this texture should be combined with the previous one
+            if (t > 0 && textures[t].first == textures[t - 1].first)
+            {
+                // Adjust previous entry
+                entries.back() = offsets[val] + baseoff + 0x20000000;
+            }
+            else
+            {
+                entries.push_back(offsets[val] + baseoff + 0x20000000);
             }
         }
-        for (auto& i : offsets)
-            entries.push_back(i.second + baseoff + 0x20000000);
     }
 }
 
@@ -500,14 +529,18 @@ void GetRAWOffsets(void* addr, void* endaddr, int baseoff, std::vector<int>& ent
         int GsinfoOff = off[6];
         int dataOffset = off[7];
 
-        //get all the image data offsets from the CLUT Transfer Info blocks
+		//New addition.
+        std::vector<int> baseTextureOffsets;
+        std::map<int, std::vector<int>> texaMapping; // Stores TEXA textures per TexIndex
+
+		//get all the image data offsets from the CLUT Transfer Info blocks
         int* PicOffsets = new int[TextureInfoCount];
         for (int t = 0; t < TextureInfoCount; t++)
             PicOffsets[t] = *(int*)((char*)addr + (CLUTTransinfoOff + 0x90) + (t * 0x90) + 116);
 
-        //first loop to get number of pixel format 8 textures
-        //this is needed to calculate the correct HD link offsets because for some reason
-        //Pixel format 4 textures need to be adjusted by Pixel8 image count * 16
+		//first loop to get number of pixel format 8 textures
+		//this is needed to calculate the correct HD link offsets because for some reason
+		//Pixel format 4 textures need to be adjusted by Pixel8 image count * 16
         int Modifier = 0;
         for (int m = 0; m < GSInfoCount; m++)
         {
@@ -516,10 +549,9 @@ void GetRAWOffsets(void* addr, void* endaddr, int baseoff, std::vector<int>& ent
             if (PSM != 20)
                 Modifier += 1;
         }
-
-        //second loop to get actual offsets
-        //We need to keep track of how many of each type of texture we find
-        //to correctly aclculate the the game expects for the HD link offsets.
+		//second loop to get actual offsets
+		//We need to keep track of how many of each type of texture we find
+		//to correctly aclculate the the game expects for the HD link offsets.
         int Pxl4Count = 0;
         int Pxl8Count = 0;
         for (int p = 0; p < GSInfoCount; p++)
@@ -540,18 +572,36 @@ void GetRAWOffsets(void* addr, void* endaddr, int baseoff, std::vector<int>& ent
                 FinalOffset += (Pxl8Count * 0x10);
                 Pxl8Count += 1;
             }
-            entries.push_back(FinalOffset);
+            baseTextureOffsets.push_back(FinalOffset);
         }
 
         delete[] PicOffsets;
 
+        // Scan for TEXA and store them in a map.
         char* texa = std::search((char*)addr, (char*)endaddr, TEXA, TEXA + 4);
         while (texa != endaddr)
         {
-            int imageToApplyTo = *(short*)(texa + 0x0A);
+            int imageToApplyTo = *(short*)(texa + 0x0A); // TexIndex
             int texaOffset = *(int*)(texa + 0x28);
-            entries.push_back((int)(baseoff + (texa - (char*)addr) + texaOffset + 0x08 + (imageToApplyTo * 0x10LL) + 0x20000000));
+
+            int texaFinalOffset = baseoff + (texa - (char*)addr) + texaOffset + 0x08 + (imageToApplyTo * 0x10LL) + 0x20000000;
+
+            texaMapping[imageToApplyTo].push_back(texaFinalOffset);
+
             texa = std::search(texa + 4, (char*)endaddr, TEXA, TEXA + 4);
+        }
+
+        // Insert textures in the correct order with TEXA textures immediately after their corresponding base texture
+        for (size_t i = 0; i < baseTextureOffsets.size(); i++)
+        {
+            entries.push_back(baseTextureOffsets[i]);
+            if (texaMapping.find(i) != texaMapping.end())
+            {
+                for (int texaOffset : texaMapping[i])
+                {
+                    entries.push_back(texaOffset);
+                }
+            }
         }
     }
 }
@@ -710,6 +760,8 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
             GetTM2Offsets(addr, 0, assetoffs);
         else if (!_wcsicmp(ext, L".pax"))
             GetPAXOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".dpd"))
+            GetDPDOffsets(addr, 0, assetoffs);
         else if (!_wcsicmp(ext, L".2dd")
             || !_wcsicmp(ext, L".2ld")
             || !_wcsicmp(ext, L".a.fm")
