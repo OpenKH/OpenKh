@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Command.CoctChanger\OpenKh.Command.CoctChanger.csproj" />
     <ProjectReference Include="..\OpenKh.Command.DoctChanger\OpenKh.Command.DoctChanger.csproj" />
+    <ProjectReference Include="..\OpenKh.Command.KHAnimationConverter\OpenKh.Command.KHAnimationConverter.csproj" />
     <ProjectReference Include="..\OpenKh.Command.MapGen\OpenKh.Command.MapGen.csproj" />
     <ProjectReference Include="..\OpenKh.Command.TexFooter\OpenKh.Command.TexFooter.csproj" />
     <ProjectReference Include="..\OpenKh.Command.Bdxio\OpenKh.Command.Bdxio.csproj" />
@@ -26,6 +27,10 @@
     <None Update="res\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="res\animconverter\inputs\" />
   </ItemGroup>
 
 </Project>
