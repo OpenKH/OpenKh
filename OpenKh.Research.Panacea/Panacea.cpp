@@ -443,7 +443,7 @@ void GetDPDOffsets(void* addr, int baseoff, std::vector<int>& entries)
         off += *off + 1;
         int texcnt = *off++; //Read number of textures
 
-        std::vector<std::pair<short, int>> textures; // To store texture offsets and their first two bytes. First entry stores firstTwoBytes, second stores texture offset
+        std::vector<std::tuple<short, int, int>> textures; // To store texture offsets and their first two bytes. First entry stores firstTwoBytes, second stores texture offset
 
         for (int t = 0; t < texcnt; ++t) //Iterates over textures.
         {
@@ -452,13 +452,14 @@ void GetDPDOffsets(void* addr, int baseoff, std::vector<int>& entries)
             int* off2 = (int*)((char*)addr + texoff); //Converts texoff into an absolute address; if null, skip to the next texture.
 
             short firstTwoBytes = off2[0]; // Extract first two bytes from firstTwoBytes.
+            int shTexXY = *(int*)((char*)off2 + 0x08); //Get shTexXY. Textures should ONLY be combined if they share the same value for firstTwoBytes, AND shTexXY is NOT equal to 0.
 
-            textures.push_back(std::make_pair(firstTwoBytes, texoff)); //Log the extracted bytes, store them in textures.
+            textures.push_back(std::make_tuple(firstTwoBytes, texoff, shTexXY)); //Log the extracted bytes, store them in textures.
         }
 
         // Sort textures by the first two bytes
-        std::sort(textures.begin(), textures.end(), [](const std::pair<short, int>& a, const std::pair<short, int>& b) {
-            return a.first < b.first; //Sorts the textures by their first two bytes.
+        std::sort(textures.begin(), textures.end(), [](const std::tuple<short, int, int>& a, const std::tuple<short, int, int>& b) {
+            return std::get<0>(a) < std::get<0>(b); //Sorts the textures by their first two bytes.
             });
 
 
@@ -466,7 +467,7 @@ void GetDPDOffsets(void* addr, int baseoff, std::vector<int>& entries)
 
         for (int t = 0; t < textures.size(); ++t)
         {
-            int texoff = textures[t].second;
+            int texoff = std::get<1>(textures[t]);
             int* off2 = (int*)((char*)addr + texoff);
 
             short val = off2[0];
@@ -483,10 +484,20 @@ void GetDPDOffsets(void* addr, int baseoff, std::vector<int>& entries)
             }
 
             // Check if this texture should be combined with the previous one
-            if (t > 0 && textures[t].first == textures[t - 1].first)
+            if (t > 0 && std::get<0>(textures[t]) == std::get<0>(textures[t - 1]))
             {
-                // Adjust previous entry
-                entries.back() = offsets[val] + baseoff + 0x20000000;
+                int prev_shTexXY = std::get<2>(textures[t - 1]);
+                int curr_shTexXY = std::get<2>(textures[t]);
+
+                if (curr_shTexXY != 0 || prev_shTexXY != 0) //ONLY combine textures with entries.back if either shTexX or shTexY are greater than 0.
+                {
+                    // Adjust previous entry
+                    entries.back() = offsets[val] + baseoff + 0x20000000;
+                }
+                else
+                {
+                    entries.push_back(offsets[val] + baseoff + 0x20000000);
+                }
             }
             else
             {
@@ -495,7 +506,6 @@ void GetDPDOffsets(void* addr, int baseoff, std::vector<int>& entries)
         }
     }
 }
-
 void GetDPXOffsets(void* addr, int baseoff, std::vector<int>& entries)
 {
     int* off = (int*)((char*)addr + *(int*)addr * 0x20 + 4);
