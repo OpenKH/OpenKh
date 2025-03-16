@@ -194,7 +194,7 @@ namespace OpenKh.Command.KHAnimationConverter
                                 if (l > 0)
                                 {
                                     float prevChannelValue = prevBoneChannelValues[anbChannel - 3];
-                                    anbChannelValue = UnwrapAngle(prevChannelValue, anbChannelValue);                                    
+                                    anbChannelValue = UnwrapAngle(prevChannelValue, anbChannelValue);
                                 }
                                 prevBoneChannelValues[anbChannel - 3] = anbChannelValue;
                             }
@@ -232,6 +232,7 @@ namespace OpenKh.Command.KHAnimationConverter
                 keysListUnique.Sort();
                 valuesListUnique.Sort();
 
+                int fcurveInd = 0;
                 int keyframeInd = 0;
                 for (int j = 0; j < boneCount; j++)
                 {
@@ -287,22 +288,22 @@ namespace OpenKh.Command.KHAnimationConverter
                                         case 3:
                                         case 4:
                                         case 5:
-                                            im.RootPosition.FCurveId[anbChannel] = im.FCurveKeys.Count;
+                                            im.RootPosition.FCurveId[anbChannel] = fcurveInd;
                                             im.RootPosition.NotUnit = 1;
                                             break;
                                         case 6:
                                             im.RootPosition.TranslateX = anbChannelValue;
-                                            im.RootPosition.FCurveId[anbChannel] = im.FCurveKeys.Count;
+                                            im.RootPosition.FCurveId[anbChannel] = fcurveInd;
                                             im.RootPosition.NotUnit = 1;
                                             break;
                                         case 7:
                                             im.RootPosition.TranslateY = anbChannelValue;
-                                            im.RootPosition.FCurveId[anbChannel] = im.FCurveKeys.Count;
+                                            im.RootPosition.FCurveId[anbChannel] = fcurveInd;
                                             im.RootPosition.NotUnit = 1;
                                             break;
                                         case 8:
                                             im.RootPosition.TranslateZ = anbChannelValue;
-                                            im.RootPosition.FCurveId[anbChannel] = im.FCurveKeys.Count;
+                                            im.RootPosition.FCurveId[anbChannel] = fcurveInd;
                                             im.RootPosition.NotUnit = 1;
                                             break;
                                         default:
@@ -314,6 +315,7 @@ namespace OpenKh.Command.KHAnimationConverter
 
                                 keyframeInd++;
                             }
+                            fcurveInd++;
                         }
                     }
                 }
@@ -365,10 +367,16 @@ namespace OpenKh.Command.KHAnimationConverter
         public static float EvaluatePAMChannel(List<Pam.KeyframeEntry> keys, double time, int frameCnt, float max, float min, double framerate=30f)
         {
             if (keys is null || keys.Count == 0)
+            {
                 if (frameCnt == 1)
+                {
                     return min;
+                }
                 else
+                {
                     return float.NaN;
+                }
+            }
 
             double frametick = 1.0 / framerate;
 
