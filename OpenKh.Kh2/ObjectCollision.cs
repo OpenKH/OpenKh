@@ -11,8 +11,8 @@ namespace OpenKh.Kh2
         [Data] public byte Group { get; set; }
         [Data] public byte Parts { get; set; }
         [Data] public short Argument { get; set; }
-        [Data] public byte Type { get; set; }
-        [Data] public byte Shape { get; set; }
+        [Data] public TypeEnum Type { get; set; }
+        [Data] public ShapeEnum Shape { get; set; }
         [Data] public short Bone { get; set; }
         [Data] public short PositionX { get; set; }
         [Data] public short PositionY { get; set; }
@@ -21,7 +21,7 @@ namespace OpenKh.Kh2
         [Data] public short Radius { get; set; }
         [Data] public short Height { get; set; }
 
-        public enum TypeEnum
+        public enum TypeEnum : byte
         {
             BG = 0x0,
             OBJ = 0x1,
@@ -46,7 +46,7 @@ namespace OpenKh.Kh2
             RTN_NECK = 0x14,
         }
 
-        public enum ShapeEnum
+        public enum ShapeEnum : byte
         {
             ELLIPSOID = 0x0,
             COLUMN = 0x1,

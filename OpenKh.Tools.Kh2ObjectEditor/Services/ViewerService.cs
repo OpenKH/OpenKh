@@ -470,17 +470,17 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
 
             // Color
             Color color = new Color();
-            if (collisionEntry.Type == (byte)ObjectCollision.TypeEnum.HIT) {
+            if (collisionEntry.Type == ObjectCollision.TypeEnum.HIT) {
                 color = Color.FromArgb(100, 255, 255, 0);
             }
-            else if (collisionEntry.Type == (byte)ObjectCollision.TypeEnum.ATTACK)
+            else if (collisionEntry.Type == ObjectCollision.TypeEnum.ATTACK)
             {
                 color = Color.FromArgb(100, 255, 0, 0);
             }
-            else if (collisionEntry.Type == (byte)ObjectCollision.TypeEnum.REACTION) {
+            else if (collisionEntry.Type == ObjectCollision.TypeEnum.REACTION) {
                 color = Color.FromArgb(100, 0, 255, 0);
             }
-            else if (collisionEntry.Type == (byte)ObjectCollision.TypeEnum.TARGET)
+            else if (collisionEntry.Type == ObjectCollision.TypeEnum.TARGET)
             {
                 color = Color.FromArgb(100, 0, 0, 255);
             }
@@ -489,17 +489,17 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             }
 
             MtShape collisionShape = new MtShape();
-            if(collisionEntry.Shape == 0) {
+            if(collisionEntry.Shape == ObjectCollision.ShapeEnum.ELLIPSOID) {
                 collisionShape = MtShape.CreateEllipsoid(basePosition, collisionEntry.Height, collisionEntry.Radius, collisionEntry.Radius);
             }
-            else if (collisionEntry.Shape == 1) {
+            else if (collisionEntry.Shape == ObjectCollision.ShapeEnum.COLUMN) {
                 collisionShape = MtShape.CreateColumn(basePosition, collisionEntry.Height, collisionEntry.Radius);
             }
-            else if (collisionEntry.Shape == 2) {
+            else if (collisionEntry.Shape == ObjectCollision.ShapeEnum.CUBE) {
                 collisionShape = MtShape.CreateBox(basePosition, collisionEntry.Height, collisionEntry.Radius, collisionEntry.Radius);
                 collisionShape.Type = MtShape.ShapeType.cube;
             }
-            else if (collisionEntry.Shape == 3) {
+            else if (collisionEntry.Shape == ObjectCollision.ShapeEnum.SPHERE) {
                 collisionShape = MtShape.CreateEllipsoid(basePosition, collisionEntry.Height, collisionEntry.Radius, collisionEntry.Radius);
             }
             collisionShape.Name = GetCollisionName(collisionId);
