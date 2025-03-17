@@ -33,8 +33,8 @@
             </DataGrid.ContextMenu>
 
             <DataGrid.Resources>
-                <local:CollisionTypeConverter x:Key="CollisionTypeConverter" />
-                <local:CollisionShapeConverter x:Key="CollisionShapeConverter" />
+                <local:CollisionTypeConverter x:Key="CollisionType_Converter" />
+                <local:CollisionShapeConverter x:Key="CollisionShape_Converter" />
 
                 <Style TargetType="DataGridRow">
                     <EventSetter Event="MouseLeftButtonUp" Handler="DataGridRow_MouseLeftButtonUp"/>
@@ -51,7 +51,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox HorizontalAlignment="Stretch"
-                                      SelectedItem="{Binding Shape, Converter={StaticResource CollisionShapeConverter}, Mode=TwoWay}"
+                                      SelectedItem="{Binding Shape, Converter={StaticResource CollisionShape_Converter}, Mode=TwoWay}"
                                       ItemsSource="{Binding DataContext.CollisionShapeOptions, RelativeSource={RelativeSource AncestorType=UserControl}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -61,7 +61,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox HorizontalAlignment="Stretch"
-                                      SelectedItem="{Binding Type, Converter={StaticResource CollisionTypeConverter}, Mode=TwoWay}"
+                                      SelectedItem="{Binding Type, Converter={StaticResource CollisionType_Converter}, Mode=TwoWay}"
                                       ItemsSource="{Binding DataContext.CollisionTypeOptions, RelativeSource={RelativeSource AncestorType=UserControl}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

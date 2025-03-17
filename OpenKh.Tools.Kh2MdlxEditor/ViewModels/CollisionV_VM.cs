@@ -91,11 +91,11 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
 
 
                     Color color = new Color();
-                    if (collision.Type == (byte)ObjectCollision.TypeEnum.HIT)
+                    if (collision.Type == ObjectCollision.TypeEnum.HIT)
                     {
                         color = Color.FromArgb(100, 255, 0, 0);
                     }
-                    else if (collision.Type == (byte)ObjectCollision.TypeEnum.REACTION)
+                    else if (collision.Type == ObjectCollision.TypeEnum.REACTION)
                     {
                         color = Color.FromArgb(100, 0, 255, 0);
                     }
@@ -104,7 +104,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                         color = Color.FromArgb(100, 0, 0, 255);
                     }
 
-                    if(collision.Shape == (byte) ObjectCollision.ShapeEnum.ELLIPSOID)
+                    if(collision.Shape == ObjectCollision.ShapeEnum.ELLIPSOID)
                     {
                         simpleMeshes.Add(new SimpleMesh(
                             Simple3DViewport.Utils.GeometryShapes.getEllipsoid(collision.Radius, collision.Height, 10, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), color),
@@ -112,7 +112,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                             new List<string> { "COLLISION", "COLLISION_SINGLE" }
                             ));
                     }
-                    else if (collision.Shape == (byte)ObjectCollision.ShapeEnum.COLUMN)
+                    else if (collision.Shape == ObjectCollision.ShapeEnum.COLUMN)
                     {
                         simpleMeshes.Add(new SimpleMesh(
                             Simple3DViewport.Utils.GeometryShapes.getCylinder(collision.Radius, collision.Height, 10, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), color),
@@ -120,7 +120,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                             new List<string> { "COLLISION", "COLLISION_SINGLE" }
                             ));
                     }
-                    else if (collision.Shape == (byte)ObjectCollision.ShapeEnum.CUBE)
+                    else if (collision.Shape == ObjectCollision.ShapeEnum.CUBE)
                     {
                         simpleMeshes.Add(new SimpleMesh(
                             Simple3DViewport.Utils.GeometryShapes.getCuboid(collision.Radius, collision.Height, collision.Radius, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), color),
@@ -128,7 +128,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                             new List<string> { "COLLISION", "COLLISION_SINGLE" }
                             ));
                     }
-                    else if (collision.Shape == (byte)ObjectCollision.ShapeEnum.SPHERE)
+                    else if (collision.Shape == ObjectCollision.ShapeEnum.SPHERE)
                     {
                         simpleMeshes.Add(new SimpleMesh(
                             Simple3DViewport.Utils.GeometryShapes.getSphere(collision.Radius, 10, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), color),
