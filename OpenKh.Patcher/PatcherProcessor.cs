@@ -862,19 +862,18 @@ namespace OpenKh.Patcher
                     case "objentry":
                         var objEntryList = Kh2.Objentry.Read(stream).ToDictionary(x => x.ObjectId, x => x);
                         var moddedObjEntry = deserializer.Deserialize<Dictionary<uint, Kh2.Objentry>>(sourceText);
+
                         foreach (var objEntry in moddedObjEntry)
                         {
-                            if (objEntryList.ContainsKey(objEntry.Key))
-                            {
-                                objEntryList[objEntry.Key] = objEntry.Value;
-                            }
-                            else
-                            {
-                                objEntryList.Add(objEntry.Key, objEntry.Value);
-                            }
+                            objEntryList[objEntry.Key] = objEntry.Value; // Add or overwrite
                         }
-                        Kh2.Objentry.Write(stream.SetPosition(0), objEntryList.Values);
+
+                        // Sort final list by ObjId before writing
+                        var sortedEntries = objEntryList.Values.OrderBy(x => x.ObjectId).ToList();
+
+                        Kh2.Objentry.Write(stream.SetPosition(0), sortedEntries);
                         break;
+
 
                     case "plrp":
                         var plrpList = Kh2.Battle.Plrp.Read(stream);
