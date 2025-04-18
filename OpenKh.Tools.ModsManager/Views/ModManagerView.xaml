@@ -32,6 +32,39 @@
                 </Grid>
             </Border>
         </ControlTemplate>
+        
+        <ControlTemplate x:Key="downloadableModList" TargetType="ListBox">
+            <Border Name="Border" BorderThickness="1">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="#FFABADB3" />
+                </Border.BorderBrush>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Margin="3" Background="{Binding ColorTheme.BackgroundColor}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock HorizontalAlignment="Center" Text="Available Mods" Foreground="{Binding ColorTheme.TextColor}"/>
+                            <Button Grid.Column="1" Command="{Binding RefreshDownloadableModsCommand}" ToolTip="Refresh available mods" Padding="3,0">
+                                <Image Source="{StaticResource Refresh_16x}"/>
+                            </Button>
+                        </Grid>
+                        <Separator Margin="3" Background="#FFABADB3"/>
+                    </StackPanel>
+                    <TextBlock Grid.Row="1" Text="Loading available mods..." HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding ColorTheme.TextColor}" Visibility="{Binding IsLoadingDownloadableModsVisibility}"/>
+                    <ScrollViewer Grid.Row="1" Margin="0" Background="{Binding ColorTheme.BackgroundColor}">
+                        <StackPanel Margin="0" IsItemsHost="True"/>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+        
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
         </Style>
@@ -43,10 +76,18 @@
             <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="282"/>
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
         <ListBox
             Template="{DynamicResource modList}"
-            Grid.Column="0"
+            Grid.Column="0" Grid.Row="0"
             VerticalAlignment="Stretch"
             ItemsSource="{Binding ModsList}"
             SelectedValue="{Binding SelectedValue}" KeyUp="ListBox_KeyUp"
@@ -75,7 +116,103 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <Grid Grid.Column="1">
+        
+        <TextBlock Text="Downloadable Mods" Grid.Row="2" Margin="0,0,0,2" 
+                   Foreground="{Binding ColorTheme.TextColor}" FontWeight="Bold"/>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Click on a mod to see its details" Margin="0,0,0,2" 
+                     Foreground="{Binding ColorTheme.TextColor}" FontStyle="Italic" FontSize="11"/>
+            <!-- Eliminamos el botón Refresh de aquí ya que tenemos otro en el header de la lista -->
+        </Grid>
+        
+        <Grid Grid.Row="4" Margin="0,3,0,3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Border Background="{Binding ColorTheme.BackColor2}" BorderThickness="1" BorderBrush="#FFABADB3">
+                <Grid>
+                    <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" 
+                         Margin="0" Padding="3" Background="Transparent" 
+                         Foreground="{Binding ColorTheme.TextColor}" BorderThickness="0"
+                         VerticalContentAlignment="Center"
+                         ToolTip="Search mods by name"/>
+                    <TextBlock Text="Search mods..." IsHitTestVisible="False" 
+                         Margin="5,0,0,0" VerticalAlignment="Center" Foreground="Gray"
+                         Visibility="{Binding SearchQuery, Converter={StaticResource StringEmptyToVisibilityConverter}}"/>
+                </Grid>
+            </Border>
+        </Grid>
+        
+        <ListBox
+            Template="{DynamicResource downloadableModList}"
+            Grid.Column="0" Grid.Row="5"
+            VerticalAlignment="Stretch"
+            ItemsSource="{Binding FilteredDownloadableModsList}"
+            SelectedValue="{Binding SelectedDownloadableMod}"
+            Foreground="{Binding ColorTheme.TextColor}"
+            Background="{Binding ColorTheme.BackColor2}"
+            HorizontalContentAlignment="Stretch">
+            <ListBox.Style>
+                <Style TargetType="ListBox">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsLoadingDownloadableMods}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.Style>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Height="64" Margin="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Margin="3 1 10 0" Grid.Column="0" VerticalAlignment="Center">
+                            <Image Width="64" Height="64" Source="{Binding IconImage}"/>
+                        </Grid>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="{Binding ColorTheme.TextColor}"/>
+                            <TextBlock Text="{Binding Author}" Foreground="{Binding ColorTheme.TextColor}"/>
+                            <TextBlock Text="{Binding Game}" Foreground="{Binding ColorTheme.TextColor}"/>
+                            <ProgressBar Height="5" Visibility="{Binding IsInstalling, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                                         Value="{Binding InstallProgress}" Maximum="100" Width="150" HorizontalAlignment="Left" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <Grid Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5,0,0,0">
+                            <Button Command="{Binding InstallCommand}" Padding="6,6" Width="28" Height="28"
+                                    IsEnabled="{Binding IsInstalling, Converter={StaticResource InvertBooleanConverter}}" 
+                                    ToolTip="Install mod">
+                                <Image Source="{StaticResource Add_16x}" Width="16" Height="16"/>
+                            </Button>
+                            <!-- Indicador de carga cuando está instalando -->
+                            <Border Width="28" Height="28" Background="#4C4C4C" 
+                                    Visibility="{Binding IsInstalling, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock Text="{Binding InstallProgress, StringFormat={}{0}%}" 
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                           FontSize="9" Foreground="White"/>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        
+        <!-- Loading indicator for downloadable mods -->
+        <Grid Grid.Column="0" Grid.Row="5" Visibility="{Binding IsLoadingDownloadableModsVisibility}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Loading downloadable mods..." Foreground="{Binding ColorTheme.TextColor}" HorizontalAlignment="Center"/>
+                <ProgressBar IsIndeterminate="True" Width="200" Height="10" Margin="0,10,0,0"/>
+            </StackPanel>
+        </Grid>
+        
+        <Grid Grid.Column="1" Grid.Row="0">
             <StackPanel VerticalAlignment="Center">
                 <Button Grid.Row="0" Margin="0 3 0 3" Command="{Binding MoveTop}" ToolTip="Moves Selected mod to the top.">
                     <Image Source="{StaticResource ExpandChevronRightGroup_16x}" RenderTransformOrigin="0.5,0.5">
@@ -103,7 +240,7 @@
                 </Button>
             </StackPanel>
         </Grid>
-        <Grid Grid.Column="3">
+        <Grid Grid.Column="3" Grid.Row="0">
             <StackPanel Visibility="{Binding IsModUnselectedMessageVisible}">
                 <TextBlock Margin="0 0 0 3" Text="The selected mod info will be displayed here." TextWrapping="Wrap"/>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
@@ -119,6 +256,21 @@
             </StackPanel>
             <ScrollViewer Visibility="{Binding IsModInfoVisible}">
                 <local:ModDetailsView Grid.Column="3" DataContext="{Binding SelectedValue}"/>
+            </ScrollViewer>
+        </Grid>
+        
+        <Grid Grid.Column="3" Grid.Row="5">
+            <StackPanel Visibility="{Binding IsDownloadableModUnselectedMessageVisible}">
+                <TextBlock Margin="0 0 0 3" Text="The selected downloadable mod info will be displayed here." TextWrapping="Wrap"/>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    These are mods available for download that are compatible with your selected game.
+                </TextBlock>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    Select a mod to see more details and install it with a single click.
+                </TextBlock>
+            </StackPanel>
+            <ScrollViewer Visibility="{Binding IsDownloadableModInfoVisible}">
+                <local:DownloadableModDetailsView Grid.Column="3" DataContext="{Binding SelectedDownloadableMod}"/>
             </ScrollViewer>
         </Grid>
 

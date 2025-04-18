@@ -2,13 +2,22 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:OpenKh.Tools.ModsManager"
+             xmlns:converters="clr-namespace:OpenKh.Tools.ModsManager.Converters"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Xe.Tools.Wpf;component/Themes/Generic.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Xe.Tools.Wpf;component/Icons/VisualStudioIcons.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Xe.Tools.Wpf;component/Icons/RefreshIcons.xaml"/>
                 <ResourceDictionary Source="Styles/MonoStyleCheckBox.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Converters -->
+            <converters:InvertBooleanConverter x:Key="InvertBooleanConverter" />
+            <converters:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter" />
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

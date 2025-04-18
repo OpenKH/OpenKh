@@ -43,6 +43,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>WinSettings.Designer.cs</LastGenOutput>
     </None>
+    <None Update="downloadable-mods.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

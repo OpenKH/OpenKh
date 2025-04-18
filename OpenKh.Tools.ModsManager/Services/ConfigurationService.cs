@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -127,6 +128,8 @@ namespace OpenKh.Tools.ModsManager.Services
                     .ToList();
             });
         }
+
+        public static event EventHandler OnGameNameChanged;
 
         public static ICollection<string> EnabledMods
         {
@@ -481,11 +484,15 @@ namespace OpenKh.Tools.ModsManager.Services
         }
         public static string LaunchGame
         {
-            get => _config.LaunchGame;
+            get => _config.LaunchGame ?? "kh2";
             set
             {
-                _config.LaunchGame = value;
-                _config.Save(ConfigPath);
+                if (_config.LaunchGame != value)
+                {
+                    _config.LaunchGame = value;
+                    _config.Save(ConfigPath);
+                    OnGameNameChanged?.Invoke(null, EventArgs.Empty);
+                }
             }
         }
         public static bool DarkMode

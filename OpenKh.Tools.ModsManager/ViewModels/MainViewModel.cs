@@ -34,6 +34,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         private DebuggingWindow _debuggingWindow = new DebuggingWindow();
         private ModViewModel _selectedValue;
+        private DownloadableModViewModel _selectedDownloadableMod;
         private Pcsx2Injector _pcsx2Injector;
         private Process _runningProcess;
         private bool _isBuilding;
@@ -65,6 +66,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             "KINGDOM HEARTS Dream Drop Distance.exe"
         };
         private int launchExecutable = 0;
+        private bool _isLoadingDownloadableMods;
 
         private const string RAW_FILES_FOLDER_NAME = "raw";
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
@@ -74,6 +76,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string Title => ApplicationName;
         public string CurrentVersion => ApplicationVersion;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
+        public ObservableCollection<DownloadableModViewModel> DownloadableModsList { get; set; }
+        public ObservableCollection<DownloadableModViewModel> FilteredDownloadableModsList { get; set; }
         public ObservableCollection<string> PresetList { get; set; }
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AddModCommand { get; set; }
@@ -94,6 +98,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand OpenPresetMenuCommand { get; set; }
         public RelayCommand CheckForModUpdatesCommand { get; set; }
         public RelayCommand YamlGeneratorCommand { get; set; }
+        public RelayCommand RefreshDownloadableModsCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -113,10 +118,28 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
         }
 
+        public DownloadableModViewModel SelectedDownloadableMod
+        {
+            get => _selectedDownloadableMod;
+            set
+            {
+                _selectedDownloadableMod = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsDownloadableModSelected));
+                OnPropertyChanged(nameof(IsDownloadableModInfoVisible));
+                OnPropertyChanged(nameof(IsDownloadableModUnselectedMessageVisible));
+            }
+        }
+
         public bool IsModSelected => SelectedValue != null;
+
+        public bool IsDownloadableModSelected => SelectedDownloadableMod != null;
 
         public Visibility IsModInfoVisible => IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility IsDownloadableModInfoVisible => IsDownloadableModSelected ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility IsDownloadableModUnselectedMessageVisible => !IsDownloadableModSelected ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility IsLoadingDownloadableModsVisibility => _isLoadingDownloadableMods ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
@@ -305,8 +328,36 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public bool IsRunning => _runningProcess != null;
 
+        public bool IsLoadingDownloadableMods
+        {
+            get => _isLoadingDownloadableMods;
+            set
+            {
+                _isLoadingDownloadableMods = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsLoadingDownloadableModsVisibility));
+            }
+        }
+
+        private string _searchQuery;
+        
+        public string SearchQuery
+        {
+            get => _searchQuery;
+            set
+            {
+                _searchQuery = value;
+                OnPropertyChanged();
+                FilterDownloadableMods();
+            }
+        }
+
         public MainViewModel()
         {
+            DownloadableModsList = new ObservableCollection<DownloadableModViewModel>();
+            FilteredDownloadableModsList = new ObservableCollection<DownloadableModViewModel>();
+            PresetList = new ObservableCollection<string>();
+            
             if (ConfigurationService.GameEdition == 2)
             {
                 PC = true;
@@ -413,6 +464,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                         Directory.Delete(mod.Path, true);
                         ModsList.RemoveAt(ModsList.IndexOf(SelectedValue));
+                        RefreshDownloadableMods(); // Refrescar la lista de mods descargables después de eliminar un mod
                     });
                 }
             }, _ => IsModSelected);
@@ -529,11 +581,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
             );
 
+            RefreshDownloadableModsCommand = new RelayCommand(x => RefreshDownloadableMods());
+
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
             _ = FetchUpdates();
 
             if (ConfigurationService.WizardVersionNumber < _wizardVersionNumber)
                 WizardCommand.Execute(null);
+
+            ConfigurationService.OnGameNameChanged += (sender, e) =>
+            {
+                ReloadModsList();
+                RefreshDownloadableMods();
+            };
+
+            ReloadModsList();
+            RefreshDownloadableMods();
         }
 
         public void CloseAllWindows()
@@ -845,7 +908,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 Log.Info(data);
         }
 
-        private void ReloadModsList()
+        public void ReloadModsList()
         {
             ModsList = new ObservableCollection<ModViewModel>(
                 ModsService.GetMods(ModsService.Mods).Select(Map));
@@ -1325,6 +1388,66 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             foreach (string presetFilePath in Directory.GetFiles(ConfigurationService.PresetPath))
             {
                 PresetList.Add(Path.GetFileNameWithoutExtension(presetFilePath));
+            }
+        }
+
+        public async void RefreshDownloadableMods()
+        {
+            try
+            {
+                IsLoadingDownloadableMods = true;
+                DownloadableModsList.Clear();
+                FilteredDownloadableModsList.Clear();
+                SelectedDownloadableMod = null;
+
+                var mods = await DownloadableModsService.GetDownloadableModsForGame(ConfigurationService.LaunchGame);
+
+                // Filter out installed mods
+                var installedModPaths = ModsList
+                    .Select(x => x.Source.ToLower())
+                    .ToList();
+
+                var downloadableMods = mods
+                    .Where(x => 
+                    {
+                        string modPath = DownloadableModsService.GetModPath(x.Repository);
+                        return !string.IsNullOrEmpty(modPath) && !installedModPaths.Contains(modPath.ToLower());
+                    })
+                    .Select(x => new DownloadableModViewModel(x, this))
+                    .ToList();
+
+                foreach (var mod in downloadableMods.OrderBy(x => x.Name))
+                {
+                    DownloadableModsList.Add(mod);
+                }
+
+                // Apply search filter if there's a search query
+                FilterDownloadableMods();
+
+                if (FilteredDownloadableModsList.Count > 0)
+                {
+                    SelectedDownloadableMod = FilteredDownloadableModsList[0];
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error refreshing downloadable mods: {ex.Message}");
+            }
+            finally
+            {
+                IsLoadingDownloadableMods = false;
+            }
+        }
+
+        private void FilterDownloadableMods()
+        {
+            FilteredDownloadableModsList.Clear();
+            foreach (var mod in DownloadableModsList)
+            {
+                if (string.IsNullOrEmpty(_searchQuery) || mod.Name.ToLower().Contains(_searchQuery.ToLower()))
+                {
+                    FilteredDownloadableModsList.Add(mod);
+                }
             }
         }
     }
