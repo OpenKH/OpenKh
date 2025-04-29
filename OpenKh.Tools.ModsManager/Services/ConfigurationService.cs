@@ -52,6 +52,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public string LaunchGame { get; internal set; } = "kh2";
             public bool DarkMode { get; internal set; } = true;
             public List<YamlGenPref> YamlGenPrefs { get; internal set; } = new List<YamlGenPref>();
+            public bool Updated { get; internal set; } = false;
 
             public void Save(string fileName)
             {
@@ -504,6 +505,16 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.YamlGenPrefs = value.ToList();
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static bool Updated
+        {
+            get => _config.Updated;
+            set
+            {
+                _config.Updated = value;
                 _config.Save(ConfigPath);
             }
         }
