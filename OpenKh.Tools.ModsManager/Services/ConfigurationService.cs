@@ -52,7 +52,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public string LaunchGame { get; internal set; } = "kh2";
             public bool DarkMode { get; internal set; } = true;
             public List<YamlGenPref> YamlGenPrefs { get; internal set; } = new List<YamlGenPref>();
-            public bool Updated { get; internal set; } = false;
+            public bool Updated { get; internal set; }
 
             public void Save(string fileName)
             {
