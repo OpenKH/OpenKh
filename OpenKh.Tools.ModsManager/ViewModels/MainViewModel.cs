@@ -317,6 +317,54 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _panaceaSoundDebugEnabled = ConfigurationService.SoundDebug;
                 _panaceaCacheEnabled = ConfigurationService.EnableCache;
                 _panaceaQuickMenuEnabled = ConfigurationService.QuickMenu;
+
+                if (PanaceaInstalled && ConfigurationService.Updated)
+                {
+                    try
+                    {
+                        string PanaceaSourceLocation = Path.Combine(AppContext.BaseDirectory, "OpenKH.Panacea.dll");
+                        if (ConfigurationService.PcReleaseLanguage != null)
+                        {
+                            string PanaceaDestinationLocation = Path.Combine(ConfigurationService.PcReleaseLocation, "DBGHELP.dll");
+                            string PanaceaAlternateLocation = Path.Combine(ConfigurationService.PcReleaseLocation, "version.dll");
+                            if (Process.GetProcessesByName("winlogon").Length > 0)
+                            {
+                                File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation, true);
+                                File.Delete(PanaceaAlternateLocation);
+                            }
+                            else
+                            {
+                                File.Copy(PanaceaSourceLocation, PanaceaAlternateLocation, true);
+                                File.Delete(PanaceaDestinationLocation);
+                            }
+                        }
+                        if (ConfigurationService.PcReleaseLocationKH3D != null)
+                        {
+                            string PanaceaDestinationLocationkh3d = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "DBGHELP.dll");
+                            string PanaceaAlternateLocationkh3d = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "version.dll");
+                            if (Process.GetProcessesByName("winlogon").Length > 0)
+                            {
+                                File.Copy(PanaceaSourceLocation, PanaceaDestinationLocationkh3d, true);
+                                File.Delete(PanaceaAlternateLocationkh3d);
+                            }
+                            else
+                            {
+                                File.Copy(PanaceaSourceLocation, PanaceaAlternateLocationkh3d, true);
+                                File.Delete(PanaceaDestinationLocationkh3d);
+                            }
+                        }
+                        ConfigurationService.Updated = false;
+                    }
+                    catch
+                    {
+                        ConfigurationService.Updated = false;
+                        MessageBox.Show(
+                               $"Unable to automatically update Panacea.\nPlease manually run the setup wizard and reinstall Panacea.",
+                               "Error",
+                               MessageBoxButton.OK,
+                               MessageBoxImage.Error);
+                    }
+                }
             }
             else
                 PC = false;
@@ -1224,7 +1272,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             );
                         }
                     );
-
+                    ConfigurationService.Updated = true;
                     // quit app
                     Window?.Close();
                 }
