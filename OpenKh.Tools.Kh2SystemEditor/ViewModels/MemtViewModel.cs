@@ -62,11 +62,10 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                 }
             }
 
-            public short Unk06 { get => _entry.Unk06; set => _entry.Unk06 = value; }
-            public short Unk08 { get => (short)(_entry.Unk08 & 0xff); set => _entry.Unk08 = value; }
-            public short Unk0A { get => _entry.Unk0A; set => _entry.Unk0A = value; }
-            public short Unk0C { get => (short)(_entry.Unk0C & 0xff); set => _entry.Unk0C = value; }
-            public short Unk0E { get => _entry.Unk0E; set => _entry.Unk0E = value; }
+            public byte CheckArea { get => _entry.CheckArea; set => _entry.CheckArea = value; }
+            public byte Padding { get => _entry.Padding; set => _entry.Padding = value; }
+            public int PlayerSize { get => _entry.PlayerSize; set => _entry.PlayerSize = value; }
+            public int FriendSize { get => _entry.FriendSize; set => _entry.FriendSize = value; }
             public short[] Members { get => _entry.Members; set => _entry.Members = value; }
 
             public World FlagWorld
