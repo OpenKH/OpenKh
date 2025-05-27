@@ -863,9 +863,47 @@ namespace OpenKh.Patcher
                         var objEntryList = Kh2.Objentry.Read(stream).ToDictionary(x => x.ObjectId, x => x);
                         var moddedObjEntry = deserializer.Deserialize<Dictionary<uint, Kh2.Objentry>>(sourceText);
 
-                        foreach (var objEntry in moddedObjEntry)
+                        foreach (var kv in moddedObjEntry)
                         {
-                            objEntryList[objEntry.Key] = objEntry.Value; // Add or overwrite
+                            if (objEntryList.TryGetValue(kv.Key, out var existing))
+                            {
+                                var incoming = kv.Value;
+
+                                // Merge spawn objects if the same OBJID is detected in two different mod.ymls.
+                                var mergedSpawns = new List<ushort>
+                                {
+                                    existing.SpawnObject1,
+                                    existing.SpawnObject2,
+                                    existing.SpawnObject3,
+                                    existing.SpawnObject4,
+                                    incoming.SpawnObject1,
+                                    incoming.SpawnObject2,
+                                    incoming.SpawnObject3,
+                                    incoming.SpawnObject4
+                                }
+                                .Where(x => x != 0)
+                                .Distinct()
+                                .Take(4)
+                                .ToList();
+
+                                while (mergedSpawns.Count < 4) mergedSpawns.Add(0);
+
+                                // Overwrite everything else
+                                objEntryList[kv.Key] = incoming;
+
+                                // Restore merged spawns
+                                var merged = objEntryList[kv.Key];
+                                merged.SpawnObject1 = mergedSpawns[0];
+                                merged.SpawnObject2 = mergedSpawns[1];
+                                merged.SpawnObject3 = mergedSpawns[2];
+                                merged.SpawnObject4 = mergedSpawns[3];
+
+                                objEntryList[kv.Key] = merged;
+                            }
+                            else
+                            {
+                                objEntryList[kv.Key] = kv.Value;
+                            }
                         }
 
                         // Sort final list by ObjId before writing
