@@ -429,26 +429,29 @@ End of Sea: #End of Sea. Names are taken from worlds.md
 ### `memt` Source Example
 ```
 MemtEntries: 
-  - Index: 0 #Specify a memt index to edit. Use a new index to create a new MemtEntry.
+  - Index: 0 #Index to edit. Specify new indices to append new entries
     WorldId: 2
-    CheckStoryFlag: 3
-    CheckStoryFlagNegation: 4
-    Unk06: 5
-    Unk08: 6
-    Unk0A: 7
-    Unk0C: 8
-    Unk0E: 9
-    Members: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+    CheckStoryFlag: 209
+    FlagForWorld: The World That Never Was #Specify world name
+    CheckStoryFlagNegation: 0
+    NegationFlagForWorld: Twilight Town #Specify world name
+    CheckArea: 2
+    Padding: 0
+    PlayerSize: 4299264
+    FriendSize: 1625344
+    Members: [84, 92, 93, 2073, 85, 86, 2397, 87, 88, 89, 91, 264, 200, 1529, 2431, 1530, 1531, 264]
   - Index: 37
     WorldId: 2
-    CheckStoryFlag: 3
-    CheckStoryFlagNegation: 4
-    Unk06: 5
-    Unk08: 6
-    Unk0A: 7
-    Unk0C: 8
-    Unk0E: 9
-    Members: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+    CheckStoryFlag: 209
+    FlagForWorld: Twilight Town #Specify world name
+    CheckStoryFlagNegation: 0
+    FlagNegationForWorld: Twilight Town #Specify world name
+    CheckArea: 2
+    Padding: 0
+    PlayerSize: 4299264
+    FriendSize: 1625344
+    Members: [84, 92, 93, 2073, 85, 86, 2397, 87, 88, 89, 91, 264, 200, 1529, 2431, 1530, 1531, 264]
+
 
 MemberIndices:
   - Index: 0
