@@ -1367,14 +1367,28 @@ namespace OpenKh.Patcher
                                 var memtEntry = memtEntries[patch.Index];
                                 memtEntry.WorldId = patch.WorldId;
                                 memtEntry.CheckStoryFlag = patch.CheckStoryFlag;
-                                memtEntry.CheckStoryFlagNegation = patch.CheckStoryFlagNegation;
-                                memtEntry.Unk06 = patch.Unk06;
-                                memtEntry.Unk08 = patch.Unk08;
-                                memtEntry.Unk0A = patch.Unk0A;
-                                memtEntry.Unk0C = patch.Unk0C;
-                                memtEntry.Unk0E = patch.Unk0E;
-                                memtEntry.Members = patch.Members.ToArray();
+                                if (!string.IsNullOrWhiteSpace(patch.FlagForWorld))
+                                {
+                                    if (!worldIndexMap.TryGetValue(patch.FlagForWorld.Replace(" ", "").ToLower(), out var worldId))
+                                        throw new Exception($"Unknown world name '{patch.FlagForWorld}' in CheckStoryFlagWorld.");
 
+                                    memtEntry.CheckStoryFlag += (short)(worldId * 1024);
+                                }
+
+                                memtEntry.CheckStoryFlagNegation = patch.CheckStoryFlagNegation;
+                                if (!string.IsNullOrWhiteSpace(patch.NegationFlagForWorld))
+                                {
+                                    if (!worldIndexMap.TryGetValue(patch.NegationFlagForWorld.Replace(" ", "").ToLower(), out var worldId))
+                                        throw new Exception($"Unknown world name '{patch.NegationFlagForWorld}' in CheckStoryFlagNegationWorld.");
+
+                                    memtEntry.CheckStoryFlagNegation += (short)(worldId * 1024);
+                                }
+                                memtEntry.CheckArea = patch.CheckArea;
+                                memtEntry.Padding = patch.Padding;
+                                memtEntry.PlayerSize = patch.PlayerSize;
+                                memtEntry.FriendSize = patch.FriendSize;
+
+                                memtEntry.Members = patch.Members.ToArray();
                                 memtEntries[patch.Index] = memtEntry;
                             }
 
