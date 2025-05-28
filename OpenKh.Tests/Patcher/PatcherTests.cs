@@ -1089,11 +1089,10 @@ namespace OpenKh.Tests.Patcher
                 WorldId = 1,
                 CheckStoryFlag = 1,
                 CheckStoryFlagNegation = 0,
-                Unk06 = 0,
-                Unk08 = 0,
-                Unk0A = 0,
-                Unk0C = 0,
-                Unk0E = 0,
+                CheckArea = 0,
+                Padding = 0,
+                PlayerSize= 0,
+                FriendSize = 0,
                 Members = new short[18]
             }
         };
@@ -1137,11 +1136,10 @@ namespace OpenKh.Tests.Patcher
                 writer.WriteLine("    WorldId: 2");
                 writer.WriteLine("    CheckStoryFlag: 3");
                 writer.WriteLine("    CheckStoryFlagNegation: 4");
-                writer.WriteLine("    Unk06: 5");
-                writer.WriteLine("    Unk08: 6");
-                writer.WriteLine("    Unk0A: 7");
-                writer.WriteLine("    Unk0C: 8");
-                writer.WriteLine("    Unk0E: 9");
+                writer.WriteLine("    CheckArea: 5");
+                writer.WriteLine("    Padding: 6");
+                writer.WriteLine("    PlayerSize: 7");
+                writer.WriteLine("    FriendSize: 8");
                 writer.WriteLine("    Members: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]");
                 writer.WriteLine("MemberIndices:");
                 writer.WriteLine("  - Index: 0");
@@ -1153,7 +1151,7 @@ namespace OpenKh.Tests.Patcher
             });
 
             // Apply the patch
-            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
 
             // Verify the patched data
             AssertFileExists(ModOutputDir, "03system.bar");
@@ -1170,11 +1168,10 @@ namespace OpenKh.Tests.Patcher
                 Assert.Equal((short)2, memtEntry.WorldId);
                 Assert.Equal((short)3, memtEntry.CheckStoryFlag);
                 Assert.Equal((short)4, memtEntry.CheckStoryFlagNegation);
-                Assert.Equal((short)5, memtEntry.Unk06);
-                Assert.Equal((short)6, memtEntry.Unk08);
-                Assert.Equal((short)7, memtEntry.Unk0A);
-                Assert.Equal((short)8, memtEntry.Unk0C);
-                Assert.Equal((short)9, memtEntry.Unk0E);
+                Assert.Equal((short)5, memtEntry.CheckArea);
+                Assert.Equal((short)6, memtEntry.Padding);
+                Assert.Equal((short)7, memtEntry.PlayerSize);
+                Assert.Equal((short)8, memtEntry.FriendSize);
                 Assert.Equal(new short[] { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27 }, memtEntry.Members);
 
                 // Check MemberIndices deserialization
@@ -1185,6 +1182,7 @@ namespace OpenKh.Tests.Patcher
                 Assert.Equal((byte)0, memberIndices.FriendWorld);
             });
         }
+
 
 
 

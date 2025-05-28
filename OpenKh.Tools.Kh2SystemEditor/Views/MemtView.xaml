@@ -62,17 +62,14 @@
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"/>
 
-                <TextBlock Text="Unk06" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unk06, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="Unk08" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unk08, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="Unk0A" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unk0A, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="Unk0C" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unk0C, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="Unk0E" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unk0E, UpdateSourceTrigger=PropertyChanged}"/>
-
+                <TextBlock Text="CheckArea" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding CheckArea, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Padding" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Padding, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="PlayerSize" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding PlayerSize, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="FriendSize" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding FriendSize, UpdateSourceTrigger=PropertyChanged}"/>
                 <Separator/>
                 <Separator/>
                 <TextBlock Text="For world" Margin="{StaticResource LabelMargin}"/>
