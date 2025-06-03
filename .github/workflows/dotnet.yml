@@ -60,6 +60,7 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         title: "OpenKh Latest Build"
+        prerelease: false
         files: |
           openkh.zip
 
@@ -70,5 +71,6 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "release2-${{github.run_number}}"
         title: "OpenKh Build ${{github.run_number}} (${{github.ref_name}})"
+        prerelease: false
         files: |
           openkh.zip
