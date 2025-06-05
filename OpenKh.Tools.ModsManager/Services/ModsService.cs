@@ -76,6 +76,19 @@ namespace OpenKh.Tools.ModsManager.Services
                     if (File.Exists(Path.Combine(dir, ModMetadata)))
                         yield return authorName;
                 }
+                var collectionsPath = ConfigurationService.ModCollectionsPath;
+                foreach (var dir in Directory.GetDirectories(collectionsPath))
+                {
+                    var authorName = Path.GetFileName(dir);
+                    foreach (var subdir in Directory.GetDirectories(dir))
+                    {
+                        var repoName = Path.GetFileName(subdir);
+                        if (File.Exists(Path.Combine(subdir, ModMetadata)))
+                        {
+                            yield return $"{authorName}/{repoName}";
+                        }
+                    }
+                }
             }
         }
 
@@ -286,7 +299,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 throw new ModNotValidException(repositoryName);
 
             var modPath = GetModPath(repositoryName);
-            if (Directory.Exists(modPath))
+            var collectionPath = GetCollectionPath(repositoryName);
             {
                 var errorMessage = MessageBox.Show($"A mod with the name '{repositoryName}' already exists. Do you want to overwrite the mod install.", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No , MessageBoxOptions.DefaultDesktopOnly);
 
@@ -296,14 +309,19 @@ namespace OpenKh.Tools.ModsManager.Services
                         Handle(() =>
                         {
                             MainViewModel.overwriteMod = true;
-                            foreach (var filePath in Directory.GetFiles(modPath, "*", SearchOption.AllDirectories))
+                            if (Directory.Exists(modPath))
+                                CleanModFiles(modPath);
+                            else
                             {
-                                var attributes = File.GetAttributes(filePath);
-                                if (attributes.HasFlag(FileAttributes.ReadOnly))
-                                    File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
+                                CleanModFiles(collectionPath);
+                                foreach (var game in new List<string> { "kh1", "kh2", "bbs", "Recom", "kh3d" })
+                                {
+                                    modPath = GetModPathGame(repositoryName, game);
+                                    if (Directory.Exists(modPath))
+                                        CleanModFiles(modPath);
+                                }
                             }
-
-                            Directory.Delete(modPath, true);
+                                
                         });
                         break;
                     case MessageBoxResult.No:
@@ -336,6 +354,14 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 Repository.Clone($"https://github.com/{repositoryName}", modPath, options);
             });
+            var metadata = File.OpenRead(Path.Combine(modPath, "mod.yml")).Using(Metadata.Read);
+            if (metadata.IsCollection)
+            {
+                Directory.CreateDirectory(Path.Combine(ConfigurationService.ModCollectionsPath, repositoryName.Split("/")[0]));
+                Directory.Move(modPath, collectionPath);
+                if (Directory.Exists(GetModPath(repositoryName.Split("/")[0])))
+                    Directory.Delete(GetModPath(repositoryName.Split("/")[0]), true);
+            }
         }
 
         public static void InstallModFromLua(string fileName)
@@ -409,6 +435,10 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static string GetModPath(string repositoryName) =>
             Path.Combine(ConfigurationService.ModCollectionPath, repositoryName);
+        public static string GetModPathGame(string repositoryName, string game) =>
+            Path.Combine(ConfigurationService.ModCollectionPath, "..", game, repositoryName);
+        public static string GetCollectionPath(string repositoryName) =>
+            Path.Combine(ConfigurationService.ModCollectionsPath, repositoryName);
 
         public static IEnumerable<ModModel> GetMods(IEnumerable<string> modNames)
         {
@@ -416,6 +446,10 @@ namespace OpenKh.Tools.ModsManager.Services
             foreach (var modName in modNames)
             {
                 var modPath = GetModPath(modName);
+                if (!Directory.Exists(modPath))
+                    modPath = GetCollectionPath(modName);
+                if (!Directory.Exists(modPath))
+                    throw new ModNotValidException(modName);
                 yield return new ModModel
                 {
                     Name = modName,
@@ -433,7 +467,10 @@ namespace OpenKh.Tools.ModsManager.Services
             foreach (var modName in Mods)
             {
                 var modPath = GetModPath(modName);
+                if (!Directory.Exists(modPath))
+                    modPath = GetCollectionPath(modName);
                 var updateCount = await RepositoryService.FetchUpdate(modPath);
+                await ClearOldMods(modName);
                 if (updateCount > 0)
                     yield return new ModUpdateModel
                     {
@@ -445,10 +482,19 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static Task Update(string modName,
             Action<string> progressOutput = null,
-            Action<float> progressNumber = null) =>
-            RepositoryService.FetchAndResetUponOrigin(GetModPath(modName), progressOutput, progressNumber);
+            Action<float> progressNumber = null) => Task.Run(() => Handle(() =>
+            {
+                var modPath = GetModPath(modName);
+                if (Directory.Exists(modPath))
+                {
+                    RepositoryService.FetchAndResetUponOrigin(modPath, progressOutput, progressNumber);
+                    ClearOldMods(modName);
+                }
+                else
+                    RepositoryService.FetchAndResetUponOrigin(GetCollectionPath(modName), progressOutput, progressNumber);
+            }));
 
-        public static Task<bool> RunPacherAsync(bool fastMode) => Task.Run(() => Handle(() =>
+        public static Task<bool> RunPatcherAsync(bool fastMode) => Task.Run(() => Handle(() =>
         {
             if (Directory.Exists(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame)))
             {
@@ -522,5 +568,40 @@ namespace OpenKh.Tools.ModsManager.Services
             var remote = repository.Network.Remotes.FirstOrDefault();
             return remote != null ? GetSourceFromUrl(remote.Url) : null;
         }
+
+        public static Task ClearOldMods(string modName) => Task.Run(() => Handle(() =>
+        {
+            var modPath = GetModPath(modName);
+            if (!Directory.Exists(modPath))
+                modPath = GetCollectionPath(modName);
+            var metadata = File.OpenRead(Path.Combine(modPath, "mod.yml")).Using(Metadata.Read);
+            if (metadata.IsCollection)
+            {
+                if (!Directory.Exists((Path.Combine(ConfigurationService.ModCollectionsPath, modName))))
+                {
+                    Directory.CreateDirectory(Path.Combine(ConfigurationService.ModCollectionsPath, modName.Split("/")[0]));
+                    Directory.Move(modPath, GetCollectionPath(modName));
+                }
+                if (Directory.Exists(GetModPath(modName.Split("/")[0])))
+                    Directory.Delete(GetModPath(modName.Split("/")[0]), true);
+            }
+            foreach (var game in new List<string> { "kh1", "kh2", "bbs", "Recom", "kh3d" })
+            {
+                modPath = GetModPathGame(modName, game);
+                if (Directory.Exists(modPath))
+                    CleanModFiles(modPath);
+            }
+        }));
+
+        public static Task CleanModFiles(string modPath) => Task.Run(() => Handle(() =>
+        {
+            foreach (var filePath in Directory.GetFiles(modPath, "*", SearchOption.AllDirectories))
+            {
+                var attributes = File.GetAttributes(filePath);
+                if (attributes.HasFlag(FileAttributes.ReadOnly))
+                    File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
+            }
+            Directory.Delete(modPath, true);
+        }));
     }
 }
