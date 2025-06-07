@@ -466,8 +466,10 @@ namespace OpenKh.Tools.ModsManager.Services
                 var modPath = GetModPath(modName);
                 var isCollection = false;
                 if (!Directory.Exists(modPath))
+                {
                     isCollection = true;
                     modPath = GetCollectionPath(modName);
+                }
                 var updateCount = await RepositoryService.FetchUpdate(modPath);
                 var metadata = GetMetadata(modPath);
                 if (isCollection && !metadata.IsCollection)
@@ -489,13 +491,12 @@ namespace OpenKh.Tools.ModsManager.Services
             {
                 var modPath = GetModPath(modName);
                 var isCollection = false;
-                if (Directory.Exists(modPath))
-                    RepositoryService.FetchAndResetUponOrigin(modPath, progressOutput, progressNumber);
-                else
+                if (!Directory.Exists(modPath))
                 {
-                    RepositoryService.FetchAndResetUponOrigin(GetCollectionPath(modName), progressOutput, progressNumber);
                     isCollection = true;
+                    modPath = GetCollectionPath(modName);
                 }
+                RepositoryService.FetchAndResetUponOrigin(modPath, progressOutput, progressNumber);
                 var metadata = GetMetadata(modPath);
                 if (isCollection && !metadata.IsCollection)
                     MoveFromCollection(modName);
