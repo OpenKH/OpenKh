@@ -434,11 +434,16 @@ namespace OpenKh.Tools.ModsManager.Services
         public static IEnumerable<ModModel> GetMods(IEnumerable<string> modNames)
         {
             var enabledMods = ConfigurationService.EnabledMods;
+            var collectionEnabledMods = ConfigurationService.EnabledCollectionMods;
             foreach (var modName in modNames)
             {
+                var collectionEnabledAssets = new Dictionary<string, bool> { };
                 var modPath = GetModPath(modName);
                 if (!Directory.Exists(modPath))
+                {
                     modPath = GetCollectionPath(modName);
+                    collectionEnabledMods.TryGetValue(modName, out collectionEnabledAssets);
+                }
                 if (!Directory.Exists(modPath))
                     throw new ModNotValidException(modName);
                 yield return new ModModel
@@ -448,7 +453,8 @@ namespace OpenKh.Tools.ModsManager.Services
                     IconImageSource = Path.Combine(modPath, "icon.png"),
                     PreviewImageSource = Path.Combine(modPath, "preview.png"),
                     Metadata = GetMetadata(modPath),
-                    IsEnabled = enabledMods.Contains(modName)
+                    IsEnabled = enabledMods.Contains(modName),
+                    CollectionOptionalEnabledAssets = collectionEnabledAssets
                 };
             }
         }

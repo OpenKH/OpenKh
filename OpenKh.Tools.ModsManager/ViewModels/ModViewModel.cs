@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using static OpenKh.Tools.ModsManager.Helpers;
+using Newtonsoft.Json;
+using OpenKh.Tools.ModsManager.Exceptions;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
 {
@@ -165,6 +167,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             foreach (var asset in _model.Metadata?.Assets ?? Enumerable.Empty<Patcher.AssetFile>())
             {
+                if (asset.CollectionOptional == true)
+                {
+                    var isOptionalEnabled = false;
+                    _model.CollectionOptionalEnabledAssets.TryGetValue(asset.Name, out isOptionalEnabled);
+                    if (!isOptionalEnabled)
+                        continue;
+                }
                 yield return asset.Name;
                 if (asset.Multi != null)
                 {

@@ -94,7 +94,8 @@ namespace OpenKh.Patcher
             IDictionary<string, string> packageMap = null,
             string LaunchGame = null,
             string Language = "en",
-            bool Tests = false
+            bool Tests = false,
+            Dictionary<string, bool> collectionOptionalEnabledMods = null
         )
         {
 
@@ -114,6 +115,8 @@ namespace OpenKh.Patcher
                 metadata.Assets.AsParallel().ForAll(assetFile =>
                 {
                     if (assetFile.Game != null && assetFile.Game != LaunchGame)
+                        return;
+                    if (assetFile.CollectionOptional == true && !collectionOptionalEnabledMods[assetFile.Name])
                         return;
                     var names = new List<string>();
                     names.Add(assetFile.Name);
