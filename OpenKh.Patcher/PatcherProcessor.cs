@@ -106,11 +106,15 @@ namespace OpenKh.Patcher
                     throw new Exception("No assets found.");
                 if (metadata.Game != null && GamesList.Contains(metadata.Game.ToLower()) && metadata.Game.ToLower() != LaunchGame.ToLower())
                     return;
+                if (metadata.IsCollection && !metadata.CollectionGames.Contains(LaunchGame))
+                    return;
 
                 var exclusiveLock = new object();
 
                 metadata.Assets.AsParallel().ForAll(assetFile =>
                 {
+                    if (assetFile.Game != null && assetFile.Game != LaunchGame)
+                        return;
                     var names = new List<string>();
                     names.Add(assetFile.Name);
                     if (assetFile.Multi != null)

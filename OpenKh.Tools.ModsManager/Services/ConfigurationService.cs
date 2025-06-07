@@ -26,6 +26,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
             public int WizardVersionNumber { get; set; }
             public string ModCollectionPath { get; internal set; }
+            public string ModCollectionsPath { get; internal set; }
             public string GameModPath { get; internal set; }
             public string GameDataPath { get; internal set; }
             public int GameEdition { get; internal set; }
@@ -92,6 +93,8 @@ namespace OpenKh.Tools.ModsManager.Services
         static ConfigurationService()
         {
             string modsPath = Path.GetFullPath(Path.Combine(ModCollectionPath, ".."));
+            if (!Directory.Exists(Path.Combine(modsPath, "collections")))
+                Directory.CreateDirectory(Path.Combine(modsPath, "collections"));
             if (!Directory.Exists(Path.Combine(modsPath, "kh2")))
                 Directory.CreateDirectory(Path.Combine(modsPath, "kh2"));
             if (!Directory.Exists(Path.Combine(modsPath, "kh1")))
@@ -189,6 +192,16 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.ModCollectionPath = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static string ModCollectionsPath
+        {
+            get => _config.ModCollectionsPath ?? Path.GetFullPath(Path.Combine(StoragePath, "mods", "collections"));
+            set
+            {
+                _config.ModCollectionsPath = value;
                 _config.Save(ConfigPath);
             }
         }
