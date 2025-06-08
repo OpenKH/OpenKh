@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ModelingToolkit\ModelingToolkit\ModelingToolkit.csproj" />
     <ProjectReference Include="..\OpenKh.AssimpUtils\OpenKh.AssimpUtils.csproj" />
     <ProjectReference Include="..\OpenKh.Command.AnbMaker\OpenKh.Command.AnbMaker.csproj" />
