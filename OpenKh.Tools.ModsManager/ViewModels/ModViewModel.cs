@@ -1,9 +1,12 @@
+//using OpenKh.Common;
 using OpenKh.Common;
+using OpenKh.Tools.ModsManager.Exceptions;
 using OpenKh.Tools.ModsManager.Models;
 using OpenKh.Tools.ModsManager.Services;
 using OpenKh.Tools.ModsManager.Views;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,18 +16,23 @@ using System.Windows.Media.Imaging;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using static OpenKh.Tools.ModsManager.Helpers;
-using Newtonsoft.Json;
-using OpenKh.Tools.ModsManager.Exceptions;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
 {
-    public class ModViewModel : BaseNotifyPropertyChanged
+    public interface IChangeCollectionModEnableState
+    {
+        void CollectionModEnableStateChanged();
+    }
+    public class ModViewModel : BaseNotifyPropertyChanged, IChangeCollectionModEnableState
     {
         public ColorThemeService ColorTheme => ColorThemeService.Instance;
         private static readonly string FallbackImage = null;
         private readonly ModModel _model;
+        private CollectionSettingsViewModel _selectedValue;
         private readonly IChangeModEnableState _changeModEnableState;
         private int _updateCount;
+        private string FilesToPatch => string.Join('\n', GetFilesToPatch());
+        public ObservableCollection<CollectionSettingsViewModel> CollectionModsList { get; set; }
 
         public ModViewModel(ModModel model, IChangeModEnableState changeModEnableState)
         {
@@ -44,6 +52,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
 
             ReadMetadata();
+            ReloadCollectionModsList();
+            CollectionSelectedValue = CollectionModsList.FirstOrDefault();
+
             if (Title != null)
                 Name = Title;
 
@@ -100,9 +111,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     Application.Current.Dispatcher.Invoke(() => progressWindow?.Close());
                 }
             });
+
+            CollectionSettingsCommand = new RelayCommand(_ =>
+            {
+                var view = new CollectionSettingsView();
+                view.DataContext = this;
+                if (view.ShowDialog() != true)
+                    return;
+            });
         }
 
         public RelayCommand UpdateCommand { get; }
+
+        public RelayCommand CollectionSettingsCommand { get; set; }
 
         public bool Enabled
         {
@@ -115,14 +136,30 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
         }
 
+        public CollectionSettingsViewModel CollectionSelectedValue
+        {
+            get => _selectedValue;
+            set
+            {
+                _selectedValue = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsModSelected));
+                OnPropertyChanged(nameof(IsModUnselectedMessageVisible));
+            }
+        }
+
+        public bool IsModSelected => CollectionSelectedValue != null;
         public ImageSource IconImage { get; private set; }
         public ImageSource PreviewImage { get; private set; }
         public Visibility PreviewImageVisibility => PreviewImage != null ? Visibility.Visible : Visibility.Collapsed;
 
         public bool IsHosted => _model.Name.Contains('/');
+        public bool IsCollection => _model.Metadata.IsCollection;
         public string Path => _model.Path;
         public Visibility SourceVisibility => IsHosted ? Visibility.Visible : Visibility.Collapsed;
         public Visibility LocalVisibility => !IsHosted ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility CollectionSettingsVisibility => IsCollection ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
 
         public string Title => _model?.Metadata?.Title ?? Name;
         public string Name { get; }
@@ -131,7 +168,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string AuthorUrl => $"https://github.com/{Author}";
         public string SourceUrl => $"https://github.com/{Source}";
         public string ReportBugUrl => $"https://github.com/{Source}/issues";
-        public string FilesToPatch => string.Join('\n', GetFilesToPatch());
 
         public string Description => _model.Metadata?.Description;
 
@@ -206,6 +242,41 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 UpdateCount = 0;
             });
         });
+
+        private void ReloadCollectionModsList()
+        {
+            CollectionModsList = new ObservableCollection<CollectionSettingsViewModel>(
+                ModsService.GetCollectionOptionalMods(_model).Select(Map));
+            OnPropertyChanged(nameof(CollectionModsList));
+        }
+        public void CollectionModEnableStateChanged()
+        {
+            var mods = CollectionModsList.ToList();
+            var current = new Dictionary<string, bool> { };
+            var holder = ConfigurationService.EnabledCollectionMods;
+            if (holder.ContainsKey(_model.Name))
+            {
+                current = holder[_model.Name];
+                foreach (KeyValuePair<string, bool> entry in current)
+                    foreach (var mod in mods)
+                        if (mod.Name == entry.Key)
+                        {
+                            current[mod.Name] = mod.Enabled;
+                        }
+            }
+            else
+            {
+                holder[_model.Name] = new Dictionary<string, bool> { };
+                current = holder[_model.Name];
+                foreach (var mod in mods)
+                {
+                    current[mod.Name] = mod.Enabled;
+                }
+            }
+            holder[_model.Name] = current;
+            ConfigurationService.EnabledCollectionMods = holder;
+        }
+        private CollectionSettingsViewModel Map(CollectionModModel mod) => new (mod, this);
 
         private static void LoadImage(string source, string fallback, Action<ImageSource> setter)
         {

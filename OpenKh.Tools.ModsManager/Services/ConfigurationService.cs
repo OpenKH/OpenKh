@@ -1,9 +1,11 @@
 using Newtonsoft.Json;
+using OpenKh.Tools.ModsManager.Exceptions;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Windows;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 

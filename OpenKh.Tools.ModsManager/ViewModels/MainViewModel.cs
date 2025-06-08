@@ -891,9 +891,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             ModsList = new ObservableCollection<ModViewModel>(
                 ModsService.GetMods(ModsService.Mods).Select(Map));
             OnPropertyChanged(nameof(ModsList));
+            OnPropertyChanged(nameof(ModViewModel.CollectionModsList));
         }
 
-        private ModViewModel Map(ModModel mod) => new ModViewModel(mod, this);
+        private ModViewModel Map(ModModel mod) => new (mod, this);
 
         public void ModEnableStateChanged()
         {

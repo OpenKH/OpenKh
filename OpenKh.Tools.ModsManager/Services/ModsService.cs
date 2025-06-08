@@ -646,5 +646,30 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             return File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read);
         }
+
+        public static IEnumerable<CollectionModModel> GetCollectionOptionalMods(ModModel mod)
+        {
+            var enabledMods = ConfigurationService.EnabledCollectionMods;
+            foreach (var asset in mod.Metadata.Assets)
+            {
+                if (!asset.CollectionOptional)
+                    continue;
+                var enabled = false;
+                if (enabledMods.ContainsKey(mod.Name))
+                {
+                    if (enabledMods[mod.Name].ContainsKey(asset.Name))
+                        enabled = enabledMods[mod.Name][asset.Name];
+                    else
+                        enabledMods[mod.Name][asset.Name] = false;
+                }
+                yield return new CollectionModModel
+                {
+                    Name = asset.Name,
+                    Author = mod.Metadata.OriginalAuthor,
+                    IsEnabled = enabled
+                };
+            }
+            ConfigurationService.EnabledCollectionMods = enabledMods;
+        }
     }
 }
