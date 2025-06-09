@@ -13,8 +13,6 @@
     </UserControl.Resources>
     <StackPanel>
         <TextBlock Margin="3 0 0 3" FontWeight="Bold" Text="{Binding Name}" d:Text="Mod name"/>
-        <StackPanel Visibility="{Binding SourceVisibility}">
-            <TextBlock Margin="3 0 0 3" Text="{Binding Author}" d:Text="Author name"/>
-        </StackPanel>
+        <TextBlock Margin="3 0 0 3" Text="{Binding Author}" d:Text="Author name"/>
     </StackPanel>
 </UserControl>

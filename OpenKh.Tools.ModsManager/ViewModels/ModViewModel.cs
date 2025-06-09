@@ -116,7 +116,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 var view = new CollectionSettingsView();
                 view.DataContext = this;
                 if (view.ShowDialog() != true)
+                {
+                    _model.CollectionOptionalEnabledAssets = ConfigurationService.EnabledCollectionMods[_model.Name];
+                    FilesToPatch = string.Join('\n', GetFilesToPatch());
                     return;
+                }
             });
         }
 
@@ -167,7 +171,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string AuthorUrl => $"https://github.com/{Author}";
         public string SourceUrl => $"https://github.com/{Source}";
         public string ReportBugUrl => $"https://github.com/{Source}/issues";
-        public string FilesToPatch => string.Join('\n', GetFilesToPatch());
+        public string FilesToPatch
+        {
+            get
+            {
+                return string.Join('\n', GetFilesToPatch());
+            }
+            set
+            {
+                OnPropertyChanged();
+            }
+        }
 
         public string Description => _model.Metadata?.Description;
 
