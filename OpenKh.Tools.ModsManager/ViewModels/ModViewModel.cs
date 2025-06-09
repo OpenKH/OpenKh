@@ -28,10 +28,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public ColorThemeService ColorTheme => ColorThemeService.Instance;
         private static readonly string FallbackImage = null;
         private readonly ModModel _model;
-        private CollectionSettingsViewModel _selectedValue;
+        private CollectionSettingsViewModel _selectedCollectionValue;
         private readonly IChangeModEnableState _changeModEnableState;
         private int _updateCount;
-        private string FilesToPatch => string.Join('\n', GetFilesToPatch());
         public ObservableCollection<CollectionSettingsViewModel> CollectionModsList { get; set; }
 
         public ModViewModel(ModModel model, IChangeModEnableState changeModEnableState)
@@ -138,10 +137,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public CollectionSettingsViewModel CollectionSelectedValue
         {
-            get => _selectedValue;
+            get => _selectedCollectionValue;
             set
             {
-                _selectedValue = value;
+                _selectedCollectionValue = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsModSelected));
                 OnPropertyChanged(nameof(IsModUnselectedMessageVisible));
@@ -168,6 +167,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string AuthorUrl => $"https://github.com/{Author}";
         public string SourceUrl => $"https://github.com/{Source}";
         public string ReportBugUrl => $"https://github.com/{Source}/issues";
+        public string FilesToPatch => string.Join('\n', GetFilesToPatch());
 
         public string Description => _model.Metadata?.Description;
 
@@ -210,6 +210,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     if (!isOptionalEnabled)
                         continue;
                 }
+                if (_model.Metadata.IsCollection)
+                    if (asset.Game != ConfigurationService.LaunchGame)
+                        continue;
                 yield return isOptionalEnabled ? $"{asset.Name} (optional, enabled)" : asset.Name;
                 if (asset.Multi != null)
                 {

@@ -519,12 +519,16 @@ namespace OpenKh.Tools.ModsManager.Services
 
             var patcherProcessor = new PatcherProcessor();
             var modsList = GetMods(EnabledMods).ToList();
+            var collectionOptionalModsList = ConfigurationService.EnabledCollectionMods;
+            var enabledOptionalAssets = new Dictionary<string, bool> { };
             var packageMap = new ConcurrentDictionary<string, string>();
 
             for (var i = modsList.Count - 1; i >= 0; i--)
             {
                 var mod = modsList[i];
                 Log.Info($"Building {mod.Name} for {_gameList[ConfigurationService.GameEdition]} - {_langList[ConfigurationService.RegionId]}");
+                if (collectionOptionalModsList.ContainsKey(mod.Name))
+                    enabledOptionalAssets = collectionOptionalModsList[mod.Name];
 
                 patcherProcessor.Patch(
                     Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame),
@@ -535,7 +539,9 @@ namespace OpenKh.Tools.ModsManager.Services
                     fastMode,
                     packageMap,
                     ConfigurationService.LaunchGame,
-                    ConfigurationService.PcReleaseLanguage);
+                    ConfigurationService.PcReleaseLanguage,
+                    false,
+                    enabledOptionalAssets);
             }
 
             using var packageMapWriter = new StreamWriter(Path.Combine(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame), "patch-package-map.txt"));

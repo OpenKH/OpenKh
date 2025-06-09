@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Collection Settings"
-		d:DesignHeight="450" d:DesignWidth="600" Background="{Binding ColorTheme.BackgroundColor}">
+		d:DesignHeight="300" d:DesignWidth="400" Background="{Binding ColorTheme.BackgroundColor}">
     <Window.Resources>
 		<ControlTemplate x:Key="collectionModList" TargetType="ListBox">
 			<Border Name="Border" BorderThickness="1">
