@@ -1261,14 +1261,15 @@ namespace OpenKh.Patcher
 
                             if (definition != null)
                             {
-                                definition.Unknown = patch.Unknown;
+                                definition.Type = patch.Type;
 
                                 var contentList = new List<Libretto.TalkMessageContent>();
                                 foreach (var contentPatch in patch.Contents)
                                 {
                                     contentList.Add(new Libretto.TalkMessageContent
                                     {
-                                        Unknown1 = contentPatch.Unknown1,
+                                        CodeType = contentPatch.CodeType,
+                                        Unknown = contentPatch.Unknown,
                                         TextId = contentPatch.TextId
                                     });
                                 }
@@ -1279,7 +1280,7 @@ namespace OpenKh.Patcher
                                 var newDefinition = new Libretto.TalkMessageDefinition
                                 {
                                     TalkMessageId = patch.TalkMessageId,
-                                    Unknown = patch.Unknown,
+                                    Type = patch.Type,
                                     ContentPointer = 0 // Will update this later after adding content entries
                                 };
 
@@ -1291,7 +1292,8 @@ namespace OpenKh.Patcher
                                 {
                                     contentList.Add(new Libretto.TalkMessageContent
                                     {
-                                        Unknown1 = contentPatch.Unknown1,
+                                        CodeType = contentPatch.CodeType,
+                                        Unknown = contentPatch.Unknown,
                                         TextId = contentPatch.TextId
                                     });
                                 }
