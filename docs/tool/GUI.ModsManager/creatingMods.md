@@ -146,8 +146,23 @@ Asset Example
     - name: files/b_40.yml
     type: AreaDataSpawn
 ```
-
 ### Binarc Methods
+
+## `index` (KH2) - Specifies a modification to a specific, indexed subfile within a binarc using one of the available methods, instead of searching for a matching filename to replace.
+
+Asset Example
+
+```
+- name: 07localset.bin
+  method: binarc
+  source:
+  - index: 1 #Patch the file at index 1, instead of replacing the first file with a name.
+    method: listpatch
+    type: List
+    source:
+    - name: LocalsetList.yml
+      type: localset
+```
 
 ## `copy` (KH2) - Performs a copy on a supfile within a Bar. Must be one of the [following](https://github.com/Xeeynamo/OpenKh/blob/master/OpenKh.Tools.BarEditor/Helpers.cs#L14) types
 
@@ -755,12 +770,14 @@ Sora:
 
 ### `libretto` Source Example
 ```
-- TalkMessageId: 752 #Id to update.
-  Unknown: 3 #Unknown to update.
-  Contents: #Contents to update. Will insert additional Contents as necessary. When no additional are detected, terminates w/ 0.
-    - Unknown1: 0x00010001
-      TextId: 0x3DEB
-    - Unknown1: 0x00010001
+- TalkMessageId: 752 #Id to update. This is used as "ReactionCommand" in ARDs.
+  Type: 3 #Specify the type of Message. 1, 2, and 3 seem functionally identical, while 0 does nothing.
+  Contents: #Contents to update. Will insert additional Contents as necessary. When no additional are detected, terminates with 0.
+    - CodeType: 0x0001 #CodeType. Most worlds use a value of 1, while the World Map uses 0x100 to 0x113.
+      Unknown: 0x0001 #Unknown what this is used for. 
+      TextId: 0x3DEB #TextID in that worlds .bar file in the msg folder to reference.
+    - CodeType: 0x0001
+      Unknown: 0x0001
       TextId: 0x183C
 ```
 ### `localset` Source Example
