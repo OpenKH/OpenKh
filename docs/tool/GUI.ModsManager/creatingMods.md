@@ -8,6 +8,7 @@ This document will focus on teaching you how to create mods using the OpenKH Mod
 * [Asset Methods](#asset-methods)
   * [copy](#copy-any-game---performs-a-direct-copy-to-overwrite-a-file-works-on-any-file-type)
   * [binarc (KH2)](#binarc-kh2---specifies-a-modification-to-a-subfile-within-a-binarc-using-one-of-the-available-methods-see-binarc-methods-for-details-on-implementing-a-specific-method)
+    * [index](#index-kh2---specifies-a-modification-to-a-specific-indexed-subfile-within-a-binarc-using-one-of-the-available-methods-instead-of-searching-for-a-matching-filename-to-replace)
     * [copy](#copy-kh2---performs-a-copy-on-a-supfile-within-a-bar-must-be-one-of-the-following-types)
     * [imgd](#imgd-kh2---replaces-a-single-imgd-found-within-a-binarc)
     * [imgz / fac](#imgz--fac-kh2---replaces-multiple-imgds-found-within-a-binarc)
