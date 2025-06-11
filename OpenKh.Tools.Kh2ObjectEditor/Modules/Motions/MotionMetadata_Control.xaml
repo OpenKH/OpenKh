@@ -17,7 +17,7 @@
             <StackPanel Orientation="Horizontal">
                 <Label Foreground="White" VerticalAlignment="Center">Frame count:</Label>
                 <TextBox MinWidth="30" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.FrameCount}"></TextBox>
-                <Label Foreground="White" VerticalAlignment="Center">Frame per second:</Label>
+                <Label Foreground="White" VerticalAlignment="Center">Frames per second:</Label>
                 <TextBox MinWidth="30" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.FrameData.FramesPerSecond}"></TextBox>
             </StackPanel>
 
@@ -29,7 +29,8 @@
                 <Label Foreground="White" VerticalAlignment="Center">Frame return:</Label>
                 <TextBox MinWidth="30" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.FrameData.FrameReturn}"></TextBox>
             </StackPanel>
-            <Label Foreground="White">Note: These 3 values above are halved</Label>
+            <Label Foreground="White">Note: These 3 values above have to be proportional to 60 fps</Label>
+            <Label Foreground="White">30 fps = Halved | 60 fps = Normal | 120 fps = Doubled</Label>
             <Separator Height="20"/>
             <Label Foreground="White">BOUNDING BOX</Label>
             <StackPanel Orientation="Horizontal">

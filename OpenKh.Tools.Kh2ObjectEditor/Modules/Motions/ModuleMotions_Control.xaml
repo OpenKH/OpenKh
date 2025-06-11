@@ -38,6 +38,8 @@
             </Grid>
             <!-- Filters -->
             <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10">
+                <Button FontFamily="Marlett" FontSize="20" Content="5" IsEnabled="{Binding AllowMotionMove}" Click="Motion_MoveUp"/>
+                <Button FontFamily="Marlett" FontSize="20" Content="6" IsEnabled="{Binding AllowMotionMove}" Click="Motion_MoveDown"/>
                 <Label Foreground="White" FontWeight="Bold">Filters</Label>
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0">Name:</Label>
@@ -59,11 +61,16 @@
                         <Separator/>
                         <MenuItem Header="Copy motion" Click="Motion_Copy"/>
                         <MenuItem Header="Replace with copied motion" Click="Motion_Replace"/>
-                        <MenuItem Header="Export FBX animation" Click="Motion_Export"/>
-                        <MenuItem Header="Replace with imported FBX animation" Click="Motion_Import"/>
                         <Separator/>
-                        <MenuItem Header="Export RC as mset" Click="RC_Export"/>
-                        <MenuItem Header="Replace with imported RC mset" Click="RC_Replace"/>
+                        <MenuItem Header="Export as">
+                            <MenuItem Header="Motion entry" Click="MotionEntry_Export"/>
+                            <MenuItem Header="FBX animation" Click="Motion_Export"/>
+                        </MenuItem>
+                        <MenuItem Header="Import and Replace as">
+                            <MenuItem Header="Anb" Click="ANB_Replace"/>
+                            <MenuItem Header="Mset" Click="MSET_Replace"/>
+                            <MenuItem Header="FBX animation" Click="Motion_Import"/>
+                        </MenuItem>
                     </ContextMenu>
                 </ListView.ContextMenu>
                 <ListView.ItemTemplate>
