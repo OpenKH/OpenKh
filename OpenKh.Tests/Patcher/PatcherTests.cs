@@ -2800,7 +2800,7 @@ namespace OpenKh.Tests.Patcher
                 writer.Flush();
             });
 
-            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
 
             AssertFileExists(ModOutputDir, "libretto-ca.bar");
 
