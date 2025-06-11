@@ -2760,7 +2760,7 @@ namespace OpenKh.Tests.Patcher
                 new Kh2.Libretto.TalkMessageDefinition
                 {
                     TalkMessageId = 1,
-                    Unknown = 0,
+                    Type = 0,
                     ContentPointer = 8 + 8 // MagicCode (4 bytes) + Count (4 bytes) + Definitions (8 bytes each)
                 }
             },
@@ -2768,7 +2768,7 @@ namespace OpenKh.Tests.Patcher
             {
                 new List<Kh2.Libretto.TalkMessageContent>
                 {
-                    new Kh2.Libretto.TalkMessageContent { Unknown1 = 0x02000200, TextId = 2500 }
+                    new Kh2.Libretto.TalkMessageContent { CodeType = 0x0200, Unknown = 0x0200, TextId = 2500 }
                 }
             }
                 };
@@ -2792,9 +2792,10 @@ namespace OpenKh.Tests.Patcher
             {
                 var writer = new StreamWriter(stream);
                 writer.WriteLine("- TalkMessageId: 1");
-                writer.WriteLine("  Unknown: 0");
+                writer.WriteLine("  Type: 0");
                 writer.WriteLine("  Contents:");
-                writer.WriteLine("    - Unknown1: 0x02000200");
+                writer.WriteLine("    - CodeType: 0x0200");
+                writer.WriteLine("      Unknown: 0x0200");
                 writer.WriteLine("      TextId: 2500");
                 writer.Flush();
             });
@@ -2808,7 +2809,8 @@ namespace OpenKh.Tests.Patcher
                 var binarc = Bar.Read(stream);
                 var librettoList = Kh2.Libretto.Read(binarc[0].Stream);
                 var librettoEntry = librettoList.Contents[0][0];
-                Assert.Equal(0x02000200u, librettoEntry.Unknown1);
+                Assert.Equal(0x0200u, librettoEntry.CodeType);
+                Assert.Equal(0x0200u, librettoEntry.Unknown);
                 Assert.Equal(2500u, librettoEntry.TextId);
             });
         }
