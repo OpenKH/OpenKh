@@ -1,0 +1,86 @@
+<Window x:Class="OpenKh.Tools.ModsManager.Views.CollectionSettingsView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:my="clr-namespace:OpenKh.Tools.ModsManager.Services"
+        xmlns:vm="clr-namespace:OpenKh.Tools.ModsManager.ViewModels"
+        xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+		d:DataContext="{d:DesignInstance Type=vm:CollectionSettingsViewModel}"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="Collection Settings"
+		d:DesignHeight="300" d:DesignWidth="400" Background="{Binding ColorTheme.BackgroundColor}">
+    <Window.Resources>
+		<ControlTemplate x:Key="collectionModList" TargetType="ListBox">
+			<Border Name="Border" BorderThickness="1">
+				<Border.BorderBrush>
+					<SolidColorBrush Color="#FFABADB3" />
+				</Border.BorderBrush>
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+					<ScrollViewer Grid.Row="1" Margin="0" Background="{Binding ColorTheme.BackgroundColor}">
+						<StackPanel Margin="0" IsItemsHost="True"/>
+					</ScrollViewer>
+				</Grid>
+			</Border>
+		</ControlTemplate>
+		<Style TargetType="TextBlock">
+			<Setter Property="Foreground" Value="{Binding ColorTheme.TextColor}"/>
+		</Style>
+	</Window.Resources>
+	<Grid Margin="10">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="2*"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+		<ListBox
+        Template="{DynamicResource collectionModList}"
+        Grid.Column="0"
+        VerticalAlignment="Stretch"
+        ItemsSource="{Binding CollectionModsList}"
+        SelectedValue="{Binding CollectionSelectedValue}"
+        HorizontalContentAlignment="Stretch">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<Grid Height="64" Margin="3">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+
+						<CheckBox Grid.Column="0" VerticalAlignment="Center" VerticalContentAlignment="Center" IsChecked="{Binding Enabled}" Foreground="{Binding ColorTheme.TextColor}">
+							<CheckBox.Content>
+								<Grid Margin="3 1 10 0">
+									<Image Width="64" Height="64" Source="{Binding IconImage}"/>
+								</Grid>
+							</CheckBox.Content>
+						</CheckBox>
+						<StackPanel Grid.Column="1">
+							<TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="{Binding ColorTheme.TextColor}"/>
+							<TextBlock Text="{Binding Author}" Foreground="{Binding ColorTheme.TextColor}"/>
+						</StackPanel>
+					</Grid>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+		<Grid Grid.Column="1">
+			<StackPanel Visibility="{Binding IsModUnselectedMessageVisible}">
+				<TextBlock Margin="3 0 0 3" Text="The selected mod info will be displayed here." TextWrapping="Wrap"/>
+				<TextBlock Margin="3 0 0 3" TextWrapping="Wrap" Text="&#x0a;To have a mod included in patching tick the box next to it.&#x0a;"></TextBlock>
+				<TextBlock Margin="3 0 0 3" TextWrapping="Wrap">
+					After selecting the mods you wish to run with
+					close this window and follow your normal 'Build'
+					process with either the 'Build' or 'Build and Run' commands.
+				</TextBlock>
+			</StackPanel>
+			<ScrollViewer Visibility="{Binding IsModInfoVisible}">
+				<local:CollectionOptionalModDetailsView Grid.Column="3" DataContext="{Binding CollectionSelectedValue}"/>
+			</ScrollViewer>
+		</Grid>
+	</Grid>
+</Window>
