@@ -277,8 +277,10 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             LoadAnbIndir();
             LoadAnimProvider();
 
-            MotionMinFrame = (int)MsetService.Instance.LoadedMotion.MotionFile.InterpolatedMotionHeader.FrameData.FrameStart * 2;
-            MotionMaxFrame = (int)MsetService.Instance.LoadedMotion.MotionFile.InterpolatedMotionHeader.FrameData.FrameEnd * 2;
+            float adjustFactor = 60.0f / (float)MsetService.Instance.LoadedMotion.MotionFile.InterpolatedMotionHeader.FrameData.FramesPerSecond;
+
+            MotionMinFrame = (int)((int)MsetService.Instance.LoadedMotion.MotionFile.InterpolatedMotionHeader.FrameData.FrameStart * adjustFactor);
+            MotionMaxFrame = (int)((int)MsetService.Instance.LoadedMotion.MotionFile.InterpolatedMotionHeader.FrameData.FrameEnd * adjustFactor);
             CurrentFrame = MotionMinFrame;
 
             LoadPoseForFrame(MotionMinFrame);

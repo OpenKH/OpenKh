@@ -30,9 +30,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Classes
         }
         public void setName()
         {
-            Name = "[" + Index + "] " + Entry.Name + " [" + (MotionSet.MotionName)(Index / 4) + "]";
+            int motionIndex = (MsetService.Instance.MsetBinarc.MSetType == BinaryArchive.MotionsetType.Player) ? Index / 4 : Index;
+            Name = "[" + Index + "] " + Entry.Name + " [" + (MotionSet.MotionName)motionIndex + "]";
+             
+            // Tags
             if (Entry.Type == BinaryArchive.EntryType.Motionset)
-                Name += "<RC>";
+                Name += "<SET>";
             if (LinkedSubfile.Length == 0)
                 Name += "<DUMMY>";
         }
