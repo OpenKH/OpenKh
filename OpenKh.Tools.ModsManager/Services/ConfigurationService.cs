@@ -1,8 +1,11 @@
+using Newtonsoft.Json;
+using OpenKh.Tools.ModsManager.Exceptions;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Windows;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -26,6 +29,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
             public int WizardVersionNumber { get; set; }
             public string ModCollectionPath { get; internal set; }
+            public string ModCollectionsPath { get; internal set; }
             public string GameModPath { get; internal set; }
             public string GameDataPath { get; internal set; }
             public int GameEdition { get; internal set; }
@@ -77,6 +81,11 @@ namespace OpenKh.Tools.ModsManager.Services
         private static string EnabledModsPathBBS = Path.Combine(StoragePath, "mods-BBS.txt");
         private static string EnabledModsPathRECOM = Path.Combine(StoragePath, "mods-ReCoM.txt");
         private static string EnabledModsPathKH3D = Path.Combine(StoragePath, "mods-KH3D.txt");
+        private static string EnabledCollectionModsPathKH1 = Path.Combine(StoragePath, "collection-mods-KH1.json");
+        private static string EnabledCollectionModsPathKH2 = Path.Combine(StoragePath, "collection-mods-KH2.json");
+        private static string EnabledCollectionModsPathBBS = Path.Combine(StoragePath, "collection-mods-BBS.json");
+        private static string EnabledCollectionModsPathRECOM = Path.Combine(StoragePath, "collection-mods-ReCoM.json");
+        private static string EnabledCollectionModsPathKH3D = Path.Combine(StoragePath, "collection-mods-KH3D.json");
         private static readonly Config _config = Config.Open(ConfigPath);
         public static string PresetPath = Path.Combine(StoragePath, "presets");
 
@@ -92,6 +101,8 @@ namespace OpenKh.Tools.ModsManager.Services
         static ConfigurationService()
         {
             string modsPath = Path.GetFullPath(Path.Combine(ModCollectionPath, ".."));
+            if (!Directory.Exists(Path.Combine(modsPath, "collections")))
+                Directory.CreateDirectory(Path.Combine(modsPath, "collections"));
             if (!Directory.Exists(Path.Combine(modsPath, "kh2")))
                 Directory.CreateDirectory(Path.Combine(modsPath, "kh2"));
             if (!Directory.Exists(Path.Combine(modsPath, "kh1")))
@@ -170,6 +181,55 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
+        public static Dictionary<string, Dictionary<string, bool>> EnabledCollectionMods
+        {
+            get
+            {
+                var optionsJson = ""; 
+                switch (LaunchGame)
+                {
+                    case "kh1":
+                        optionsJson = File.Exists(EnabledCollectionModsPathKH1) ? File.ReadAllText(EnabledCollectionModsPathKH1) : "";
+                        break;
+                    case "bbs":
+                        optionsJson = File.Exists(EnabledCollectionModsPathBBS) ? File.ReadAllText(EnabledCollectionModsPathBBS) : "";
+                        break;
+                    case "Recom":
+                        optionsJson = File.Exists(EnabledCollectionModsPathRECOM) ? File.ReadAllText(EnabledCollectionModsPathRECOM) : "";
+                        break;
+                    case "kh3d":
+                        optionsJson = File.Exists(EnabledCollectionModsPathKH3D) ? File.ReadAllText(EnabledCollectionModsPathKH3D) : "";
+                        break;
+                    default:
+                        optionsJson = File.Exists(EnabledCollectionModsPathKH2) ? File.ReadAllText(EnabledCollectionModsPathKH2) : "";
+                        break;
+                }
+                return optionsJson != "" ? JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, bool>>> (optionsJson) : new Dictionary<string, Dictionary<string, bool>> { };
+            }
+            set
+            {
+                var jsonOut = JsonConvert.SerializeObject(value);
+                switch (LaunchGame)
+                {
+                    case "kh1":
+                        File.WriteAllText(EnabledCollectionModsPathKH1, jsonOut);
+                        break;
+                    case "bbs":
+                        File.WriteAllText(EnabledCollectionModsPathBBS, jsonOut);
+                        break;
+                    case "Recom":
+                        File.WriteAllText(EnabledCollectionModsPathRECOM, jsonOut);
+                        break;
+                    case "kh3d":
+                        File.WriteAllText(EnabledCollectionModsPathKH3D, jsonOut);
+                        break;
+                    default:
+                        File.WriteAllText(EnabledCollectionModsPathKH2, jsonOut);
+                        break;
+                }
+            }
+        }
+
         public static ICollection<string> FeaturedMods { get; private set; }
         public static ICollection<string> BlacklistedMods { get; private set; }
 
@@ -189,6 +249,16 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.ModCollectionPath = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static string ModCollectionsPath
+        {
+            get => _config.ModCollectionsPath ?? Path.GetFullPath(Path.Combine(StoragePath, "mods", "collections"));
+            set
+            {
+                _config.ModCollectionsPath = value;
                 _config.Save(ConfigPath);
             }
         }
