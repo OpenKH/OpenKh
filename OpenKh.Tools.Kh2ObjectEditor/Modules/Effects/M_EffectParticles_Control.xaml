@@ -11,7 +11,7 @@
                 AutoGenerateColumns="False"
                 CanUserAddRows="False">
             <DataGrid.Columns>
-                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Path=EffectNumber}" Header="Number" />
+                <DataGridTextColumn Binding="{Binding Path=EffectNumber}" Header="Number" />
                 <DataGridTextColumn Binding="{Binding Path=DpdId}" Header="DPD Id" />
                 <DataGridTextColumn Binding="{Binding Path=ParticleDataId}" Header="Particle Data Id" />
             </DataGrid.Columns>
