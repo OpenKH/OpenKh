@@ -16,7 +16,7 @@
                   AutoGenerateColumns="False"
                   CanUserAddRows="False">
             <DataGrid.Columns>
-                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Path=Id}" Header="Id" />
+                <DataGridTextColumn Binding="{Binding Path=Id}" Header="Id" />
                 <DataGridTextColumn Binding="{Binding Path=EffectNumber}" Header="Effect Number" />
                 <DataGridTextColumn Binding="{Binding Path=BoneId}" Header="Bone Id" />
                 <DataGridTextColumn Binding="{Binding Path=SoundEffectNumber}" Header="Sound Effect Id" />
