@@ -165,6 +165,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             foreach (var asset in _model.Metadata?.Assets ?? Enumerable.Empty<Patcher.AssetFile>())
             {
+                if (_model.Metadata.IsCollection)
+                    if (asset.Game != ConfigurationService.LaunchGame)
+                        continue;
                 yield return asset.Name;
                 if (asset.Multi != null)
                 {
