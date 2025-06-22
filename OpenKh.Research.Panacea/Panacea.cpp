@@ -438,71 +438,90 @@ void GetTM2Offsets(void* addr, int baseoff, std::vector<int>& entries)
 void GetDPDOffsets(void* addr, int baseoff, std::vector<int>& entries)
 {
     int* off = (int*)addr;
-    if (*off++ == 0x96) //Magic number check.
+    if (*off++ != 0x96) // Magic number check
+        return;
+
+    off += *off + 1;
+    int texcnt = *off++;
+
+    struct TexInfo {
+        short TBP0;
+        int texoff;
+        int shTexXY;
+        short shX;
+        short shY;
+        bool unique = false;
+    };
+
+    std::vector<TexInfo> textures;
+
+    //Extract data
+    for (int t = 0; t < texcnt; ++t)
     {
-        off += *off + 1;
-        int texcnt = *off++; //Read number of textures
+        int texoff = *off++;
+        char* texptr = (char*)addr + texoff;
 
-        std::vector<std::tuple<short, int, int>> textures; // To store texture offsets and their first two bytes. First entry stores firstTwoBytes, second stores texture offset
+        TexInfo info;
+        info.TBP0 = *(short*)(texptr + 0x00);              // shTexDbp
+        info.shTexXY = *(int*)(texptr + 0x08);             // packed shX/Y
+        info.shX = *(short*)(texptr + 0x08);
+        info.shY = *(short*)(texptr + 0x0A);
+        info.texoff = texoff;
 
-        for (int t = 0; t < texcnt; ++t) //Iterates over textures.
+        textures.push_back(info);
+    }
+
+    //Pass 1: Mark duplicates as unique
+    for (size_t i = 0; i < textures.size(); ++i)
+    {
+        for (size_t j = 0; j < textures.size(); ++j)
         {
-            int texoff = *off++; //Reads texoff from off.
+            if (i != j &&
+                textures[i].TBP0 == textures[j].TBP0 &&
+                textures[i].shX == textures[j].shX &&
+                textures[i].shY == textures[j].shY)
+            {
+                textures[i].unique = true;
+                textures[j].unique = true;
+            }
+        }
+    }
 
-            int* off2 = (int*)((char*)addr + texoff); //Converts texoff into an absolute address; if null, skip to the next texture.
+    //Sort by TBP0
+    std::sort(textures.begin(), textures.end(), [](const TexInfo& a, const TexInfo& b) {
+        return a.TBP0 < b.TBP0;
+        });
 
-            short firstTwoBytes = off2[0]; // Extract first two bytes from firstTwoBytes.
-            int shTexXY = *(int*)((char*)off2 + 0x08); //Get shTexXY. Textures should ONLY be combined if they share the same value for firstTwoBytes, AND shTexXY is NOT equal to 0.
+    std::map<short, int> offsets; // TBP0 → offset
 
-            textures.push_back(std::make_tuple(firstTwoBytes, texoff, shTexXY)); //Log the extracted bytes, store them in textures.
+    for (size_t t = 0; t < textures.size(); ++t)
+    {
+        const auto& tex = textures[t];
+        short val = tex.TBP0;
+
+        // If first time seeing this TBP0, set the offset.
+        if (offsets.find(val) == offsets.end())
+        {
+            offsets[val] = tex.texoff + 0x20;
         }
 
-        // Sort textures by the first two bytes
-        std::sort(textures.begin(), textures.end(), [](const std::tuple<short, int, int>& a, const std::tuple<short, int, int>& b) {
-            return std::get<0>(a) < std::get<0>(b); //Sorts the textures by their first two bytes.
-            });
-
-
-        std::map<int, int> offsets; //Now this logic applies AFTER sorting.
-
-        for (int t = 0; t < textures.size(); ++t)
+        // Try to combine
+        bool combined = false;
+        if (!tex.unique && t > 0 && tex.TBP0 == textures[t - 1].TBP0)
         {
-            int texoff = std::get<1>(textures[t]);
-            int* off2 = (int*)((char*)addr + texoff);
+            const auto& prev = textures[t - 1];
 
-            short val = off2[0];
+            if (!prev.unique && (tex.shX != 0 || tex.shY != 0 || prev.shX != 0 || prev.shY != 0))
+            {
+                // Combine onto previous
+                entries.back() = offsets[val] + baseoff + 0x20000000;
+                combined = true;
+            }
+        }
 
-            auto found = offsets.find(val);
-            if (found == offsets.end())
-            {
-                offsets[val] = texoff + 0x20;
-            }
-            else
-            {
-                // Instead of ++, properly increment by the expected stride
-                offsets[val] = found->second;  // Keep using val, not val + t
-            }
-
-            // Check if this texture should be combined with the previous one
-            if (t > 0 && std::get<0>(textures[t]) == std::get<0>(textures[t - 1]))
-            {
-                int prev_shTexXY = std::get<2>(textures[t - 1]);
-                int curr_shTexXY = std::get<2>(textures[t]);
-
-                if (curr_shTexXY != 0 || prev_shTexXY != 0) //ONLY combine textures with entries.back if either shTexX or shTexY are greater than 0.
-                {
-                    // Adjust previous entry
-                    entries.back() = offsets[val] + baseoff + 0x20000000;
-                }
-                else
-                {
-                    entries.push_back(offsets[val] + baseoff + 0x20000000);
-                }
-            }
-            else
-            {
-                entries.push_back(offsets[val] + baseoff + 0x20000000);
-            }
+        if (!combined)
+        {
+            entries.push_back(offsets[val] + baseoff + 0x20000000);
         }
     }
 }
