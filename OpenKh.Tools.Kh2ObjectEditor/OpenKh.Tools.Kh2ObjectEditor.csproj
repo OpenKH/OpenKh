@@ -9,6 +9,10 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="5.1.0" />
+    <PackageReference Include="MahApps.Metro.IconPacks.MaterialDesign" Version="5.1.0" />
+    <PackageReference Include="MahApps.Metro.IconPacks.PhosphorIcons" Version="5.1.0" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.6" />
   </ItemGroup>
 
   <ItemGroup>

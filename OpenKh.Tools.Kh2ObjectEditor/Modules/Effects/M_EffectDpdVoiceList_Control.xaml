@@ -17,7 +17,16 @@
 
         <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
 
-        <ListView Grid.Column="2" x:Name="ListView_Vsf" ItemsSource="{Binding VsfWrappers}" MouseDoubleClick="ListView_Vsf_MouseDoubleClick">
+        <ListView Grid.Column="2" x:Name="ListView_Vsf" ItemsSource="{Binding VsfWrappers}" SelectionChanged="ListView_Vsf_SelectionChanged">
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="BorderBrush" Value="#22FFFFFF"/>
+                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                    <Setter Property="Padding" Value="5"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Vertical">

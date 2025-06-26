@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Views"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="600">
     <Grid>
@@ -14,13 +15,19 @@
         <TabControl Grid.Column="0">
             <TabItem>
                 <TabItem.Header>
-                    <Label>Meshes</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconPhosphorIcons Kind="Cube" Height="20"/>
+                        <Label FontWeight="Bold" Margin="5 0">Meshes</Label>
+                    </StackPanel>
                 </TabItem.Header>
                 <local:ModuleModelMeshes_Control/>
             </TabItem>
             <TabItem>
                 <TabItem.Header>
-                    <Label>Skeleton</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconPhosphorIcons Kind="Bone" Height="20"/>
+                        <Label FontWeight="Bold" Margin="5 0">Bones</Label>
+                    </StackPanel>
                 </TabItem.Header>
                 <local:ModelBoneViewer_Control/>
             </TabItem>

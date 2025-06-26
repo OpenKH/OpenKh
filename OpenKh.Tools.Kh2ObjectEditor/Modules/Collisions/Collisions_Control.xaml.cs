@@ -62,7 +62,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Collisions
             ThisVM.TestCollisionsIngame();
         }
 
-        private void DataGridRow_MouseLeftButtonUp(object sender, MouseEventArgs e)
+        private void DataTable_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             List<int> selectedIndices = new List<int>();
             foreach (var selectedItem in DataTable.SelectedItems)

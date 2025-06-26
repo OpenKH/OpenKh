@@ -33,12 +33,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
             ImageFrame.Source = mat.GetAsBitmapImage();
         }
 
-        private void list_doubleCLick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            TextureWrapper item = (TextureWrapper)(sender as ListView).SelectedItem;
-            loadImage(item.Id);
-        }
-
         private void Button_MoveTextureUp(object sender, System.Windows.RoutedEventArgs e)
         {
             int newIndex = ThisVM.fun_moveTextureUp((TextureWrapper)List_Textures.SelectedItem);
@@ -86,6 +80,15 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
         public void Texture_Add(object sender, RoutedEventArgs e)
         {
             ThisVM.addImage();
+        }
+
+        private void Texture_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if ((sender as ListView).SelectedItem == null) {
+                return;
+            }
+            TextureWrapper item = (TextureWrapper)(sender as ListView).SelectedItem;
+            loadImage(item.Id);
         }
     }
 }

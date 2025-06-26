@@ -21,6 +21,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
     {
         public ViewportController VpController { get; set; }
         public MtModel LoadedModel { get; set; }
+        public MdlxService ServiceMdlx { get; set; } = MdlxService.Instance;
         //-------------------------------------
         // Animation
         //-------------------------------------

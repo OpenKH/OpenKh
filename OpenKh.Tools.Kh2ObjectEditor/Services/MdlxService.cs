@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2ObjectEditor.Utils;
 using System;
@@ -6,10 +7,10 @@ using System.Windows.Forms;
 
 namespace OpenKh.Tools.Kh2ObjectEditor.Services
 {
-    public class MdlxService
+    public partial class MdlxService : ObservableObject
     {
         // Apdx File
-        public string MdlxPath { get; set; }
+        [ObservableProperty] public string mdlxPath;
         public Bar MdlxBar { get; set; }
         public Kh2.Models.ModelSkeletal ModelFile { get; set; }
         public ModelCollision CollisionFile { get; set; }
@@ -33,6 +34,10 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Services
             MsetService.Reset();
             ApdxService.Reset();
 
+            ModelFile = null;
+            TextureFile = null;
+            CollisionFile = null;
+            BdxFile = null;
             foreach (Bar.Entry barEntry in MdlxBar)
             {
                 switch (barEntry.Type)

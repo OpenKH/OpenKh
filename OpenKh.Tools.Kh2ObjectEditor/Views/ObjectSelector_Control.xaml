@@ -6,36 +6,53 @@
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    
-    <DockPanel>
 
-        <!-- FILTERS AND OTHER CONTROLS -->
-        <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10">
-            <Label FontWeight="Bold">Filters</Label>
-            <StackPanel Orientation="Horizontal">
-                <Label VerticalAlignment="Center" Margin="0,0,5,0">Name:</Label>
-                <TextBox Name="FilterName" Text="{Binding FilterName}" Width="80" VerticalContentAlignment="Center" PreviewKeyDown="FilterName_PreviewKeyDown" TextChanged="FilterName_TextChanged" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label VerticalAlignment="Center" Margin="0,0,5,0">Has Moveset:</Label>
-                <CheckBox IsChecked="{Binding FilterHasMset}" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
-            </StackPanel>
-            <!-- <Button Width="100" HorizontalAlignment="Left" Click="Button_ApplyFilters">Apply filters</Button> -->
-        </StackPanel>
+    <Border Background="#333333">
+        <DockPanel>
 
-        <!-- OBJECT LIST -->
-        <ListView ItemsSource="{Binding ObjectsView}" SelectedItem="{Binding SelectedObject}"  MouseDoubleClick="list_doubleCLick">
-            <ListView.ItemTemplate>
-                <DataTemplate>
+            <!-- FILTERS AND OTHER CONTROLS -->
+            <Border DockPanel.Dock="Bottom" Margin="10" Padding="5" CornerRadius="5" Background="#555555" BorderBrush="White" BorderThickness="1">
+                <StackPanel Orientation="Vertical">
+                    <Label FontWeight="Bold">Filters</Label>
+                    <Separator Margin="0 0 0 10"/>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Grid.Column="0" Margin="0,0,5,0" Text="{Binding Path=FileName}" VerticalAlignment="Center"/>
-                        <CheckBox Grid.Column="1" Focusable="False" IsHitTestVisible="False"  IsChecked="{Binding Path=HasMset}" VerticalAlignment="Center" >
-                        </CheckBox>
+                        <Label VerticalAlignment="Center" Margin="0,0,5,0">Name:</Label>
+                        <TextBox Name="FilterName" Text="{Binding FilterName}" Width="120" VerticalContentAlignment="Center" PreviewKeyDown="FilterName_PreviewKeyDown" TextChanged="FilterName_TextChanged" />
                     </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        
-    </DockPanel>
-    
+                    <StackPanel Orientation="Horizontal">
+                        <Label VerticalAlignment="Center" Margin="0,0,5,0">Has Moveset:</Label>
+                        <CheckBox IsChecked="{Binding FilterHasMset}" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
+                    </StackPanel>
+                    <!-- <Button Width="100" HorizontalAlignment="Left" Click="Button_ApplyFilters">Apply filters</Button> -->
+                </StackPanel>
+            </Border>
+
+            <!-- OBJECT LIST -->
+            <Border Margin="10" Padding="5" CornerRadius="5" Background="#777777" BorderBrush="White" BorderThickness="1">
+                <ListView ItemsSource="{Binding ObjectsView}" SelectedItem="{Binding SelectedObject}"  MouseDoubleClick="list_doubleCLick">
+
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Margin" Value="0,0,0,1"/>
+                            <Setter Property="BorderBrush" Value="#22000000"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Grid.Column="1" Focusable="False" IsHitTestVisible="False"  IsChecked="{Binding Path=HasMset}" VerticalAlignment="Center" >
+                                <TextBlock Grid.Column="0" Margin="0,0,5,0" Text="{Binding Path=FileName}" VerticalAlignment="Center"/>
+                                </CheckBox>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Border>
+
+        </DockPanel>
+    </Border>
+
 </UserControl>

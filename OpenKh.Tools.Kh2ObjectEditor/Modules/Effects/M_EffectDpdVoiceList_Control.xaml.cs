@@ -22,11 +22,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
             DataContext = this;
         }
 
-        private void ListView_Vsf_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            Frame_Voice.Content = new M_EffectDpdVoice_Control(VsfWrappers[ListView_Vsf.SelectedIndex].VoiceEffect);
-        }
-
         public class VsfWrapper
         {
             public int Index { get; set; }
@@ -39,6 +34,15 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
                 VoiceEffect = vsf;
                 Name = "Vsf " + Index;
             }
+        }
+
+        private void ListView_Vsf_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(ListView_Vsf.SelectedIndex == null)
+            {
+                return;
+            }
+            Frame_Voice.Content = new M_EffectDpdVoice_Control(VsfWrappers[ListView_Vsf.SelectedIndex].VoiceEffect);
         }
     }
 }

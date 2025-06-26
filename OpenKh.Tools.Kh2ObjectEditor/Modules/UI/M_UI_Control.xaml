@@ -41,7 +41,7 @@
         </Grid>
         
         
-        <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
+        <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="2"/>
 
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
