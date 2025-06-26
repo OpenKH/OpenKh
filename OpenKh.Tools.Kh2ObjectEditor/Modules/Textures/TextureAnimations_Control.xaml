@@ -29,7 +29,7 @@
                 Stretch="Uniform"/>
         </Canvas> -->
 
-        <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
+        <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="2"/>
 
         <DockPanel Grid.Column="2">
             <!-- Filters -->
@@ -38,7 +38,17 @@
                 <Button Width="100" Click="Button_MoveTextureDown">V</Button>
             </StackPanel> -->
 
-            <ListView x:Name="List_Textures" ItemsSource="{Binding TexAnims}" SelectedItem="{Binding SelectedAnim}" MouseDoubleClick="list_doubleCLick">
+            <ListView x:Name="List_Textures" ItemsSource="{Binding TexAnims}" SelectedItem="{Binding SelectedAnim}" SelectionChanged="Animation_SelectionChanged">
+
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Margin" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="#22FFFFFF"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="Padding" Value="5"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Export as PNG" Click="Texture_Export"/>
@@ -50,8 +60,11 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{Binding Path=Name}"/>
-                            <TextBlock Text="{Binding Path=Group.Header.PolygonCount}"/>
+                            <Label FontWeight="Bold" Content="{Binding Path=Name}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Label FontSize="12">On Texture:</Label>
+                                <Label FontSize="12" Margin="3 0 0 0" Content="{Binding Path=TextureAnim.TextureIndex}"/>
+                            </StackPanel>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>

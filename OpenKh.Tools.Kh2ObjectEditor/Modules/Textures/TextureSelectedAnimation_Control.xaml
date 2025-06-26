@@ -18,7 +18,7 @@
                 <Canvas.Background>
                     <DrawingBrush TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
                         <DrawingBrush.Drawing>
-                            <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#80000000"/>
+                            <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#80555555"/>
                         </DrawingBrush.Drawing>
                     </DrawingBrush>
                 </Canvas.Background>
@@ -29,44 +29,67 @@
             </Canvas>
         </ScrollViewer>
 
-        <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
+        <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="2"/>
 
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="150" />
+                <RowDefinition Height="330" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             
             <!-- Animation Properties -->
             <StackPanel Grid.Row="0"  Orientation="Vertical" Margin="4">
-                <StackPanel Orientation="Horizontal" Margin="3">
-                    <Label>Texture:</Label>
-                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.TextureIndex}"></TextBox>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="3">
-                    <Label>Offset Y:</Label>
-                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.VOffsetInBaseImage}"></TextBox>
-                    <Label>Offset X:</Label>
-                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.UOffsetInBaseImage}"></TextBox>
-                </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Margin="3">
-                    <Label>Height:</Label>
-                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.SpriteHeight}"></TextBox>
-                    <Label>Width:</Label>
-                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.SpriteWidth}"></TextBox>
-                </StackPanel>
+                <Border Margin="10" Padding="10" CornerRadius="5" Background="#555555" BorderBrush="White" BorderThickness="1">
+                    <StackPanel>
+                        <Label FontWeight="Bold" FontSize="18">Over Texture</Label>
+                        <Separator/>
+                        <StackPanel Orientation="Horizontal" Margin="3">
+                            <Label VerticalAlignment="Center">Texture:</Label>
+                            <TextBox MinWidth="30" Margin="5 0 0 0" Text="{Binding Path=TexAnim.TextureIndex}"></TextBox>
+                        </StackPanel>
+                        <WrapPanel Margin="3">
+                            <Label VerticalAlignment="Center">Offset Y:</Label>
+                            <TextBox MinWidth="30" Margin="5 0 0 0" Text="{Binding Path=TexAnim.VOffsetInBaseImage}"></TextBox>
+                            <Label VerticalAlignment="Center" Margin="10 0 0 0">Offset X:</Label>
+                            <TextBox MinWidth="30" Margin="5 0 0 0" Text="{Binding Path=TexAnim.UOffsetInBaseImage}"></TextBox>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
 
-                <StackPanel Orientation="Horizontal" Margin="3">
-                    <Label>Number of sprites:</Label>
-                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.NumSpritesInImageData}"></TextBox>
-                    <Label>Default sprite:</Label>
-                    <TextBox MinWidth="30" Text="{Binding Path=TexAnim.DefaultAnimationIndex}"></TextBox>
-                </StackPanel>
+                <Border Margin="10" Padding="10" CornerRadius="5" Background="#555555" BorderBrush="White" BorderThickness="1">
+                    <StackPanel>
+                        <Label FontWeight="Bold" FontSize="18">Sprite Data</Label>
+                        <Separator/>
+                        
+                        <WrapPanel Margin="3">
+                            <StackPanel Orientation="Horizontal">
+                                <Label VerticalAlignment="Center">Height:</Label>
+                                <TextBox MinWidth="30" Margin="5 0 0 0" Text="{Binding Path=TexAnim.SpriteHeight}"></TextBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10 0 0 0">
+                                <Label VerticalAlignment="Center">Width:</Label>
+                                <TextBox MinWidth="30" Margin="5 0 0 0" Text="{Binding Path=TexAnim.SpriteWidth}"></TextBox>
+                            </StackPanel>
+                        </WrapPanel>
+
+                        <StackPanel Margin="3">
+                            <StackPanel Orientation="Horizontal">
+                                <Label VerticalAlignment="Center">Number of sprites:</Label>
+                                <TextBox MinWidth="30" Margin="5 0 0 0" Text="{Binding Path=TexAnim.NumSpritesInImageData}"></TextBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label VerticalAlignment="Center">Default sprite:</Label>
+                                <TextBox MinWidth="30" Margin="5 0 0 0" Text="{Binding Path=TexAnim.DefaultAnimationIndex}"></TextBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
             </StackPanel>
 
-            <GridSplitter Grid.Row="1" Background="LightGray" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="True" Height="5"/>
+            <GridSplitter Grid.Row="1" Background="LightGray" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="True" Height="2"/>
 
             <ListView Grid.Row="2" Name="ScriptList" ItemsSource="{Binding Animations}" SelectedItem="{Binding SelectedAnimation}">
                 <ListView.ContextMenu>

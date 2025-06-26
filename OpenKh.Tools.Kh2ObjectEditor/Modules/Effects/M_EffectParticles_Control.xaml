@@ -9,7 +9,7 @@
     <Grid>
         <DataGrid Name="DataTable"
                 AutoGenerateColumns="False"
-                CanUserAddRows="False">
+                CanUserAddRows="False" GridLinesVisibility="All" HeadersVisibility="Column">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Path=EffectNumber}" Header="Number" />
                 <DataGridTextColumn Binding="{Binding Path=DpdId}" Header="DPD Id" />

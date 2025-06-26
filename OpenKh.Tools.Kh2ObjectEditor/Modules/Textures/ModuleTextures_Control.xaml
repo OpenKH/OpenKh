@@ -4,14 +4,27 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Modules.Textures"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <TabControl>
-            <TabItem Header="Textures">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconPhosphorIcons Kind="Image" Height="20"/>
+                        <Label FontWeight="Bold" Margin="5 0">Textures</Label>
+                    </StackPanel>
+                </TabItem.Header>
                 <local:TextureImages_Control/>
             </TabItem>
-            <TabItem Header="Animations">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="AnimationPlay" Height="20"/>
+                        <Label FontWeight="Bold" Margin="5 0">Animations</Label>
+                    </StackPanel>
+                </TabItem.Header>
                 <local:TextureAnimations_Control/>
             </TabItem>
         </TabControl>

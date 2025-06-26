@@ -27,14 +27,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             NextFrame();
         }
 
-        private void Button_Reload(object sender, System.Windows.RoutedEventArgs e)
-        {
-            if (MdlxService.Instance.ModelFile == null) {
-                return;
-            }
-            ViewerService.Instance.Render();
-        }
-
         private void Slider_DragStarted(object sender, DragStartedEventArgs e)
         {
             if (MsetService.Instance.LoadedMotion == null) {
@@ -113,6 +105,26 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             ViewerService.Instance.AnimationRunning = false;
             ViewerService.Instance.FrameIncrease(frameStep);
             ViewerService.Instance.LoadFrame();
+        }
+
+        private void Button_Play(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ViewerService.Instance.AnimationRunning = true;
+        }
+
+        private void Button_Pause(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ViewerService.Instance.AnimationRunning = false;
+        }
+
+        private void Button_Stop(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (MdlxService.Instance.ModelFile == null)
+            {
+                return;
+            }
+            ViewerService.Instance.AnimationRunning = false;
+            ViewerService.Instance.Render();
         }
     }
 }

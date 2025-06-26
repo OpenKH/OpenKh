@@ -18,9 +18,10 @@
         </Grid>
 
         <DataGrid Name="DataTable"
-                AutoGenerateColumns="False"
-                ItemsSource="{Binding Collisions}"
-                CanUserAddRows="False">
+                  AutoGenerateColumns="False"
+                  ItemsSource="{Binding Collisions}"
+                  CanUserAddRows="False"
+                  SelectionChanged="DataTable_SelectionChanged" GridLinesVisibility="All" HeadersVisibility="Column">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Add collision" Click="Collision_Add"/>
@@ -35,11 +36,6 @@
             <DataGrid.Resources>
                 <local:CollisionTypeConverter x:Key="CollisionType_Converter" />
                 <local:CollisionShapeConverter x:Key="CollisionShape_Converter" />
-
-                <Style TargetType="DataGridRow">
-                    <EventSetter Event="MouseLeftButtonUp" Handler="DataGridRow_MouseLeftButtonUp"/>
-                </Style>
-
             </DataGrid.Resources>
 
             <DataGrid.Columns>

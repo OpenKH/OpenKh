@@ -13,13 +13,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
             ThisVM = new M_EffectDpds_VM();
             DataContext = ThisVM;
         }
-
-        private void list_doubleCLick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            DpdWrapper item = (DpdWrapper)(sender as ListView).SelectedItem;
-
-            DpdFrame.Content = new M_EffectsDpdTabs_Control(item.DpdItem);
-        }
         public void Dpd_Copy(object sender, RoutedEventArgs e)
         {
             if (List_Dpds.SelectedIndex != null)
@@ -48,6 +41,18 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Effects
         public void Dpd_Import(object sender, RoutedEventArgs e)
         {
             ThisVM.Dpd_Import();
+        }
+
+        private void Dpd_Selected(object sender, SelectionChangedEventArgs e)
+        {
+            if((DpdWrapper)(sender as ListView).SelectedItem == null)
+            {
+                return;
+            }
+
+            DpdWrapper item = (DpdWrapper)(sender as ListView).SelectedItem;
+
+            DpdFrame.Content = new M_EffectsDpdTabs_Control(item.DpdItem);
         }
     }
 }

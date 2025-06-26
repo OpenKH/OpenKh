@@ -19,13 +19,6 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             }
         }
 
-        private void list_doubleCLick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            MeshWrapper item = (MeshWrapper)(sender as ListView).SelectedItem;
-
-            MeshFrame.Content = new ModuleModelMesh_Control(item.Group);
-        }
-
         private void Button_MoveMeshUp(object sender, System.Windows.RoutedEventArgs e)
         {
             if (List_Meshes.SelectedItem == null)
@@ -49,6 +42,16 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             {
                 List_Meshes.SelectedIndex = newIndex;
             }
+        }
+
+        private void Meshes_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if((MeshWrapper)(sender as ListView).SelectedItem == null) {
+                return;
+            }
+            MeshWrapper item = (MeshWrapper)(sender as ListView).SelectedItem;
+
+            MeshFrame.Content = new ModuleModelMesh_Control(item.Group);
         }
     }
 }

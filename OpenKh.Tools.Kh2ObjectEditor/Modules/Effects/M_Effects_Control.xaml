@@ -4,38 +4,69 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Modules.Effects"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <DockPanel>
-        <Grid DockPanel.Dock="Bottom" MaxHeight="50">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
-                <Button Margin="5,0,5,0" Padding="5,0,5,0"  Click="Button_ExportDpx">Export DPX</Button>
-                <Button Margin="5,0,5,0" Padding="5,0,5,0"  Click="Button_ImportDpx">Import DPX</Button>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-                <Button Margin="5,0,5,0" Padding="5,0,5,0" Width="50" Background="PaleVioletRed" Click="Button_Test">TEST</Button>
-            </StackPanel>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        </Grid>
-        <TabControl TabStripPlacement="Right">
+        <Border Grid.Row="0" DockPanel.Dock="Bottom" Margin="10" Padding="5" CornerRadius="5" Background="#555555" BorderBrush="White" BorderThickness="1">
+            <StackPanel Orientation="Vertical">
+                <Label FontWeight="Bold" FontSize="18">Effects</Label>
+                <Separator Margin="0 0 0 10"/>
+                <TextBlock TextWrapping="Wrap">
+                    Effects file > Contains the DPX file (Effects and Particles) and the Casters (These use effects) <LineBreak/>
+                    Effects > Uses a mix of particle effects defined by the given Particle DPD's data <LineBreak/>
+                    Particles > Each DPD contains various effects. The Data entries define which particles are called and how <LineBreak/>
+                    NOTE: These packages are vast and most of it is not currently editable
+                </TextBlock>
+
+                <Grid MaxHeight="50">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
+                        <Button Margin="5,0,5,0" Padding="5,0,5,0"  Click="Button_ExportDpx">Export DPX</Button>
+                        <Button Margin="5,0,5,0" Padding="5,0,5,0"  Click="Button_ImportDpx">Import DPX</Button>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+                        <Button Margin="5,0,5,0" Padding="5,0,5,0" Width="50" Background="PaleVioletRed" Click="Button_Test">TEST</Button>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        
+
+        <TabControl Grid.Row="1" TabStripPlacement="Right">
             <TabItem>
                 <TabItem.Header>
-                    <Label>Casters</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="AutoFix" Height="15"/>
+                        <Label FontWeight="Bold" Margin="5 0">Casters</Label>
+                    </StackPanel>
                 </TabItem.Header>
                 <local:M_EffectElements_Control/>
             </TabItem>
             <TabItem>
                 <TabItem.Header>
-                    <Label>Effects</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="CreationOutline" Height="15"/>
+                        <Label FontWeight="Bold" Margin="5 0">Effects</Label>
+                    </StackPanel>
                 </TabItem.Header>
                 <local:M_EffectParticles_Control/>
             </TabItem>
             <TabItem>
                 <TabItem.Header>
-                    <Label>Particles</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="Star" Height="15"/>
+                        <Label FontWeight="Bold" Margin="5 0">Particles</Label>
+                    </StackPanel>
                 </TabItem.Header>
                 <local:M_EffectDpds_Control/>
             </TabItem>
         </TabControl>
-    </DockPanel>
+    </Grid>
 </UserControl>
