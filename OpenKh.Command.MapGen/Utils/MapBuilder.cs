@@ -386,6 +386,14 @@ namespace OpenKh.Command.MapGen.Utils
                                         ?? config.textureOptions.addressV
                                         ?? "Repeat"
                                     );
+                                var originalMinU = gsInfo.AddressMode.Left;
+                                gsInfo.AddressMode.Left = gsInfo.AddressMode.Right;
+                                gsInfo.AddressMode.Right = originalMinU;
+
+                                var originalMinV = gsInfo.AddressMode.Top;
+                                gsInfo.AddressMode.Top = gsInfo.AddressMode.Bottom;
+                                gsInfo.AddressMode.Bottom = originalMinV;
+
                                 return gsInfo;
                             }
                         )
