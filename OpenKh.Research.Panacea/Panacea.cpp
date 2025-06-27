@@ -16,6 +16,7 @@
 #include <cstdarg>
 #include "bass.h"
 #include "bass_vgmstream.h"
+#include <set>
 
 template <class TFunc>
 class Hook
@@ -437,17 +438,24 @@ void GetTM2Offsets(void* addr, int baseoff, std::vector<int>& entries)
 
 void GetDPDOffsets(void* addr, int baseoff, std::vector<int>& entries)
 {
+    // Cast the start address to a 32-bit pointer within the file.
     int* off = (int*)addr;
-    if (*off++ != 0x96) // Magic number check
+    // Check for the DPD magic number, 0x96, to confirm the file is right.
+    if (*off++ != 0x96) {
         return;
+    }
 
+    // Skip over the pData section in the DPD header.
+    // *off contains the count, so move forward (count + 1) positions.
     off += *off + 1;
+
+    // Get texture count for the DPD from the int immediately after the pData section
     int texcnt = *off++;
 
+    // Struct to store specific texture data.
     struct TexInfo {
-        short TBP0;
         int texoff;
-        int shTexXY;
+        short TBP0;
         short shX;
         short shY;
         bool unique = false;
@@ -455,76 +463,102 @@ void GetDPDOffsets(void* addr, int baseoff, std::vector<int>& entries)
 
     std::vector<TexInfo> textures;
 
-    //Extract data
+    // First: Get TBP0, shX, shY.
     for (int t = 0; t < texcnt; ++t)
     {
+        // Get texture offset relative to file base
         int texoff = *off++;
+        // Convert relative offset into actual address in memory
         char* texptr = (char*)addr + texoff;
 
-        TexInfo info;
-        info.TBP0 = *(short*)(texptr + 0x00);              // shTexDbp
-        info.shTexXY = *(int*)(texptr + 0x08);             // packed shX/Y
-        info.shX = *(short*)(texptr + 0x08);
-        info.shY = *(short*)(texptr + 0x0A);
-        info.texoff = texoff;
+        // Build the TexInfo struct
+        TexInfo tex;
+        tex.texoff = texoff;                    // Texture
+        tex.TBP0 = *(short*)(texptr + 0x00);    // TBP0
+        tex.shX = *(short*)(texptr + 0x08);     // shX
+        tex.shY = *(short*)(texptr + 0x0A);     // shY
+        textures.push_back(tex);
 
-        textures.push_back(info);
     }
 
-    //Pass 1: Mark duplicates as unique
+    // Mark duplicates (TBP0 + shX + shY) as unique, i.e, shouldn't be combined.
     for (size_t i = 0; i < textures.size(); ++i)
     {
-        for (size_t j = 0; j < textures.size(); ++j)
+        for (size_t j = i + 1; j < textures.size(); ++j)
         {
-            if (i != j &&
-                textures[i].TBP0 == textures[j].TBP0 &&
+            if (textures[i].TBP0 == textures[j].TBP0 &&
                 textures[i].shX == textures[j].shX &&
                 textures[i].shY == textures[j].shY)
             {
                 textures[i].unique = true;
                 textures[j].unique = true;
+
             }
         }
     }
 
-    //Sort by TBP0
+    // Sort by TBP0 value.
     std::sort(textures.begin(), textures.end(), [](const TexInfo& a, const TexInfo& b) {
         return a.TBP0 < b.TBP0;
         });
 
-    std::map<short, int> offsets; // TBP0 → offset
+    // For non-unique TBP0 values, combine textures canvases into a "ComboTexture"
+    std::map<short, int> sharedCanvasOffsets;
+
+    std::set<short> uniqueTbpSet;
+    for (const auto& tex : textures)
+    {
+        if (tex.unique)
+        {
+            uniqueTbpSet.insert(tex.TBP0);
+        }
+    }
+    for (auto& tex : textures)
+    {
+        if (uniqueTbpSet.count(tex.TBP0) > 0)
+        {
+            tex.unique = true;
+        }
+    }
+    // fix
+
 
     for (size_t t = 0; t < textures.size(); ++t)
     {
         const auto& tex = textures[t];
-        short val = tex.TBP0;
+        int offset;
 
-        // If first time seeing this TBP0, set the offset.
-        if (offsets.find(val) == offsets.end())
+        if (!tex.unique)
         {
-            offsets[val] = tex.texoff + 0x20;
-        }
-
-        // Try to combine
-        bool combined = false;
-        if (!tex.unique && t > 0 && tex.TBP0 == textures[t - 1].TBP0)
-        {
-            const auto& prev = textures[t - 1];
-
-            if (!prev.unique && (tex.shX != 0 || tex.shY != 0 || prev.shX != 0 || prev.shY != 0))
+            if (sharedCanvasOffsets.find(tex.TBP0) != sharedCanvasOffsets.end())
             {
-                // Combine onto previous
-                entries.back() = offsets[val] + baseoff + 0x20000000;
-                combined = true;
+                // Combine onto same canvas
+                offset = sharedCanvasOffsets[tex.TBP0];
+                int combinedEntry = offset + baseoff + 0x20000000; //Value of 0x20000000 is some kind of flag HD assets use. If you use 0x80000000, for example, it replicates the glow on PS2 for textures with certain transparency values.
+                entries.back() = combinedEntry;
+
+                continue;
+            }
+            else
+            {
+                // First texture using this TBP0
+                offset = tex.texoff + 0x20;
+                sharedCanvasOffsets[tex.TBP0] = offset;
+
             }
         }
-
-        if (!combined)
+        else
         {
-            entries.push_back(offsets[val] + baseoff + 0x20000000);
+            // Unique texture: never shares offset
+            offset = tex.texoff + 0x20;
         }
+
+        int entry = offset + baseoff + 0x20000000;
+        entries.push_back(entry);
+
     }
 }
+
 void GetDPXOffsets(void* addr, int baseoff, std::vector<int>& entries)
 {
     int* off = (int*)((char*)addr + *(int*)addr * 0x20 + 4);
