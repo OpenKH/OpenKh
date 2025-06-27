@@ -6,35 +6,50 @@
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="200" />
-        </Grid.ColumnDefinitions>
 
-        <ContentControl x:Name="MeshFrame"/>
+    <Border BorderThickness="1" BorderBrush="LightGray">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
 
-        <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
+            <ContentControl x:Name="MeshFrame"/>
 
-        <DockPanel Grid.Column="2">
-            <!-- Filters -->
-            <StackPanel Visibility="Collapsed" DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
-                <Button Width="100" Click="Button_MoveMeshUp">^</Button>
-                <Button Width="100" Click="Button_MoveMeshDown">V</Button>
-            </StackPanel>
+            <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="2"/>
 
-            <ListView x:Name="List_Meshes" ItemsSource="{Binding Meshes}" SelectedItem="{Binding SelectedMesh}" MouseDoubleClick="list_doubleCLick">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{Binding Path=Name}"/>
-                            <TextBlock Text="{Binding Path=Group.Header.PolygonCount}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+            <DockPanel Grid.Column="2">
+                <!-- Filters -->
+                <StackPanel Visibility="Collapsed" DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
+                    <Button Width="100" Click="Button_MoveMeshUp">^</Button>
+                    <Button Width="100" Click="Button_MoveMeshDown">V</Button>
+                </StackPanel>
 
-        </DockPanel>
-    </Grid>
+                <ListView x:Name="List_Meshes" ItemsSource="{Binding Meshes}" SelectedItem="{Binding SelectedMesh}" SelectionChanged="Meshes_SelectionChanged" >
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Margin" Value="0,0,0,1"/>
+                            <Setter Property="BorderBrush" Value="#22FFFFFF"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="{Binding Path=Name}" FontWeight="Bold"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Polygon Count: " FontSize="12"/>
+                                    <TextBlock Text="{Binding Path=Group.Header.PolygonCount}" FontSize="12"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+            </DockPanel>
+        </Grid>
+    </Border>
+    
 </UserControl>

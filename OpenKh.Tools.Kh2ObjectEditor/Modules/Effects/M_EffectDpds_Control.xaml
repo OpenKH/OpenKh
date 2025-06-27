@@ -17,7 +17,16 @@
 
         <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
 
-        <ListView Grid.Column="2" x:Name="List_Dpds" ItemsSource="{Binding DpdList}" SelectedItem="{Binding SelectedDpd}" MouseDoubleClick="list_doubleCLick">
+        <ListView Grid.Column="2" x:Name="List_Dpds" ItemsSource="{Binding DpdList}" SelectedItem="{Binding SelectedDpd}" SelectionChanged="Dpd_Selected">
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="BorderBrush" Value="#22FFFFFF"/>
+                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                    <Setter Property="Padding" Value="5"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+
             <ListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Copy DPD" Click="Dpd_Copy"/>

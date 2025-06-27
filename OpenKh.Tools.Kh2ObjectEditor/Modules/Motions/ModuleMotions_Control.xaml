@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Views"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="600">
     <Grid>
@@ -16,13 +17,19 @@
         <TabControl Grid.Column="0">
             <TabItem>
                 <TabItem.Header>
-                    <Label>Metadata</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconPhosphorIcons Kind="NoteLight" Height="20"/>
+                        <Label FontWeight="Bold" Margin="5 0">Metadata</Label>
+                    </StackPanel>
                 </TabItem.Header>
                 <ContentControl Name="Frame_Metadata"/>
             </TabItem>
             <TabItem>
                 <TabItem.Header>
-                    <Label>Triggers</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="AutoFix" Height="20"/>
+                        <Label FontWeight="Bold" Margin="5 0">Triggers</Label>
+                    </StackPanel>
                 </TabItem.Header>
                 <ContentControl Name="Frame_Triggers"/>
                 <!--<local:DataViewer_Control Grid.Row="1"/>-->
@@ -38,21 +45,41 @@
             </Grid>
             <!-- Filters -->
             <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10">
-                <Button FontFamily="Marlett" FontSize="20" Content="5" IsEnabled="{Binding AllowMotionMove}" Click="Motion_MoveUp"/>
-                <Button FontFamily="Marlett" FontSize="20" Content="6" IsEnabled="{Binding AllowMotionMove}" Click="Motion_MoveDown"/>
-                <Label Foreground="White" FontWeight="Bold">Filters</Label>
-                <StackPanel Orientation="Horizontal">
-                    <Label Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0">Name:</Label>
-                    <TextBox Name="FilterName" Text="{Binding FilterName}" Width="100" VerticalContentAlignment="Center" PreviewKeyDown="FilterName_PreviewKeyDown" TextChanged="FilterName_TextChanged"></TextBox>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0">Hide Dummies:</Label>
-                    <CheckBox IsChecked="{Binding FilterHideDummies}" VerticalAlignment="Center" Checked="HideDummies_Checked" Unchecked="HideDummies_Unchecked"/>
-                </StackPanel>
+                <Button IsEnabled="{Binding AllowMotionMove}" Click="Motion_MoveUp" HorizontalAlignment="Stretch" BorderBrush="DarkGray" BorderThickness="1">
+                    <iconPacks:PackIconMaterialDesign Kind="ArrowDropUp" />
+                </Button>
+                <Button IsEnabled="{Binding AllowMotionMove}" Click="Motion_MoveDown" HorizontalAlignment="Stretch" BorderBrush="DarkGray" BorderThickness="1">
+                    <iconPacks:PackIconMaterialDesign Kind="ArrowDropDown" />
+                </Button>
+
+                <Border Margin="5" Padding="10" CornerRadius="5" Background="#555555" BorderBrush="White" BorderThickness="1">
+                    <StackPanel>
+                        <Label FontWeight="Bold">Filters</Label>
+                        <Separator Margin="0 0 0 10"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0">Name:</Label>
+                            <TextBox Name="FilterName" Text="{Binding FilterName}" Width="100" VerticalContentAlignment="Center" PreviewKeyDown="FilterName_PreviewKeyDown" TextChanged="FilterName_TextChanged"></TextBox>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0">Hide Dummies:</Label>
+                            <CheckBox IsChecked="{Binding FilterHideDummies}" VerticalAlignment="Center" Checked="HideDummies_Checked" Unchecked="HideDummies_Unchecked"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
             </StackPanel>
 
             <!-- Motion list -->
             <ListView Name="MotionList" ItemsSource="{Binding MotionsView}" SelectedItem="{Binding SelectedMotion}"  MouseDoubleClick="list_doubleCLick">
+
+                <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Margin" Value="0,0,0,1"/>
+                    <Setter Property="BorderBrush" Value="#22FFFFFF"/>
+                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                    <Setter Property="Padding" Value="5"/>
+                </Style>
+                </ListView.ItemContainerStyle>
+
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Rename" Click="Motion_Rename"/>
@@ -75,7 +102,24 @@
                 </ListView.ContextMenu>
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Grid.Column="0" Text="{Binding Path=Name}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" FontWeight="Bold" Content="{Binding IndexString}" VerticalAlignment="Center"></Label>
+                            <StackPanel Grid.Column="1">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label FontSize="12" FontWeight="Bold" Content="{Binding Entry.Name}"></Label>
+                                    <Label FontSize="8" Content="{Binding Tags}" Margin="5 0 0 0"></Label>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal">
+                                    <Label FontSize="12" Content="{Binding MotionName}"></Label>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                        <!--<TextBlock Grid.Column="0" Text="{Binding Path=Name}"/>-->
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

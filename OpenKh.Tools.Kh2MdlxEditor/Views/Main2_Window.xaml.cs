@@ -15,7 +15,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
     {
         // VIEW MODEL
         //-----------------------------------------------------------------------
-        Main2_VM mainVM { get; set; }
+        Main2_VM mainVM { get; set; } = new Main2_VM();
 
         // CONSTRUCTOR
         //-----------------------------------------------------------------------

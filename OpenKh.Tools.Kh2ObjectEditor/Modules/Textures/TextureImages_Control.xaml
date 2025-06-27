@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Modules.Textures"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -17,7 +18,7 @@
             <Canvas.Background>
                 <DrawingBrush TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
                     <DrawingBrush.Drawing>
-                        <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#80000000"/>
+                        <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#80555555"/>
                     </DrawingBrush.Drawing>
                 </DrawingBrush>
             </Canvas.Background>
@@ -31,12 +32,27 @@
 
         <DockPanel Grid.Column="2">
             <!-- Filters -->
-            <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
-                <Button Width="100" Click="Button_MoveTextureUp">Move Up</Button>
-                <Button Width="100" Click="Button_MoveTextureDown">Move Down</Button>
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10">
+
+                <Button IsEnabled="{Binding AllowMotionMove}" Click="Button_MoveTextureUp" HorizontalAlignment="Stretch" BorderBrush="DarkGray" BorderThickness="1">
+                    <iconPacks:PackIconMaterialDesign Kind="ArrowDropUp" />
+                </Button>
+                <Button IsEnabled="{Binding AllowMotionMove}" Click="Button_MoveTextureDown" HorizontalAlignment="Stretch" BorderBrush="DarkGray" BorderThickness="1">
+                    <iconPacks:PackIconMaterialDesign Kind="ArrowDropDown" />
+                </Button>
             </StackPanel>
 
-            <ListView x:Name="List_Textures" ItemsSource="{Binding Textures}" SelectedItem="{Binding SelectedMesh}" MouseDoubleClick="list_doubleCLick">
+            <ListView x:Name="List_Textures" ItemsSource="{Binding Textures}" SelectedItem="{Binding SelectedMesh}" SelectionChanged="Texture_SelectionChanged">
+
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Margin" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="#22FFFFFF"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="Padding" Value="5"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Export as PNG" Click="Texture_Export"/>
@@ -48,11 +64,11 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{Binding Path=Name}"/>
+                            <TextBlock Text="{Binding Path=Name}" FontWeight="Bold"/>
                             <StackPanel Orientation="Horizontal">
-                                <Label Content="{Binding Path=SizeX}"/>
-                                <Label>X</Label>
-                                <Label Content="{Binding Path=SizeY}"/>
+                                <Label FontSize="12" Content="{Binding Path=SizeX}"/>
+                                <Label FontSize="12">X</Label>
+                                <Label FontSize="12" Content="{Binding Path=SizeY}"/>
                             </StackPanel>
                         </StackPanel>
                     </DataTemplate>

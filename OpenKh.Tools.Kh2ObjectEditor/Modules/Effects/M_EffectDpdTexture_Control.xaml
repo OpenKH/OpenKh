@@ -17,7 +17,7 @@
             <Canvas.Background>
                 <DrawingBrush TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
                     <DrawingBrush.Drawing>
-                        <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#10000000"/>
+                        <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#80555555"/>
                     </DrawingBrush.Drawing>
                 </DrawingBrush>
             </Canvas.Background>
@@ -30,7 +30,16 @@
 
         <GridSplitter Grid.Column="1" Background="LightGray" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="5"/>
 
-        <ListView Grid.Column="2" x:Name="List_Textures" ItemsSource="{Binding TextureWrappers}" SelectedItem="{Binding SelectedTexture}" MouseDoubleClick="List_Textures_MouseDoubleClick">
+        <ListView Grid.Column="2" x:Name="List_Textures" ItemsSource="{Binding TextureWrappers}" SelectedItem="{Binding SelectedTexture}" SelectionChanged="EffectImage_Selected">
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="BorderBrush" Value="#22FFFFFF"/>
+                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                    <Setter Property="Padding" Value="5"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+
             <ListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Export as PNG" Click="EffectImage_Export"/>

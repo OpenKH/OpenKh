@@ -9,12 +9,12 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="30" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         <DataGrid Name="DataTable" Grid.Row="0"
                   ItemsSource="{Binding LoadedEntries, Mode=TwoWay}"
                   AutoGenerateColumns="False"
-                  CanUserAddRows="False">
+                  CanUserAddRows="False" GridLinesVisibility="All" HeadersVisibility="Column">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Path=Id}" Header="Id" />
                 <DataGridTextColumn Binding="{Binding Path=EffectNumber}" Header="Effect Number" />
@@ -52,7 +52,7 @@
                 <DataGridTextColumn Binding="{Binding Path=BonePosition.Adjust}" Header="BP Adjust" />
             </DataGrid.Columns>
         </DataGrid>
-        <Button Grid.Row="1" Click="Button_Save">
+        <Button Margin="10" Grid.Row="1" Click="Button_Save" HorizontalAlignment="Right">
             Save Casters
         </Button>
     </Grid>

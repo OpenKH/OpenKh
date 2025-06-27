@@ -20,7 +20,7 @@
         <DataGrid Name="DataTable"
                   AutoGenerateColumns="False"
                   ItemsSource="{Binding Indices}"
-                  CanUserAddRows="True">
+                  CanUserAddRows="True" GridLinesVisibility="All" HeadersVisibility="Column">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Index}" Header="Index" />
             </DataGrid.Columns>
