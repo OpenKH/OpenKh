@@ -452,14 +452,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     Handle(() =>
                     {
-                        foreach (var filePath in Directory.GetFiles(mod.Path, "*", SearchOption.AllDirectories))
-                        {
-                            var attributes = File.GetAttributes(filePath);
-                            if (attributes.HasFlag(FileAttributes.ReadOnly))
-                                File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
-                        }
-
-                        Directory.Delete(mod.Path, true);
+                        ModsService.CleanModFiles(mod.Path);
                         ModsList.RemoveAt(ModsList.IndexOf(SelectedValue));
                     });
                 }
@@ -615,7 +608,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private async Task<bool> BuildPatches(bool fastMode)
         {
             IsBuilding = true;
-            var result = await ModsService.RunPacherAsync(fastMode);
+            var result = await ModsService.RunPatcherAsync(fastMode);
             IsBuilding = false;
 
             return result;
@@ -898,9 +891,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             ModsList = new ObservableCollection<ModViewModel>(
                 ModsService.GetMods(ModsService.Mods).Select(Map));
             OnPropertyChanged(nameof(ModsList));
+            OnPropertyChanged(nameof(ModViewModel.CollectionModsList));
         }
 
-        private ModViewModel Map(ModModel mod) => new ModViewModel(mod, this);
+        private ModViewModel Map(ModModel mod) => new (mod, this);
 
         public void ModEnableStateChanged()
         {

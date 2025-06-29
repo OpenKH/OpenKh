@@ -94,10 +94,12 @@ namespace OpenKh.Patcher
             IDictionary<string, string> packageMap = null,
             string LaunchGame = null,
             string Language = "en",
-            bool Tests = false
+            bool Tests = false,
+            Dictionary<string, bool> collectionOptionalEnabledMods = null
         )
         {
-
+            if (collectionOptionalEnabledMods == null)
+                collectionOptionalEnabledMods = new Dictionary<string, bool> { };
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
             try
             {
@@ -106,11 +108,19 @@ namespace OpenKh.Patcher
                     throw new Exception("No assets found.");
                 if (metadata.Game != null && GamesList.Contains(metadata.Game.ToLower()) && metadata.Game.ToLower() != LaunchGame.ToLower())
                     return;
+                if (metadata.IsCollection && !metadata.CollectionGames.Contains(LaunchGame))
+                    return;
 
                 var exclusiveLock = new object();
-
                 metadata.Assets.AsParallel().ForAll(assetFile =>
                 {
+                    if (assetFile.Game != null && assetFile.Game != LaunchGame)
+                        return;
+                    if (assetFile.CollectionOptional == true)
+                        if (!collectionOptionalEnabledMods.ContainsKey(assetFile.Name))
+                            return;
+                        else if (!collectionOptionalEnabledMods[assetFile.Name])
+                            return;
                     var names = new List<string>();
                     names.Add(assetFile.Name);
                     if (assetFile.Multi != null)
