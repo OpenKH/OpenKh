@@ -1,0 +1,92 @@
+﻿<Window x:Class="KH2FM_Localset_Editor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="KH2FM Localset Editor" Height="600" Width="900"
+        AllowDrop="True" Drop="Window_Drop" DragOver="Window_DragOver">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+
+
+        <!-- File Controls -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10,5">
+            <TextBlock Text="File: " FontWeight="Bold"/>
+            <TextBlock x:Name="FilePathTextBlock" Text="No file loaded"/>
+            <Button x:Name="OpenFileButton" Content="Open File" Margin="20,0,10,0" Click="OpenFile_Click"/>
+            <Button x:Name="SaveFileButton" Content="Save File" Click="SaveFile_Click" IsEnabled="{Binding IsFileLoaded}"/>
+        </StackPanel>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="2" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- World List -->
+            <GroupBox Grid.Column="0" Header="Worlds" Margin="0,0,10,0">
+                <ListBox x:Name="WorldListBox" SelectionChanged="WorldListBox_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Index, StringFormat='{}{0:D2}.'}" Width="25"/>
+                                <TextBlock Text="{Binding Name}"/>
+                                <TextBlock Text="{Binding EntryCount, StringFormat=' ({0})'}" Foreground="Gray"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </GroupBox>
+
+            <!-- Entry Grid -->
+            <GroupBox Grid.Column="1" Header="{Binding SelectedWorld.Name, StringFormat='Entries for {0}'}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Add Entry Button -->
+                    <Button Grid.Row="0" Content="Add New Entry (KH2 Doesn't like it)" 
+                            HorizontalAlignment="Right" Margin="0,0,0,5"
+                            Click="AddEntry_Click" 
+                            IsEnabled="{Binding IsFileLoaded}"/>
+
+                    <DataGrid Grid.Row="1" x:Name="EntryDataGrid" 
+                              AutoGenerateColumns="False" 
+                              CanUserAddRows="False" 
+                              CanUserDeleteRows="False"
+                              GridLinesVisibility="All"
+                              HeadersVisibility="All">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Index" Binding="{Binding Index}" IsReadOnly="True" Width="60"/>
+                            <DataGridTextColumn Header="LocalSet ID" Binding="{Binding ID}" Width="80"/>
+                            <DataGridTextColumn Header="Room ID" Binding="{Binding RoomID}" Width="80"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <TextBlock x:Name="NoDataTextBlock" Grid.Row="1"
+                               Text="No file loaded. Drag and drop a 07localset.bin file here or use the Open File button."
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap"
+                               FontSize="14"
+                               Foreground="Gray"
+                               Visibility="Visible"/>
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <!-- Status Bar -->
+        <StatusBar Grid.Row="3">
+            <StatusBarItem>
+                <TextBlock x:Name="StatusTextBlock" Text=" "/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
