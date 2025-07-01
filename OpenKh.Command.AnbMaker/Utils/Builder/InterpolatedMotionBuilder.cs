@@ -35,7 +35,7 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
             Ipm.InterpolatedMotionHeader.TotalBoneCount = Convert.ToInt16(parm.BoneCount);
             Ipm.InterpolatedMotionHeader.FrameCount = (int)(frameCount * keyTimeMultiplier); // in 1/60 seconds
             Ipm.InterpolatedMotionHeader.FrameData.FrameStart = 0;
-            Ipm.InterpolatedMotionHeader.FrameData.FrameEnd = frameCount - 1;
+            Ipm.InterpolatedMotionHeader.FrameData.FrameEnd = frameCount;
             Ipm.InterpolatedMotionHeader.FrameData.FramesPerSecond = parm.TicksPerSecond;
             Ipm.InterpolatedMotionHeader.BoundingBox = new BoundingBox
             {
@@ -69,11 +69,11 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
 
             short AddKeyValue(float keyValue)
             {
-                var idx = Ipm.KeyValues.IndexOf(keyValue);
+                var idx = Ipm.KeyValues.IndexOf(GetLowerPrecisionValue2(keyValue));
                 if (idx < 0)
                 {
                     idx = Ipm.KeyValues.Count;
-                    Ipm.KeyValues.Add(keyValue);
+                    Ipm.KeyValues.Add(GetLowerPrecisionValue2(keyValue));
                 }
                 return (short)Convert.ToUInt16(idx);
             }
@@ -199,7 +199,7 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                                     .Select(
                                         key => new Key
                                         {
-                                            Type = Interpolation.Hermite,
+                                            Type = Interpolation.Linear,
                                             Time = AddSourceKeyTime(key.Time),
                                             ValueId = AddKeyValue(channel.fixValue(key.Value)),
                                         }
@@ -354,6 +354,11 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
         private static float GetLowerPrecisionValue(float value)
         {
             return (float)Math.Round(value, 2);
+        }
+
+        private static float GetLowerPrecisionValue2(float value)
+        {
+            return (float)Math.Round(value, 3);
         }
 
         private class ChannelProvider
