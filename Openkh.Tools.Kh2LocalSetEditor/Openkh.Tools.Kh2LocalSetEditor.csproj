@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <RootNamespace>KH2FM_Localset_Editor</RootNamespace>
+    <AssemblyName>OpenKh.Tools.Kh2LocalSetEditor</AssemblyName>
+    <UseWPF>true</UseWPF>
+    <ProjectGuid>{D58EEC5B-962C-4888-953B-4A443015E45D}</ProjectGuid>
+  </PropertyGroup>
+
+</Project>
