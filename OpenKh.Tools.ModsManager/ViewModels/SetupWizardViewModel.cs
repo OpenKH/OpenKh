@@ -575,13 +575,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 if (PcReleaseLocation != null && GameCollection == 0)
                 {
-                    return (File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.dll")) || File.Exists(Path.Combine(PcReleaseLocation, "dinput8.dll"))) &&
-                        File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
+                    return File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.dll")) && File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
                 }
                 else if (PcReleaseLocationKH3D != null && GameCollection == 1)
                 {
-                    return (File.Exists(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.dll")) || File.Exists(Path.Combine(PcReleaseLocationKH3D, "dinput8.dll"))) &&
-                        File.Exists(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"));
+                    return File.Exists(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.dll")) && File.Exists(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"));
                 }
                 else
                     return false;
@@ -1204,14 +1202,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             if (File.Exists(Path.Combine(TempExtractionLocation, "DBGHELP.dll")))
                             {
-                                if (Process.GetProcessesByName("winlogon").Length > 0)
-                                {
-                                    File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "LuaBackend.dll"), true);
-                                }
-                                else
-                                {
-                                    File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "dinput8.dll"), true);
-                                }
+                                File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "LuaBackend.dll"), true);
                             }
                             if (File.Exists(Path.Combine(TempExtractionLocation, "LuaBackend.toml")))
                             {
@@ -1538,13 +1529,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         if (GameCollection == 0)
                         {
                             File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.dll"));
-                            File.Delete(Path.Combine(PcReleaseLocation, "dinput8.dll"));
                             File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
                         }
                         else if (GameCollection == 1)
                         {
                             File.Delete(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.dll"));
-                            File.Delete(Path.Combine(PcReleaseLocation, "dinput8.dll"));
                             File.Delete(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"));
                         }
                         OnPropertyChanged(nameof(IsLuaBackendInstalled));
