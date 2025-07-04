@@ -101,6 +101,9 @@
                 <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding RemoveModCommand}" ToolTip="Delete selected mod.">
                     <Image Source="{StaticResource Remove_color_16x}"/>
                 </Button>
+                <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding OpenModSearchCommand}" ToolTip="Search and download mods online.">
+                    <Image Source="{StaticResource Search_16x}"/>
+                </Button>
             </StackPanel>
         </Grid>
         <Grid Grid.Column="3">
