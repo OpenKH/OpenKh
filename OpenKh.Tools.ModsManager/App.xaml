@@ -9,10 +9,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Xe.Tools.Wpf;component/Themes/Generic.xaml"/>
                 <ResourceDictionary Source="Styles/MonoStyleCheckBox.xaml" />
-                <!-- Temporarily removed all icon references -->
-                <!-- <ResourceDictionary Source="pack://application:,,,/Xe.Tools.Wpf;component/Icons/VisualStudioIcons.xaml"/> -->
-                <!-- <ResourceDictionary Source="pack://application:,,,/Xe.Tools.Wpf;component/Icons/RefreshIcons.xaml"/> -->
-                <!-- <ResourceDictionary Source="pack://application:,,,/Xe.Tools.Wpf;component/Icons/SearchIcons.xaml"/> -->
             </ResourceDictionary.MergedDictionaries>
             
             <!-- Converters -->
