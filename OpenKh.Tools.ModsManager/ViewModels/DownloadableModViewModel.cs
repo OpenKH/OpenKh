@@ -16,10 +16,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
     {
         private readonly DownloadableModModel _model;
         private bool _isInstalling;
-        
+
         // Event to notify when mod installation is complete
         public event Action<DownloadableModViewModel> ModInstalled;
-        
+
         public DownloadableModViewModel(DownloadableModModel model)
         {
             _model = model;
@@ -34,7 +34,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public BitmapImage IconImage => _model.IconImage;
         public BitmapImage ScreenshotImage => _model.ScreenshotImageSource;
         public string RepoUrl => $"https://github.com/{_model.Repo}";
-        
+
         public ICommand InstallCommand { get; }
 
         public bool IsInstalling
@@ -69,9 +69,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     window.Show();
                     return window;
                 });
-                
+
                 // Install mod with progress updates
-                await Task.Run(() => ModsService.InstallModFromGithub(Repo, 
+                await Task.Run(() => ModsService.InstallModFromGithub(Repo,
                     progress => {
                         Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
                     },
@@ -79,7 +79,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
                     }
                 ));
-                
+
                 // Notify that the mod was successfully installed
                 ModInstalled?.Invoke(this);
             }
