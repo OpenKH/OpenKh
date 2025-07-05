@@ -454,14 +454,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     Handle(() =>
                     {
-                        foreach (var filePath in Directory.GetFiles(mod.Path, "*", SearchOption.AllDirectories))
-                        {
-                            var attributes = File.GetAttributes(filePath);
-                            if (attributes.HasFlag(FileAttributes.ReadOnly))
-                                File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
-                        }
-
-                        Directory.Delete(mod.Path, true);
+                        ModsService.CleanModFiles(mod.Path);
                         ModsList.RemoveAt(ModsList.IndexOf(SelectedValue));
                     });
                 }
@@ -638,7 +631,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private async Task<bool> BuildPatches(bool fastMode)
         {
             IsBuilding = true;
-            var result = await ModsService.RunPacherAsync(fastMode);
+            var result = await ModsService.RunPatcherAsync(fastMode);
             IsBuilding = false;
 
             return result;
