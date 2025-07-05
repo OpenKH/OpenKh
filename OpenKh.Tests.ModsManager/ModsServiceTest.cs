@@ -1,11 +1,10 @@
-using Moq;
-using Moq.Protected;
 using OpenKh.Tools.ModsManager.Services;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace OpenKh.Tests.ModsManager
 {
+    [Collection("Sequential")]
     public class ModsServiceTest : IDisposable
     {
         private readonly ITestOutputHelper output;
