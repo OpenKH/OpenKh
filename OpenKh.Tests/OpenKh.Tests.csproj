@@ -48,6 +48,7 @@
 
   <ItemGroup>
     <Folder Include="Egs\res\" />
+    <Folder Include="Patcher\res\test_mod_files\" />
   </ItemGroup>
 
 </Project>

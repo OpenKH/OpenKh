@@ -11,8 +11,9 @@ This document will focus on teaching you how to utilize the OpenKH Mod Manager a
 * [1. Intro to Mod Manager](#intro-to-mod-manager)
     * [Installation & Panacea](#installation--panacea)
 * [2. Installing Mods](#installing-mods)
+    * [Mod Collections](#mod-collections)
 * [3. Running the Game With Mods](#running-the-game-with-mods)
-* [4. Additional Functions](#additional-functions)
+* [4. Additional Functions](#additional-functions) 
 * [5. Game Classifications](#game-classifications)
     * [Legacy Class](#legacy-class-kh-games)
     * [Modern Class](#modern-class-kh-games)
@@ -88,6 +89,8 @@ There are two primary methods of installing mods, as you will see when clicking 
 
 Mod authors may publish their mods directly to GitHub, a repository website, or distribute `.zip` archive files containing the same mod contents that would otherwise be identical to the GitHub method.
 
+The one acception to this is a new feature, mod collections, which are currently only supported under GitHub install. See [here](#mod-collections) for details on what a mod collection is!
+
 The aforementioned [Critical Mix](https://www.nexusmods.com/kingdomheartsfinalmix/mods/93) mod is an example of a mod that distributes its contents through an archive. An example of a mod that is distributed through GitHub would be Keytotruth's [Ultimate Mix](https://github.com/Truthkey/BBSUM_Mod) mod for Birth by Sleep.
 
 To install a mod through GitHub, you simply copy the end portion of the mod you wish to install's GitHub URL into the provided line. For example: `Truthkey/BBSUM_Mod`
@@ -99,6 +102,24 @@ Once you have some mods installed, your page will look more like this:
 ![alt text](image-6.png)
 
 You're now free to check or uncheck which mods you wish to play with at any given time! Some mods may overwrite the same entire file. Because of this, OpenKH includes a priority system. Mods higher on the list have higher priority and will take precedence over mods lower in the list. 
+
+### Mod Collections
+
+Mod collections are a new feature allowing creators to group assets for multiple titles into a single GitHub repository and install cross game. In simpler words this means a single GitHub repository install can span from 1 game to all supported games.
+
+The install procss is exactly the same as you would any other GitHub based mod, however once install the mod will appear in the list of mods for any game that is included.
+
+Additionally the creators can now grant control over which files from the mod are required to be installed versus which ones you as the end user can opt into, allowing multiple mods.
+
+You can access the selection of said optional mods from the collection settings button:
+
+![alt text](collection-settings.png)
+
+Which will bring you to the collection settings window:
+
+![alt text](collection-settings-window.png)
+
+From here you can tick the check boxes and the selected mods will be added to the list of files to be installed!
 
 ## Running the Game With Mods
 
@@ -176,7 +197,7 @@ These games are considered "modern class" as opposed to "[legacy class](#legacy-
 * Kingdom Hearts: Melody of Memory
 * Kingdom Hearts IV
 
-### MIscellaneous Class KH Games
+### Miscellaneous Class KH Games
 
 These are games which, at the time of writing, are not considered to be within the scope of OpenKH. However, any and all documentation on these titles are more than welcome, as the preservation of knowledge in this series is the first and foremost goal of OpenKH.
 
