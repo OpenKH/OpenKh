@@ -62,6 +62,17 @@ The mod.yml file is a YAML format specification for your mod. It will contain th
 * `assets` - A list of assets that will be modified when the mod runs. 
   * See [`asset types`](#asset-types), for details on creating an asset. Some asset types will work on any game, while others are game specific.
 
+Additional optional fields for the mod.yml include:
+* `game` - If this mod is for a single specific game you can specify it here to ensure safe install
+* `speciications` -
+* `dependencies` -
+* `isCollection` - Specifies that this is a collection of mods, potentially cross game
+* `collectionGames` - A list of the short hand titles of the games the mod collection covers (accepted values: `kh1`, `kh2`, `bbs`, `Recom`, `kh3d`)
+
+Additional optional fields for Assets:
+* `game` - The game this specific asset belongs to when part of a mod collection
+* `collectionOptional` - Marks the asset as optionally installable, and sets it to show in the collecion settings pane
+
 While you are developing a mod you can create a folder inside the `mods` directory of the mod manager release. I.e.:
 
 `openkh/mods/<authorname>/<modname>`
@@ -980,7 +991,7 @@ To start, here are the steps:
 
 ## Publishing a Mod on GitHub
 
-Mods should be published to a public GitHUb repository, so that users can install the mod just by providing the repository name.
+Mods should be published to a public GitHub repository, so that users can install the mod just by providing the repository name.
 
 It is recommended to apply the following tags to the repository, in order to make it easily found by searching GitHub for mods manager mods:
 
