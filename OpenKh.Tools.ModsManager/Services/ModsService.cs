@@ -298,14 +298,14 @@ namespace OpenKh.Tools.ModsManager.Services
             if (!isValidMod)
                 throw new ModNotValidException(repositoryName);
 
-            var modPaths = new List<string> { 
+            var modPaths = new List<string> {
                 GetModPath(repositoryName),
                 GetCollectionPath(repositoryName),
-                GetModPathGame(repositoryName, "kh1"),
-                GetModPathGame(repositoryName, "kh2"),
-                GetModPathGame(repositoryName, "bbs"),
-                GetModPathGame(repositoryName, "Recom"),
-                GetModPathGame(repositoryName, "kh3d"),
+                GetModsGamePath(repositoryName, "kh1"),
+                GetModsGamePath(repositoryName, "kh2"),
+                GetModsGamePath(repositoryName, "bbs"),
+                GetModsGamePath(repositoryName, "Recom"),
+                GetModsGamePath(repositoryName, "kh3d"),
             };
             if (modPaths.Any(mod => Directory.Exists(mod)))
             {
