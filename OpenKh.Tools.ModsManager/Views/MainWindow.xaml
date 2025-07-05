@@ -61,6 +61,11 @@
         <Menu Grid.Row="0">
             <MenuItem Header="_Mods">
                 <MenuItem Header="_Install a new mod" Command="{Binding AddModCommand}" InputGestureText="Ins"/>
+                <MenuItem Header="Search _Online mods" Command="{Binding OpenModSearchCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource Search_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="_Open mod folder" Command="{Binding OpenModFolderCommand}" InputGestureText="Ctrl+O"/>
                 <MenuItem Header="_Delete selected mod" Command="{Binding RemoveModCommand}" InputGestureText="Del"/>

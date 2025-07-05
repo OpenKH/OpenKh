@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using static OpenKh.Tools.ModsManager.Helpers;
@@ -89,11 +90,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand BuildAndRunCommand { get; set; }
         public RelayCommand StopRunningInstanceCommand { get; set; }
         public RelayCommand WizardCommand { get; set; }
-        public RelayCommand OpenLinkCommand { get; set; }
-        public RelayCommand CheckOpenkhUpdateCommand { get; set; }
-        public RelayCommand OpenPresetMenuCommand { get; set; }
-        public RelayCommand CheckForModUpdatesCommand { get; set; }
-        public RelayCommand YamlGeneratorCommand { get; set; }
+        public ICommand OpenPresetMenuCommand { get; private set; }
+        public ICommand CheckForModUpdatesCommand { get; private set; }
+        public ICommand OpenLinkCommand { get; private set; }
+        public ICommand CheckOpenkhUpdateCommand { get; private set; }
+        public ICommand YamlGeneratorCommand { get; private set; }
+        public ICommand OpenModSearchCommand { get; private set; }
 
         public ModViewModel SelectedValue
         {
@@ -577,6 +579,27 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
             );
 
+            OpenModSearchCommand = new RelayCommand(
+                _ =>
+                {
+                    var searchWindow = new ModSearchWindow(this)
+                    {
+                        Owner = _getActiveWindowService.GetActiveWindow(),
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner
+                    };
+                    searchWindow.Closing += (_, e) =>
+                    {
+                        if (!e.Cancel)
+                        {
+                            searchWindow.Owner?.Focus();
+                            // Reload mods list to show newly installed mods
+                            ReloadModsList();
+                        }
+                    };
+                    searchWindow.Show();
+                }
+            );
+
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
             _ = FetchUpdates();
 
@@ -893,7 +916,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 Log.Info(data);
         }
 
-        private void ReloadModsList()
+        public void ReloadModsList()
         {
             ModsList = new ObservableCollection<ModViewModel>(
                 ModsService.GetMods(ModsService.Mods).Select(Map));
