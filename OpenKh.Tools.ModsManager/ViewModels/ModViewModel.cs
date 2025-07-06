@@ -49,7 +49,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
 
             ReadMetadata();
-            if (FilesToPatch != "")
+            if (IsCollection)
             {
                 ReloadCollectionModsList();
                 CollectionSelectedValue = CollectionModsList.FirstOrDefault();
