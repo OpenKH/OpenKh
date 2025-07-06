@@ -466,14 +466,17 @@ namespace OpenKh.Tools.ModsManager.Services
                 var metadata = GetMetadata(modPath);
                 if (isCollection && !metadata.IsCollection)
                     await MoveFromCollection(modName);
-                else if (!isCollection && metadata.IsCollection && !Directory.Exists(GetCollectionPath(modName)))
-                    await MoveToCollection(modName);
+                else if (!isCollection && metadata.IsCollection)
+                    if (!Directory.Exists(GetCollectionPath(modName)))
+                        await MoveToCollection(modName);
+                    else
+                        await CleanModFiles(modName);
                 if (updateCount > 0)
-                    yield return new ModUpdateModel
-                    {
-                        Name = modName,
-                        UpdateCount = updateCount
-                    };
+                        yield return new ModUpdateModel
+                        {
+                            Name = modName,
+                            UpdateCount = updateCount
+                        };
             }
         }
 
