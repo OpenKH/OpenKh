@@ -18,7 +18,7 @@ namespace OpenKh.Tests.ModsManager
         {
             try
             {
-                DeleteDir(Path.Combine(ConfigurationService.ModCollectionPath, "test"));
+                DeleteDir(Path.Combine(ConfigurationService.ModsGamePath, "test"));
             }
             catch (Exception e)
             {
@@ -45,7 +45,7 @@ namespace OpenKh.Tests.ModsManager
 
         private void AddMod()
         {
-            var modDir = ConfigurationService.ModCollectionPath;
+            var modDir = ConfigurationService.ModsGamePath;
             Directory.CreateDirectory(Path.Combine(modDir, "test/test"));
             using (File.Create(Path.Combine(modDir, "test/test/mod.yml"))) { }
         }
@@ -81,10 +81,10 @@ namespace OpenKh.Tests.ModsManager
 
             Directory.Delete(target, false);
         }
-        
+
         [Fact]
         public void ModsServiceNoModsTest()
-	    {            
+	    {
             var mods = ModsService.Mods;
             Assert.Empty(mods);
         }

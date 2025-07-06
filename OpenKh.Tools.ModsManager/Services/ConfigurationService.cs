@@ -98,7 +98,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
         static ConfigurationService()
         {
-            string modsPath = Path.GetFullPath(Path.Combine(ModCollectionPath, ".."));
+            string modsPath = Path.GetFullPath(Path.Combine(ModsGamePath, ".."));
             if (!Directory.Exists(Path.Combine(modsPath, "collections")))
                 Directory.CreateDirectory(Path.Combine(modsPath, "collections"));
             if (!Directory.Exists(Path.Combine(modsPath, "kh2")))
@@ -183,7 +183,7 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             get
             {
-                var optionsJson = ""; 
+                var optionsJson = "";
                 switch (LaunchGame)
                 {
                     case "kh1":
@@ -241,7 +241,7 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        public static string ModCollectionPath
+        public static string ModsGamePath
         {
             get => _config.ModCollectionPath ?? Path.GetFullPath(Path.Combine(StoragePath, "mods", LaunchGame));
             set

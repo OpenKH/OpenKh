@@ -62,7 +62,7 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             get
             {
-                var modsPath = ConfigurationService.ModCollectionPath;
+                var modsPath = ConfigurationService.ModsGamePath;
                 foreach (var dir in Directory.GetDirectories(modsPath))
                 {
                     var authorName = Path.GetFileName(dir);
@@ -298,14 +298,14 @@ namespace OpenKh.Tools.ModsManager.Services
             if (!isValidMod)
                 throw new ModNotValidException(repositoryName);
 
-            var modPaths = new List<string> { 
+            var modPaths = new List<string> {
                 GetModPath(repositoryName),
                 GetCollectionPath(repositoryName),
-                GetModPathGame(repositoryName, "kh1"),
-                GetModPathGame(repositoryName, "kh2"),
-                GetModPathGame(repositoryName, "bbs"),
-                GetModPathGame(repositoryName, "Recom"),
-                GetModPathGame(repositoryName, "kh3d"),
+                GetModsGamePath(repositoryName, "kh1"),
+                GetModsGamePath(repositoryName, "kh2"),
+                GetModsGamePath(repositoryName, "bbs"),
+                GetModsGamePath(repositoryName, "Recom"),
+                GetModsGamePath(repositoryName, "kh3d"),
             };
             if (modPaths.Any(mod => Directory.Exists(mod)))
             {
@@ -421,13 +421,10 @@ namespace OpenKh.Tools.ModsManager.Services
             File.WriteAllText(_yamlPath, yaml);
         }
 
-        public static string GetModPath(string author, string repo) =>
-            Path.Combine(ConfigurationService.ModCollectionPath, author, repo);
-
         public static string GetModPath(string repositoryName) =>
-            Path.Combine(ConfigurationService.ModCollectionPath, repositoryName);
-        public static string GetModPathGame(string repositoryName, string game) =>
-            Path.Combine(ConfigurationService.ModCollectionPath, "..", game, repositoryName);
+            Path.Combine(ConfigurationService.ModsGamePath, repositoryName);
+        public static string GetModsGamePath(string repositoryName, string game) =>
+            Path.Combine(ConfigurationService.ModsGamePath, "..", game, repositoryName);
         public static string GetCollectionPath(string repositoryName) =>
             Path.Combine(ConfigurationService.ModCollectionsPath, repositoryName);
 
@@ -611,8 +608,8 @@ namespace OpenKh.Tools.ModsManager.Services
             var metadata = GetMetadata(modPath);
             if (metadata.Game != null)
             {
-                var gamePath = GetModPathGame(modName, metadata.Game);
-                var authorPath = GetModPathGame(modName.Split("/")[0], metadata.Game);
+                var gamePath = GetModsGamePath(modName, metadata.Game);
+                var authorPath = GetModsGamePath(modName.Split("/")[0], metadata.Game);
                 if (!Directory.Exists(authorPath))
                     Directory.CreateDirectory(authorPath);
                 Directory.Move(modPath, gamePath);
@@ -628,7 +625,7 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             foreach (var game in new List<string> { "kh1", "kh2", "bbs", "Recom", "kh3d" })
             {
-                var modPath = GetModPathGame(modName, game);
+                var modPath = GetModsGamePath(modName, game);
                 if (Directory.Exists(modPath))
                     CleanModFiles(modPath);
             }
