@@ -653,26 +653,29 @@ namespace OpenKh.Tools.ModsManager.Services
         public static IEnumerable<CollectionModModel> GetCollectionOptionalMods(ModModel mod)
         {
             var enabledMods = ConfigurationService.EnabledCollectionMods;
-            foreach (var asset in mod.Metadata.Assets)
+            if (enabledMods.Count > 0)
             {
-                if (!asset.CollectionOptional)
-                    continue;
-                var enabled = false;
-                if (enabledMods.ContainsKey(mod.Name))
+                foreach (var asset in mod.Metadata.Assets)
                 {
-                    if (enabledMods[mod.Name].ContainsKey(asset.Name))
-                        enabled = enabledMods[mod.Name][asset.Name];
-                    else
-                        enabledMods[mod.Name][asset.Name] = false;
+                    if (!asset.CollectionOptional)
+                        continue;
+                    var enabled = false;
+                    if (enabledMods.ContainsKey(mod.Name))
+                    {
+                        if (enabledMods[mod.Name].ContainsKey(asset.Name))
+                            enabled = enabledMods[mod.Name][asset.Name];
+                        else
+                            enabledMods[mod.Name][asset.Name] = false;
+                    }
+                    yield return new CollectionModModel
+                    {
+                        Name = asset.Name,
+                        Author = mod.Metadata.OriginalAuthor,
+                        IsEnabled = enabled
+                    };
                 }
-                yield return new CollectionModModel
-                {
-                    Name = asset.Name,
-                    Author = mod.Metadata.OriginalAuthor,
-                    IsEnabled = enabled
-                };
+                ConfigurationService.EnabledCollectionMods = enabledMods;
             }
-            ConfigurationService.EnabledCollectionMods = enabledMods;
         }
     }
 }
