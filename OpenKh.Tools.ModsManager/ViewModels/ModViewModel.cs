@@ -118,6 +118,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 view.DataContext = this;
                 if (view.ShowDialog() != true)
                 {
+                    if (!ConfigurationService.EnabledCollectionMods.ContainsKey(_model.Name))
+                    {
+                        var temp = ConfigurationService.EnabledCollectionMods;
+                        temp[_model.Name] = new Dictionary<string, bool> { };
+                        ConfigurationService.EnabledCollectionMods = temp;
+                    }
                     _model.CollectionOptionalEnabledAssets = ConfigurationService.EnabledCollectionMods[_model.Name];
                     FilesToPatch = string.Join('\n', GetFilesToPatch());
                     return;
