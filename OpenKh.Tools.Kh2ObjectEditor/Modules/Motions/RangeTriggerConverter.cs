@@ -20,7 +20,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is string stringValue && parameter is Dictionary<byte, string> dictionary)
+            if (value is string stringValue)
             {
                 foreach (var kvp in TriggerDictionary.Range)
                 {
