@@ -1,4 +1,5 @@
 using Microsoft.Win32;
+using ModernWpf;
 using OpenKh.AssimpUtils;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.Wpf;
@@ -69,6 +70,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
         public Main_Window()
         {
             InitializeComponent();
+            ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
         }
 
         private void Window_Drop(object sender, DragEventArgs e)
