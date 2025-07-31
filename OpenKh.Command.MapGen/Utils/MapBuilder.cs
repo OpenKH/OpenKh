@@ -51,7 +51,7 @@ namespace OpenKh.Command.MapGen.Utils
             }
             else if (config.disableBSPCollisionBuilder)
             {
-                logger.Debug($"Running flatten doct builder.");
+                logger.Debug($"Running flatten doct builder (Legacy.)");
 
                 doctBuilt = new FlattenDoctBuilder(
                     new BSPNodeSplitter(
@@ -68,9 +68,9 @@ namespace OpenKh.Command.MapGen.Utils
             }
             else if (config.disableBSPCollisionBuilder2)
             {
-                logger.Debug($"Running flatten doct builder.");
+                logger.Debug($"Running flatten doct builder (with group support.)");
 
-                doctBuilt = new FlattenDoctBuilder(
+                doctBuilt = new FlattenDoctBuilderAlt(
                     new BSPNodeSplitter(
                         singleFaces
                             .Where(it => !it.matDef.nodraw),
