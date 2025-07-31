@@ -70,8 +70,7 @@ namespace OpenKh.Command.MapGen.Utils
                     // Extract bounding box
                     var bbox = GetBoundingBoxOf(faces);
 
-                    // Determine flags:
-                    // - if group starts with "g", use it as special group (high bit set maybe?)
+                    // - if group starts with "g", use it as special group to be able to be hidden with MapVisibility.
                     // - else fallback to attribute flags
                     var key = group.Key;
                     uint flags;
@@ -80,8 +79,8 @@ namespace OpenKh.Command.MapGen.Utils
                     {
                         var groupId = int.Parse(key.Substring(1));
                         var floorLevel = faces[0].matDef.floorLevel;
-
-                        flags = 0x00000000 | ((uint)groupId << 8) | ((uint)floorLevel << 16); //Shift group to +0x01 position, since its stored as a 4-byte value and not 4, independent values.
+                        //What's known as "flags" is really a set of 4 bytes known as Visible, Group, floorLevel, & padding. Bitshift to accomodate the improper DOCT class.
+                        flags = 0x00000000 | ((uint)groupId << 8) | ((uint)floorLevel << 16); //Shift group to +0x01 & +0x02 position, since its stored as a 4-byte value and not 4, independent values.
                     }
                     else
                     {
