@@ -51,7 +51,7 @@ namespace OpenKh.Command.MapGen.Utils
             }
             else if (config.disableBSPCollisionBuilder)
             {
-                logger.Debug($"Running flatten doct builder.");
+                logger.Debug($"Running flatten doct builder (Legacy.)");
 
                 doctBuilt = new FlattenDoctBuilder(
                     new BSPNodeSplitter(
@@ -68,9 +68,9 @@ namespace OpenKh.Command.MapGen.Utils
             }
             else if (config.disableBSPCollisionBuilder2)
             {
-                logger.Debug($"Running flatten doct builder.");
+                logger.Debug($"Running flatten doct builder (with group support.)");
 
-                doctBuilt = new FlattenDoctBuilder(
+                doctBuilt = new FlattenDoctBuilderAlt(
                     new BSPNodeSplitter(
                         singleFaces
                             .Where(it => !it.matDef.nodraw),
@@ -226,15 +226,30 @@ namespace OpenKh.Command.MapGen.Utils
                         }
                     );
 
-                    return config.disableBSPCollisionBuilder
-                        ? new FlattenCollisionBuilder(
-                            splitter,
-                            matDef => matDef.surfaceFlags
-                        )
-                        : new HierarchicalCollisionBuilder(
+                    if (config.disableBSPCollisionBuilder2)
+                    {
+                        // Use the logic for the "group" value when disableBSPCollisionBuilder2 is set
+                        return new FlattenCollisionBuilderAlt(
                             splitter,
                             matDef => matDef.surfaceFlags
                         );
+                    }
+                    else if (config.disableBSPCollisionBuilder)
+                    {
+                        // Use the existing logic for disabling BSP collision builder
+                        return new FlattenCollisionBuilder(
+                            splitter,
+                            matDef => matDef.surfaceFlags
+                        );
+                    }
+                    else
+                    {
+                        // Default to the hierarchical collision builder
+                        return new HierarchicalCollisionBuilder(
+                            splitter,
+                            matDef => matDef.surfaceFlags
+                        );
+                    }
                 }
 
                 {
