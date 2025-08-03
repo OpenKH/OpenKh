@@ -188,6 +188,7 @@ namespace OpenKh.Kh2
         {
             Stream fileStream = new MemoryStream();
 
+            Header.ElementCount = Elements.Count;
             Header.DebugInfoOffset = 16 + 80 * Elements.Count;
             Header.DpxOffset = Header.DebugInfoOffset + 128;
 
