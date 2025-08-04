@@ -377,8 +377,24 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
             AutoUpdateMods = ConfigurationService.AutoUpdateMods;
 
-            Log.OnLogDispatch += (long ms, string tag, string message) =>
-                _debuggingWindow.Log(ms, tag, message);
+            try
+            {
+                Log.OnLogDispatch += (long ms, string tag, string message) =>
+                    _debuggingWindow.Log(ms, tag, message);
+            }
+            catch
+            {
+                Process[] runningProcesses = Process.GetProcesses();
+                foreach (Process process in runningProcesses)
+                {
+                    if (process.ProcessName == "OpenKh.Tools.ModsManager" && process.Id != Process.GetCurrentProcess().Id)
+                    {
+                        process.Kill(true);
+                    }
+                }
+                System.Windows.Forms.Application.Restart();
+                Process.GetCurrentProcess().Kill();
+            }
 
             ReloadModsList();
             SelectedValue = ModsList.FirstOrDefault();
