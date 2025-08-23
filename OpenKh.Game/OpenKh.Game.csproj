@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <InformationalVersion>0.0.0.0-local</InformationalVersion>
+    <InformationalVersion>25.02.10.0-local</InformationalVersion>
     <ApplicationIcon />
     <StartupObject />
-  </PropertyGroup>
+  <AssemblyVersion>25.02.10.0</AssemblyVersion><FileVersion>25.02.10.0</FileVersion><Version>25.02.10.0-local</Version><Authors>OpenKH contributors</Authors><Company>OpenKH</Company><Copyright>Copyright (C) OpenKH </Copyright><Description>https://github.com/OpenKH/OpenKh</Description></PropertyGroup>
 
   <ItemGroup>
     <MonoGameContentReference Include="**\*.mgcb" />
