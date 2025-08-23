@@ -1,6 +1,7 @@
 using OpenKh.Kh2.Extensions;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Numerics;
 using Xe.BinaryMapper;
 
@@ -60,7 +61,19 @@ namespace OpenKh.Kh2.Utils
             return new BoundingBox(min, max);
         }
 
-        public override string ToString() => $"Minimum: {Minimum} Maximum: {Maximum}";
+        public override string ToString() // If I just do a ToString() on the Vector3, it will not format it correctly between , and .
+        {
+            return string.Format(
+        CultureInfo.InvariantCulture,
+        "Minimum: <{0}, {1}, {2}> Maximum: <{3}, {4}, {5}>",
+        Minimum.X,
+        Minimum.Y,
+        Minimum.Z,
+        Maximum.X,
+        Maximum.Y,
+        Maximum.Z
+    );
+        }
 
         public BoundingBoxInt16 ToBoundingBoxInt16()
         {
