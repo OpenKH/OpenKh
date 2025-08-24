@@ -65,7 +65,7 @@ namespace OpenKh.Bbs
         public TableOffsetHeader tableOffsetHeader = new();
         public List<StreamHeader> StreamHeaders = [];
         public List<byte[]> StreamFiles = [];
-        public List<byte[]> MediaFiles = [];
+        public List<byte[]> MediaFiles = []; //6 = .ogg file, everything else is a .wav with msadpcm codec, throw it at ffmpeg /shrug
 
         public static Scd Read(Stream stream)
         {
