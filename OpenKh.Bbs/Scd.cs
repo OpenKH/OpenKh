@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Xe.BinaryMapper;
 using System.IO;
+using System.Linq;
 using OpenKh.Common;
 
 namespace OpenKh.Bbs
