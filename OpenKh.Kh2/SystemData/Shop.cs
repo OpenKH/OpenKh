@@ -1,9 +1,6 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.SystemData
@@ -61,7 +58,7 @@ namespace OpenKh.Kh2.SystemData
                 InventoryCount = InventoryCount,
                 ShopID = ShopID,
                 Unk19 = Unk19,
-                InventoryStartIndex = (uint)((InventoryOffset - InventoriesBaseOffset) / 8),
+                InventoryStartIndex = (uint)((InventoryOffset - InventoriesBaseOffset) / InventoryEntrySize),
             };
 
             public static List<ShopEntry> Read(Stream stream, int count) => BaseList<ShopEntry>.Read(stream, count).ToList();
@@ -80,7 +77,7 @@ namespace OpenKh.Kh2.SystemData
                 InventoryIndex = InventoryIndex,
                 UnlockEventID = UnlockEventID,
                 ProductCount = ProductCount,
-                ProductStartIndex = (uint)((ProductOffset - ProductsBaseOffset) / 2)
+                ProductStartIndex = (uint)((ProductOffset - ProductsBaseOffset) / ProductEntrySize)
             };
 
             public static List<InventoryEntry> Read(Stream stream, int count) => BaseList<InventoryEntry>.Read(stream, count).ToList();
@@ -152,7 +149,7 @@ namespace OpenKh.Kh2.SystemData
                 InventoryCount = InventoryCount,
                 ShopID = ShopID,
                 Unk19 = Unk19,
-                InventoryOffset = (ushort)(InventoriesBaseOffset + InventoryStartIndex * 8),
+                InventoryOffset = (ushort)(InventoriesBaseOffset + InventoryStartIndex * InventoryEntrySize),
                 Reserved = 0
             };
         }
@@ -168,7 +165,7 @@ namespace OpenKh.Kh2.SystemData
             {
                 UnlockEventID = UnlockEventID,
                 ProductCount = ProductCount,
-                ProductOffset  = (ushort)(ProductsBaseOffset + ProductStartIndex * 2),
+                ProductOffset  = (ushort)(ProductsBaseOffset + ProductStartIndex * ProductEntrySize),
                 Reserved = 0
             };
         }
@@ -186,10 +183,10 @@ namespace OpenKh.Kh2.SystemData
 
         public class ShopHelper
         {
-            public List<ShopEntryHelper> ShopEntryHelpers;
-            public List<InventoryEntryHelper> InventoryEntryHelpers;
-            public List<ProductEntryHelper> ProductEntryHelpers;
-            public List<ProductEntryHelper> ValidProductEntryHelpers;
+            public List<ShopEntryHelper> ShopEntryHelpers { get; set; }
+            public List<InventoryEntryHelper> InventoryEntryHelpers { get; set; }
+            public List<ProductEntryHelper> ProductEntryHelpers { get; set; }
+            public List<ProductEntryHelper> ValidProductEntryHelpers { get; set; }
         }
 
         public static Shop Read(Stream stream)
@@ -198,12 +195,18 @@ namespace OpenKh.Kh2.SystemData
                 throw new InvalidDataException($"Read or seek must be supported.");
 
             ShopHeader header = ShopHeader.Read(stream);
+
+            if (header.MagicCode != MagicCode)
+                throw new InvalidDataException($"Invalid shop magic 0x{header.MagicCode:X8} (expected 0x{MagicCode:X8}).");
+            if (header.FileType != FileType)
+                throw new InvalidDataException($"Invalid shop file type 0x{header.FileType:X4} (expected 0x{FileType:X4}).");
+
             var shop = new Shop()
             {
                 ShopEntries = ShopEntry.Read(stream, header.ShopEntryCount),
                 InventoryEntries = InventoryEntry.Read(stream, header.InventoryEntryCount),
                 ProductEntries = ProductEntry.Read(stream, header.ProductEntryCount),
-                ValidProductEntries = ProductEntry.Read(stream, (int)((stream.Length - header.ValidProductsOffset) / 2))
+                ValidProductEntries = ProductEntry.Read(stream, (int)((stream.Length - header.ValidProductsOffset) / ProductEntrySize))
             };
             return shop;
         }

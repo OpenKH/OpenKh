@@ -19,7 +19,7 @@ This document will focus on teaching you how to create mods using the OpenKH Mod
       * [trsr](#trsr-source-example)
       * [cmd](#cmd-source-example)
       * [item](#item-source-example)
-	  * [shop](#shop-source-example)
+      * [shop](#shop-source-example)
       * [sklt](#sklt-source-example)
       * [arif](#arif-source-example)
       * [memt](#memt-source-example)
