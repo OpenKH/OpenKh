@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <LangVersion>latest</LangVersion>
     <UseWPF>true</UseWPF>
-  </PropertyGroup>
+  <AssemblyVersion>25.02.10.0</AssemblyVersion><FileVersion>25.02.10.0</FileVersion><Version>25.02.10.0-local</Version><InformationalVersion>25.02.10.0-local</InformationalVersion><Authors>OpenKH contributors</Authors><Company>OpenKH</Company><Copyright>Copyright (C) OpenKH </Copyright><Description>https://github.com/OpenKH/OpenKh</Description></PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />

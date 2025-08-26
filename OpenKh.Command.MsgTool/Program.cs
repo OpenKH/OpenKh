@@ -46,7 +46,7 @@ namespace OpenKh.Command.MsgTool
         public string Input { get; }
 
         [Required]
-        [AllowedValues("eusys", "euevt", "jpsys", "jpevt")]
+        [McMaster.Extensions.CommandLineUtils.AllowedValues("eusys", "euevt", "jpsys", "jpevt")]
         [Option(ShortName = "e", LongName = "encoder", Description = "Specify which encoder should be used")]
         public string Encoder { get; }
 
