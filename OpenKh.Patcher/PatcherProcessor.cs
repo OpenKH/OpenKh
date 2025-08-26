@@ -94,10 +94,12 @@ namespace OpenKh.Patcher
             IDictionary<string, string> packageMap = null,
             string LaunchGame = null,
             string Language = "en",
-            bool Tests = false
+            bool Tests = false,
+            Dictionary<string, bool> collectionOptionalEnabledMods = null
         )
         {
-
+            if (collectionOptionalEnabledMods == null)
+                collectionOptionalEnabledMods = new Dictionary<string, bool> { };
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
             try
             {
@@ -106,11 +108,19 @@ namespace OpenKh.Patcher
                     throw new Exception("No assets found.");
                 if (metadata.Game != null && GamesList.Contains(metadata.Game.ToLower()) && metadata.Game.ToLower() != LaunchGame.ToLower())
                     return;
+                if (metadata.IsCollection && !metadata.CollectionGames.Contains(LaunchGame))
+                    return;
 
                 var exclusiveLock = new object();
-
                 metadata.Assets.AsParallel().ForAll(assetFile =>
                 {
+                    if (assetFile.Game != null && assetFile.Game != LaunchGame)
+                        return;
+                    if (assetFile.CollectionOptional == true)
+                        if (!collectionOptionalEnabledMods.ContainsKey(assetFile.Name))
+                            return;
+                        else if (!collectionOptionalEnabledMods[assetFile.Name])
+                            return;
                     var names = new List<string>();
                     names.Add(assetFile.Name);
                     if (assetFile.Multi != null)
@@ -862,18 +872,16 @@ namespace OpenKh.Patcher
                     case "objentry":
                         var objEntryList = Kh2.Objentry.Read(stream).ToDictionary(x => x.ObjectId, x => x);
                         var moddedObjEntry = deserializer.Deserialize<Dictionary<uint, Kh2.Objentry>>(sourceText);
+
                         foreach (var objEntry in moddedObjEntry)
                         {
-                            if (objEntryList.ContainsKey(objEntry.Key))
-                            {
-                                objEntryList[objEntry.Key] = objEntry.Value;
-                            }
-                            else
-                            {
-                                objEntryList.Add(objEntry.Key, objEntry.Value);
-                            }
+                            objEntryList[objEntry.Key] = objEntry.Value; // Add or overwrite
                         }
-                        Kh2.Objentry.Write(stream.SetPosition(0), objEntryList.Values);
+
+                        // Sort final list by ObjId before writing
+                        var sortedEntries = objEntryList.Values.OrderBy(x => x.ObjectId).ToList();
+
+                        Kh2.Objentry.Write(stream.SetPosition(0), sortedEntries);
                         break;
 
                     case "plrp":
@@ -985,6 +993,31 @@ namespace OpenKh.Patcher
                         }
 
                         Kh2.Battle.Enmp.Write(stream.SetPosition(0), enmpList);
+                        break;
+
+                    case "shop":
+                        var shop = Kh2.SystemData.Shop.Read(stream);
+                        var moddedShop = deserializer.Deserialize<Kh2.SystemData.Shop.ShopHelper>(sourceText);
+                        ushort inventoriesBaseOffset = (ushort)(Kh2.SystemData.Shop.HeaderSize + shop.ShopEntries.Count * Kh2.SystemData.Shop.ShopEntrySize);
+                        ushort productsBaseOffset = (ushort)(inventoriesBaseOffset + shop.InventoryEntries.Count * Kh2.SystemData.Shop.InventoryEntrySize);
+                        foreach (var shopEntryHelper in moddedShop.ShopEntryHelpers)
+                        {
+                            var entryIndex = shop.ShopEntries.FindIndex(x => x.ShopID == shopEntryHelper.ShopID);
+                            shop.ShopEntries[entryIndex] = shopEntryHelper.ToShopEntry(inventoriesBaseOffset);
+                        }
+                        foreach (var inventoryEntryHelper in moddedShop.InventoryEntryHelpers)
+                        {
+                            shop.InventoryEntries[inventoryEntryHelper.InventoryIndex] = inventoryEntryHelper.ToInventoryEntry(productsBaseOffset);
+                        }
+                        foreach (var productEntryHelper in moddedShop.ProductEntryHelpers)
+                        {
+                            shop.ProductEntries[productEntryHelper.ProductIndex] = productEntryHelper.ToProductEntry();
+                        }
+                        foreach (var productEntryHelper in moddedShop.ValidProductEntryHelpers)
+                        {
+                            shop.ValidProductEntries[productEntryHelper.ProductIndex] = productEntryHelper.ToProductEntry();
+                        }
+                        Kh2.SystemData.Shop.Write(stream.SetPosition(0), shop);
                         break;
 
                     case "sklt":
@@ -1263,14 +1296,15 @@ namespace OpenKh.Patcher
 
                             if (definition != null)
                             {
-                                definition.Unknown = patch.Unknown;
+                                definition.Type = patch.Type;
 
                                 var contentList = new List<Libretto.TalkMessageContent>();
                                 foreach (var contentPatch in patch.Contents)
                                 {
                                     contentList.Add(new Libretto.TalkMessageContent
                                     {
-                                        Unknown1 = contentPatch.Unknown1,
+                                        CodeType = contentPatch.CodeType,
+                                        Unknown = contentPatch.Unknown,
                                         TextId = contentPatch.TextId
                                     });
                                 }
@@ -1281,7 +1315,7 @@ namespace OpenKh.Patcher
                                 var newDefinition = new Libretto.TalkMessageDefinition
                                 {
                                     TalkMessageId = patch.TalkMessageId,
-                                    Unknown = patch.Unknown,
+                                    Type = patch.Type,
                                     ContentPointer = 0 // Will update this later after adding content entries
                                 };
 
@@ -1293,7 +1327,8 @@ namespace OpenKh.Patcher
                                 {
                                     contentList.Add(new Libretto.TalkMessageContent
                                     {
-                                        Unknown1 = contentPatch.Unknown1,
+                                        CodeType = contentPatch.CodeType,
+                                        Unknown = contentPatch.Unknown,
                                         TextId = contentPatch.TextId
                                     });
                                 }
@@ -1330,14 +1365,28 @@ namespace OpenKh.Patcher
                                 var memtEntry = memtEntries[patch.Index];
                                 memtEntry.WorldId = patch.WorldId;
                                 memtEntry.CheckStoryFlag = patch.CheckStoryFlag;
-                                memtEntry.CheckStoryFlagNegation = patch.CheckStoryFlagNegation;
-                                memtEntry.Unk06 = patch.Unk06;
-                                memtEntry.Unk08 = patch.Unk08;
-                                memtEntry.Unk0A = patch.Unk0A;
-                                memtEntry.Unk0C = patch.Unk0C;
-                                memtEntry.Unk0E = patch.Unk0E;
-                                memtEntry.Members = patch.Members.ToArray();
+                                if (!string.IsNullOrWhiteSpace(patch.FlagForWorld))
+                                {
+                                    if (!worldIndexMap.TryGetValue(patch.FlagForWorld.Replace(" ", "").ToLower(), out var worldId))
+                                        throw new Exception($"Unknown world name '{patch.FlagForWorld}' in CheckStoryFlagWorld.");
 
+                                    memtEntry.CheckStoryFlag += (short)(worldId * 1024);
+                                }
+
+                                memtEntry.CheckStoryFlagNegation = patch.CheckStoryFlagNegation;
+                                if (!string.IsNullOrWhiteSpace(patch.NegationFlagForWorld))
+                                {
+                                    if (!worldIndexMap.TryGetValue(patch.NegationFlagForWorld.Replace(" ", "").ToLower(), out var worldId))
+                                        throw new Exception($"Unknown world name '{patch.NegationFlagForWorld}' in CheckStoryFlagNegationWorld.");
+
+                                    memtEntry.CheckStoryFlagNegation += (short)(worldId * 1024);
+                                }
+                                memtEntry.CheckArea = patch.CheckArea;
+                                memtEntry.Padding = patch.Padding;
+                                memtEntry.PlayerSize = patch.PlayerSize;
+                                memtEntry.FriendSize = patch.FriendSize;
+
+                                memtEntry.Members = patch.Members.ToArray();
                                 memtEntries[patch.Index] = memtEntry;
                             }
 

@@ -877,6 +877,239 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
+        public void ListPatchShopTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "03system.bin",
+                        Method = "binarc",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "shop",
+                                Method = "listpatch",
+                                Type = "Unknown41",
+                                Source = new List<AssetFile>
+                                {
+                                    new AssetFile
+                                    {
+                                        Name = "ShopList.yml",
+                                        Type = "shop"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "03system.bin")).Using(stream =>
+            {
+                var shop = new OpenKh.Kh2.SystemData.Shop
+                {
+                    ShopEntries = new List<OpenKh.Kh2.SystemData.Shop.ShopEntry>
+                    {
+                        new OpenKh.Kh2.SystemData.Shop.ShopEntry
+                        {
+                            CommandArgument = 0x0067,
+                            UnlockMenuFlag = 0x0029,
+                            NameID = 0x8AB8,
+                            ShopKeeperEntityID = 0x0539,
+                            PosX = 0x008B,
+                            PosY = 0x006C,
+                            PosZ = -576, //0xFDC0,
+                            ExtraInventoryBitMask = 0x81,
+                            SoundID = 0x01,
+                            InventoryCount = 0x0001,
+                            ShopID = 0x00,
+                            Unk19 = 0x02,
+                            InventoryOffset = 0x0028,
+                            Reserved = 0x00
+                        }
+                    },
+                    InventoryEntries = new List<OpenKh.Kh2.SystemData.Shop.InventoryEntry>
+                    {
+                        new OpenKh.Kh2.SystemData.Shop.InventoryEntry
+                        {
+                            UnlockEventID = 0xFFFF,
+                            ProductCount = 0x0002,
+                            ProductOffset = 0x0030,
+                            Reserved = 0x00
+                        }
+                    },
+                    ProductEntries = new List<OpenKh.Kh2.SystemData.Shop.ProductEntry>
+                    {
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x0094
+                        },
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x008B
+                        },
+                    },
+                    ValidProductEntries = new List<OpenKh.Kh2.SystemData.Shop.ProductEntry>
+                    {
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x0094
+                        },
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x008B
+                        },
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x0000
+                        },
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x0000
+                        },
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x0000
+                        },
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x0000
+                        }
+                    }
+                };
+
+                using var shopStream = new MemoryStream();
+                OpenKh.Kh2.SystemData.Shop.Write(shopStream, shop);
+                Bar.Write(stream, new Bar {
+                    new Bar.Entry
+                    {
+                        Name = "shop",
+                        Type = Bar.EntryType.Unknown41,
+                        Stream = shopStream
+                    }
+                });
+            });
+
+            var moddedShop = new OpenKh.Kh2.SystemData.Shop.ShopHelper
+            {
+                ShopEntryHelpers = new List<OpenKh.Kh2.SystemData.Shop.ShopEntryHelper>
+                {
+                    new OpenKh.Kh2.SystemData.Shop.ShopEntryHelper
+                    {
+                        CommandArgument = 0x0068,
+                        UnlockMenuFlag = 0x002A,
+                        NameID = 0x8AB9,
+                        ShopKeeperEntityID = 0x0749,
+                        PosX = 0x0086,
+                        PosY = 0x0096,
+                        PosZ = -591, // 0xFDB1,
+                        ExtraInventoryBitMask = 0x82,
+                        SoundID = 0x01,
+                        InventoryCount = 0x0001,
+                        ShopID = 0x00,
+                        Unk19 = 0x02,
+                        InventoryStartIndex = 0
+                    }
+                },
+                InventoryEntryHelpers = new List<OpenKh.Kh2.SystemData.Shop.InventoryEntryHelper>
+                {
+                    new OpenKh.Kh2.SystemData.Shop.InventoryEntryHelper
+                    {
+                        InventoryIndex = 0,
+                        UnlockEventID = 0xFFFF,
+                        ProductCount = 0x0002,
+                        ProductStartIndex = 0,
+                    }
+                },
+                ProductEntryHelpers = new List<OpenKh.Kh2.SystemData.Shop.ProductEntryHelper>
+                {
+                    new OpenKh.Kh2.SystemData.Shop.ProductEntryHelper
+                    {
+                        ProductIndex = 0,
+                        ItemID = 0x0043
+                    },
+                    new OpenKh.Kh2.SystemData.Shop.ProductEntryHelper
+                    {
+                        ProductIndex = 1,
+                        ItemID = 0x0128
+                    }
+                },
+                ValidProductEntryHelpers = new List<OpenKh.Kh2.SystemData.Shop.ProductEntryHelper>
+                {
+                    new OpenKh.Kh2.SystemData.Shop.ProductEntryHelper
+                    {
+                        ProductIndex = 0,
+                        ItemID = 0x0043
+                    },
+                    new OpenKh.Kh2.SystemData.Shop.ProductEntryHelper
+                    {
+                        ProductIndex = 1,
+                        ItemID = 0x0128
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(ModInputDir, "ShopList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+
+                var serializer = new Serializer();
+
+                writer.Write(serializer.Serialize(moddedShop));
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            AssertFileExists(ModOutputDir, "03system.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "03system.bin")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var verifyShop = OpenKh.Kh2.SystemData.Shop.Read(binarc[0].Stream);
+                uint inventoryEntriesBaseOffset = (uint)(OpenKh.Kh2.SystemData.Shop.HeaderSize + verifyShop.ShopEntries.Count * OpenKh.Kh2.SystemData.Shop.ShopEntrySize);
+                uint productEntriesBaseOffset = (uint)(inventoryEntriesBaseOffset + verifyShop.InventoryEntries.Count * OpenKh.Kh2.SystemData.Shop.InventoryEntrySize);
+                foreach (var shopEntryHelper in moddedShop.ShopEntryHelpers)
+                {
+                    int shopID = shopEntryHelper.ShopID;
+                    Assert.Equal(verifyShop.ShopEntries[shopID].CommandArgument, shopEntryHelper.CommandArgument);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].UnlockMenuFlag, shopEntryHelper.UnlockMenuFlag);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].NameID, shopEntryHelper.NameID);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].ShopKeeperEntityID, shopEntryHelper.ShopKeeperEntityID);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].PosX, shopEntryHelper.PosX);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].PosY, shopEntryHelper.PosY);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].PosZ, shopEntryHelper.PosZ);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].ExtraInventoryBitMask, shopEntryHelper.ExtraInventoryBitMask);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].SoundID, shopEntryHelper.SoundID);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].InventoryCount, shopEntryHelper.InventoryCount);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].ShopID, shopEntryHelper.ShopID);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].Unk19, shopEntryHelper.Unk19);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].InventoryOffset, (int)(inventoryEntriesBaseOffset + shopEntryHelper.InventoryStartIndex * OpenKh.Kh2.SystemData.Shop.InventoryEntrySize));
+                }
+                foreach (var inventoryEntryHelper in moddedShop.InventoryEntryHelpers)
+                {
+                    Assert.Equal(verifyShop.InventoryEntries[inventoryEntryHelper.InventoryIndex].UnlockEventID, inventoryEntryHelper.UnlockEventID);
+                    Assert.Equal(verifyShop.InventoryEntries[inventoryEntryHelper.InventoryIndex].ProductCount, inventoryEntryHelper.ProductCount);
+                    Assert.Equal(verifyShop.InventoryEntries[inventoryEntryHelper.InventoryIndex].ProductOffset, (int)(productEntriesBaseOffset + inventoryEntryHelper.ProductStartIndex * OpenKh.Kh2.SystemData.Shop.ProductEntrySize));
+                }
+                foreach (var productEntryHelper in moddedShop.ProductEntryHelpers)
+                {
+                    Assert.Equal(verifyShop.ProductEntries[productEntryHelper.ProductIndex].ItemID, productEntryHelper.ItemID);
+                }
+                foreach (var productEntryHelper in moddedShop.ValidProductEntryHelpers)
+                {
+                    Assert.Equal(verifyShop.ValidProductEntries[productEntryHelper.ProductIndex].ItemID, productEntryHelper.ItemID);
+                }
+            });
+        }
+
+        [Fact]
         public void ListPatchSkltTest()
         {
             var patcher = new PatcherProcessor();
@@ -1089,11 +1322,10 @@ namespace OpenKh.Tests.Patcher
                 WorldId = 1,
                 CheckStoryFlag = 1,
                 CheckStoryFlagNegation = 0,
-                Unk06 = 0,
-                Unk08 = 0,
-                Unk0A = 0,
-                Unk0C = 0,
-                Unk0E = 0,
+                CheckArea = 0,
+                Padding = 0,
+                PlayerSize= 0,
+                FriendSize = 0,
                 Members = new short[18]
             }
         };
@@ -1137,11 +1369,10 @@ namespace OpenKh.Tests.Patcher
                 writer.WriteLine("    WorldId: 2");
                 writer.WriteLine("    CheckStoryFlag: 3");
                 writer.WriteLine("    CheckStoryFlagNegation: 4");
-                writer.WriteLine("    Unk06: 5");
-                writer.WriteLine("    Unk08: 6");
-                writer.WriteLine("    Unk0A: 7");
-                writer.WriteLine("    Unk0C: 8");
-                writer.WriteLine("    Unk0E: 9");
+                writer.WriteLine("    CheckArea: 5");
+                writer.WriteLine("    Padding: 6");
+                writer.WriteLine("    PlayerSize: 7");
+                writer.WriteLine("    FriendSize: 8");
                 writer.WriteLine("    Members: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]");
                 writer.WriteLine("MemberIndices:");
                 writer.WriteLine("  - Index: 0");
@@ -1153,7 +1384,7 @@ namespace OpenKh.Tests.Patcher
             });
 
             // Apply the patch
-            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
 
             // Verify the patched data
             AssertFileExists(ModOutputDir, "03system.bar");
@@ -1170,11 +1401,10 @@ namespace OpenKh.Tests.Patcher
                 Assert.Equal((short)2, memtEntry.WorldId);
                 Assert.Equal((short)3, memtEntry.CheckStoryFlag);
                 Assert.Equal((short)4, memtEntry.CheckStoryFlagNegation);
-                Assert.Equal((short)5, memtEntry.Unk06);
-                Assert.Equal((short)6, memtEntry.Unk08);
-                Assert.Equal((short)7, memtEntry.Unk0A);
-                Assert.Equal((short)8, memtEntry.Unk0C);
-                Assert.Equal((short)9, memtEntry.Unk0E);
+                Assert.Equal((short)5, memtEntry.CheckArea);
+                Assert.Equal((short)6, memtEntry.Padding);
+                Assert.Equal((short)7, memtEntry.PlayerSize);
+                Assert.Equal((short)8, memtEntry.FriendSize);
                 Assert.Equal(new short[] { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27 }, memtEntry.Members);
 
                 // Check MemberIndices deserialization
@@ -1185,6 +1415,7 @@ namespace OpenKh.Tests.Patcher
                 Assert.Equal((byte)0, memberIndices.FriendWorld);
             });
         }
+
 
 
 
@@ -2762,7 +2993,7 @@ namespace OpenKh.Tests.Patcher
                 new Kh2.Libretto.TalkMessageDefinition
                 {
                     TalkMessageId = 1,
-                    Unknown = 0,
+                    Type = 0,
                     ContentPointer = 8 + 8 // MagicCode (4 bytes) + Count (4 bytes) + Definitions (8 bytes each)
                 }
             },
@@ -2770,7 +3001,7 @@ namespace OpenKh.Tests.Patcher
             {
                 new List<Kh2.Libretto.TalkMessageContent>
                 {
-                    new Kh2.Libretto.TalkMessageContent { Unknown1 = 0x02000200, TextId = 2500 }
+                    new Kh2.Libretto.TalkMessageContent { CodeType = 0x0200, Unknown = 0x0200, TextId = 2500 }
                 }
             }
                 };
@@ -2794,9 +3025,10 @@ namespace OpenKh.Tests.Patcher
             {
                 var writer = new StreamWriter(stream);
                 writer.WriteLine("- TalkMessageId: 1");
-                writer.WriteLine("  Unknown: 0");
+                writer.WriteLine("  Type: 0");
                 writer.WriteLine("  Contents:");
-                writer.WriteLine("    - Unknown1: 0x02000200");
+                writer.WriteLine("    - CodeType: 0x0200");
+                writer.WriteLine("      Unknown: 0x0200");
                 writer.WriteLine("      TextId: 2500");
                 writer.Flush();
             });
@@ -2810,7 +3042,8 @@ namespace OpenKh.Tests.Patcher
                 var binarc = Bar.Read(stream);
                 var librettoList = Kh2.Libretto.Read(binarc[0].Stream);
                 var librettoEntry = librettoList.Contents[0][0];
-                Assert.Equal(0x02000200u, librettoEntry.Unknown1);
+                Assert.Equal(0x0200u, librettoEntry.CodeType);
+                Assert.Equal(0x0200u, librettoEntry.Unknown);
                 Assert.Equal(2500u, librettoEntry.TextId);
             });
         }

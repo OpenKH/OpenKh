@@ -8,6 +8,7 @@ This document will focus on teaching you how to create mods using the OpenKH Mod
 * [Asset Methods](#asset-methods)
   * [copy](#copy-any-game---performs-a-direct-copy-to-overwrite-a-file-works-on-any-file-type)
   * [binarc (KH2)](#binarc-kh2---specifies-a-modification-to-a-subfile-within-a-binarc-using-one-of-the-available-methods-see-binarc-methods-for-details-on-implementing-a-specific-method)
+    * [index](#index-kh2---specifies-a-modification-to-a-specific-indexed-subfile-within-a-binarc-using-one-of-the-available-methods-instead-of-searching-for-a-matching-filename-to-replace)
     * [copy](#copy-kh2---performs-a-copy-on-a-supfile-within-a-bar-must-be-one-of-the-following-types)
     * [imgd](#imgd-kh2---replaces-a-single-imgd-found-within-a-binarc)
     * [imgz / fac](#imgz--fac-kh2---replaces-multiple-imgds-found-within-a-binarc)
@@ -18,6 +19,7 @@ This document will focus on teaching you how to create mods using the OpenKH Mod
       * [trsr](#trsr-source-example)
       * [cmd](#cmd-source-example)
       * [item](#item-source-example)
+	  * [shop](#shop-source-example)
       * [sklt](#sklt-source-example)
       * [arif](#arif-source-example)
       * [memt](#memt-source-example)
@@ -61,6 +63,17 @@ The mod.yml file is a YAML format specification for your mod. It will contain th
 * `logo` - The path to the icon.png
 * `assets` - A list of assets that will be modified when the mod runs. 
   * See [`asset types`](#asset-types), for details on creating an asset. Some asset types will work on any game, while others are game specific.
+
+Additional optional fields for the mod.yml include:
+* `game` - If this mod is for a single specific game you can specify it here to ensure safe install
+* `speciications` -
+* `dependencies` -
+* `isCollection` - Specifies that this is a collection of mods, potentially cross game
+* `collectionGames` - A list of the short hand titles of the games the mod collection covers (accepted values: `kh1`, `kh2`, `bbs`, `Recom`, `kh3d`)
+
+Additional optional fields for Assets:
+* `game` - The game this specific asset belongs to when part of a mod collection
+* `collectionOptional` - Marks the asset as optionally installable, and sets it to show in the collecion settings pane
 
 While you are developing a mod you can create a folder inside the `mods` directory of the mod manager release. I.e.:
 
@@ -146,8 +159,23 @@ Asset Example
     - name: files/b_40.yml
     type: AreaDataSpawn
 ```
-
 ### Binarc Methods
+
+## `index` (KH2) - Specifies a modification to a specific, indexed subfile within a binarc using one of the available methods, instead of searching for a matching filename to replace.
+
+Asset Example
+
+```
+- name: 07localset.bin
+  method: binarc
+  source:
+  - index: 1 #Patch the file at index 1, instead of replacing the first file with a name.
+    method: listpatch
+    type: List
+    source:
+    - name: LocalsetList.yml
+      type: localset
+```
 
 ## `copy` (KH2) - Performs a copy on a supfile within a Bar. Must be one of the [following](https://github.com/Xeeynamo/OpenKh/blob/master/OpenKh.Tools.BarEditor/Helpers.cs#L14) types
 
@@ -283,6 +311,7 @@ Asset Example
  * `trsr`
  * `cmd`
  * `item`
+ * `shop`
  * `sklt`
  * `arif`
  * `memt`
@@ -390,6 +419,38 @@ Items:
   Icon2: 0
   InsertBefore: 7 #This will insert the item ID before the item ID you specify here. Defaults to 0, which will append to the item list instead. You can alternatively use InsertAfter. 
 ```
+### `shop` Source Example
+```
+ShopEntryHelpers:
+- CommandArgument: 104
+  UnlockMenuFlag: 42
+  NameID: 35513
+  ShopKeeperEntityID: 1865
+  PosX: 134
+  PosY: 150
+  PosZ: -591
+  ExtraInventoryBitMask: 130
+  SoundID: 1
+  InventoryCount: 1
+  ShopID: 0
+  Unk19: 2
+  InventoryStartIndex: 0
+InventoryEntryHelpers:
+- InventoryIndex: 0
+  UnlockEventID: 65535
+  ProductCount: 2
+  ProductStartIndex: 0
+ProductEntryHelpers:
+- ProductIndex: 0
+  ItemID: 67
+- ProductIndex: 1
+  ItemID: 296
+ValidProductEntryHelpers:
+- ProductIndex: 0
+  ItemID: 67
+- ProductIndex: 1
+  ItemID: 296
+```
 ### `sklt` Source Example
 ```
 - CharacterId: 1
@@ -429,26 +490,29 @@ End of Sea: #End of Sea. Names are taken from worlds.md
 ### `memt` Source Example
 ```
 MemtEntries: 
-  - Index: 0 #Specify a memt index to edit. Use a new index to create a new MemtEntry.
+  - Index: 0 #Index to edit. Specify new indices to append new entries
     WorldId: 2
-    CheckStoryFlag: 3
-    CheckStoryFlagNegation: 4
-    Unk06: 5
-    Unk08: 6
-    Unk0A: 7
-    Unk0C: 8
-    Unk0E: 9
-    Members: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+    CheckStoryFlag: 209
+    FlagForWorld: The World That Never Was #Specify world name
+    CheckStoryFlagNegation: 0
+    NegationFlagForWorld: Twilight Town #Specify world name
+    CheckArea: 2
+    Padding: 0
+    PlayerSize: 4299264
+    FriendSize: 1625344
+    Members: [84, 92, 93, 2073, 85, 86, 2397, 87, 88, 89, 91, 264, 200, 1529, 2431, 1530, 1531, 264]
   - Index: 37
     WorldId: 2
-    CheckStoryFlag: 3
-    CheckStoryFlagNegation: 4
-    Unk06: 5
-    Unk08: 6
-    Unk0A: 7
-    Unk0C: 8
-    Unk0E: 9
-    Members: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+    CheckStoryFlag: 209
+    FlagForWorld: Twilight Town #Specify world name
+    CheckStoryFlagNegation: 0
+    FlagNegationForWorld: Twilight Town #Specify world name
+    CheckArea: 2
+    Padding: 0
+    PlayerSize: 4299264
+    FriendSize: 1625344
+    Members: [84, 92, 93, 2073, 85, 86, 2397, 87, 88, 89, 91, 264, 200, 1529, 2431, 1530, 1531, 264]
+
 
 MemberIndices:
   - Index: 0
@@ -752,12 +816,14 @@ Sora:
 
 ### `libretto` Source Example
 ```
-- TalkMessageId: 752 #Id to update.
-  Unknown: 3 #Unknown to update.
-  Contents: #Contents to update. Will insert additional Contents as necessary. When no additional are detected, terminates w/ 0.
-    - Unknown1: 0x00010001
-      TextId: 0x3DEB
-    - Unknown1: 0x00010001
+- TalkMessageId: 752 #Id to update. This is used as "ReactionCommand" in ARDs.
+  Type: 3 #Specify the type of Message. 1, 2, and 3 seem functionally identical, while 0 does nothing.
+  Contents: #Contents to update. Will insert additional Contents as necessary. When no additional are detected, terminates with 0.
+    - CodeType: 0x0001 #CodeType. Most worlds use a value of 1, while the World Map uses 0x100 to 0x113.
+      Unknown: 0x0001 #Unknown what this is used for. 
+      TextId: 0x3DEB #TextID in that worlds .bar file in the msg folder to reference.
+    - CodeType: 0x0001
+      Unknown: 0x0001
       TextId: 0x183C
 ```
 ### `localset` Source Example
@@ -977,7 +1043,7 @@ To start, here are the steps:
 
 ## Publishing a Mod on GitHub
 
-Mods should be published to a public GitHUb repository, so that users can install the mod just by providing the repository name.
+Mods should be published to a public GitHub repository, so that users can install the mod just by providing the repository name.
 
 It is recommended to apply the following tags to the repository, in order to make it easily found by searching GitHub for mods manager mods:
 
