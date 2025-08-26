@@ -64,7 +64,7 @@ namespace OpenKh.Kh2.SystemData
                 InventoryStartIndex = (uint)((InventoryOffset - InventoriesBaseOffset) / 8),
             };
 
-            public static List<ShopEntry> Read(Stream stream, int count) => [.. BaseList<ShopEntry>.Read(stream, count)];
+            public static List<ShopEntry> Read(Stream stream, int count) => BaseList<ShopEntry>.Read(stream, count).ToList();
             public static void Write(Stream stream, IEnumerable<ShopEntry> entries) => BaseList<ShopEntry>.Write(stream, entries);
         }
 
@@ -83,7 +83,7 @@ namespace OpenKh.Kh2.SystemData
                 ProductStartIndex = (uint)((ProductOffset - ProductsBaseOffset) / 2)
             };
 
-            public static List<InventoryEntry> Read(Stream stream, int count) => [.. BaseList<InventoryEntry>.Read(stream, count)];
+            public static List<InventoryEntry> Read(Stream stream, int count) => BaseList<InventoryEntry>.Read(stream, count).ToList();
             public static void Write(Stream stream, IEnumerable<InventoryEntry> entries) => BaseList<InventoryEntry>.Write(stream, entries);
         }
 
@@ -97,7 +97,7 @@ namespace OpenKh.Kh2.SystemData
                 ItemID = ItemID
             };
 
-            public static List<ProductEntry> Read(Stream stream, int count) => [.. BaseList<ProductEntry>.Read(stream, count)];
+            public static List<ProductEntry> Read(Stream stream, int count) => BaseList<ProductEntry>.Read(stream, count).ToList();
             public static void Write(Stream stream, IEnumerable<ProductEntry> entries) => BaseList<ProductEntry>.Write(stream, entries);
         }
 
