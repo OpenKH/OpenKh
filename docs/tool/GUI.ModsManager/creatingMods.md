@@ -19,6 +19,7 @@ This document will focus on teaching you how to create mods using the OpenKH Mod
       * [trsr](#trsr-source-example)
       * [cmd](#cmd-source-example)
       * [item](#item-source-example)
+      * [shop](#shop-source-example)
       * [sklt](#sklt-source-example)
       * [arif](#arif-source-example)
       * [memt](#memt-source-example)
@@ -310,6 +311,7 @@ Asset Example
  * `trsr`
  * `cmd`
  * `item`
+ * `shop`
  * `sklt`
  * `arif`
  * `memt`
@@ -416,6 +418,38 @@ Items:
   Icon1: 9
   Icon2: 0
   InsertBefore: 7 #This will insert the item ID before the item ID you specify here. Defaults to 0, which will append to the item list instead. You can alternatively use InsertAfter. 
+```
+### `shop` Source Example
+```
+ShopEntryHelpers:
+- CommandArgument: 104
+  UnlockMenuFlag: 42
+  NameID: 35513
+  ShopKeeperEntityID: 1865
+  PosX: 134
+  PosY: 150
+  PosZ: -591
+  ExtraInventoryBitMask: 130
+  SoundID: 1
+  InventoryCount: 1
+  ShopID: 0
+  Unk19: 2
+  InventoryStartIndex: 0
+InventoryEntryHelpers:
+- InventoryIndex: 0
+  UnlockEventID: 65535
+  ProductCount: 2
+  ProductStartIndex: 0
+ProductEntryHelpers:
+- ProductIndex: 0
+  ItemID: 67
+- ProductIndex: 1
+  ItemID: 296
+ValidProductEntryHelpers:
+- ProductIndex: 0
+  ItemID: 67
+- ProductIndex: 1
+  ItemID: 296
 ```
 ### `sklt` Source Example
 ```
