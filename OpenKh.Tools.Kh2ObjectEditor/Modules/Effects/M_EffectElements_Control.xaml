@@ -7,11 +7,16 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <DataGrid Name="DataTable"
-                AutoGenerateColumns="False"
-                CanUserAddRows="False">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <DataGrid Name="DataTable" Grid.Row="0"
+                  ItemsSource="{Binding LoadedEntries, Mode=TwoWay}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False" GridLinesVisibility="All" HeadersVisibility="Column">
             <DataGrid.Columns>
-                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Path=Id}" Header="Id" />
+                <DataGridTextColumn Binding="{Binding Path=Id}" Header="Id" />
                 <DataGridTextColumn Binding="{Binding Path=EffectNumber}" Header="Effect Number" />
                 <DataGridTextColumn Binding="{Binding Path=BoneId}" Header="Bone Id" />
                 <DataGridTextColumn Binding="{Binding Path=SoundEffectNumber}" Header="Sound Effect Id" />
@@ -26,7 +31,29 @@
                 <DataGridTextColumn Binding="{Binding Path=ScaleX}" Header="ScaleX" />
                 <DataGridTextColumn Binding="{Binding Path=ScaleY}" Header="ScaleY" />
                 <DataGridTextColumn Binding="{Binding Path=ScaleZ}" Header="ScaleZ" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagBind}" Header="Bind" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagBindOnlyStart}" Header="Bind Only Start" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagBindOnlyPos}" Header="Bind Only Pos" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagGetColor}" Header="Get Color" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagGetBrightness}" Header="Get Brightness" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagDestroyWhenMotionChange}" Header="Destroy When Motion Change" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagDestroyFadeout}" Header="Destroy Fadeout" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagDestroyLoopend}" Header="Destroy Loop End" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagBindScale}" Header="Bind Scale" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagDestroyWhenObjectLeaves}" Header="Destroy When Object Leaves" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagDestroyWhenBindEffectOff}" Header="Destroy When Bind Effect Off" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagGetObjectFade}" Header="Get Object Fade" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagBonePos}" Header="Bone Pos" />
+                <DataGridCheckBoxColumn Binding="{Binding Path=FlagBindCamera}" Header="Bind Camera" />
+                <DataGridTextColumn Binding="{Binding Path=BonePosition.A}" Header="BP A" />
+                <DataGridTextColumn Binding="{Binding Path=BonePosition.B}" Header="BP B" />
+                <DataGridTextColumn Binding="{Binding Path=BonePosition.RatioA}" Header="BP Ratio A" />
+                <DataGridTextColumn Binding="{Binding Path=BonePosition.RatioB}" Header="BP Ratio B" />
+                <DataGridTextColumn Binding="{Binding Path=BonePosition.Adjust}" Header="BP Adjust" />
             </DataGrid.Columns>
         </DataGrid>
+        <Button Margin="10" Grid.Row="1" Click="Button_Save" HorizontalAlignment="Right">
+            Save Casters
+        </Button>
     </Grid>
 </UserControl>

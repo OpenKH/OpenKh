@@ -1,9 +1,30 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenKh.Kh2
 {
     public class MotionSet
     {
+        private static List<int> _validMotionValues;
+        private static List<int> ValidMotionValues
+        {
+            get
+            {
+                if (_validMotionValues == null)
+                {
+                    _validMotionValues = ((MotionName[])Enum.GetValues(typeof(MotionName)))
+                                                                .Select(e => (int)e)
+                                                                .ToList();
+                }
+                return _validMotionValues;
+            }
+        }
+        public static bool IsNamedMotion(int motionId)
+        {
+            return ValidMotionValues.Contains(motionId);
+        }
+
         public enum MotionName
         {
             IDLE = 0,

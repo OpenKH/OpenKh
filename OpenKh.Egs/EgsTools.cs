@@ -815,7 +815,7 @@ namespace OpenKh.Egs
                 var DpdTexCount = ms.ReadInt32(); //finally found the texture offsets
                 var DpdTexOffsets = ((int)ms.Position); //save this position
 
-                List<Tuple<short, int>> textures = new List<Tuple<short, int>>(); // Store value1 (short) and texture offset
+                List<Tuple<short, int, int>> textures = new List<Tuple<short, int, int>>(); // Store value1 (short) and texture offset
 
                 for (int t = 0; t < DpdTexCount; t++) //For each DpdTexCount, run this.
                 {
@@ -823,9 +823,10 @@ namespace OpenKh.Egs
                     var DpdTexOffset = ms.ReadInt32(); //Get the offset
                     ms.Seek(Dpxoffset + DpdOffset + DpdTexOffset, SeekOrigin.Begin); //Then get to the offset, using DpxOffset+DpdOffset+DpdTexOffset.
                     short value1 = ms.ReadInt16(); // Read value1 as a short (2 bytes)
-                    ms.Seek(6, SeekOrigin.Current); // Skip the next 6 bytes 2 bytes for a different value and 4 bytes for formerly value2)
+                    ms.Seek(6, SeekOrigin.Current); // Skip the next 6 bytes. 2 bytes for a different value and 4 bytes for formerly value2)
+                    int shTexXY = ms.ReadInt32(); // Read shTexXY at 0x08 offset. Some textures can share the first two bytes but aren't considered "combo" textures if they don't shift the texture on the X or Y plane.
 
-                    textures.Add(new Tuple<short, int>(value1, DpdTexOffset)); // Store value1 and texture offset
+                    textures.Add(new Tuple<short, int, int>(value1, DpdTexOffset, shTexXY)); // Store value1 and texture offset
                 }
 
                 // Sort textures by value1
@@ -838,6 +839,7 @@ namespace OpenKh.Egs
                 {
                     short value1 = textures[t].Item1;
                     int texoff = textures[t].Item2;
+                    int shTexXY = textures[t].Item3;
 
                     // Calculate the base offset for this texture
                     int baseOffset = texoff + 0x20;
@@ -854,8 +856,18 @@ namespace OpenKh.Egs
                     // Check if this texture should be combined with the previous one
                     if (t > 0 && textures[t].Item1 == textures[t - 1].Item1)
                     {
-                        // Adjust previous entry
-                        Offsets[Offsets.Count - 1] = finaloffset;
+                        int prev_shTexXY = textures[t - 1].Item3;
+                        int curr_shTexXY = textures[t].Item3;
+                        if (curr_shTexXY != 0 || prev_shTexXY != 0)
+                        {
+                            // Adjust previous entry ONLY if shTexXY for either the current or previous texture is 0.
+                            Offsets[Offsets.Count - 1] = finaloffset;
+                        }
+                        else
+                        {
+                            Offsets.Add(finaloffset);
+                            TextureCount++;
+                        }
                     }
                     else
                     {

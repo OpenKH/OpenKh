@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using static OpenKh.Tools.ModsManager.Helpers;
@@ -89,11 +90,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand BuildAndRunCommand { get; set; }
         public RelayCommand StopRunningInstanceCommand { get; set; }
         public RelayCommand WizardCommand { get; set; }
-        public RelayCommand OpenLinkCommand { get; set; }
-        public RelayCommand CheckOpenkhUpdateCommand { get; set; }
-        public RelayCommand OpenPresetMenuCommand { get; set; }
-        public RelayCommand CheckForModUpdatesCommand { get; set; }
-        public RelayCommand YamlGeneratorCommand { get; set; }
+        public ICommand OpenPresetMenuCommand { get; private set; }
+        public ICommand CheckForModUpdatesCommand { get; private set; }
+        public ICommand OpenLinkCommand { get; private set; }
+        public ICommand CheckOpenkhUpdateCommand { get; private set; }
+        public ICommand YamlGeneratorCommand { get; private set; }
+        public ICommand OpenModSearchCommand { get; private set; }
 
         public ModViewModel SelectedValue
         {
@@ -317,6 +319,54 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _panaceaSoundDebugEnabled = ConfigurationService.SoundDebug;
                 _panaceaCacheEnabled = ConfigurationService.EnableCache;
                 _panaceaQuickMenuEnabled = ConfigurationService.QuickMenu;
+
+                if (PanaceaInstalled && ConfigurationService.Updated)
+                {
+                    try
+                    {
+                        string PanaceaSourceLocation = Path.Combine(AppContext.BaseDirectory, "OpenKH.Panacea.dll");
+                        if (ConfigurationService.PcReleaseLanguage != null)
+                        {
+                            string PanaceaDestinationLocation = Path.Combine(ConfigurationService.PcReleaseLocation, "DBGHELP.dll");
+                            string PanaceaAlternateLocation = Path.Combine(ConfigurationService.PcReleaseLocation, "version.dll");
+                            if (Process.GetProcessesByName("winlogon").Length > 0)
+                            {
+                                File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation, true);
+                                File.Delete(PanaceaAlternateLocation);
+                            }
+                            else
+                            {
+                                File.Copy(PanaceaSourceLocation, PanaceaAlternateLocation, true);
+                                File.Delete(PanaceaDestinationLocation);
+                            }
+                        }
+                        if (ConfigurationService.PcReleaseLocationKH3D != null)
+                        {
+                            string PanaceaDestinationLocationkh3d = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "DBGHELP.dll");
+                            string PanaceaAlternateLocationkh3d = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "version.dll");
+                            if (Process.GetProcessesByName("winlogon").Length > 0)
+                            {
+                                File.Copy(PanaceaSourceLocation, PanaceaDestinationLocationkh3d, true);
+                                File.Delete(PanaceaAlternateLocationkh3d);
+                            }
+                            else
+                            {
+                                File.Copy(PanaceaSourceLocation, PanaceaAlternateLocationkh3d, true);
+                                File.Delete(PanaceaDestinationLocationkh3d);
+                            }
+                        }
+                        ConfigurationService.Updated = false;
+                    }
+                    catch
+                    {
+                        ConfigurationService.Updated = false;
+                        MessageBox.Show(
+                               $"Unable to automatically update Panacea.\nPlease manually run the setup wizard and reinstall Panacea.",
+                               "Error",
+                               MessageBoxButton.OK,
+                               MessageBoxImage.Error);
+                    }
+                }
             }
             else
                 PC = false;
@@ -327,8 +377,24 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
             AutoUpdateMods = ConfigurationService.AutoUpdateMods;
 
-            Log.OnLogDispatch += (long ms, string tag, string message) =>
-                _debuggingWindow.Log(ms, tag, message);
+            try
+            {
+                Log.OnLogDispatch += (long ms, string tag, string message) =>
+                    _debuggingWindow.Log(ms, tag, message);
+            }
+            catch
+            {
+                Process[] runningProcesses = Process.GetProcesses();
+                foreach (Process process in runningProcesses)
+                {
+                    if (process.ProcessName == "OpenKh.Tools.ModsManager" && process.Id != Process.GetCurrentProcess().Id)
+                    {
+                        process.Kill(true);
+                    }
+                }
+                System.Windows.Forms.Application.Restart();
+                Process.GetCurrentProcess().Kill();
+            }
 
             ReloadModsList();
             SelectedValue = ModsList.FirstOrDefault();
@@ -404,14 +470,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     Handle(() =>
                     {
-                        foreach (var filePath in Directory.GetFiles(mod.Path, "*", SearchOption.AllDirectories))
-                        {
-                            var attributes = File.GetAttributes(filePath);
-                            if (attributes.HasFlag(FileAttributes.ReadOnly))
-                                File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
-                        }
-
-                        Directory.Delete(mod.Path, true);
+                        ModsService.CleanModFiles(mod.Path);
                         ModsList.RemoveAt(ModsList.IndexOf(SelectedValue));
                     });
                 }
@@ -529,6 +588,27 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
             );
 
+            OpenModSearchCommand = new RelayCommand(
+                _ =>
+                {
+                    var searchWindow = new ModSearchWindow(this)
+                    {
+                        Owner = _getActiveWindowService.GetActiveWindow(),
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner
+                    };
+                    searchWindow.Closing += (_, e) =>
+                    {
+                        if (!e.Cancel)
+                        {
+                            searchWindow.Owner?.Focus();
+                            // Reload mods list to show newly installed mods
+                            ReloadModsList();
+                        }
+                    };
+                    searchWindow.Show();
+                }
+            );
+
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
             _ = FetchUpdates();
 
@@ -567,7 +647,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private async Task<bool> BuildPatches(bool fastMode)
         {
             IsBuilding = true;
-            var result = await ModsService.RunPacherAsync(fastMode);
+            var result = await ModsService.RunPatcherAsync(fastMode);
             IsBuilding = false;
 
             return result;
@@ -845,14 +925,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 Log.Info(data);
         }
 
-        private void ReloadModsList()
+        public void ReloadModsList()
         {
             ModsList = new ObservableCollection<ModViewModel>(
                 ModsService.GetMods(ModsService.Mods).Select(Map));
             OnPropertyChanged(nameof(ModsList));
+            OnPropertyChanged(nameof(ModViewModel.CollectionModsList));
         }
 
-        private ModViewModel Map(ModModel mod) => new ModViewModel(mod, this);
+        private ModViewModel Map(ModModel mod) => new (mod, this);
 
         public void ModEnableStateChanged()
         {
@@ -1224,7 +1305,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             );
                         }
                     );
-
+                    ConfigurationService.Updated = true;
                     // quit app
                     Window?.Close();
                 }

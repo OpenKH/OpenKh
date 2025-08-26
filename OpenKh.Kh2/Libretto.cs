@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Xe.BinaryMapper;
@@ -15,26 +16,28 @@ namespace OpenKh.Kh2
         public class TalkMessageDefinition
         {
             [Data] public ushort TalkMessageId { get; set; }
-            [Data] public ushort Unknown { get; set; }
+            [Data] public ushort Type { get; set; }
             [Data] public uint ContentPointer { get; set; }
         }
 
         public class TalkMessageContent
         {
-            [Data] public uint Unknown1 { get; set; }
+            [Data] public ushort CodeType { get; set; }
+            [Data] public ushort Unknown { get; set; }
             [Data] public uint TextId { get; set; }
         }
 
         public class TalkMessagePatch
         {
             [Data] public ushort TalkMessageId { get; set; }
-            [Data] public ushort Unknown { get; set; }
+            [Data] public ushort Type { get; set; }
             [Data] public List<ContentPatch> Contents { get; set; }
         }
 
         public class ContentPatch
         {
-            [Data] public uint Unknown1 { get; set; }
+            [Data] public ushort CodeType { get; set; }
+            [Data] public ushort Unknown { get; set; }
             [Data] public uint TextId { get; set; }
         }
 
@@ -60,7 +63,7 @@ namespace OpenKh.Kh2
                 libretto.Definitions.Add(new TalkMessageDefinition
                 {
                     TalkMessageId = stream.ReadUInt16(),
-                    Unknown = stream.ReadUInt16(),
+                    Type = stream.ReadUInt16(),
                     ContentPointer = stream.ReadUInt32()
                 });
             }
@@ -72,28 +75,18 @@ namespace OpenKh.Kh2
                 stream.Position = basePosition + definition.ContentPointer;
                 //Create a new list to hold our TalkMessageContent objects for the current definition.
                 var contents = new List<TalkMessageContent>();
-
-                //Read all TalkMessageContents for current definition until Terminating Condition is met.
-                //while (true) //CAn set to while (true)...
-                //var content = BinaryMapping.ReadObject<TalkMessageContent>(stream);
-                //while (content.Unknown1 != 0)
-
-                //Literally had to do both a while loop and manually change the content check.
-                //Also changed the way content is read, from being read like this:
-                //                    var content = BinaryMapping.ReadObject<TalkMessageContent>(stream);
-                //And changed the condition. So, might be times where you need to read like this.
-                //Yea. issue is down to using the BinaryMapper for this.
                 while (true)
                 {
                     // Read a TalkMessageContent object manually from the stream
                     var content = new TalkMessageContent
                     {
-                        Unknown1 = stream.ReadUInt32(),
+                        CodeType = stream.ReadUInt16(),
+                        Unknown = stream.ReadUInt16(),
                         TextId = stream.ReadUInt32()
                     };
 
-                    // Check for the termination condition: Unknown1 == 0 and TextId == 0
-                    if (content.Unknown1 == 0 || content.Unknown1 == null)
+                    // Check for the termination condition: CodeType == 0 and Unknown == 0
+                    if (content.CodeType == 0 || content.CodeType == null || content.Unknown == 0 || content.Unknown == null)
                     {
                         break;
                     }
@@ -101,7 +94,7 @@ namespace OpenKh.Kh2
                     // Add content to the contents list
                     contents.Add(content);
                 }
-                //ADd list of contents for the current definition to the Contents list.
+                //Add list of contents for the current definition to the Contents list.
                 libretto.Contents.Add(contents);
             }
 
@@ -121,7 +114,7 @@ namespace OpenKh.Kh2
             foreach (var definition in libretto.Definitions)
             {
                 stream.Write(definition.TalkMessageId);                                              //Write the TalkMessage for each Definition.
-                stream.Write(definition.Unknown);                                                    //Write the Unknown for each Definition.
+                stream.Write(definition.Type);                                                       //Write the Unknown for each Definition.
                 stream.Write(offset);                                                                //Write the offset for each Definition.
                 offset += libretto.Contents[libretto.Definitions.IndexOf(definition)].Count * 8 + 4; //Update the Offset in each definition.
             }
@@ -131,7 +124,8 @@ namespace OpenKh.Kh2
             {
                 foreach (var content in contents)
                 {
-                    stream.Write(content.Unknown1);
+                    stream.Write(content.CodeType);
+                    stream.Write(content.Unknown);
                     stream.Write(content.TextId);
                     //if (content.Unknown1 == 0)
                     //    break;

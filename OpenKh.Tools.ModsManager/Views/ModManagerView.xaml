@@ -101,6 +101,9 @@
                 <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding RemoveModCommand}" ToolTip="Delete selected mod.">
                     <Image Source="{StaticResource Remove_color_16x}"/>
                 </Button>
+                <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding OpenModSearchCommand}" ToolTip="Search and download mods online.">
+                    <Image Source="{StaticResource Search_16x}"/>
+                </Button>
             </StackPanel>
         </Grid>
         <Grid Grid.Column="3">
@@ -111,7 +114,7 @@
                     A simple mod to add for testing can be 'OpenKH/mod-template'.
                 </TextBlock>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    Once you will select the mods you want to, go to the menu 'Run'
+                    Once you have selected the mods you want to, go to the menu 'Run'
                     and then select 'Build and Run'! The 'Build' is only required when the
                     content of a mod or the selected mod changes. If you are unsure, you
                     can just always use 'Build and Run'.

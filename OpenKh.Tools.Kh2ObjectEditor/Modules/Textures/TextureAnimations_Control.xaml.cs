@@ -19,7 +19,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Textures
             }
         }
 
-        private void list_doubleCLick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void Animation_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if ((sender as ListView).SelectedItem == null)
                 return;

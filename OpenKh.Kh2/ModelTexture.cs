@@ -686,6 +686,11 @@ namespace OpenKh.Kh2
             };
             _textureTransfer = texTransList;
             _gsInfo = gsInfoList;
+            if (build.footerData != null && build.footerData.Length > 0)
+            {
+                using (var stream = new MemoryStream(build.footerData))
+                    this.TextureFooterData = TextureFooterData.Read(stream);
+            }
         }
 
         private static int GetSizeRegister(int realSize) => (int)Math.Ceiling(Math.Log(realSize, 2));

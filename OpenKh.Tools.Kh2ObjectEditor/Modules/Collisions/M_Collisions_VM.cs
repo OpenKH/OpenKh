@@ -13,8 +13,8 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Collisions
     {
         public ObservableCollection<ObjectCollision> Collisions { get; set; }
 
-        public List<string> CollisionShapeOptions => CollisionShapeConverter.CollisionShapes.Values.ToList();
-        public List<string> CollisionTypeOptions => CollisionTypeConverter.CollisionTypes.Values.ToList();
+        public List<string> CollisionShapeOptions => new CollisionShapeConverter().Options.Values.ToList();
+        public List<string> CollisionTypeOptions => new CollisionTypeConverter().Options.Values.ToList();
 
         public M_Collisions_VM()
         {

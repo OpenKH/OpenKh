@@ -36,13 +36,13 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             // Reaction Command
             if (item.Entry.Type == BinaryArchive.EntryType.Motionset)
             {
-                System.Windows.Forms.MessageBox.Show("This is a Reaction Command", "Motion couldn't be loaded", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                System.Windows.Forms.MessageBox.Show("This is a Motion Set", "Motion couldn't be loaded", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
             }
             // No motion
             else if(item.Entry.Type != BinaryArchive.EntryType.Anb)
             {
-                System.Windows.Forms.MessageBox.Show("This is not a Motion or Reaction Command", "Motion couldn't be loaded", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                System.Windows.Forms.MessageBox.Show("This is not a Motion or Motion Set", "Motion couldn't be loaded", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
             }
 
@@ -97,7 +97,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
                 newMotionEntry.Type = BinaryArchive.EntryType.Anb;
                 newMotionEntry.Link = -1;
 
-                MsetService.Instance.MsetBinarc.Entries.Insert(item.Index + 1, new BinaryArchive.Entry());
+                MsetService.Instance.MsetBinarc.Entries.Insert(item.Index + 1, newMotionEntry);
 
                 ThisVM.loadMotions();
                 ThisVM.applyFilters();
@@ -203,7 +203,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             }
             catch (Exception exception) { }
         }
-        public void RC_Export(object sender, RoutedEventArgs e)
+        public void MotionEntry_Export(object sender, RoutedEventArgs e)
         {
             if (MotionList.SelectedItem == null) {
                 return;
@@ -211,17 +211,22 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
 
             MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
 
-            if(item.Entry.Type != BinaryArchive.EntryType.Motionset) {
-                System.Windows.Forms.MessageBox.Show("The selected entry is not a Moveset", "Can't export entry", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                return;
+            string fileExtension = ".mentry";
+            if(item.Entry.Type == BinaryArchive.EntryType.Anb)
+            {
+                fileExtension = ".anb";
+            }
+            if (item.Entry.Type == BinaryArchive.EntryType.Motionset)
+            {
+                fileExtension = ".mset";
             }
 
             try
             {
                 System.Windows.Forms.SaveFileDialog sfd;
                 sfd = new System.Windows.Forms.SaveFileDialog();
-                sfd.Title = "Export Reaction Command";
-                sfd.FileName = item.Entry.Name + ".mset";
+                sfd.Title = "Export motion entry";
+                sfd.FileName = item.Entry.Name + fileExtension;
                 sfd.ShowDialog();
                 if (sfd.FileName != "")
                 {
@@ -230,7 +235,15 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
             }
             catch (Exception exc) { }
         }
-        public void RC_Replace(object sender, RoutedEventArgs e)
+        public void ANB_Replace(object sender, RoutedEventArgs e)
+        {
+            Entry_Replace(BinaryArchive.EntryType.Anb);
+        }
+        public void MSET_Replace(object sender, RoutedEventArgs e)
+        {
+            Entry_Replace(BinaryArchive.EntryType.Motionset);
+        }
+        public void Entry_Replace(BinaryArchive.EntryType entryType)
         {
             if (MotionList.SelectedItem == null) {
                 return;
@@ -245,15 +258,63 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Views
                 if (openFileDialog.ShowDialog() == true && openFileDialog.FileNames != null && openFileDialog.FileNames.Length > 0)
                 {
                     string filePath = openFileDialog.FileNames[0];
-                    if (filePath.ToLower().EndsWith(".mset"))
-                    {
-                        ThisVM.Motion_ImportRC(item.Index, filePath);
-                    }
+                    ThisVM.Motion_ImportEntry(item.Index, filePath, entryType);
                 }
 
-                openMotionTabs(MsetService.Instance.LoadedMotion);
+                // Unneeded and will crash if null
+                //openMotionTabs(MsetService.Instance.LoadedMotion);
             }
             catch (Exception exception) { }
+        }
+        public void Motion_MoveUp(object sender, RoutedEventArgs e)
+        {
+            if (MotionList.SelectedItem != null)
+            {
+                MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
+
+                int index = item.Index;
+
+                if(index == 0)
+                {
+                    return;
+                }
+
+                BinaryArchive.Entry tempEntry = MsetService.Instance.MsetBinarc.Entries[item.Index];
+
+                MsetService.Instance.MsetBinarc.Entries.RemoveAt(item.Index);
+
+                MsetService.Instance.MsetBinarc.Entries.Insert(index - 1, tempEntry);
+
+                ThisVM.loadMotions();
+                ThisVM.applyFilters();
+
+                MotionList.SelectedItem = MotionList.Items[index - 1];
+            }
+        }
+        public void Motion_MoveDown(object sender, RoutedEventArgs e)
+        {
+            if (MotionList.SelectedItem != null)
+            {
+                MotionSelector_Wrapper item = (MotionSelector_Wrapper)MotionList.SelectedItem;
+
+                int index = item.Index;
+
+                if (index >= MotionList.Items.Count - 1)
+                {
+                    return;
+                }
+
+                BinaryArchive.Entry tempEntry = MsetService.Instance.MsetBinarc.Entries[item.Index];
+
+                MsetService.Instance.MsetBinarc.Entries.RemoveAt(item.Index);
+
+                MsetService.Instance.MsetBinarc.Entries.Insert(index + 1, tempEntry);
+
+                ThisVM.loadMotions();
+                ThisVM.applyFilters();
+
+                MotionList.SelectedItem = MotionList.Items[index + 1];
+            }
         }
 
         private void Button_TEST(object sender, System.Windows.RoutedEventArgs e)

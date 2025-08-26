@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using OpenKh.Kh2.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,7 +33,7 @@ namespace OpenKh.Kh2
             [Data] public byte FadeoutFrame { get; set; }
             [Data] public short BoneId { get; set; }
 			[Data] public ulong Category { get; set; }
-			[Data] public uint Flag { get; set; }
+			[Data] public ElementFlags Flags { get; set; }
 			[Data] public float StartWait { get; set; }
 			[Data] public int SoundEffectNumber { get; set; }
 			[Data] public float TranslationX { get; set; }
@@ -44,10 +45,41 @@ namespace OpenKh.Kh2
 			[Data] public float ScaleX { get; set; }
 			[Data] public float ScaleZ { get; set; }
 			[Data] public float ScaleY { get; set; }
-			[Data] public int Unk40 { get; set; } // Reserve/Padding? Always 0
-			[Data] public int Unk44 { get; set; } // Reserve/Padding? Always 0
-            [Data] public int Unk48 { get; set; } // Reserve/Padding? Always 0
-            [Data] public int Unk4C { get; set; } // Reserve/Padding? Always 0
+			[Data] public BonePos BonePosition { get; set; }
+
+            public bool FlagBind { get => BitFlag.IsFlagSet(Flags, ElementFlags.Bind); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.Bind, value); }
+            public bool FlagBindOnlyStart { get => BitFlag.IsFlagSet(Flags, ElementFlags.BindOnlyStart); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.BindOnlyStart, value); }
+            public bool FlagBindOnlyPos { get => BitFlag.IsFlagSet(Flags, ElementFlags.BindOnlyPos); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.BindOnlyPos, value); }
+            public bool FlagGetColor { get => BitFlag.IsFlagSet(Flags, ElementFlags.GetColor); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.GetColor, value); }
+            public bool FlagGetBrightness { get => BitFlag.IsFlagSet(Flags, ElementFlags.GetBrightness); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.GetBrightness, value); }
+            public bool FlagDestroyWhenMotionChange { get => BitFlag.IsFlagSet(Flags, ElementFlags.DestroyWhenMotionChange); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.DestroyWhenMotionChange, value); }
+            public bool FlagDestroyFadeout { get => BitFlag.IsFlagSet(Flags, ElementFlags.DestroyFadeout); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.DestroyFadeout, value); }
+            public bool FlagDestroyLoopend { get => BitFlag.IsFlagSet(Flags, ElementFlags.DestroyLoopend); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.DestroyLoopend, value); }
+            public bool FlagBindScale { get => BitFlag.IsFlagSet(Flags, ElementFlags.BindScale); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.BindScale, value); }
+            public bool FlagDestroyWhenObjectLeaves { get => BitFlag.IsFlagSet(Flags, ElementFlags.DestroyWhenObjectLeaves); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.DestroyWhenObjectLeaves, value); }
+            public bool FlagDestroyWhenBindEffectOff { get => BitFlag.IsFlagSet(Flags, ElementFlags.DestroyWhenBindEffectOff); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.DestroyWhenBindEffectOff, value); }
+            public bool FlagGetObjectFade { get => BitFlag.IsFlagSet(Flags, ElementFlags.GetObjectFade); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.GetObjectFade, value); }
+            public bool FlagBonePos { get => BitFlag.IsFlagSet(Flags, ElementFlags.BonePos); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.BonePos, value); }
+            public bool FlagBindCamera { get => BitFlag.IsFlagSet(Flags, ElementFlags.BindCamera); set => Flags = BitFlag.SetFlag(Flags, ElementFlags.BindCamera, value); }
+
+            [Flags]
+            public enum ElementFlags : uint
+            {
+                Bind = 0x01,
+                BindOnlyStart = 0x02,
+                BindOnlyPos = 0x04,
+                GetColor = 0x08,
+                GetBrightness = 0x10,
+                DestroyWhenMotionChange = 0x20,
+                DestroyFadeout = 0x40,
+                DestroyLoopend = 0x80,
+                BindScale = 0x100,
+                DestroyWhenObjectLeaves = 0x200,
+                DestroyWhenBindEffectOff = 0x400,
+                GetObjectFade = 0x800,
+                BonePos = 0x1000,
+                BindCamera = 0x2000
+            }
 
             /*internal static Element Read(BinaryReader reader)
 			{
@@ -78,7 +110,7 @@ namespace OpenKh.Kh2
 				};
 			}*/
 
-			internal void Save(BinaryWriter writer)
+            internal void Save(BinaryWriter writer)
 			{
 				writer.Write((ushort)EffectNumber);
 				writer.Write((ushort)Id);
@@ -86,7 +118,7 @@ namespace OpenKh.Kh2
                 writer.Write((byte)FadeoutFrame);
                 writer.Write((short)BoneId);
 				writer.Write(Category);
-				writer.Write(Flag);
+				writer.Write((uint)Flags);
 				writer.Write(StartWait);
 				writer.Write(SoundEffectNumber);
 				writer.Write(TranslationX);
@@ -98,15 +130,27 @@ namespace OpenKh.Kh2
 				writer.Write(ScaleX);
 				writer.Write(ScaleZ);
 				writer.Write(ScaleY);
-				writer.Write(Unk40);
-				writer.Write(Unk44);
-				writer.Write(Unk48);
-				writer.Write(Unk4C);
+				writer.Write(BonePosition.A);
+				writer.Write(BonePosition.B);
+				writer.Write(BonePosition.RatioA);
+				writer.Write(BonePosition.RatioB);
+				writer.Write(BonePosition.Adjust);
+				writer.Write(BonePosition.Padding);
             }
 
             public override string ToString()
             {
                 return "No: "+ EffectNumber + " | Id: " + Id + " | Gr: " + Group + " | Bone: " + BoneId + " | SEno: " + SoundEffectNumber;
+            }
+
+            public class BonePos
+            {
+                [Data] public ushort A { get; set; }
+                [Data] public ushort B { get; set; }
+                [Data] public float RatioA { get; set; }
+                [Data] public float RatioB { get; set; }
+                [Data] public byte Adjust { get; set; }
+                [Data(Count=3)] public byte[] Padding { get; set; }
             }
         }
 
@@ -144,6 +188,7 @@ namespace OpenKh.Kh2
         {
             Stream fileStream = new MemoryStream();
 
+            Header.ElementCount = Elements.Count;
             Header.DebugInfoOffset = 16 + 80 * Elements.Count;
             Header.DpxOffset = Header.DebugInfoOffset + 128;
 

@@ -4,39 +4,55 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Modules.Effects"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <TabControl Grid.Column="0">
-            <TabItem Width="60">
+            <TabItem>
                 <TabItem.Header>
-                    <Label>Textures</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconPhosphorIcons Kind="Image" Height="15"/>
+                        <Label FontWeight="Bold" Margin="5 0">Textures</Label>
+                    </StackPanel>
                 </TabItem.Header>
                 <ContentControl Name="Tab_Textures"/>
             </TabItem>
-            <TabItem Width="60">
+            <TabItem IsEnabled="False">
                 <TabItem.Header>
-                    <Label>Models</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconPhosphorIcons Kind="Cube" Height="15"/>
+                        <Label FontWeight="Bold" Margin="5 0">Models</Label>
+                    </StackPanel>
                 </TabItem.Header>
                 <Label>Unimplemented</Label>
                 <!--<ContentControl Name="Tab_Models"/>-->
             </TabItem>
-            <TabItem Width="60">
+            <TabItem IsEnabled="False">
                 <TabItem.Header>
-                    <Label>Shapes</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="Star" Height="15"/>
+                        <Label FontWeight="Bold" Margin="5 0">Shapes</Label>
+                    </StackPanel>
                 </TabItem.Header>
                 <Label>Unimplemented</Label>
                 <!--<ContentControl Name="Tab_Shapes"/>-->
             </TabItem>
-            <TabItem Width="60">
+            <TabItem>
                 <TabItem.Header>
-                    <Label>VSF</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconPhosphorIcons Kind="SpeakerHighBold" Height="15"/>
+                        <Label FontWeight="Bold" Margin="5 0">VSF</Label>
+                    </StackPanel>
                 </TabItem.Header>
                 <ContentControl Name="Tab_Vsf"/>
             </TabItem>
-            <TabItem Width="60">
+            <TabItem IsEnabled="False">
                 <TabItem.Header>
-                    <Label>Data</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="ScriptTextOutline" Height="20"/>
+                        <Label FontWeight="Bold" Margin="5 0">Data</Label>
+                    </StackPanel>
                 </TabItem.Header>
                 <Label>Unimplemented</Label>
                 <!--<ContentControl Name="Tab_Data"/>-->

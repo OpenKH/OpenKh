@@ -7,6 +7,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
+
+    <UserControl.Resources>
+        <local:RangeTriggerConverter x:Key="RangeTriggerConverter" />
+        <local:FrameTriggerConverter x:Key="FrameTriggerConverter" />
+    </UserControl.Resources>
+
     <Grid>
         
         <Grid.RowDefinitions>
@@ -22,71 +28,89 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <DockPanel Grid.Row="0">
-                <Label DockPanel.Dock="Top" HorizontalAlignment="Center" Foreground="White">Range Triggers</Label>
-                <DataGrid ItemsSource="{Binding RangeTriggerList}" AutoGenerateColumns="False" CanUserAddRows="True">
 
-                    <DataGrid.Resources>
-                        <local:RangeTriggerConverter x:Key="RangeTriggerConverter" />
-                    </DataGrid.Resources>
+            <Border Grid.Row="0" Margin="10" Padding="5" CornerRadius="5" Background="#555555" BorderBrush="White" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0">
+                        <Label FontWeight="Bold" FontSize="18">Range Triggers</Label>
+                        <Separator Margin="0 0 0 10"/>
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding RangeTriggerList}" AutoGenerateColumns="False" CanUserAddRows="True"
+                                  GridLinesVisibility="All" HeadersVisibility="Column" Background="#222222">
+
+                        <DataGrid.Columns>
+
+                            <DataGridTemplateColumn Header="Trigger">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox HorizontalAlignment="Stretch"
+                              SelectedItem="{Binding Trigger, Converter={StaticResource RangeTriggerConverter}, Mode=TwoWay}"
+                              ItemsSource="{Binding DataContext.RangeTriggerOptions2, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTextColumn Binding="{Binding Path=StartFrame}" Header="Start Frame" />
+                            <DataGridTextColumn Binding="{Binding Path=EndFrame}" Header="End Frame" />
+                            <DataGridTextColumn Binding="{Binding Path=ParamSize}" Header="Param Size"/>
+                            <DataGridTextColumn Binding="{Binding Path=Param1}" Header="Param 1" />
+                            <DataGridTextColumn Binding="{Binding Path=Param2}" Header="Param 2" />
+                            <DataGridTextColumn Binding="{Binding Path=Param3}" Header="Param 3" />
+                            <DataGridTextColumn Binding="{Binding Path=Param4}" Header="Param 4" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                </Grid>
+            </Border>
+
+            <GridSplitter Grid.Row="1" Background="LightGray" VerticalAlignment="Center" HorizontalAlignment="Stretch" ShowsPreview="True" Height="2"/>
+
+            <Border Grid.Row="2" Margin="10" Padding="5" CornerRadius="5" Background="#555555" BorderBrush="White" BorderThickness="1">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0">
+                        <Label FontWeight="Bold" FontSize="18">Frame Triggers</Label>
+                        <Separator Margin="0 0 0 10"/>
+                    </StackPanel>
                     
-                    <DataGrid.Columns>
+                    <DataGrid Grid.Row="1" AutoGenerateColumns="False"
+                              ItemsSource="{Binding FrameTriggerList}"
+                              CanUserAddRows="True"
+                              GridLinesVisibility="All" HeadersVisibility="Column" Background="#222222">
 
-                        <DataGridTemplateColumn Header="Trigger">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ComboBox HorizontalAlignment="Stretch"
-                                      SelectedItem="{Binding Trigger, Converter={StaticResource RangeTriggerConverter}, Mode=TwoWay}"
-                                      ItemsSource="{Binding DataContext.RangeTriggerOptions2, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                        <DataGrid.Columns>
 
-                        <DataGridTextColumn Binding="{Binding Path=StartFrame}" Header="Start Frame" />
-                        <DataGridTextColumn Binding="{Binding Path=EndFrame}" Header="End Frame" />
-                        <DataGridTextColumn Binding="{Binding Path=ParamSize}" Header="Param Size"/>
-                        <DataGridTextColumn Binding="{Binding Path=Param1}" Header="Param 1" />
-                        <DataGridTextColumn Binding="{Binding Path=Param2}" Header="Param 2" />
-                        <DataGridTextColumn Binding="{Binding Path=Param3}" Header="Param 3" />
-                        <DataGridTextColumn Binding="{Binding Path=Param4}" Header="Param 4" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </DockPanel>
+                            <DataGridTemplateColumn Header="Trigger">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox HorizontalAlignment="Stretch"
+                                                  SelectedItem="{Binding Trigger, Converter={StaticResource FrameTriggerConverter}, Mode=TwoWay}"
+                                                  ItemsSource="{Binding DataContext.FrameTriggerOptions2, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
 
-            <GridSplitter Grid.Row="1" Background="LightGray" VerticalAlignment="Center" HorizontalAlignment="Stretch" ShowsPreview="True" Height="5"/>
-
-            <DockPanel Grid.Row="2">
-                <Label DockPanel.Dock="Top" HorizontalAlignment="Center" Foreground="White">Frame Triggers</Label>
-                <DataGrid
-                  AutoGenerateColumns="False"
-                  ItemsSource="{Binding FrameTriggerList}"
-                  CanUserAddRows="True">
-
-                    <DataGrid.Resources>
-                        <local:FrameTriggerConverter x:Key="FrameTriggerConverter" />
-                    </DataGrid.Resources>
-                    
-                    <DataGrid.Columns>
-
-                        <DataGridTemplateColumn Header="Trigger">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ComboBox HorizontalAlignment="Stretch"
-                                      SelectedItem="{Binding Trigger, Converter={StaticResource FrameTriggerConverter}, Mode=TwoWay}"
-                                      ItemsSource="{Binding DataContext.FrameTriggerOptions2, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-
-                        <DataGridTextColumn Binding="{Binding Path=Frame}" Header="Frame" />
-                        <DataGridTextColumn Binding="{Binding Path=ParamSize}" Header="ParamSize"/>
-                        <DataGridTextColumn Binding="{Binding Path=Param1}" Header="Param 1" />
-                        <DataGridTextColumn Binding="{Binding Path=Param2}" Header="Param 2" />
-                        <DataGridTextColumn Binding="{Binding Path=Param3}" Header="Param 3" />
-                        <DataGridTextColumn Binding="{Binding Path=Param4}" Header="Param 4" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </DockPanel>
+                            <DataGridTextColumn Binding="{Binding Path=Frame}" Header="Frame" />
+                            <DataGridTextColumn Binding="{Binding Path=ParamSize}" Header="ParamSize"/>
+                            <DataGridTextColumn Binding="{Binding Path=Param1}" Header="Param 1" />
+                            <DataGridTextColumn Binding="{Binding Path=Param2}" Header="Param 2" />
+                            <DataGridTextColumn Binding="{Binding Path=Param3}" Header="Param 3" />
+                            <DataGridTextColumn Binding="{Binding Path=Param4}" Header="Param 4" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
 
         </Grid>
 

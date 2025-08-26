@@ -1,3 +1,4 @@
+using OpenKh.Common.Utils;
 using OpenKh.Kh2.Models.VIF;
 using System.Collections.Generic;
 using System.IO;
@@ -147,6 +148,19 @@ namespace OpenKh.Kh2.Models
              * not_joint > On when the bone has no rigged vertices
              * The rest is unused
              */
+
+
+            public bool NoEnvelop
+            {
+                get => BitsUtil.Int.GetBit(Flags, 0);
+                set => Flags = (int)BitsUtil.Int.SetBit(Flags, 0, value);
+            }
+
+            public bool NoJoint
+            {
+                get => BitsUtil.Int.GetBit(Flags, 1);
+                set => Flags = (int)BitsUtil.Int.SetBit(Flags, 1, value);
+            }
 
             public override string ToString()
             {

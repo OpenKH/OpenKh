@@ -10,7 +10,8 @@
     <DataGrid Name="DataTable"
                 AutoGenerateColumns="False"
                 ItemsSource="{Binding ModelFile.Bones}"
-                CanUserAddRows="True">
+                CanUserAddRows="True"
+                GridLinesVisibility="All" HeadersVisibility="Column">
         <DataGrid.Columns>
             <DataGridTextColumn Binding="{Binding Path=Index}" Header="Index" />
             <DataGridTextColumn Binding="{Binding Path=SiblingIndex}" Header="SiblingIndex" />
@@ -28,7 +29,9 @@
             <DataGridTextColumn Binding="{Binding Path=TranslationY}" Header="TranslationY" />
             <DataGridTextColumn Binding="{Binding Path=TranslationZ}" Header="TranslationZ" />
             <DataGridTextColumn Binding="{Binding Path=TranslationW}" Header="TranslationW" />
-            <DataGridTextColumn Binding="{Binding Path=Flags}" Header="Flags" />
+            <!--<DataGridTextColumn Binding="{Binding Path=Flags}" Header="Flags" />-->
+            <DataGridCheckBoxColumn Binding="{Binding Path=NoEnvelop}" Header="No Envelop" />
+            <DataGridCheckBoxColumn Binding="{Binding Path=NoJoint}" Header="No Joint" />
         </DataGrid.Columns>
     </DataGrid>
     

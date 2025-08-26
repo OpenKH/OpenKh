@@ -24,7 +24,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
         public ObservableCollection<MotionSelector_Wrapper> MotionsView { get; set; }
 
         // FILTERS
-        private string _filterName { get; set; }
+        private string _filterName { get; set; } = "";
         public string FilterName
         {
             get { return _filterName; }
@@ -32,6 +32,7 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
             {
                 _filterName = value;
                 OnPropertyChanged("FilterName");
+                OnPropertyChanged("AllowMotionMove");
             }
         }
         private bool _filterHideDummies { get; set; }
@@ -42,7 +43,12 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
             {
                 _filterHideDummies = value;
                 OnPropertyChanged("FilterHideDummies");
+                OnPropertyChanged("AllowMotionMove");
             }
+        }
+        public bool AllowMotionMove
+        {
+            get { return !FilterHideDummies && FilterName == ""; }
         }
 
         // CONSTRUCTOR
@@ -143,18 +149,32 @@ namespace OpenKh.Tools.Kh2ObjectEditor.Modules.Motions
             
             loadMotions();
         }
-        public void Motion_ImportRC(int index, string msetPath)
+        public void Motion_ImportEntry(int index, string msetPath, BinaryArchive.EntryType entryType)
         {
             using FileStream streamMset = File.Open(msetPath, FileMode.Open);
-            if (!Bar.IsValid(streamMset))
-                throw new Exception("File is not a valid MSET: " + msetPath);
+            //if (!Bar.IsValid(streamMset))
+            //    throw new Exception("File is not a valid MSET: " + msetPath);
 
 
             MemoryStream msetStream = new MemoryStream();
             streamMset.CopyTo(msetStream);
 
+            MsetService msetService = MsetService.Instance;
+
+            // DUMMY
+            if(MsetService.Instance.MsetBinarc.Entries[index].Link == -1)
+            {
+                MsetService.Instance.MsetBinarc.Subfiles.Add(new byte[0]);
+                MsetService.Instance.MsetBinarc.Entries[index].Link = MsetService.Instance.MsetBinarc.Subfiles.Count - 1;
+            }
+
             MsetService.Instance.MsetBinarc.Subfiles[MsetService.Instance.MsetBinarc.Entries[index].Link] = msetStream.ToArray();
-            MsetService.Instance.MsetBinarc.Entries[index].Type = BinaryArchive.EntryType.Motionset;
+            MsetService.Instance.MsetBinarc.Entries[index].Type = entryType;
+            MsetService.Instance.MsetBinarc.Entries[index].Name = "IMPO";
+
+            loadMotions();
+            applyFilters();
+            App_Context.Instance.loadMotion(index);
         }
 
 
