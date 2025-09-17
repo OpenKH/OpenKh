@@ -125,7 +125,7 @@ namespace OpenKh.Command.IdxImg
 
                 [Required]
                 [Option(ShortName = "g", LongName = "game_id", Description = "Which game to patch for")]
-                [AllowedValues("kh1", "kh2", "bbs", "Recom", "kh3d")]
+                [McMaster.Extensions.CommandLineUtils.AllowedValues("kh1", "kh2", "bbs", "Recom", "kh3d")]
                 public string GameId { get; }
 
                 protected int OnExecute(CommandLineApplication app)
