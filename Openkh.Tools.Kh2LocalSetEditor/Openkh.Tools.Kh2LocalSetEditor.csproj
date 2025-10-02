@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <RootNamespace>KH2FM_Localset_Editor</RootNamespace>
     <AssemblyName>OpenKh.Tools.Kh2LocalSetEditor</AssemblyName>
     <UseWPF>true</UseWPF>
