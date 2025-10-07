@@ -1,7 +1,7 @@
 # [Kingdom Hearts I](index.md) - Worlds
 
-| Id | World |
-|----|-------|
+| Id | World             | Acronymous
+|----|-------------------|---------
 | AL | Agrabah
 | AW | Wonderland
 | DC | Disney Castle
@@ -9,18 +9,19 @@
 | DI | Destiny Island
 | EW | End of the World
 | GB | Unknown
-| HE | Olympus Coliseum
+| HE | Olympus Coliseum   ](#olympus)| **He**rcules
 | LM | Atlantica
 | NM | Halloweentown
 | PC | Hollow Bastion
 | PI | Monstro
-| PO | 100 Acre Wood
+| PO | 100 Acre Wood     ](#100-acre-wood)| **Po**oh
 | PP | Neverland
 | TW | Traverse Town
 | TZ | Deep Jungle
 | ZZ | Miscellaneous
 
-Agrabah
+## Agrabah
+
 | Filename | Area | 
 |----------|-----------|
 | al00_01.bin | Desert |
@@ -33,7 +34,8 @@ Agrabah
 | al00_08.bin | Aladdin's House |
 | al00_09.bin | Cave: Escape |
 
-Wonderland
+## Wonderland
+
 | Filename | Area | 
 |----------|-----------|
 | aw00_01.bin | Rabbit Hole |
@@ -45,7 +47,8 @@ Wonderland
 | aw00_07.bin | Bizzare Room (Ceiling) |
 | aw00_08.bin | Tiny Party Garden |
 
-Disney Castle
+## Disney Castle
+
 | Filename | Area | 
 |----------|-----------|
 | dc00_01.bin | Audience Chamber |
@@ -53,14 +56,16 @@ Disney Castle
 | dc00_03.bin | Gummi Hangar |
 | dc00_04.bin | Epilogue |
 
-Dive to Heart
+## Dive to Heart
+
 | Filename | Area | 
 |----------|-----------|
 | dh00_01.bin | Awakening |
 | dh00_02.bin | Awakening (Boss) |
 | dh00_03.bin | Seashore |
 
-Destiny Island
+## Destiny Island
+
 | Filename | Area | 
 |----------|-----------|
 | di00_01.bin | Seashore |
@@ -72,7 +77,8 @@ Destiny Island
 | di00_07.bin | Secret Place |
 | di00_08.bin | Secret Place (Past) |
 
-End of the World
+## End of the World
+
 | Filename | Area | 
 |----------|-----------|
 | ew00_01.bin | Gate to the Dark |
@@ -95,7 +101,8 @@ End of the World
 | ew00_18.bin | The Void (Final Boss) |
 | ew00_19.bin | Homecoming (Purple Dark Water) |
 
-Olympus Coliseum
+## Olympus Coliseum
+
 | Filename | Area | 
 |----------|-----------|
 | he00_01.bin | Coliseum Gates |
@@ -104,7 +111,8 @@ Olympus Coliseum
 | he00_04.bin | Coliseum: Arena (Night) |
 | he00_05.bin | Coliseum: Arena (Boss)  |
 
-Atlantica
+## Atlantica
+
 | Filename | Area | 
 |----------|-----------|
 | lm00_01.bin | Undersea Valley |
@@ -125,7 +133,8 @@ Atlantica
 | lm00_16.bin | Undersea Valley (Beta) |
 | lm00_17.bin | Undersea Valley (Beta) |
 
-Halloweentown
+## Halloweentown
+
 | Filename | Area | 
 |----------|-----------|
 | nm00_01.bin | Guillotine Square |
@@ -136,7 +145,8 @@ Halloweentown
 | nm00_06.bin | Evil Playroom |
 | nm00_07.bin | Research Lab |
 
-Hollow Bastion
+## Hollow Bastion
+
 | Filename | Area | 
 |----------|-----------|
 | pc00_01.bin | Rising Falls |
@@ -152,7 +162,8 @@ Hollow Bastion
 | pc00_11.bin | Grand Hall |
 | pc00_12.bin | Castle Chapel (Cutscene) |
 
-Monstro
+## Monstro
+
 | Filename | Area | 
 |----------|-----------|
 | pi00_01.bin | Mouth |
@@ -160,7 +171,8 @@ Monstro
 | pi00_03.bin | Stomach (Boss) |
 | pi00_04.bin | Chambers |
 
-100 Acre Wood
+## 100 Acre Wood
+
 | Filename | Area | 
 |----------|-----------|
 | po00_01.bin | Pooh's House |
@@ -173,7 +185,8 @@ Monstro
 | po00_08.bin | Wood: Hill (Night) |
 | po00_09.bin | 100 Acre Wood (Opened Book) |
 
-Neverland
+## Neverland
+
 | Filename | Area | 
 |----------|-----------|
 | pp00_01.bin | Ship: Hold |
@@ -181,7 +194,8 @@ Neverland
 | pp00_03.bin | Clock Tower|
 | pp00_04.bin | Clock Tower (Beta) |
 
-Traverse Town
+## Traverse Town
+
 | Filename | Area | 
 |----------|-----------|
 | tw00_01.bin | 1st District |
@@ -198,7 +212,8 @@ Traverse Town
 | tw00_12.bin | Secret Waterway |
 | tw00_13.bin | 3rd District (Small House) |
 
-Deep Jungle
+## Deep Jungle
+
 | Filename | Area | 
 |----------|-----------|
 | tz00_01.bin | Tree House |
