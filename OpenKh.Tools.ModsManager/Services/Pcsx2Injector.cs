@@ -416,6 +416,7 @@ namespace OpenKh.Tools.ModsManager.Services
             ADDIU(RA, RA, 0x98), // skip the remainder of the function
             LI(V0, -1),
             JR(RA),
+            NOP(),
         };
 
         private static readonly uint[] RegionInitPatch = new uint[]
