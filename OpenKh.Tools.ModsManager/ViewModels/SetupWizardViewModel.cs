@@ -120,6 +120,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     var game = GameService.DetectGameId(_isoLocation);
                     GameId = game?.Id;
                     GameName = game?.Name;
+                    ConfigurationService.LaunchGame = GameId;
                     ConfigurationService.IsoLocation = _isoLocation;
                 }
                 else

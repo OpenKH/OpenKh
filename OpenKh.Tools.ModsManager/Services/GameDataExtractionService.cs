@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Xceed.Wpf.Toolkit.Core.Converters;
 using Xe.IO;
 
 namespace OpenKh.Tools.ModsManager.Services
@@ -62,6 +63,11 @@ namespace OpenKh.Tools.ModsManager.Services
                 {
                     var fileName = Idx1Name.Lookup(fileEntry.Value) ?? $"@noname/{fileEntry.Value.Hash:X08}";
                     using var stream = img.FileOpen(fileEntry.Value);
+                    if (stream == null)
+                    {
+                        Log.Warn($"Unable to extract {fileName}");
+                        continue;
+                    }
                     var fileDestination = Path.Combine(gameDataLocation, "kh1", fileName);
                     var directoryDestination = Path.GetDirectoryName(fileDestination);
                     if (!Directory.Exists(directoryDestination))

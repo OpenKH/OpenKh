@@ -14,6 +14,20 @@ namespace OpenKh.Tools.ModsManager.Services
 
         private static readonly HashSet<string> _denyList = new HashSet<string>
         {
+            // KH1
+            "dkmovie.x",
+            "dktitle.x",
+            "gb.x",
+            "wm.x",
+            "xl_limit.x",
+            "xs_bambi.x",
+            "xs_dh_break.x",
+            "xs_dumbo.x",
+            "xs_genie.x",
+            "xs_mushu.x",
+            "xs_simba.x",
+            "xs_tink.x",
+            // KH2
             "ovl_title.x",
             "ovl_shop.x",
             "ovl_movie.x",
@@ -24,7 +38,8 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public int LoadFile(Stream outStream, string fileName)
         {
-            if (GetFinalNamePath(fileName, out var finalFileName))
+            int status = GetFinalNamePath(fileName, out var finalFileName);
+            if (status == 0)
             {
                 Log.Info($"Load file {finalFileName}");
                 return File.OpenRead(finalFileName).Using(x =>
@@ -33,38 +48,44 @@ namespace OpenKh.Tools.ModsManager.Services
                     return (int)x.Length;
                 });
             }
-
-            Log.Warn($"File {fileName} not found, falling back");
-            return 0;
+            else if (status == -1)
+            {
+                Log.Warn($"File {fileName} is on the deny list, falling back");
+            }
+            else
+            {
+                Log.Warn($"File {fileName} not found, falling back");
+            }
+                return 0;
         }
 
         public int GetFileSize(string fileName)
         {
-            if (GetFinalNamePath(fileName, out var finalFileName))
+            if (GetFinalNamePath(fileName, out var finalFileName) == 0)
                 return (int)new FileInfo(finalFileName).Length;
 
             return 0;
         }
 
-        private bool GetFinalNamePath(string fileName, out string finalFileName)
+        private int GetFinalNamePath(string fileName, out string finalFileName)
         {
             if (_denyList.Contains(fileName))
             {
                 finalFileName = null;
-                return false;
+                return -1;  // Error Code -1: denied
             }
 
             finalFileName = Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame, fileName);
             if (File.Exists(finalFileName))
-                return true;
+                return 0;
 
             finalFileName = Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame, fileName);
             if (File.Exists(finalFileName))
-                return true;
+                return 0;
 
             var region = GetRegion(fileName);
             if (region == null)
-                return false;
+                return -2;  // Error Code -2: file not found
 
             foreach (var fallback in _regionFallback)
             {
@@ -74,15 +95,15 @@ namespace OpenKh.Tools.ModsManager.Services
                     .Replace($".apdx", $".a.{fallback}");
                 finalFileName = Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame, temptativeRegionalFallbackFileName);
                 if (File.Exists(finalFileName))
-                    return true;
+                    return 0;
 
                 finalFileName = Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame, temptativeRegionalFallbackFileName);
                 if (File.Exists(finalFileName))
-                    return true;
+                    return 0;
             }
 
             finalFileName = null;
-            return false;
+            return -2;  // Error Code -2: file not found
         }
 
         private static string GetRegion(string fileName)
