@@ -553,6 +553,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         PC = false;
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
                 }
+                ReloadModsList();
             });
 
             OpenPresetMenuCommand = new RelayCommand(_ =>

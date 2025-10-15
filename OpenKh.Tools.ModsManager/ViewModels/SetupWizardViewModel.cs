@@ -1696,6 +1696,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     onProgress: CreateOnProgressProcessor()
                                 );
                                 break;
+                            case "Recom":
+                                await _gameDataExtractionService.ExtractRecomPs2EditionAsync(
+                                    isoLocation: isoLocation,
+                                    gameDataLocation: gameDataLocation,
+                                    onProgress: CreateOnProgressProcessor()
+                                );
+                                break;
                         }
                         break;
                     }

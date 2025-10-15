@@ -230,6 +230,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Command.KHAnimationC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Openkh.Tools.Kh2LocalSetEditor", "Openkh.Tools.Kh2LocalSetEditor\Openkh.Tools.Kh2LocalSetEditor.csproj", "{D58EEC5B-962C-4888-953B-4A443015E45D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Recom", "OpenKh.Recom\OpenKh.Recom.csproj", "{E9CAA582-1823-4B42-8218-F4B7B2C788D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		.NET Debug|Any CPU = .NET Debug|Any CPU
@@ -932,6 +934,14 @@ Global
 		{D58EEC5B-962C-4888-953B-4A443015E45D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D58EEC5B-962C-4888-953B-4A443015E45D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D58EEC5B-962C-4888-953B-4A443015E45D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9CAA582-1823-4B42-8218-F4B7B2C788D3}..NET Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{E9CAA582-1823-4B42-8218-F4B7B2C788D3}..NET Debug|Any CPU.Build.0 = Release|Any CPU
+		{E9CAA582-1823-4B42-8218-F4B7B2C788D3}..NET Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9CAA582-1823-4B42-8218-F4B7B2C788D3}..NET Release|Any CPU.Build.0 = Release|Any CPU
+		{E9CAA582-1823-4B42-8218-F4B7B2C788D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9CAA582-1823-4B42-8218-F4B7B2C788D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9CAA582-1823-4B42-8218-F4B7B2C788D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9CAA582-1823-4B42-8218-F4B7B2C788D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1028,6 +1038,7 @@ Global
 		{788CDE3D-77D8-4910-8D1A-C829EFD591D2} = {EC12F6FC-5753-430C-AE13-09EFD219E432}
 		{A8DAC079-E416-4574-9B54-19EED185D368} = {9C52D787-9819-4B89-989B-EEA6FEB20731}
 		{D58EEC5B-962C-4888-953B-4A443015E45D} = {402B2669-D594-4DFA-965B-02A92626ADC6}
+		{E9CAA582-1823-4B42-8218-F4B7B2C788D3} = {0FB7CD6A-EE31-467D-A590-267DCD028618}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DF3960B-4FE5-4E56-92D4-2FC0A912E823}

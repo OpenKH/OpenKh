@@ -1,6 +1,7 @@
 using OpenKh.Common;
 using OpenKh.Kh1;
 using OpenKh.Kh2;
+using OpenKh.Recom;
 using System;
 using System.IO;
 using System.Linq;
@@ -82,6 +83,20 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 onProgress(1.0f);
             });
+        }
+
+        public async Task ExtractRecomPs2EditionAsync(
+            string isoLocation,
+            string gameDataLocation,
+            Action<float> onProgress)
+        {
+            var stream = File.OpenRead(isoLocation);
+            var rdi_stream = IsoUtility.GetSectors(stream, 0x244, stream.SetPosition(0x244 * 0x800).ReadByte());
+            var rdi = RootDirInfo.Read(rdi_stream);
+            await Task.Run(() => {
+                rdi.ExtractFiles(stream, Path.Combine(gameDataLocation, "Recom"), onProgress);
+            });
+            stream.Close();
         }
 
         public async Task ExtractKh2Ps2EditionAsync(
