@@ -699,11 +699,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 if (!File.Exists(panaceaSettings))
                                 {
                                     File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
-                                    new string[]
-                                    {
-                                $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
-                                $"show_console={false}",
-                                    });
+                                    [
+                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                    $"show_console={false}",
+                                    ]);
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
@@ -737,14 +736,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
                                     {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
-                                        new string[]
-                                        {
-                                    $"mod_path={ConfigurationService.GameModPath}",
-                                    $"show_console={false}",
-                                        });
+                                        [
+                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                        $"show_console={false}",
+                                        ]);
                                     }
-                                    else
-                                        File.Create(panaceaSettings);
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
@@ -776,11 +772,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 if (!File.Exists(panaceaSettings))
                                 {
                                     File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
-                                    new string[]
-                                    {
-                                $"mod_path={ConfigurationService.GameModPath}",
-                                $"show_console={false}",
-                                    });
+                                    [
+                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                    $"show_console={false}",
+                                    ]);
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
@@ -814,14 +809,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
                                     {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
-                                        new string[]
-                                        {
-                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
-                                    $"show_console={false}",
-                                        });
+                                        [
+                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                        $"show_console={false}",
+                                        ]);
                                     }
-                                    else
-                                        File.Create(panaceaSettings);
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
@@ -851,10 +843,34 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             if (!(_launchGame == "kh3d"))
                             {
+                                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
+                                if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
+                                {
+                                    if (Directory.Exists(ConfigurationService.PcReleaseLocation))
+                                    {
+                                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
+                                        [
+                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                        $"show_console={false}",
+                                        ]);
+                                    }
+                                }
                                 filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
                             }
                             else
                             {
+                                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
+                                if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
+                                {
+                                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                                    {
+                                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
+                                        [
+                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                        $"show_console={false}",
+                                        ]);
+                                    }
+                                }
                                 filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
                             }
                             processStartInfo = new ProcessStartInfo
