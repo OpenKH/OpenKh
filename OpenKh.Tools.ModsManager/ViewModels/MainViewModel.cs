@@ -1248,7 +1248,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         try
                         {
-                            Directory.Delete(Path.Combine(ConfigurationService.GameModPath, _launchGame), true);
+                            Directory.Delete(ConfigurationService.GameModPath, true);
                         }
                         catch (Exception ex)
                         {
