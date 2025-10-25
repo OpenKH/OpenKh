@@ -701,7 +701,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
                                     new string[]
                                     {
-                                $"mod_path={ConfigurationService.GameModPath}",
+                                $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
                                 $"show_console={false}",
                                     });
                                 }
@@ -816,7 +816,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
                                         new string[]
                                         {
-                                    $"mod_path={ConfigurationService.GameModPath}",
+                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
                                     $"show_console={false}",
                                         });
                                     }
