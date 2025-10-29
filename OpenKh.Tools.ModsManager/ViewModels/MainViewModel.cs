@@ -545,7 +545,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         PanaceaInstalled = ConfigurationService.PanaceaInstalled;
                     }
                     else
+                    {
                         PC = false;
+                        GametoLaunch = 0;
+                    }
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
                 }
             });
