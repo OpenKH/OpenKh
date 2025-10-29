@@ -1005,19 +1005,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (ConfigurationService.GameEdition == 2)
                 {
                     // Use the package map file to rearrange the files in the structure needed by the patcher
-                    var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, _launchGame, "patch-package-map.txt");
+                    var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, "patch-package-map.txt");
                     var packageMap = File
                         .ReadLines(packageMapLocation)
                         .Select(line => line.Split(" $$$$ "))
                         .ToDictionary(array => array[0], array => array[1]);
 
-                    var patchStagingDir = Path.Combine(ConfigurationService.GameModPath, _launchGame, "patch-staging");
+                    var patchStagingDir = Path.Combine(ConfigurationService.GameModPath, "patch-staging");
                     if (Directory.Exists(patchStagingDir))
                         Directory.Delete(patchStagingDir, true);
                     Directory.CreateDirectory(patchStagingDir);
                     foreach (var entry in packageMap)
                     {
-                        var sourceFile = Path.Combine(ConfigurationService.GameModPath, _launchGame, entry.Key);
+                        var sourceFile = Path.Combine(ConfigurationService.GameModPath, entry.Key);
                         var destFile = Path.Combine(patchStagingDir, entry.Value);
                         if (File.Exists(sourceFile))
                         {
@@ -1026,7 +1026,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }
                     }
 
-                    foreach (var directory in Directory.GetDirectories(Path.Combine(ConfigurationService.GameModPath, _launchGame)))
+                    foreach (var directory in Directory.GetDirectories(Path.Combine(ConfigurationService.GameModPath)))
                         if (!"patch-staging".Equals(Path.GetFileName(directory)))
                             Directory.Delete(directory, true);
 
@@ -1038,18 +1038,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         specialDirs = Directory.GetDirectories(specialStagingDir).Select(directory => Path.GetFileName(directory)).ToArray();
 
                     foreach (var packageName in stagingDirs)
-                        Directory.Move(Path.Combine(patchStagingDir, packageName), Path.Combine(ConfigurationService.GameModPath, _launchGame, packageName));
+                        Directory.Move(Path.Combine(patchStagingDir, packageName), Path.Combine(ConfigurationService.GameModPath, packageName));
                     foreach (var specialDir in specialDirs)
-                        Directory.Move(Path.Combine(ConfigurationService.GameModPath, _launchGame, "special", specialDir), Path.Combine(ConfigurationService.GameModPath, _launchGame, specialDir));
+                        Directory.Move(Path.Combine(ConfigurationService.GameModPath, "special", specialDir), Path.Combine(ConfigurationService.GameModPath, specialDir));
 
                     stagingDirs.Remove("special"); // Since it's not actually a real game package
                     Directory.Delete(patchStagingDir, true);
 
-                    var specialModDir = Path.Combine(ConfigurationService.GameModPath, _launchGame, "special");
+                    var specialModDir = Path.Combine(ConfigurationService.GameModPath, "special");
                     if (Directory.Exists(specialModDir))
                         Directory.Delete(specialModDir, true);
 
-                    foreach (var directory in stagingDirs.Select(packageDir => Path.Combine(ConfigurationService.GameModPath, _launchGame, packageDir)))
+                    foreach (var directory in stagingDirs.Select(packageDir => Path.Combine(ConfigurationService.GameModPath, packageDir)))
                     {
                         if (specialDirs.Contains(Path.GetDirectoryName(directory)))
                             continue;
