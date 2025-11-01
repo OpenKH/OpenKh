@@ -297,7 +297,7 @@ namespace OpenKh.Patcher
                                         string matchedRegion = emulatorRegionPaths.FirstOrDefault(x => name.Contains(x));
                                         if (matchedRegion != null)
                                         {
-                                            string emuRegionPath = context.GetOriginalAssetPath(name.Substring(0, name.IndexOf(matchedRegion)) + 3);
+                                            string emuRegionPath = context.GetOriginalAssetPath(name.Substring(0, name.IndexOf(matchedRegion) + 3));
                                             if (Directory.Exists(emuRegionPath))
                                             {
                                                 Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
@@ -329,7 +329,7 @@ namespace OpenKh.Patcher
                                         string matchedRegion = emulatorRegionPaths.FirstOrDefault(x => assetFile.Source[0].Name.Contains(x));
                                         if (matchedRegion != null)
                                         {
-                                            string emuRegionPath = context.GetOriginalAssetPath(assetFile.Source[0].Name.Substring(0, assetFile.Source[0].Name.IndexOf(matchedRegion)) + 3);
+                                            string emuRegionPath = context.GetOriginalAssetPath(assetFile.Source[0].Name.Substring(0, assetFile.Source[0].Name.IndexOf(matchedRegion) + 3));
                                             if (Directory.Exists(emuRegionPath))
                                             {
                                                 Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
