@@ -294,10 +294,14 @@ namespace OpenKh.Patcher
                                     }
                                     else
                                     {
-                                        string emuRegionPath = context.GetOriginalAssetPath(name.Substring(0, name.IndexOf(emulatorRegionPaths.FirstOrDefault(x => name.Contains(x))) + 3));
-                                        if (Directory.Exists(emuRegionPath))
+                                        string matchedRegion = emulatorRegionPaths.FirstOrDefault(x => name.Contains(x));
+                                        if (matchedRegion != null)
                                         {
-                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
+                                            string emuRegionPath = context.GetOriginalAssetPath(name.Substring(0, name.IndexOf(matchedRegion)) + 3);
+                                            if (Directory.Exists(emuRegionPath))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
+                                            }
                                         }
                                     }
                                 }
@@ -322,10 +326,14 @@ namespace OpenKh.Patcher
                                     }
                                     else
                                     {
-                                        string emuRegionPath = context.GetOriginalAssetPath(assetFile.Source[0].Name.Substring(0, assetFile.Source[0].Name.IndexOf(emulatorRegionPaths.FirstOrDefault(x => assetFile.Source[0].Name.Contains(x))) + 3));
-                                        if (Directory.Exists(emuRegionPath))
+                                        string matchedRegion = emulatorRegionPaths.FirstOrDefault(x => assetFile.Source[0].Name.Contains(x));
+                                        if (matchedRegion != null)
                                         {
-                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
+                                            string emuRegionPath = context.GetOriginalAssetPath(assetFile.Source[0].Name.Substring(0, assetFile.Source[0].Name.IndexOf(matchedRegion)) + 3);
+                                            if (Directory.Exists(emuRegionPath))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
                                         }
                                     }
                                 }
@@ -1028,7 +1036,7 @@ namespace OpenKh.Patcher
                         }
                         inventoriesBaseOffset = (ushort)(Kh2.SystemData.Shop.HeaderSize + moddedShopEntryHelpers.Count * Kh2.SystemData.Shop.ShopEntrySize);
                         shop.ShopEntries = moddedShopEntryHelpers.Select(x => x.ToShopEntry(inventoriesBaseOffset)).ToList();
-                        List<Kh2.SystemData.Shop.InventoryEntryHelper> moddedInventoryEntryHelpers = shop.InventoryEntries.Select((x, index) => 
+                        List<Kh2.SystemData.Shop.InventoryEntryHelper> moddedInventoryEntryHelpers = shop.InventoryEntries.Select((x, index) =>
                             x.ToInventoryEntryHelper(index, productsBaseOffset)
                         ).ToList();
                         if (moddedShop?.InventoryEntryHelpers != null)
