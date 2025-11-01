@@ -272,6 +272,7 @@ namespace OpenKh.Patcher
                                 // The following codes are for validation purposes only.
 
                                 List<string> globalFilePaths = new List<string> { ".a.fr", ".a.gr", ".a.it", ".a.sp", ".a.us", "/fr/", "/gr/", "/it/", "/sp/", "/us/" };
+                                List<string> emulatorRegionPaths = new List<string> { "/jp/", "/us/", "/it/", "/sp/", "/gr/", "/fr/", "/fm/" };
                                 if (assetFile.Method != "copy" && assetFile.Method != "imd")
                                 {
                                     if (platform == 2)
@@ -293,7 +294,11 @@ namespace OpenKh.Patcher
                                     }
                                     else
                                     {
-                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
+                                        string emuRegionPath = context.GetOriginalAssetPath(name.Substring(0, name.IndexOf(emulatorRegionPaths.FirstOrDefault(x => name.Contains(x))) + 3));
+                                        if (Directory.Exists(emuRegionPath))
+                                        {
+                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
+                                        }
                                     }
                                 }
                                 else if (assetFile.Source[0].Type == "internal")
@@ -317,7 +322,11 @@ namespace OpenKh.Patcher
                                     }
                                     else
                                     {
-                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
+                                        string emuRegionPath = context.GetOriginalAssetPath(assetFile.Source[0].Name.Substring(0, assetFile.Source[0].Name.IndexOf(emulatorRegionPaths.FirstOrDefault(x => assetFile.Source[0].Name.Contains(x))) + 3));
+                                        if (Directory.Exists(emuRegionPath))
+                                        {
+                                            Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
+                                        }
                                     }
                                 }
                                 else
