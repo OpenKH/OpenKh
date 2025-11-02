@@ -392,7 +392,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         process.Kill(true);
                     }
                 }
-                System.Windows.Forms.Application.Restart();
+                MessageBox.Show(
+                       $"Mods Manager had problems starting. Will now force close any instances of Mods Manager to hopefully allow you to re-open the program",
+                       "Error",
+                       MessageBoxButton.OK,
+                       MessageBoxImage.Error);
                 Process.GetCurrentProcess().Kill();
             }
 
