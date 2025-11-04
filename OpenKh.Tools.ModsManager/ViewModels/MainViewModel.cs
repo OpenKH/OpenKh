@@ -325,7 +325,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     try
                     {
                         string PanaceaSourceLocation = Path.Combine(AppContext.BaseDirectory, "OpenKH.Panacea.dll");
-                        if (ConfigurationService.PcReleaseLanguage != null)
+                        if (ConfigurationService.PcReleaseLocation != null)
                         {
                             string PanaceaDestinationLocation = Path.Combine(ConfigurationService.PcReleaseLocation, "DBGHELP.dll");
                             string PanaceaAlternateLocation = Path.Combine(ConfigurationService.PcReleaseLocation, "version.dll");
@@ -384,6 +384,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
             catch
             {
+                MessageBox.Show(
+                       $"Mods Manager had problems starting. Will now force close any instances of Mods Manager to hopefully allow you to re-open the program.",
+                       "Error",
+                       MessageBoxButton.OK,
+                       MessageBoxImage.Error);
                 Process[] runningProcesses = Process.GetProcesses();
                 foreach (Process process in runningProcesses)
                 {
@@ -392,11 +397,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         process.Kill(true);
                     }
                 }
-                MessageBox.Show(
-                       $"Mods Manager had problems starting. Will now force close any instances of Mods Manager to hopefully allow you to re-open the program",
-                       "Error",
-                       MessageBoxButton.OK,
-                       MessageBoxImage.Error);
                 Process.GetCurrentProcess().Kill();
             }
 
