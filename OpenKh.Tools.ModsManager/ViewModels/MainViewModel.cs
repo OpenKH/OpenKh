@@ -1359,7 +1359,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
 
                 string panaceaSettings = Path.Combine(configTargetPath, "panacea_settings.txt");
-                string[] lines = File.ReadAllLines(panaceaSettings);
+                string[] lines = File.Exists(panaceaSettings) ? File.ReadAllLines(panaceaSettings) : Array.Empty<string>();
                 string textToWrite = $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}\r\n";
                 foreach (string entry in lines)
                 {
