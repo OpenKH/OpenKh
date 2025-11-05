@@ -1351,6 +1351,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     configTargetPath = ConfigurationService.PcReleaseLocation;
                 else if (ConfigurationService.PcReleaseLocationKH3D != null)
                     configTargetPath = ConfigurationService.PcReleaseLocationKH3D;
+                else
+                {
+                    Log.Warn("Unable to update Panacea settings! Game installation directory is not configured or is invalid.")
+
+                    return;
+                }
 
                 string panaceaSettings = Path.Combine(configTargetPath, "panacea_settings.txt");
                 string[] lines = File.ReadAllLines(panaceaSettings);
