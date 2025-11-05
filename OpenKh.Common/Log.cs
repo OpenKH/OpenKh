@@ -115,9 +115,9 @@ namespace OpenKh.Common
             {
                 return new StreamWriter(LogFileName, false, Encoding.UTF8, 65536);
             }
-            catch
+            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
             {
-                // For example: `System. UnauthorizedAccessException: Access to the path 'C:\WINDOWS\system32\OpenKh.Tools.ModsManager.log' is denied.`
+                // For example: `System.UnauthorizedAccessException: Access to the path 'C:\WINDOWS\system32\OpenKh.Tools.ModsManager.log' is denied.`
                 // Currently no need to inform the user about this failure.
 
                 return StreamWriter.Null;
