@@ -1345,42 +1345,34 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             if (PanaceaInstalled)
             {
+                string configTargetPath;
+
                 if (_launchGame != "kh3d" && ConfigurationService.PcReleaseLocation != null)
-                {
-                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
-                    string[] lines = File.ReadAllLines(panaceaSettings);
-                    string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\n";
-                    foreach (string entry in lines)
-                    {
-                        if (entry.Contains("dev_path"))
-                        {
-                            textToWrite += entry;
-                            break;
-                        }
-                    }
-                    textToWrite += $"\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
-                        $"debug_log={_panaceaDebugLogEnabled}\r\nsound_debug={_panaceaSoundDebugEnabled}\r\n" +
-                        $"enable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
-                    File.WriteAllText(panaceaSettings, textToWrite);
-                }
+                    configTargetPath = ConfigurationService.PcReleaseLocation;
                 else if (ConfigurationService.PcReleaseLocationKH3D != null)
+                    configTargetPath = ConfigurationService.PcReleaseLocationKH3D;
+                else
                 {
-                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
-                    string[] lines = File.ReadAllLines(panaceaSettings);
-                    string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\n";
-                    foreach (string entry in lines)
-                    {
-                        if (entry.Contains("dev_path"))
-                        {
-                            textToWrite += entry;
-                            break;
-                        }
-                    }
-                    textToWrite += $"\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
-                        $"debug_log={_panaceaDebugLogEnabled}\r\nsound_debug={_panaceaSoundDebugEnabled}\r\n" +
-                        $"enable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
-                    File.WriteAllText(panaceaSettings, textToWrite);
+                    Log.Warn("Unable to update Panacea settings! Game installation directory is not configured or is invalid.");
+
+                    return;
                 }
+
+                string panaceaSettings = Path.Combine(configTargetPath, "panacea_settings.txt");
+                string[] lines = File.Exists(panaceaSettings) ? File.ReadAllLines(panaceaSettings) : Array.Empty<string>();
+                string textToWrite = $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}\r\n";
+                foreach (string entry in lines)
+                {
+                    if (entry.Contains("dev_path"))
+                    {
+                        textToWrite += entry;
+                        break;
+                    }
+                }
+                textToWrite += $"\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
+                    $"debug_log={_panaceaDebugLogEnabled}\r\nsound_debug={_panaceaSoundDebugEnabled}\r\n" +
+                    $"enable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
+                File.WriteAllText(panaceaSettings, textToWrite);
             }
         }
 
