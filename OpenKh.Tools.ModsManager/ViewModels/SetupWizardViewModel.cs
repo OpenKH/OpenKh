@@ -1008,20 +1008,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         if (Directory.Exists(PcReleaseLocation))
                         {
                             File.WriteAllLines(Path.Combine(PcReleaseLocation, "panacea_settings.txt"),
-                                new string[]
-                                {
-                                $"mod_path={ConfigurationService.GameModPath}",
+                                [
+                                $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
                                 $"show_console={false}",
-                                });
+                                ]);
                         }
                         if (Directory.Exists(PcReleaseLocationKH3D))
                         {
                             File.WriteAllLines(Path.Combine(PcReleaseLocationKH3D, "panacea_settings.txt"),
-                                new string[]
-                                {
-                                $"mod_path={ConfigurationService.GameModPath}",
+                                [
+                                $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
                                 $"show_console={false}",
-                                });
+                                ]);
                         }
                     }
                     catch (Exception ex)
@@ -1211,27 +1209,27 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 if (LuaScriptPaths.Contains("kh1") && GameCollection == 0)
                                 {
                                     int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
-                                    config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));
+                                    config = config.Insert(index, ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "kh1/scripts\" , relative = false}").Replace("\\", "/"));
                                 }
                                 if (LuaScriptPaths.Contains("kh2") && GameCollection == 0)
                                 {
                                     int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
-                                    config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
+                                    config = config.Insert(index, ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "kh2/scripts\" , relative = false}").Replace("\\", "/"));
                                 }
                                 if (LuaScriptPaths.Contains("bbs") && GameCollection == 0)
                                 {
                                     int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
-                                    config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
+                                    config = config.Insert(index, ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "bbs/scripts\" , relative = false}").Replace("\\", "/"));
                                 }
                                 if (LuaScriptPaths.Contains("Recom") && GameCollection == 0)
                                 {
                                     int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
-                                    config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
+                                    config = config.Insert(index, ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "Recom/scripts\" , relative = false}").Replace("\\", "/"));
                                 }
                                 if (LuaScriptPaths.Contains("kh3d") && GameCollection == 1)
                                 {
                                     int index = config.IndexOf("true }", config.IndexOf("[kh3d]")) + 6;
-                                    config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}").Replace("\\", "/"));
+                                    config = config.Insert(index, ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "kh3d/scripts\" , relative = false}").Replace("\\", "/"));
                                 }
                                 if (ConfigurationService.PCVersion == "Steam")
                                 {
@@ -1327,7 +1325,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                                 int index = config.IndexOf("scripts", config.IndexOf("[kh1]"));
                                                 config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                                 config = config.Insert(index, "scripts = [{ path = \"scripts/kh1/\", relative = true }" +
-                                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
+                                                    ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
                                                 break;
                                             }
                                         }
@@ -1337,7 +1335,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         int index = config.IndexOf("scripts", config.IndexOf("[kh1]"));
                                         config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                         config = config.Insert(index, "scripts = [{ path = \"scripts/kh1/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
                                     }
                                 }
                                 if (LuaScriptPaths.Contains("kh2") && GameCollection == 0)
@@ -1355,7 +1353,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                                 int index = config.IndexOf("scripts", config.IndexOf("[kh2]"));
                                                 config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                                 config = config.Insert(index, "scripts = [{ path = \"scripts/kh2/\", relative = true }" +
-                                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
+                                                    ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
                                                 break;
                                             }
                                         }
@@ -1365,7 +1363,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         int index = config.IndexOf("scripts", config.IndexOf("[kh2]"));
                                         config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                         config = config.Insert(index, "scripts = [{ path = \"scripts/kh2/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
                                     }
                                 }
                                 if (LuaScriptPaths.Contains("bbs") && GameCollection == 0)
@@ -1383,7 +1381,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                                 int index = config.IndexOf("scripts", config.IndexOf("[bbs]"));
                                                 config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                                 config = config.Insert(index, "scripts = [{ path = \"scripts/bbs/\", relative = true }" +
-                                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
+                                                    ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
                                                 break;
                                             }
                                         }
@@ -1393,7 +1391,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         int index = config.IndexOf("scripts", config.IndexOf("[bbs]"));
                                         config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                         config = config.Insert(index, "scripts = [{ path = \"scripts/bbs/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
                                     }
                                 }
                                 if (LuaScriptPaths.Contains("Recom") && GameCollection == 0)
@@ -1411,7 +1409,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                                 int index = config.IndexOf("scripts", config.IndexOf("[recom]"));
                                                 config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                                 config = config.Insert(index, "scripts = [{ path = \"scripts/recom/\", relative = true }" +
-                                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
+                                                    ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
                                                 break;
                                             }
                                         }
@@ -1421,7 +1419,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         int index = config.IndexOf("scripts", config.IndexOf("[recom]"));
                                         config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                         config = config.Insert(index, "scripts = [{ path = \"scripts/recom/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
                                     }
                                 }
                                 if (LuaScriptPaths.Contains("kh3d") && GameCollection == 1)
@@ -1439,7 +1437,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                                 int index = config.IndexOf("scripts", config.IndexOf("[kh3d]"));
                                                 config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                                 config = config.Insert(index, "scripts = [{ path = \"scripts/kh3d/\", relative = true }" +
-                                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
+                                                    ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
                                                 break;
                                             }
                                         }
@@ -1449,7 +1447,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         int index = config.IndexOf("scripts", config.IndexOf("[kh3d]"));
                                         config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                         config = config.Insert(index, "scripts = [{ path = \"scripts/kh3d/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath, "..")), "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
                                     }
                                 }
                                 if (ConfigurationService.PCVersion == "Steam")

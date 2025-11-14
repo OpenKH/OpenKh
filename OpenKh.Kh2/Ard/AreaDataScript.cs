@@ -541,11 +541,16 @@ namespace OpenKh.Kh2.Ard
 
             public void Parse(int nRow, List<string> tokens)
             {
-                throw new Exception($"Parsing an '{nameof(If)}' is not yet supported");
+                var entrance = GetToken(nRow, tokens, 1);
+                if (entrance != "Entrance")
+                {
+                    throw new SpawnScriptParserException(nRow, $"Expected 'Entrance' keyword, but got '{entrance}'.");
+                }
+                Value = ParseAsInt(nRow, GetToken(nRow, tokens, 2));
             }
 
             public override string ToString() =>
-                $"{nameof(If)} Entrance {Value}{string.Join("\n\t", Commands)}\n";
+                $"{nameof(If)} Entrance {Value}\n{string.Concat(Commands?.Select(one => $"\t{one}\n") ?? Enumerable.Empty<string>())}";
         }
 
         public class Unk1d : IAreaDataCommand
@@ -813,7 +818,7 @@ namespace OpenKh.Kh2.Ard
 
         public static string Decompile(IEnumerable<AreaDataScript> scripts) =>
             string.Join("\n\n", scripts.Select(x => x.ToString()));
-        
+
         public static IEnumerable<AreaDataScript> Compile(string text)
         {
             const char Comment = '#';
@@ -830,10 +835,13 @@ namespace OpenKh.Kh2.Ard
                 .Replace("\r", "\n")
                 .Split('\n');
 
+            If lastIf = null;
+
             var row = 0;
             while (row < lines.Length)
             {
                 var line = lines[row++];
+                var indented = (lastIf != null) && line.StartsWith("\t");
                 var cleanLine = line.Split(Comment);
                 var tokens = Tokenize(row, cleanLine[0]).ToList();
                 if (tokens.Count == 0)
@@ -854,6 +862,7 @@ namespace OpenKh.Kh2.Ard
 
                         state = LexState.Code;
                         script.ProgramId = programId;
+                        lastIf = null;
                         break;
                     case "AreaSettings":
                         var function = new AreaSettings
@@ -862,6 +871,7 @@ namespace OpenKh.Kh2.Ard
                         };
                         function.Parse(row, tokens);
                         script.Functions.Add(function);
+                        lastIf = null;
 
                         while (row < lines.Length && (lines[row].Length == 0 || char.IsWhiteSpace(lines[row][0])))
                         {
@@ -875,7 +885,49 @@ namespace OpenKh.Kh2.Ard
                         }
                         break;
                     default:
-                        script.Functions.Add(ParseCommand(row, tokens));
+                        // A command is either one of the following styles:
+                        // - root level command
+                        // - inside an if block, where it starts a line with a tab character
+                        // 
+                        // ```
+                        // Program 0x26
+                        // Spawn "b_9e"
+                        // ...
+                        // ```
+                        //
+                        // ```
+                        // Program 0xBE
+                        // Spawn "b_z1"
+                        // ...
+                        // If Entrance 5
+                        //     Mission 0x15F "HE_COLOSSEUM_2"
+                        //     ...
+                        // 
+                        // If Entrance 6
+                        //     Mission 0x15F "HE_COLOSSEUM_2"
+                        //     ...
+                        // 
+                        // ```
+
+                        var func = ParseCommand(row, tokens);
+                        if (func is If)
+                        {
+                            // Start of a new if block
+                            lastIf = (If)func;
+                            lastIf.Commands ??= new List<IAreaDataCommand>();
+                            script.Functions.Add(func);
+                        }
+                        else if (lastIf != null && indented)
+                        {
+                            // Inside an if block
+                            lastIf.Commands.Add(func);
+                        }
+                        else
+                        {
+                            // Normal root level command
+                            lastIf = null;
+                            script.Functions.Add(func);
+                        }
                         break;
                 }
             }
@@ -1140,8 +1192,17 @@ namespace OpenKh.Kh2.Ard
                 yield return sb.ToString();
         }
 
-        private static string GetToken(int row, List<string> tokens, int tokenIndex) =>
-            tokens[tokenIndex];
+        private static string GetToken(int row, List<string> tokens, int tokenIndex)
+        {
+            if (tokenIndex < 0 || tokens.Count <= tokenIndex)
+            {
+                throw new SpawnScriptParserException(row, $"Expected token #{1 + tokenIndex} is missing from: {string.Join(" ", tokens)}");
+            }
+            else
+            {
+                return tokens[tokenIndex];
+            }
+        }
 
         public static string ParseAsString(int row, string text, int maxLength)
         {

@@ -1,6 +1,7 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -141,6 +142,28 @@ StatusFlag5";
 
                 Assert.Equal(0x123, script[1].ProgramId);
                 Assert.Single(script[1].Functions);
+            }
+
+            [Fact]
+            public void CreateProgramWithIfCorrectly()
+            {
+                const string Input = @"
+Program 0xBE
+Party NO_FRIEND
+If Entrance 5
+	Mission 0x15F ""HE_COLOSSEUM_2""
+	Spawn ""b_b5""
+	Spawn ""b_z0""
+
+If Entrance 6
+	Mission 0x15F ""HE_COLOSSEUM_2""
+	Spawn ""b_b6""
+	Spawn ""b_z0""
+";
+                var script = AreaDataScript.Compile(Input).ToArray();
+                var output = AreaDataScript.Decompile(script);
+                string Normalize(string str) => str.Replace("\r\n", "\n").Trim();
+                Assert.Equal(expected: Normalize(Input), actual: Normalize(output));
             }
 
             [Theory]

@@ -15,7 +15,7 @@ namespace OpenKh.Common
         private static readonly string LogFileName = $"{AppName}.log";
         private static readonly Task _taskLog;
         private static readonly Stopwatch _stopwatch = Stopwatch.StartNew();
-        private static readonly StreamWriter _logWriter = new StreamWriter(LogFileName, false, Encoding.UTF8, 65536);
+        private static readonly StreamWriter _logWriter = OpenLogWriterWithoutError();
         private static readonly Queue<(long ms, string tag, string fmt, object[] args)> _logQueue =
             new Queue<(long, string, string, object[])>();
         private static readonly CancellationTokenSource _cancellationTokenSrc = new CancellationTokenSource();
@@ -107,6 +107,21 @@ namespace OpenKh.Common
         public static string FormatSecondaryLinesWithIndent(string lines, string indent)
         {
             return lines.Replace("\n", "\n" + indent);
+        }
+
+        private static StreamWriter OpenLogWriterWithoutError()
+        {
+            try
+            {
+                return new StreamWriter(LogFileName, false, Encoding.UTF8, 65536);
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
+            {
+                // For example: `System.UnauthorizedAccessException: Access to the path 'C:\WINDOWS\system32\OpenKh.Tools.ModsManager.log' is denied.`
+                // Currently no need to inform the user about this failure.
+
+                return StreamWriter.Null;
+            }
         }
     }
 }
