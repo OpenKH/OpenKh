@@ -90,7 +90,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     return -1;  // Error Code -1: denied
                 }
 
-                basePath = Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame);
+                basePath = ConfigurationService.GameModPath;
                 finalFileName = Path.Combine(basePath, fileName);
                 if (File.Exists(finalFileName))
                 {
@@ -126,7 +126,7 @@ namespace OpenKh.Tools.ModsManager.Services
                         .Replace($"/{region}/", $"/{fallback}/")
                         .Replace($".a.{region}", $".a.{fallback}")
                         .Replace($".apdx", $".a.{fallback}");
-                    basePath = Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame);
+                    basePath = ConfigurationService.GameModPath;
                     finalFileName = Path.Combine(basePath, temptativeRegionalFallbackFileName);
                     if (File.Exists(finalFileName))
                     {
