@@ -120,6 +120,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     var game = GameService.DetectGameId(_isoLocation);
                     GameId = game?.Id;
                     GameName = game?.Name;
+                    ConfigurationService.LaunchGame = GameId;
                     ConfigurationService.IsoLocation = _isoLocation;
                 }
                 else
@@ -545,7 +546,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public bool IsNotExtracting { get; private set; }
-        public bool IsGameDataFound => IsNotExtracting && (GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) ||
+        public bool IsGameDataFound => IsNotExtracting && (GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, GameId)) ||
             (GameEdition == PC && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) ||
             GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) ||
             Directory.Exists(Path.Combine(GameDataLocation, "bbs", "message")) ||
@@ -1677,11 +1678,30 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     default:
                     {
-                        await _gameDataExtractionService.ExtractKh2Ps2EditionAsync(
-                            isoLocation: isoLocation,
-                            gameDataLocation: gameDataLocation,
-                            onProgress: CreateOnProgressProcessor()
-                        );
+                        switch (GameId)
+                        {
+                            case "kh1":
+                                await _gameDataExtractionService.ExtractKh1Ps2EditionAsync(
+                                    isoLocation: isoLocation,
+                                    gameDataLocation: gameDataLocation,
+                                    onProgress: CreateOnProgressProcessor()
+                                );
+                                break;
+                            case "kh2":
+                                await _gameDataExtractionService.ExtractKh2Ps2EditionAsync(
+                                    isoLocation: isoLocation,
+                                    gameDataLocation: gameDataLocation,
+                                    onProgress: CreateOnProgressProcessor()
+                                );
+                                break;
+                            case "Recom":
+                                await _gameDataExtractionService.ExtractRecomPs2EditionAsync(
+                                    isoLocation: isoLocation,
+                                    gameDataLocation: gameDataLocation,
+                                    onProgress: CreateOnProgressProcessor()
+                                );
+                                break;
+                        }
                         break;
                     }
 

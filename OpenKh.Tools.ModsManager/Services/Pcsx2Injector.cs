@@ -1,12 +1,18 @@
 using OpenKh.Common;
+using OpenKh.Kh1;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.ModsManager.Interfaces;
+using OpenKh.Tools.ModsManager.ViewModels;
+using System;
+using System.Buffers;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Tools.ModsManager.Services
@@ -19,6 +25,9 @@ namespace OpenKh.Tools.ModsManager.Services
             public int LoadFile { get; init; }
             public int GetFileSize { get; init; }
             public int LoadFileTask { get; init; }
+            public int LoadFileAsync { get; init; }
+
+            public int GetFileSizeRecom { get; init; }
             public int RegionInit { get; init; }
             public int BufferPointer { get; init; }
             public int RegionForce { get; init; }
@@ -39,20 +48,20 @@ namespace OpenKh.Tools.ModsManager.Services
 
         private class LoadFileTask
         {
-            public int Flags { get; set; }
-            public int Unk04 { get; set; }
-            public int Unk08 { get; set; }
-            public int Unk0C { get; set; }
-            public int Unk10 { get; set; }
-            public int Unk14 { get; set; }
-            public int Unk18 { get; set; }
-            public int Unk1C { get; set; }
-            public int Unk20 { get; set; }
-            public int IsoBlock { get; set; }
-            public int Length { get; set; }
-            public int PtrDestination { get; set; }
-            public int FinalLength { get; set; }
-            public int Unk34 { get; set; }
+            [Data] public int Flags { get; set; }
+            [Data] public int Unk04 { get; set; }
+            [Data] public int Unk08 { get; set; }
+            [Data] public int Unk0C { get; set; }
+            [Data] public int Unk10 { get; set; }
+            [Data] public int Unk14 { get; set; }
+            [Data] public int Unk18 { get; set; }
+            [Data] public int Unk1C { get; set; }
+            [Data] public int Unk20 { get; set; }
+            [Data] public int IsoBlock { get; set; }
+            [Data] public int Length { get; set; }
+            [Data] public int PtrDestination { get; set; }
+            [Data] public int FinalLength { get; set; }
+            [Data] public int Unk34 { get; set; }
         }
 
         private const string KH2FM = "SLPM_666.75;1";
@@ -310,7 +319,9 @@ namespace OpenKh.Tools.ModsManager.Services
             HookExit,
             LoadFile,
             GetFileSize,
+            GetFileSizeRecom,
             LoadFileTask,
+            LoadFileAsync,
         }
 
         private const uint BaseHookPtr = 0xFFF00;
@@ -387,24 +398,96 @@ namespace OpenKh.Tools.ModsManager.Services
 
         private static readonly uint[] LoadFileTaskHook = new uint[]
         {
+            // Input:
+            // S0 DstPtr
+            // S1 Filename
+            // T4 return program counter
+            // T5 Operation
+            // V0 IdxFilePtr
+            //
+            // Work:
+            // T6 Hook stack
+            // V0 Return value
+            // 
             LUI(T6, HookStack),
             SW(S1, T6, Param1), // Filename
             SW(S0, T6, Param2), // DstPtr
             SW(V0, T6, Param3), // LoadFileTask
-            SW(T5, T6, ParamOperator),
+            SW(T5, T6, ParamOperator), // Operation
             LW(T5, T6, ParamOperator),
             BNE(T5, (byte)Operation.HookExit, -2),
-            LW(V0, T6, ParamReturn),
-            BEQ(V0, Zero, 2),
-            LW(V0, T6, ParamReturn2),
-            ADDIU(RA, RA, 0x98), // skip the entire function
-            ADDIU(S2, T6, ParamReturn2),
-            ADDIU(V0, Zero, -1),
-            LW(S0, S2, 0x2C),
-            LW(A0, S1, 0),
+            LW(V1, T6, ParamReturn),
+            BEQ(V1, Zero, 3),
+            MOVE(S2, V0),
+            BEQ(Zero, Zero, 2),
+            ADDIU(RA, RA, 0x98), // skip the remainder of the function
+            LI(V0, -1),
             JR(RA),
             NOP(),
         };
+
+        private static readonly uint[] LoadFileAsyncHook = new uint[]
+        {
+            // Input:
+            //
+            // Work:
+            //
+            LUI(T6, HookStack),
+            LW(T2, V0, -0x2A10),
+            LW(T3, V0, -0x2A24),
+            ADDI(T4, V0, -0x29F8),
+            LW(T0, T4, 0),
+            ADDIU(T1, T3, 8),
+            LW(T4, T3, 0x38),
+            LW(T4, T4, 0),
+            SW(T0, T6, Param1), // FileDirID
+            BEQ(T2, T4, 9),
+            SW(T1, T6, Param2), // FileNamePtr
+            ADDIU(T4, Zero, (byte)Operation.GetFileSizeRecom),
+            SW(T4, T6, ParamOperator), // Operation
+            LW(T4, T6, ParamOperator),
+            BNE(T4, (byte)Operation.HookExit, -2),
+            LW(T4, T6, ParamReturn),
+            BEQ(T4, Zero, 7),
+            NOP(),
+            BEQ(Zero, Zero, 8),
+            SW(T2, T6, Param3), // MemDstPtr
+            SW(T5, T6, ParamOperator), // Operation
+            LW(T5, T6, ParamOperator),
+            BNE(T5, (byte)Operation.HookExit, -2),
+            LW(T4, T6, ParamReturn),
+            LUI(V1, 0x5B), // For Fallback
+            BEQ(T4, Zero, 5),
+            LW(A2, V0, -0x29F4),
+            ADD(T2, T2, T4),
+            SW(T2, V0, -0x2A10),
+            ADDIU(V0, Zero, 1),
+            ADDIU(RA, RA, 0x64),
+            JR(RA),
+            NOP(),
+        };
+
+        private static readonly uint[] GetFileSizeRecomHook = new uint[]
+        {
+            LUI(T6, HookStack),
+            LUI(V1, 0x5C),
+            ADDI(T4, V1, -0x29F8),
+            LW(T4, T4, 0),
+            SW(T4, T6, Param1), // FileDirID
+            SW(S2, T6, Param2), // FileNamePtr
+            SW(T5, T6, ParamOperator), // Operation
+            LW(T5, T6, ParamOperator),
+            BNE(T5, (byte)Operation.HookExit, -2),
+            LW(V1, T6, ParamReturn),
+            // For Fallback
+            BNE(V1, Zero, 2),
+            NOP(),
+            LW(V1, S2, 0x18),
+            JR(RA),
+            SW(V1, S1, 0x28),
+        };
+
+
 
         private static readonly uint[] RegionInitPatch = new uint[]
         {
@@ -425,6 +508,16 @@ namespace OpenKh.Tools.ModsManager.Services
             {
                 GameName = "SLPS_251.97;1",
                 LoadFileTask = 0x1204C0,
+            },
+            new Offsets
+            {
+                GameName = "SLPS_251.98;1",
+                LoadFileTask = 0x1204C0,
+            },
+            new Offsets {
+                GameName = "SLUS_217.99;1",
+                LoadFileAsync = 0x1A0C6C,
+                GetFileSizeRecom = 0x1A11A0,
             },
             new Offsets
             {
@@ -536,6 +629,7 @@ namespace OpenKh.Tools.ModsManager.Services
         public Pcsx2Injector(IOperationDispatcher operationDispatcher)
         {
             _operationDispatcher = operationDispatcher;
+            
         }
 
         public int RegionId { get; set; }
@@ -598,8 +692,14 @@ namespace OpenKh.Tools.ModsManager.Services
                     case Operation.GetFileSize:
                         OperationGetFileSize(stream);
                         break;
+                    case Operation.GetFileSizeRecom:
+                        OperationGetFileSizeRecom(stream);
+                        break;
                     case Operation.LoadFileTask:
                         OperationLoadFileTask(stream);
+                        break;
+                    case Operation.LoadFileAsync:
+                        OperationLoadFileAsync(stream);
                         break;
                     case Operation.HookExit:
                         Thread.Sleep(1);
@@ -639,6 +739,22 @@ namespace OpenKh.Tools.ModsManager.Services
             stream.SetPosition(OperationAddress - 4).Write(returnValue);
         }
 
+        private void OperationGetFileSizeRecom(Stream stream)
+        {
+            const int ParameterCount = 2;
+            stream.SetPosition(OperationAddress - ParameterCount * sizeof(int));
+
+            var ptrFileName = stream.ReadInt32();
+            var fileDirID = stream.ReadInt32();
+            var fileName = ReadString(stream, ptrFileName);
+            fileName = Path.Combine(fileDirID.ToString(), fileName);
+            var returnValue = 0;
+            if (!string.IsNullOrEmpty(fileName))
+                returnValue = _operationDispatcher.GetFileSize(fileName);
+            stream.SetPosition(OperationAddress - 4).Write(returnValue);
+        }
+
+        private int count = 0;
         private void OperationLoadFileTask(Stream stream)
         {
             const int ParameterCount = 3;
@@ -647,26 +763,55 @@ namespace OpenKh.Tools.ModsManager.Services
             var ptrTask = stream.ReadInt32();
             var ptrMemDst = stream.ReadInt32();
             var ptrFileName = stream.ReadInt32();
+            var returnValue = 0;
 
             var fileName = ReadString(stream, ptrFileName);
-            if (string.IsNullOrEmpty(fileName))
-                return;
+            var fileLength = -1;
 
-            int returnValue;
-            var fileLength = _operationDispatcher.LoadFile(stream.SetPosition(ptrMemDst), fileName);
-            if (fileLength > 0)
+            if (!string.IsNullOrEmpty(fileName))
             {
-                var task = BinaryMapping.ReadObject<LoadFileTask>(stream.SetPosition(ptrTask));
-                task.PtrDestination = ptrMemDst;
-                task.FinalLength = fileLength;
-                BinaryMapping.WriteObject(stream.SetPosition(ptrTask), task);
-
-                returnValue = 1;
+                fileLength = _operationDispatcher.LoadFile(stream.SetPosition(ptrMemDst), fileName);
+                if (fileLength > 0)
+                {
+                    returnValue = fileLength;
+                }
+                else
+                {
+                    fileLength = -1;
+                }
             }
-            else
-                returnValue = 0;
 
-            stream.SetPosition(OperationAddress - ParamReturn).Write(returnValue);
+            stream.SetPosition(ptrTask + 44).Write(ptrMemDst);
+            // Write the return value so the hook can exit
+            stream.SetPosition(OperationAddress - 4).Write(returnValue);
+            // Wait for the emulator to get to the await loop
+            Thread.Sleep(4);
+            // Signal that the file has finished loading
+            stream.SetPosition(ptrTask + 48).Write(fileLength);
+        }
+
+        private void OperationLoadFileAsync(Stream stream)
+        {
+            const int ParameterCount = 3;
+            stream.SetPosition(OperationAddress - ParameterCount * sizeof(uint));
+
+            var ptrMemDst = stream.ReadUInt32();
+            var ptrFilename = stream.ReadInt32();
+            var fileDirID = stream.ReadInt32();
+            var returnValue = 0;
+
+            var fileName = ReadString(stream, ptrFilename);
+            fileName = Path.Combine(fileDirID.ToString(), fileName);
+
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                var fileLength = _operationDispatcher.LoadFile(stream.SetPosition(ptrMemDst), fileName);
+                if (fileLength > 0)
+                {
+                    returnValue = fileLength;
+                }
+            }
+            stream.SetPosition(OperationAddress - 4).Write(returnValue);
         }
 
         private void WritePatch(Stream stream, Offsets offsets)
@@ -676,16 +821,24 @@ namespace OpenKh.Tools.ModsManager.Services
             {
                 if (offsets.LoadFileTask > 0)
                 {
-                    Log.Info("Injeting {0} function", nameof(offsets.LoadFileTask));
+                    Log.Info("Injecting {0} function", nameof(offsets.LoadFileTask));
                     WritePatch(stream, offsets.LoadFileTask,
                         ADDIU(T4, RA, 0),
                         JAL(WriteHook(stream, LoadFileTaskHook)),
                         ADDIU(T5, Zero, (byte)Operation.LoadFileTask));
                 }
 
+                if (offsets.LoadFileAsync > 0)
+                {
+                    Log.Info("Infjection {0} function", nameof(offsets.LoadFileAsync));
+                    WritePatch(stream, offsets.LoadFileAsync,
+                        JAL(WriteHook(stream, LoadFileAsyncHook)),
+                        ADDIU(T5, Zero, (byte)Operation.LoadFileAsync));
+                }
+
                 if (offsets.LoadFile > 0)
                 {
-                    Log.Info("Injeting {0} function", nameof(offsets.LoadFile));
+                    Log.Info("Injecting {0} function", nameof(offsets.LoadFile));
                     WritePatch(stream, offsets.LoadFile,
                         ADDIU(T4, RA, 0),
                         JAL(WriteHook(stream, LoadFileHook)),
@@ -694,7 +847,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 if (offsets.GetFileSize > 0)
                 {
-                    Log.Info("Injeting {0} function", nameof(offsets.GetFileSize));
+                    Log.Info("Injecting {0} function", nameof(offsets.GetFileSize));
                     var subGetFileSizePtr = stream.SetPosition(offsets.GetFileSize + 8).ReadUInt32();
                     WritePatch(stream, offsets.GetFileSize,
                         ADDIU(T4, RA, 0),
@@ -708,6 +861,14 @@ namespace OpenKh.Tools.ModsManager.Services
                         LD(RA, SP, 0x08),
                         JR(RA),
                         ADDIU(SP, SP, 0x10));
+                }
+
+                if (offsets.GetFileSizeRecom > 0)
+                {
+                    Log.Info("Injecting {0} function", nameof(offsets.GetFileSizeRecom));
+                    WritePatch(stream, offsets.GetFileSizeRecom,
+                        JAL(WriteHook(stream, GetFileSizeRecomHook)),
+                        ADDIU(T5, Zero, (byte)Operation.GetFileSizeRecom));
                 }
 
                 if (RegionId > 0)

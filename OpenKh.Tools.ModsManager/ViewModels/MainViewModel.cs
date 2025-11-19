@@ -56,6 +56,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             "Recom",
             "kh3d"
         };
+        private List<string> _supportedPCSX2Games = new List<string>()
+        {
+            "kh2",
+            "kh1",
+            "Recom"
+        };
         private int _wizardVersionNumber = 1;
         private string[] executable = new string[]
         {
@@ -370,7 +376,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
             else
                 PC = false;
-            if (_supportedGames.Contains(ConfigurationService.LaunchGame) && PC)
+            if (_supportedGames.Contains(ConfigurationService.LaunchGame) && PC || _supportedPCSX2Games.Contains(ConfigurationService.LaunchGame) && !PC)
                 _launchGame = ConfigurationService.LaunchGame;
             else
                 ConfigurationService.LaunchGame = _launchGame;
@@ -551,10 +557,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     else
                     {
                         PC = false;
-                        GametoLaunch = 0;
+                        if (!_supportedPCSX2Games.Contains(_launchGame))
+                        { 
+                            GametoLaunch = 0;
+                        }
                     }
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
                 }
+                ReloadModsList();
             });
 
             OpenPresetMenuCommand = new RelayCommand(_ =>
