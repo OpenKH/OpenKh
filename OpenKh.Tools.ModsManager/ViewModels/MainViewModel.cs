@@ -59,7 +59,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private List<string> _supportedPCSX2Games = new List<string>()
         {
             "kh2",
-            "kh1"
+            "kh1",
+            "Recom"
         };
         private int _wizardVersionNumber = 1;
         private string[] executable = new string[]

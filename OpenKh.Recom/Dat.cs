@@ -49,6 +49,7 @@ namespace OpenKh.Recom
                 Directory.CreateDirectory(extract_path);
             }
 
+            var symlinks = new List<(String, String, String, uint, SubFileInfo)>();
             for(int file_ind = 0;  file_ind < FilesInfo.Count; file_ind++)
             {
                 var file_info = FilesInfo[file_ind];
@@ -70,25 +71,33 @@ namespace OpenKh.Recom
                         int j = 0;
                         while (mem_stream.ReadByte() != 0)
                         {
-                            FileInfo sub_file_info = BinaryMapping.ReadObject<FileInfo>(mem_stream.SetPosition(j * 48));
+                            SubFileInfo sub_file_info = BinaryMapping.ReadObject<SubFileInfo>(mem_stream.SetPosition(j * 48));
                             if (sub_file_info.DirId == sub_dir_info.DirId)
                             {
                                 var file_path = $@"{dir_path}\{sub_file_info.Filename}";
                                 var mem_stream_2 = IsoUtility.GetSectors(iso_stream, start_block + sub_file_info.StartBlock, (int)sub_file_info.BlockCount);
                                 byte[] buffer = sub_file_info.IsCompressed == 1 ? Decompress(mem_stream_2) : mem_stream_2.ReadBytes((int)sub_file_info.BlockCount * 0x800);
                                 var file_stream = File.Open(file_path, FileMode.Create, FileAccess.Write);
-                                file_stream.Write(buffer);
+                                file_stream.Write(buffer, 0, (int)sub_file_info.FileLen);
                                 file_stream.Close();
                             }
                             else if (sub_file_info.SymlinkDirId == sub_dir_info.DirId)
                             {
                                 // This dir contains a symlink to a file in another dir
                                 // TO-DO: Decide if we want a symlink to the true location of the file
+                                var symlink_path = $@"{dir_path}\{sub_file_info.Filename}";
+                                var target_path = $@"{extract_path}\{sub_file_info.DirId}\{sub_file_info.Filename}";
+                                symlinks.Add((symlink_path, target_path, dir_path, start_block, sub_file_info));
                             }
+                            //*
                             else
                             {
                                 // Both dir ID's are for different dirs?
+                                var symlink_path = $@"{dir_path}\{sub_file_info.Filename}";
+                                var target_path = $@"{extract_path}\{sub_file_info.SymlinkDirId}\{sub_file_info.Filename}";
+                                symlinks.Add((symlink_path, target_path, dir_path, start_block, sub_file_info));
                             }
+                            //*/
                             j++;
                         }
                     }
@@ -105,6 +114,27 @@ namespace OpenKh.Recom
                 if (onProgress != null)
                 {
                     onProgress(file_ind / (float)FilesInfo.Count);
+                }
+            }
+
+            foreach ((String symlink_path, String target_path, String dir_path, uint start_block, SubFileInfo sub_file_info) in symlinks)
+            {
+                // Create the symbolic link
+                if (File.Exists(target_path))
+                {
+                    if (!File.Exists(symlink_path))
+                    {
+                        File.CreateSymbolicLink(symlink_path, target_path);
+                    }
+                }
+                else
+                {
+                    var file_path = $@"{dir_path}\{sub_file_info.Filename}";
+                    var mem_stream_2 = IsoUtility.GetSectors(iso_stream, start_block + sub_file_info.StartBlock, (int)sub_file_info.BlockCount);
+                    byte[] buffer = sub_file_info.IsCompressed == 1 ? Decompress(mem_stream_2) : mem_stream_2.ReadBytes((int)sub_file_info.BlockCount * 0x800);
+                    var file_stream = File.Open(file_path, FileMode.Create, FileAccess.Write);
+                    file_stream.Write(buffer, 0, (int)sub_file_info.FileLen);
+                    file_stream.Close();
                 }
             }
 
@@ -261,10 +291,10 @@ namespace OpenKh.Recom
         [Data] public byte Unk0x1F { get; set; }
     }
 
-    public record FileInfo
+    public record SubFileInfo
     {
         [Data(Count = 24)] public string Filename { get; set; } = "";
-        [Data] public uint Unk0x18 { get; set; }
+        [Data] public uint FileLen { get; set; }
         [Data] public uint DirId { get; set; }
         [Data] public uint SymlinkDirId { get; set; }
         [Data] public uint BlockCount { get; set; }
@@ -278,7 +308,7 @@ namespace OpenKh.Recom
     public class Dat
     {
         public List<SubDirInfo> SubDirsInfo { get; set; } = new List<SubDirInfo>();
-        public List<List<FileInfo>> SubDirsFileLists { get; set; } = new List<List<FileInfo>>();
+        public List<List<SubFileInfo>> SubDirsFileLists { get; set; } = new List<List<SubFileInfo>>();
         public List<List<byte[]>> SubDirsFileContents { get; set; } = new List<List<byte[]>>();
     }
 }
