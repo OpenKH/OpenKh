@@ -805,10 +805,10 @@ namespace OpenKh.Tools.ModsManager.Services
             var returnValue = 0;
 
             var fileName = ReadString(stream, ptrFilename);
-            fileName = Path.Combine(fileDirID.ToString(), fileName);
 
             if (!string.IsNullOrEmpty(fileName))
             {
+                fileName = Path.Combine(fileDirID.ToString(), fileName);
                 var fileLength = _operationDispatcher.LoadFile(stream.SetPosition(ptrMemDst), fileName);
                 if (fileLength > 0)
                 {
@@ -834,7 +834,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 if (offsets.LoadFileAsync > 0)
                 {
-                    Log.Info("Infjection {0} function", nameof(offsets.LoadFileAsync));
+                    Log.Info("Injecting {0} function", nameof(offsets.LoadFileAsync));
                     WritePatch(stream, offsets.LoadFileAsync,
                         JAL(WriteHook(stream, LoadFileAsyncHook)),
                         ADDIU(T5, Zero, (byte)Operation.LoadFileAsync));

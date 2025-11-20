@@ -67,7 +67,7 @@ namespace OpenKh.Recom
                     {
                         var sub_dir_info = SubDirsInfo[file_info.SubDirsInfoStartIndex.Value + i];
 
-                        var dir_path = $@"{extract_path}\{sub_dir_info.DirId}";
+                        var dir_path = Path.Combine(extract_path, sub_dir_info.DirId.ToString());
                         if (!Directory.Exists(dir_path))
                         {
                             Directory.CreateDirectory(dir_path);
@@ -81,7 +81,7 @@ namespace OpenKh.Recom
                             SubFileInfo sub_file_info = BinaryMapping.ReadObject<SubFileInfo>(mem_stream.SetPosition(j * 48));
                             if (sub_file_info.DirId == sub_dir_info.DirId)
                             {
-                                var file_path = $@"{dir_path}\{sub_file_info.Filename}";
+                                var file_path = Path.Combine(dir_path, sub_file_info.Filename);
                                 var mem_stream_2 = IsoUtility.GetSectors(iso_stream, start_block + sub_file_info.StartBlock, (int)sub_file_info.BlockCount);
                                 byte[] buffer = sub_file_info.IsCompressed == 1 ? Decompress(mem_stream_2) : mem_stream_2.ReadBytes((int)sub_file_info.BlockCount * 0x800);
                                 var file_stream = File.Open(file_path, FileMode.Create, FileAccess.Write);
@@ -92,16 +92,16 @@ namespace OpenKh.Recom
                             {
                                 // This dir contains a symlink to a file in another dir
                                 // TO-DO: Decide if we want a symlink to the true location of the file
-                                var symlink_path = $@"{dir_path}\{sub_file_info.Filename}";
-                                var target_path = $@"{extract_path}\{sub_file_info.DirId}\{sub_file_info.Filename}";
+                                var symlink_path = Path.Combine(dir_path, sub_file_info.Filename);
+                                var target_path = Path.Combine(extract_path, sub_file_info.DirId.ToString(), sub_file_info.Filename);
                                 symlinks.Add((symlink_path, target_path, dir_path, start_block, sub_file_info));
                             }
                             //*
                             else
                             {
                                 // Both dir ID's are for different dirs?
-                                var symlink_path = $@"{dir_path}\{sub_file_info.Filename}";
-                                var target_path = $@"{extract_path}\{sub_file_info.SymlinkDirId}\{sub_file_info.Filename}";
+                                var symlink_path = Path.Combine(dir_path, sub_file_info.Filename);
+                                var target_path = Path.Combine(extract_path, sub_file_info.SymlinkDirId.ToString(), sub_file_info.Filename);
                                 symlinks.Add((symlink_path, target_path, dir_path, start_block, sub_file_info));
                             }
                             //*/
@@ -112,7 +112,7 @@ namespace OpenKh.Recom
                 else
                 {
                     // This is a file, extract it
-                    var file_path = $@"{extract_path}\{file_info.Filename}";
+                    var file_path = Path.Combine(extract_path, file_info.Filename);
                     var mem_stream = IsoUtility.GetSectors(iso_stream, file_info.StartBlock, (int)file_info.BlockCount);
                     var file_stream = File.Open(file_path, FileMode.Create, FileAccess.Write);
                     file_stream.Write(mem_stream.ReadBytes((int)file_info.BlockCount * 0x800));
@@ -144,7 +144,7 @@ namespace OpenKh.Recom
                 }
                 else
                 {
-                    var file_path = $@"{dir_path}\{sub_file_info.Filename}";
+                    var file_path = Path.Combine(dir_path, sub_file_info.Filename);
                     var mem_stream_2 = IsoUtility.GetSectors(iso_stream, start_block + sub_file_info.StartBlock, (int)sub_file_info.BlockCount);
                     byte[] buffer = sub_file_info.IsCompressed == 1 ? Decompress(mem_stream_2) : mem_stream_2.ReadBytes((int)sub_file_info.BlockCount * 0x800);
                     var file_stream = File.Open(file_path, FileMode.Create, FileAccess.Write);
