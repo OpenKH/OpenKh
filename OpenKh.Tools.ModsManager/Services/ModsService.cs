@@ -467,7 +467,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     if (!Directory.Exists(GetCollectionPath(modName)))
                         await MoveToCollection(modName);
                     else
-                        await CleanModFiles(modName);
+                        await CleanModFiles(GetModPath(modName));
                 if (updateCount > 0)
                         yield return new ModUpdateModel
                         {
