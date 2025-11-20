@@ -161,11 +161,11 @@
             </MenuItem>
         </Menu>
         <ComboBox SelectedIndex="{Binding GametoLaunch}" Visibility="{Binding GameSelectVisible}" HorizontalAlignment="Right" Margin="0,0,10,0" MinWidth="144">
-            <ComboBoxItem>Kingdom Hearts 2</ComboBoxItem>
-            <ComboBoxItem>Kingdom Hearts 1</ComboBoxItem>
-            <ComboBoxItem>Birth by Sleep</ComboBoxItem>
-            <ComboBoxItem>Re:Chain of Memories</ComboBoxItem>
-            <ComboBoxItem>Dream Drop Distance</ComboBoxItem>
+            <ComboBoxItem Visibility="{Binding GameSelectKH2}">Kingdom Hearts 2</ComboBoxItem>
+            <ComboBoxItem Visibility="{Binding GameSelectKH1}">Kingdom Hearts 1</ComboBoxItem>
+            <ComboBoxItem Visibility="{Binding GameSelectBBS}">Birth by Sleep</ComboBoxItem>
+            <ComboBoxItem Visibility="{Binding GameSelectRecom}">Re:Chain of Memories</ComboBoxItem>
+            <ComboBoxItem Visibility="{Binding GameSelectKH3D}">Dream Drop Distance</ComboBoxItem>
         </ComboBox>
         <local:ModManagerView Grid.Row="1" DataContext="{Binding}"/>
 

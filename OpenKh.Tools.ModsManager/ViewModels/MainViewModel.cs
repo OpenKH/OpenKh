@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using static OpenKh.Tools.ModsManager.Helpers;
@@ -131,7 +132,20 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameSelectVisible => PC || PCSX2 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH2 => PC || PCSX2 && ConfigurationService.IsoLocationKH2 != null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH1 => PC || PCSX2 && ConfigurationService.IsoLocationKH1 != null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectBBS => PC ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectRecom => PC || PCSX2 && ConfigurationService.IsoLocationRecom != null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH3D => PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PanaceaSettings => PC && PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
+
+        public enum GameIDs { 
+            KH2 = 0,
+            KH1 = 1,
+            BBS = 2,
+            Recom = 3,
+            KH3D = 4,
+        };
 
         public bool PanaceaConsoleEnabled
         {
@@ -261,55 +275,51 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 switch (_launchGame)
                 {
                     case "kh2":
-                        launchExecutable = 0;
-                        return 0;
+                        launchExecutable = (int)GameIDs.KH2;
+                        break;
                     case "kh1":
-                        launchExecutable = 1;
-                        return 1;
+                        launchExecutable = (int)GameIDs.KH1;
+                        break;
                     case "bbs":
-                        launchExecutable = 2;
-                        return 2;
+                        launchExecutable = (int)GameIDs.BBS;
+                        break;
                     case "Recom":
-                        launchExecutable = 3;
-                        return 3;
+                        launchExecutable = (int)GameIDs.Recom;
+                        break;
                     case "kh3d":
-                        launchExecutable = 4;
-                        return 4;
+                        launchExecutable = (int)GameIDs.KH3D;
+                        break;
                     default:
-                        launchExecutable = 0;
-                        return 0;
+                        launchExecutable = (int)GameIDs.KH2;
+                        break;
                 }
+                return launchExecutable;
             }
             set
             {
                 launchExecutable = value;
-                switch (value)
+                switch ((GameIDs)value)
                 {
-                    case 0:
+                    case GameIDs.KH2:
                         _launchGame = "kh2";
-                        ConfigurationService.LaunchGame = "kh2";
                         break;
-                    case 1:
+                    case GameIDs.KH1:
                         _launchGame = "kh1";
-                        ConfigurationService.LaunchGame = "kh1";
                         break;
-                    case 2:
+                    case GameIDs.BBS:
                         _launchGame = "bbs";
-                        ConfigurationService.LaunchGame = "bbs";
                         break;
-                    case 3:
+                    case GameIDs.Recom:
                         _launchGame = "Recom";
-                        ConfigurationService.LaunchGame = "Recom";
                         break;
-                    case 4:
+                    case GameIDs.KH3D:
                         _launchGame = "kh3d";
-                        ConfigurationService.LaunchGame = "kh3d";
                         break;
                     default:
                         _launchGame = "kh2";
-                        ConfigurationService.LaunchGame = "kh2";
                         break;
                 }
+                ConfigurationService.LaunchGame = _launchGame;
                 ReloadModsList();
                 if (ModsList.Count > 0)
                     _ = FetchUpdates();
@@ -334,7 +344,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public MainViewModel()
         {
-            if (ConfigurationService.GameEdition == 2)
+            if (ConfigurationService.GameEdition == SetupWizardViewModel.PC)
             {
                 PC = true;
                 PCSX2 = false;
@@ -394,7 +404,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                 }
             }
-            else if (ConfigurationService.GameEdition == 1)
+            else if (ConfigurationService.GameEdition == SetupWizardViewModel.PCSX2)
             {
                 PC = false;
                 PCSX2 = true;
@@ -577,29 +587,75 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 var dialog = new SetupWizardWindow();
                 if (dialog.ShowDialog() != null)
                 {
-                    if (ConfigurationService.GameEdition == 2)
+                    if (ConfigurationService.GameEdition == SetupWizardViewModel.PC)
                     {
                         PC = true;
                         PCSX2 = false;
                         PanaceaInstalled = ConfigurationService.PanaceaInstalled;
                     }
-                    else if (ConfigurationService.GameEdition == 1)
+                    else if (ConfigurationService.GameEdition == SetupWizardViewModel.PCSX2)
                     {
                         PC = false;
                         PCSX2 = true;
-                        if (!_supportedPCSX2Games.Contains(_launchGame))
-                        { 
-                            GametoLaunch = 0;
+                        string? launchIso;
+                        switch (_launchGame)
+                        {
+                            case "kh2":
+                                launchIso = ConfigurationService.IsoLocationKH2;
+                                break;
+                            case "kh1":
+                                launchIso = ConfigurationService.IsoLocationKH1;
+                                break;
+                            case "Recom":
+                                launchIso = ConfigurationService.IsoLocationRecom;
+                                break;
+                            default:
+                                launchIso = null;
+                                break;
+                        }
+                        GameInfoModel? game;
+                        if (launchIso != null)
+                        {
+                            game = GameService.DetectGameId(launchIso);
+                        }
+                        else
+                        {
+                            game = null;
+                        }
+                        if (!_supportedPCSX2Games.Contains(_launchGame) || launchIso == null || game == null || game?.Id != _launchGame)
+                        {
+                            if (ConfigurationService.IsoLocationKH2 != null && (game = GameService.DetectGameId(ConfigurationService.IsoLocationKH2)) != null && game?.Id == "kh2")
+                            {
+                                GametoLaunch = (int)GameIDs.KH2;
+                            }
+                            else if (ConfigurationService.IsoLocationKH1 != null && (game = GameService.DetectGameId(ConfigurationService.IsoLocationKH1)) != null && game?.Id == "kh1")
+                            {
+                                GametoLaunch = (int)GameIDs.KH1;
+                            }
+                            else if (ConfigurationService.IsoLocationRecom != null && (game = GameService.DetectGameId(ConfigurationService.IsoLocationRecom)) != null && game?.Id == "Recom")
+                            {
+                                GametoLaunch = (int)GameIDs.Recom;
+                            }
+                            else
+                            {
+                                GametoLaunch = (int)GameIDs.KH2;
+                            }
                         }
                     }
                     else
                     {
                         PC = false;
                         PCSX2 = false;
-                        GametoLaunch = 0;
+                        GametoLaunch = (int)GameIDs.KH2;
                     }
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
                 }
+                OnPropertyChanged(nameof(GametoLaunch));
+                OnPropertyChanged(nameof(GameSelectKH2));
+                OnPropertyChanged(nameof(GameSelectKH1));
+                OnPropertyChanged(nameof(GameSelectBBS));
+                OnPropertyChanged(nameof(GameSelectRecom));
+                OnPropertyChanged(nameof(GameSelectKH3D));
             });
 
             OpenPresetMenuCommand = new RelayCommand(_ =>
@@ -711,7 +767,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             bool isPcsx2 = false;
             switch (ConfigurationService.GameEdition)
             {
-                case 0:
+                case SetupWizardViewModel.OpenKHGameEngine:
                     Log.Info("Starting OpenKH Game Engine");
                     processStartInfo = new ProcessStartInfo
                     {
@@ -723,24 +779,48 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         UseShellExecute = false,
                     };
                     break;
-                case 1:
+                case SetupWizardViewModel.PCSX2:
                     Log.Info("Starting PCSX2");
                     _pcsx2Injector.RegionId = ConfigurationService.RegionId;
                     _pcsx2Injector.Region = Kh2.Constants.Regions[_pcsx2Injector.RegionId];
                     _pcsx2Injector.Language = Kh2.Constants.Languages[_pcsx2Injector.RegionId];
 
-                    processStartInfo = new ProcessStartInfo
+                    String IsoLocation;
+                    switch (_launchGame)
                     {
-                        FileName = ConfigurationService.Pcsx2Location,
-                        WorkingDirectory = Path.GetDirectoryName(ConfigurationService.Pcsx2Location),
-                        Arguments = $"\"{ConfigurationService.IsoLocation}\"",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                    };
-                    isPcsx2 = true;
+                        case "kh2":
+                            IsoLocation = ConfigurationService.IsoLocationKH2;
+                            break;
+                        case "kh1":
+                            IsoLocation = ConfigurationService.IsoLocationKH1;
+                            break;
+                        case "Recom":
+                            IsoLocation = ConfigurationService.IsoLocationRecom;
+                            break;
+                        default:
+                            IsoLocation = ConfigurationService.IsoLocationKH2;
+                            break;
+                    }
+
+                    if (IsoLocation != null)
+                    {
+                        processStartInfo = new ProcessStartInfo
+                        {
+                            FileName = ConfigurationService.Pcsx2Location,
+                            WorkingDirectory = Path.GetDirectoryName(ConfigurationService.Pcsx2Location),
+                            Arguments = $"\"{IsoLocation}\"",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                        };
+                        isPcsx2 = true;
+                    }
+                    else
+                    {
+                        processStartInfo = null;
+                    }
                     break;
-                case 2:
+                case SetupWizardViewModel.PC:
                     if (ConfigurationService.PCVersion == "EGS" && !(_launchGame == "kh3d"))
                     {
                         if (ConfigurationService.PcReleaseLocation != null)
@@ -1054,7 +1134,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             await Task.Run(() =>
             {
-                if (ConfigurationService.GameEdition == 2)
+                if (ConfigurationService.GameEdition == SetupWizardViewModel.PC)
                 {
                     // Use the package map file to rearrange the files in the structure needed by the patcher
                     var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, "patch-package-map.txt");
@@ -1246,7 +1326,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             await Task.Run(() =>
             {
-                if (ConfigurationService.GameEdition == 2)
+                if (ConfigurationService.GameEdition == SetupWizardViewModel.PC)
                 {
                     if (patched && _launchGame != "kh3d")
                     {

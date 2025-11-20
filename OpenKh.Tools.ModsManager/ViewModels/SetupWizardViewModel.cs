@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.IO.Compression;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
 {
@@ -36,12 +37,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             .Compose()
             .AddExtensions("PCSX2 Emulator", "exe");
 
-        const int OpenKHGameEngine = 0;
-        const int PCSX2 = 1;
-        const int PC = 2;
+        public const int OpenKHGameEngine = 0;
+        public const int PCSX2 = 1;
+        public const int PC = 2;
 
         private int _gameEdition;
-        private string _isoLocation = ConfigurationService.IsoLocation;
+        private string _isoLocation = null; 
+        private string _isoLocationKH2 = ConfigurationService.IsoLocationKH2;
+        private string _isoLocationKH1 = ConfigurationService.IsoLocationKH1;
+        private string _isoLocationRecom = ConfigurationService.IsoLocationRecom;
         private string _openKhGameEngineLocation = ConfigurationService.OpenKhGameEngineLocation;
         private string _pcsx2Location = ConfigurationService.Pcsx2Location;
         private string _pcReleaseLocation = ConfigurationService.PcReleaseLocation;
@@ -98,8 +102,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string Title => $"Set-up wizard | {ApplicationName}";
 
         public RelayCommand SelectIsoCommand { get; }
-        public string GameId { get; set; } = "kh2";
-        public string GameName { get; set; }
+        public string? GameId { get; set; } = "kh2";
+        public string? GameName { get; set; }
         public string IsoLocation
         {
             get
@@ -118,12 +122,45 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (File.Exists(_isoLocation))
                 {
                     var game = GameService.DetectGameId(_isoLocation);
-                    ConfigurationService.IsoLocation = _isoLocation;
+                    if (game != null)
+                    {
+                        switch (game?.Id)
+                        {
+                            case "kh2":
+                                IsoLocationKH2 = _isoLocation;
+                                break;
+                            case "kh1":
+                                IsoLocationKH1 = _isoLocation;
+                                break;
+                            case "Recom":
+                                IsoLocationRecom = _isoLocation;
+                                break;
+                            default:
+                                IsoLocationKH2 = _isoLocation;
+                                break;
+                        }
+                        GameId = game?.Id;
+                        GameName = game?.Name;
+                    }
+                    else
+                    {
+                        GameId = null;
+                        GameName = null;
+                    }
                 }
                 else
                 {
                     GameId = null;
                     GameName = null;
+                }
+
+                if (IsoLocationKH2 != null)
+                {
+                    WizardPageAfterGameData = PageRegion;
+                }
+                else
+                {
+                    WizardPageAfterGameData = LastPage;
                 }
 
                 OnPropertyChanged();
@@ -133,6 +170,142 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(GameRecognizedVisibility));
                 OnPropertyChanged(nameof(GameNotRecognizedVisibility));
                 OnPropertyChanged(nameof(IsGameRecognized));
+                OnPropertyChanged(nameof(WizardPageAfterGameData));
+            }
+        }
+        public string IsoLocationKH2
+        {
+            get
+            {
+                if (File.Exists(_isoLocationKH2))
+                {
+                    var game = GameService.DetectGameId(_isoLocationKH2);
+                    if (game?.Id != "kh2")
+                    {
+                        _isoLocationKH2 = null;
+                        ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
+                    }
+                }
+                else
+                {
+                    _isoLocationKH2 = null;
+                    ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
+                }
+
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+
+                return _isoLocationKH2;
+            }
+            set
+            {
+                _isoLocationKH2 = value;
+                if (File.Exists(_isoLocationKH2))
+                {
+                    var game = GameService.DetectGameId(_isoLocationKH2);
+                }
+                else
+                {
+                    _isoLocationKH2 = null;
+                }
+                ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
+
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+            }
+        }
+        public string IsoLocationKH1
+        {
+            get
+            {
+                if (File.Exists(_isoLocationKH1))
+                {
+                    var game = GameService.DetectGameId(_isoLocationKH1);
+                    if (game?.Id != "kh1")
+                    {
+                        _isoLocationKH1 = null;
+                        ConfigurationService.IsoLocationKH1 = _isoLocationKH1;
+                    }
+                }
+                else
+                {
+                    _isoLocationKH1 = null;
+                    ConfigurationService.IsoLocationKH1 = _isoLocationKH1;
+                }
+
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+
+                return _isoLocationKH1;
+            }
+            set
+            {
+                _isoLocationKH1 = value;
+                if (File.Exists(_isoLocationKH1))
+                {
+                    var game = GameService.DetectGameId(_isoLocationKH1);
+                    if (game?.Id != "kh1")
+                    {
+                        _isoLocationKH1 = null;
+                    }
+                }
+                else
+                {
+                    _isoLocationKH1 = null;
+                }
+                ConfigurationService.IsoLocationKH1 = _isoLocationKH1;
+
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+            }
+        }
+        public string IsoLocationRecom
+        {
+            get
+            {
+                if (File.Exists(_isoLocationRecom))
+                {
+                    var game = GameService.DetectGameId(_isoLocationRecom);
+                    GameId = game?.Id;
+                    GameName = game?.Name;
+                    if (game?.Id != "Recom")
+                    {
+                        _isoLocationRecom = null;
+                        ConfigurationService.IsoLocationRecom = _isoLocationRecom;
+                    }
+                }
+                else
+                {
+                    _isoLocationRecom = null;
+                    ConfigurationService.IsoLocationRecom = _isoLocationRecom;
+                }
+
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+
+                return _isoLocationRecom;
+            }
+            set
+            {
+                _isoLocationRecom = value;
+                if (File.Exists(_isoLocationRecom))
+                {
+                    var game = GameService.DetectGameId(_isoLocationRecom);
+                }
+                else
+                {
+                    _isoLocationRecom = null;
+                }
+                ConfigurationService.IsoLocationRecom = _isoLocationRecom;
+
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameDataFound));
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
                 OnPropertyChanged(nameof(GameDataNotFoundVisibility));
@@ -369,18 +542,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
                     File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))) &&
                     Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
-                    File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == 2)
+                    File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == PC)
                 {
                     return "both";
                 }
                 else if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
-                    File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))) && _gameEdition == 2)
+                    File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))) && _gameEdition == PC)
                 {
 
                     return "1.5+2.5";
                 }
                 else if (Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
-                    File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == 2)
+                    File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == PC)
                 {
 
                     return "2.8";
@@ -543,7 +716,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public bool IsNotExtracting { get; private set; }
-        public bool IsGameDataFound => IsNotExtracting && (GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, GameId)) ||
+        public bool IsGameDataFound => IsNotExtracting &&
+            ((GameEdition == PCSX2 && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) ||
+            GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) ||
+            GameService.FolderContainsUniqueFile("Recom", Path.Combine(GameDataLocation, "Recom")))) ||
             (GameEdition == PC && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) ||
             GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) ||
             Directory.Exists(Path.Combine(GameDataLocation, "bbs", "message")) ||
@@ -725,8 +901,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public SetupWizardViewModel()
         {
             IsNotExtracting = true;
-            SelectIsoCommand = new RelayCommand(_ =>
-                FileDialog.OnOpen(fileName => IsoLocation = fileName, _isoFilter));
+            SelectIsoCommand = new RelayCommand(_ => {
+                FileDialog.OnOpen(fileName => IsoLocation = fileName, _isoFilter);
+            });
             SelectOpenKhGameEngineCommand = new RelayCommand(_ =>
                 FileDialog.OnOpen(fileName => OpenKhGameEngineLocation = fileName, _openkhGeFilter));
             SelectPcsx2Command = new RelayCommand(_ =>
@@ -739,10 +916,21 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 FileDialog.OnFolder(path => GameDataLocation = path));
             ExtractGameDataCommand = new RelayCommand(async _ =>
             {
-                BEGIN:
+            BEGIN:
                 try
                 {
-                    await ExtractGameData(IsoLocation, GameDataLocation);
+                    if (IsoLocationKH2 != null)
+                    {
+                        await ExtractGameData(IsoLocationKH2, GameDataLocation);
+                    }
+                    if (IsoLocationKH1 != null)
+                    {
+                        await ExtractGameData(IsoLocationKH1, GameDataLocation);
+                    }
+                    if (IsoLocationRecom != null)
+                    {
+                        await ExtractGameData(IsoLocationRecom, GameDataLocation);
+                    }
                 }
                 catch (OperationCanceledException)
                 {

@@ -31,7 +31,9 @@ namespace OpenKh.Tools.ModsManager.Services
             public string GameModPath { get; internal set; }
             public string GameDataPath { get; internal set; }
             public int GameEdition { get; internal set; }
-            public string IsoLocation { get; internal set; }
+            public string IsoLocationKH2 { get; internal set; }
+            public string IsoLocationKH1 { get; internal set; }
+            public string IsoLocationRecom { get; internal set; }
             public string OpenKhGameEngineLocation { get; internal set; }
             public string Pcsx2Location { get; internal set; }
             public string PcReleaseLocation { get; internal set; }
@@ -291,12 +293,30 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        public static string IsoLocation
+        public static string IsoLocationKH2
         {
-            get => _config.IsoLocation;
+            get => _config.IsoLocationKH2;
             set
             {
-                _config.IsoLocation = value;
+                _config.IsoLocationKH2 = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static string IsoLocationKH1
+        {
+            get => _config.IsoLocationKH1;
+            set
+            {
+                _config.IsoLocationKH1 = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static string IsoLocationRecom
+        {
+            get => _config.IsoLocationRecom;
+            set
+            {
+                _config.IsoLocationRecom = value;
                 _config.Save(ConfigPath);
             }
         }
