@@ -160,7 +160,7 @@
                 <MenuItem Header="_YamlGenerator" Command="{Binding YamlGeneratorCommand}" />
             </MenuItem>
         </Menu>
-        <ComboBox SelectedIndex="{Binding GametoLaunch}" Visibility="{Binding isPC}" HorizontalAlignment="Right" Margin="0,0,10,0" MinWidth="144">
+        <ComboBox SelectedIndex="{Binding GametoLaunch}" Visibility="{Binding GameSelectVisible}" HorizontalAlignment="Right" Margin="0,0,10,0" MinWidth="144">
             <ComboBoxItem>Kingdom Hearts 2</ComboBoxItem>
             <ComboBoxItem>Kingdom Hearts 1</ComboBoxItem>
             <ComboBoxItem>Birth by Sleep</ComboBoxItem>

@@ -39,6 +39,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private Process _runningProcess;
         private bool _isBuilding;
         private bool _pc;
+        private bool _pcsx2;
         private bool _panaceaInstalled;
         private bool _panaceaConsoleEnabled;
         private bool _panaceaDebugLogEnabled;
@@ -129,6 +130,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectVisible => PC || PCSX2 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PanaceaSettings => PC && PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
 
         public bool PanaceaConsoleEnabled
@@ -231,6 +233,23 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PatchVisible));
                 OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
+                OnPropertyChanged(nameof(GameSelectVisible));
+                OnPropertyChanged(nameof(PanaceaSettings));
+            }
+        }
+
+        public bool PCSX2
+        {
+            get => _pcsx2;
+            set
+            {
+                _pcsx2 = value;
+                OnPropertyChanged(nameof(PCSX2));
+                OnPropertyChanged(nameof(ModLoader));
+                OnPropertyChanged(nameof(PatchVisible));
+                OnPropertyChanged(nameof(notPC));
+                OnPropertyChanged(nameof(isPC));
+                OnPropertyChanged(nameof(GameSelectVisible));
                 OnPropertyChanged(nameof(PanaceaSettings));
             }
         }
@@ -318,6 +337,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             if (ConfigurationService.GameEdition == 2)
             {
                 PC = true;
+                PCSX2 = false;
                 PanaceaInstalled = ConfigurationService.PanaceaInstalled;
                 DevView = ConfigurationService.DevView;
                 _panaceaConsoleEnabled = ConfigurationService.ShowConsole;
@@ -374,9 +394,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                 }
             }
-            else
+            else if (ConfigurationService.GameEdition == 1)
+            {
                 PC = false;
-            if (_supportedGames.Contains(ConfigurationService.LaunchGame) && PC || _supportedPCSX2Games.Contains(ConfigurationService.LaunchGame) && !PC)
+                PCSX2 = true;
+            }
+            else
+            {
+                PC = false;
+                PCSX2 = false;
+            }
+            if (_supportedGames.Contains(ConfigurationService.LaunchGame) && PC || _supportedPCSX2Games.Contains(ConfigurationService.LaunchGame) && PCSX2)
                 _launchGame = ConfigurationService.LaunchGame;
             else
                 ConfigurationService.LaunchGame = _launchGame;
@@ -552,19 +580,26 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     if (ConfigurationService.GameEdition == 2)
                     {
                         PC = true;
+                        PCSX2 = false;
                         PanaceaInstalled = ConfigurationService.PanaceaInstalled;
                     }
-                    else
+                    else if (ConfigurationService.GameEdition == 1)
                     {
                         PC = false;
+                        PCSX2 = true;
                         if (!_supportedPCSX2Games.Contains(_launchGame))
                         { 
                             GametoLaunch = 0;
                         }
                     }
+                    else
+                    {
+                        PC = false;
+                        PCSX2 = false;
+                        GametoLaunch = 0;
+                    }
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
                 }
-                ReloadModsList();
             });
 
             OpenPresetMenuCommand = new RelayCommand(_ =>

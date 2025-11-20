@@ -98,7 +98,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string Title => $"Set-up wizard | {ApplicationName}";
 
         public RelayCommand SelectIsoCommand { get; }
-        public string GameId { get; set; }
+        public string GameId { get; set; } = "kh2";
         public string GameName { get; set; }
         public string IsoLocation
         {
@@ -120,8 +120,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     var game = GameService.DetectGameId(_isoLocation);
                     GameId = game?.Id;
                     GameName = game?.Name;
-                    ConfigurationService.LaunchGame = GameId;
-                    ConfigurationService.IsoLocation = _isoLocation;
+                    if (GameId != null)
+                    {
+                        ConfigurationService.LaunchGame = GameId;
+                        ConfigurationService.IsoLocation = _isoLocation;
+                    }
                 }
                 else
                 {
