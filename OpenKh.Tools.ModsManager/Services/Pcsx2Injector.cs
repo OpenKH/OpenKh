@@ -746,11 +746,15 @@ namespace OpenKh.Tools.ModsManager.Services
 
             var ptrFileName = stream.ReadInt32();
             var fileDirID = stream.ReadInt32();
+
             var fileName = ReadString(stream, ptrFileName);
-            fileName = Path.Combine(fileDirID.ToString(), fileName);
             var returnValue = 0;
+
             if (!string.IsNullOrEmpty(fileName))
+            {
+                fileName = Path.Combine(fileDirID.ToString(), fileName);
                 returnValue = _operationDispatcher.GetFileSize(fileName);
+            }
             stream.SetPosition(OperationAddress - 4).Write(returnValue);
         }
 

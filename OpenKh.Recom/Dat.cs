@@ -24,7 +24,14 @@ namespace OpenKh.Recom
                 if (rfi.SubDirsInfoOffset != 0 && rfi.SubDirsCount > 0)
                 {
                     rfi.SubDirsInfoStartIndex = rdi.SubDirsInfo.Count;
-                    uint dir_offset = uint.Parse(rfi.Filename.Substring(1, 3)) * 10000;
+                    var name = rfi.Filename.Length >= 4 ? rfi.Filename.Substring(1, 3) : String.Empty;
+                    uint dir_offset;
+                    if (!uint.TryParse(name, out dir_offset))
+                    {
+                        // Skip this file
+                        continue;
+                    }
+                    dir_offset *= 10000;
                     for (int j = 0; j < rfi.SubDirsCount; j++)
                     {
                         SubDirInfo sdi = BinaryMapping.ReadObject<SubDirInfo>(stream.SetPosition(0x800 + rfi.SubDirsInfoOffset + j * 32));
@@ -124,7 +131,15 @@ namespace OpenKh.Recom
                 {
                     if (!File.Exists(symlink_path))
                     {
-                        File.CreateSymbolicLink(symlink_path, target_path);
+                        try
+                        {
+                            File.CreateSymbolicLink(symlink_path, target_path);
+                        }
+                        catch (System.IO.IOException)
+                        {
+                            // Fallback in case we don't have permissions for a symlink
+                            File.Copy(target_path, symlink_path, overwrite: false);
+                        }
                     }
                 }
                 else
