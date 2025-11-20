@@ -300,12 +300,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
             var modPaths = new List<string> {
                 GetModPath(repositoryName),
-                GetCollectionPath(repositoryName),
-                GetModsGamePath(repositoryName, "kh1"),
-                GetModsGamePath(repositoryName, "kh2"),
-                GetModsGamePath(repositoryName, "bbs"),
-                GetModsGamePath(repositoryName, "Recom"),
-                GetModsGamePath(repositoryName, "kh3d"),
+                GetCollectionPath(repositoryName)
             };
             if (modPaths.Any(mod => Directory.Exists(mod)))
             {
@@ -469,7 +464,10 @@ namespace OpenKh.Tools.ModsManager.Services
                 if (isCollection && !metadata.IsCollection)
                     await MoveFromCollection(modName);
                 else if (!isCollection && metadata.IsCollection)
-                    await MoveToCollection(modName);
+                    if (!Directory.Exists(GetCollectionPath(modName)))
+                        await MoveToCollection(modName);
+                    else
+                        await CleanModFiles(GetModPath(modName));
                 if (updateCount > 0)
                     yield return new ModUpdateModel
                     {
