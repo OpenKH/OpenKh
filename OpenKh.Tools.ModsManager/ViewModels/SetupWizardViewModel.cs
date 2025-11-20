@@ -118,13 +118,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (File.Exists(_isoLocation))
                 {
                     var game = GameService.DetectGameId(_isoLocation);
-                    GameId = game?.Id;
-                    GameName = game?.Name;
-                    if (GameId != null)
-                    {
-                        ConfigurationService.LaunchGame = GameId;
-                        ConfigurationService.IsoLocation = _isoLocation;
-                    }
+                    ConfigurationService.IsoLocation = _isoLocation;
                 }
                 else
                 {
