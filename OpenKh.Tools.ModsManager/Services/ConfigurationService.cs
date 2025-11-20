@@ -86,6 +86,14 @@ namespace OpenKh.Tools.ModsManager.Services
         private static string EnabledCollectionModsPathKH3D = Path.Combine(StoragePath, "collection-mods-KH3D.json");
         private static readonly Config _config = Config.Open(ConfigPath);
         public static string PresetPath = Path.Combine(StoragePath, "presets");
+        private static readonly HashSet<string> _supportedGames = new HashSet<string>()
+        {
+            "kh2",
+            "kh1",
+            "bbs",
+            "Recom",
+            "kh3d"
+        };
 
         public class YamlGenPref
         {
@@ -550,7 +558,7 @@ namespace OpenKh.Tools.ModsManager.Services
         }
         public static string LaunchGame
         {
-            get => _config.LaunchGame;
+            get => _supportedGames.Contains(_config.LaunchGame) ? _config.LaunchGame : _config.LaunchGame = "kh2";
             set
             {
                 _config.LaunchGame = value;
