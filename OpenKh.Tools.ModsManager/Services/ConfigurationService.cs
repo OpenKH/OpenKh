@@ -86,7 +86,7 @@ namespace OpenKh.Tools.ModsManager.Services
         private static string EnabledCollectionModsPathKH3D = Path.Combine(StoragePath, "collection-mods-KH3D.json");
         private static readonly Config _config = Config.Open(ConfigPath);
         public static string PresetPath = Path.Combine(StoragePath, "presets");
-        private static List<string> _supportedGames = new List<string>()
+        private static readonly HashSet<string> _supportedGames = new HashSet<string>()
         {
             "kh2",
             "kh1",
