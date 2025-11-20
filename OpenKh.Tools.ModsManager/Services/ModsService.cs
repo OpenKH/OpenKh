@@ -469,11 +469,11 @@ namespace OpenKh.Tools.ModsManager.Services
                     else
                         await CleanModFiles(GetModPath(modName));
                 if (updateCount > 0)
-                        yield return new ModUpdateModel
-                        {
-                            Name = modName,
-                            UpdateCount = updateCount
-                        };
+                    yield return new ModUpdateModel
+                    {
+                        Name = modName,
+                        UpdateCount = updateCount
+                    };
             }
         }
 
