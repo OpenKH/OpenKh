@@ -75,8 +75,14 @@ namespace OpenKh.Recom
 
                         var start_block = file_info.StartBlock + sub_dir_info.StartBlock;
                         var mem_stream = IsoUtility.GetSectors(iso_stream, start_block, (int)sub_dir_info.FilesListBlockCount);
+                        if (mem_stream.Length == 0)
+                        {
+                            // Skip to next file
+                            continue;
+                        }
                         int j = 0;
-                        while (mem_stream.ReadByte() != 0)
+
+                        while (mem_stream.ReadByte() > 0)
                         {
                             SubFileInfo sub_file_info = BinaryMapping.ReadObject<SubFileInfo>(mem_stream.SetPosition(j * 48));
                             if (sub_file_info.DirId == sub_dir_info.DirId)
