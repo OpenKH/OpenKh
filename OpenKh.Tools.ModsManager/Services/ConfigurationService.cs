@@ -558,7 +558,7 @@ namespace OpenKh.Tools.ModsManager.Services
         }
         public static string LaunchGame
         {
-            get => _supportedGames.Contains(_config.LaunchGame) ? _config.LaunchGame : "kh2";
+            get => _supportedGames.Contains(_config.LaunchGame) ? _config.LaunchGame : _config.LaunchGame = "kh2";
             set
             {
                 _config.LaunchGame = value;
