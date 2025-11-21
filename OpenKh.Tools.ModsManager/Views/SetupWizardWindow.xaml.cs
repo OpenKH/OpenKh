@@ -31,7 +31,6 @@ namespace OpenKh.Tools.ModsManager.Views
             Closed += (sender, e) => _vm.SetAborted();
         }
 
-        public string ConfigIsoLocation { get => _vm.IsoLocationKH2; set => _vm.IsoLocationKH2 = value; }
         public int ConfigGameEdition { get => _vm.GameEdition; set => _vm.GameEdition = value; }
         public string ConfigOpenKhGameEngineLocation { get => _vm.OpenKhGameEngineLocation; set => _vm.OpenKhGameEngineLocation = value; }
         public string ConfigPcsx2Location { get => _vm.Pcsx2Location; set => _vm.Pcsx2Location = value; }

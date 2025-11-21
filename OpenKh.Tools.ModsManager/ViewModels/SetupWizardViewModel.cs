@@ -16,7 +16,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.IO.Compression;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
 {
@@ -102,51 +101,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string Title => $"Set-up wizard | {ApplicationName}";
 
         public RelayCommand SelectIsoCommand { get; }
-        public string? GameId { get; set; } = "kh2";
-        public string? GameName { get; set; }
+        public string GameId { get; set; }
+        public string GameName { get; set; }
         public string IsoLocation
         {
-            get
-            {
-                if (File.Exists(_isoLocation))
-                {
-                    var game = GameService.DetectGameId(_isoLocation);
-                    GameId = game?.Id;
-                    GameName = game?.Name;
-                }
-                return _isoLocation;
-            }
+            get => _isoLocation;
             set
             {
                 _isoLocation = value;
                 if (File.Exists(_isoLocation))
                 {
                     var game = GameService.DetectGameId(_isoLocation);
-                    if (game != null)
-                    {
-                        switch (game?.Id)
-                        {
-                            case "kh2":
-                                IsoLocationKH2 = _isoLocation;
-                                break;
-                            case "kh1":
-                                IsoLocationKH1 = _isoLocation;
-                                break;
-                            case "Recom":
-                                IsoLocationRecom = _isoLocation;
-                                break;
-                            default:
-                                IsoLocationKH2 = _isoLocation;
-                                break;
-                        }
-                        GameId = game?.Id;
-                        GameName = game?.Name;
-                    }
-                    else
-                    {
-                        GameId = null;
-                        GameName = null;
-                    }
+                    GameId = game?.Id;
+                    GameName = game?.Name;
                 }
                 else
                 {
@@ -154,23 +121,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     GameName = null;
                 }
 
-                if (IsoLocationKH2 != null)
-                {
-                    WizardPageAfterGameData = PageRegion;
-                }
-                else
-                {
-                    WizardPageAfterGameData = LastPage;
-                }
-
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(IsIsoSelected));
-                OnPropertyChanged(nameof(GameId));
-                OnPropertyChanged(nameof(GameName));
-                OnPropertyChanged(nameof(GameRecognizedVisibility));
-                OnPropertyChanged(nameof(GameNotRecognizedVisibility));
-                OnPropertyChanged(nameof(IsGameRecognized));
-                OnPropertyChanged(nameof(WizardPageAfterGameData));
+                OnPropertyChanged(GameName);
             }
         }
         public string IsoLocationKH2
@@ -272,8 +224,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (File.Exists(_isoLocationRecom))
                 {
                     var game = GameService.DetectGameId(_isoLocationRecom);
-                    GameId = game?.Id;
-                    GameName = game?.Name;
                     if (game?.Id != "Recom")
                     {
                         _isoLocationRecom = null;
@@ -298,6 +248,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (File.Exists(_isoLocationRecom))
                 {
                     var game = GameService.DetectGameId(_isoLocationRecom);
+                    if (game?.Id != "Recom")
+                    {
+                        _isoLocationRecom = null;
+                    }
                 }
                 else
                 {
@@ -901,8 +855,42 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public SetupWizardViewModel()
         {
             IsNotExtracting = true;
-            SelectIsoCommand = new RelayCommand(_ => {
-                FileDialog.OnOpen(fileName => IsoLocation = fileName, _isoFilter);
+            SelectIsoCommand = new RelayCommand(param => {
+                String gameId = param as String;
+                FileDialog.OnOpen(
+                    fileName => {
+                        IsoLocation = fileName;
+                        if (gameId == GameId)
+                        {
+                            switch (gameId)
+                            {
+                                case "kh2":
+                                    IsoLocationKH2 = fileName;
+                                    break;
+                                case "kh1":
+                                    IsoLocationKH1 = fileName;
+                                    break;
+                                case "Recom":
+                                    IsoLocationRecom = fileName;
+                                    break;
+                                default:
+                                    IsoLocationKH2 = fileName;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            GameId = null;
+                            GameName = null;
+                        }
+                        OnPropertyChanged(nameof(GameName));
+                        OnPropertyChanged(nameof(IsIsoSelected));
+                        OnPropertyChanged(nameof(GameRecognizedVisibility));
+                        OnPropertyChanged(nameof(GameNotRecognizedVisibility));
+                        OnPropertyChanged(nameof(IsGameRecognized));
+                    },
+                    _isoFilter
+                );
             });
             SelectOpenKhGameEngineCommand = new RelayCommand(_ =>
                 FileDialog.OnOpen(fileName => OpenKhGameEngineLocation = fileName, _openkhGeFilter));

@@ -142,22 +142,40 @@
                         <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix, PC)</TextBlock>
                         <TextBlock>Kingdom Hearts Re:Chain of Memories (US)</TextBlock>
                     </StackPanel>
+                    <TextBlock Margin="0 0 0 3">Please select the location of the PlayStation 2 ISO Images.</TextBlock>
+                    <TextBlock Margin="0 0 0 3">Kingdom Hearts 2 PlayStation 2 ISO Image.</TextBlock>
                     <Grid Margin="0 0 0 3">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="20"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0">Please select the location of the PlayStation 2 ISO Image.</TextBlock>
-                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectIsoCommand}">
+                        <TextBox Grid.Column="0" Text="{Binding IsoLocationKH2, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectIsoCommand}" CommandParameter="kh2">
                             <Image Source="{StaticResource FolderOpen_16x}"/>
                         </Button>
                     </Grid>
-                    <TextBlock Margin="0 0 0 3">Kingdom Hearts 2 PlayStation 2 ISO Image.</TextBlock>
-                    <TextBox Margin="0 0 0 3" Text="{Binding IsoLocationKH2, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
                     <TextBlock Margin="0 0 0 3">Kingdom Hearts 1 PlayStation 2 ISO Image.</TextBlock>
-                    <TextBox Margin="0 0 0 3" Text="{Binding IsoLocationKH1, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                    <Grid Margin="0 0 0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding IsoLocationKH1, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectIsoCommand}" CommandParameter="kh1">
+                            <Image Source="{StaticResource FolderOpen_16x}"/>
+                        </Button>
+                    </Grid>
                     <TextBlock Margin="0 0 0 3">Kingdom Hearts Re: Chain of Memories PlayStation 2 ISO Image.</TextBlock>
-                    <TextBox Margin="0 0 0 3" Text="{Binding IsoLocationRecom, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                    <Grid Margin="0 0 0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding IsoLocationRecom, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectIsoCommand}" CommandParameter="Recom">
+                            <Image Source="{StaticResource FolderOpen_16x}"/>
+                        </Button>
+                    </Grid>
                     <TextBlock TextWrapping="Wrap" Visibility="{Binding GameRecognizedVisibility}">
                     <Run>A copy of </Run>
                     <Run Text="{Binding GameName}" d:Text="Some KH game"/>
