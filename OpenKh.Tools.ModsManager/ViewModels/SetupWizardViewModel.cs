@@ -131,15 +131,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 if (File.Exists(_isoLocationKH2))
                 {
-                    var game = GameService.DetectGameId(_isoLocationKH2);
-                    if (game?.Id != "kh2")
+                    if (GameService.DetectGameId(_isoLocationKH2)?.Id != "kh2")
                     {
+                        WizardPageAfterGameData = LastPage;
                         _isoLocationKH2 = null;
                         ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
                     }
                 }
                 else
                 {
+                    WizardPageAfterGameData = LastPage;
                     _isoLocationKH2 = null;
                     ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
                 }
@@ -147,6 +148,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsGameDataFound));
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
                 OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(KH2RecognizedVisibility));
 
                 return _isoLocationKH2;
             }
@@ -155,10 +157,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _isoLocationKH2 = value;
                 if (File.Exists(_isoLocationKH2))
                 {
-                    var game = GameService.DetectGameId(_isoLocationKH2);
+                    if (GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2")
+                    {
+                        WizardPageAfterGameData = PageRegion;
+                    }
+                    else
+                    {
+                        WizardPageAfterGameData = LastPage;
+                        _isoLocationKH2 = null;
+                    }
                 }
                 else
                 {
+                    WizardPageAfterGameData = LastPage;
                     _isoLocationKH2 = null;
                 }
                 ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
@@ -167,6 +178,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsGameDataFound));
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
                 OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(KH2RecognizedVisibility));
+                OnPropertyChanged(nameof(WizardPageAfterGameData));
             }
         }
         public string IsoLocationKH1
@@ -175,8 +188,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 if (File.Exists(_isoLocationKH1))
                 {
-                    var game = GameService.DetectGameId(_isoLocationKH1);
-                    if (game?.Id != "kh1")
+                    if (GameService.DetectGameId(_isoLocationKH1)?.Id != "kh1")
                     {
                         _isoLocationKH1 = null;
                         ConfigurationService.IsoLocationKH1 = _isoLocationKH1;
@@ -191,6 +203,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsGameDataFound));
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
                 OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(KH1RecognizedVisibility));
 
                 return _isoLocationKH1;
             }
@@ -215,6 +228,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsGameDataFound));
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
                 OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(KH1RecognizedVisibility));
             }
         }
         public string IsoLocationRecom
@@ -239,6 +253,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsGameDataFound));
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
                 OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(RecomRecognizedVisibility));
 
                 return _isoLocationRecom;
             }
@@ -263,12 +278,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsGameDataFound));
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
                 OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(RecomRecognizedVisibility));
             }
         }
         public bool IsIsoSelected => (!string.IsNullOrEmpty(IsoLocation) && File.Exists(IsoLocation));
         public bool IsGameRecognized => (IsIsoSelected && GameId != null);
         public Visibility GameRecognizedVisibility => IsIsoSelected && GameId != null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameNotRecognizedVisibility => IsIsoSelected && GameId == null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility KH1RecognizedVisibility => !String.IsNullOrEmpty(_isoLocationKH1) && GameService.DetectGameId(_isoLocationKH1)?.Id == "kh1" ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility KH2RecognizedVisibility => !String.IsNullOrEmpty(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility RecomRecognizedVisibility => !String.IsNullOrEmpty(_isoLocationRecom) && GameService.DetectGameId(_isoLocationRecom)?.Id == "Recom" ? Visibility.Visible : Visibility.Collapsed;
 
         public bool IsGameSelected
         {
@@ -306,7 +325,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => PageRegion,
+                    PCSX2 => !String.IsNullOrEmpty(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -907,15 +926,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             BEGIN:
                 try
                 {
-                    if (IsoLocationKH2 != null)
+                    if (Extractkh2 && !String.IsNullOrEmpty(IsoLocationKH2) && GameService.DetectGameId(IsoLocationKH2)?.Id == "kh2")
                     {
                         await ExtractGameData(IsoLocationKH2, GameDataLocation);
                     }
-                    if (IsoLocationKH1 != null)
+                    if (Extractkh1 && !String.IsNullOrEmpty(IsoLocationKH1) && GameService.DetectGameId(IsoLocationKH1)?.Id == "kh1")
                     {
                         await ExtractGameData(IsoLocationKH1, GameDataLocation);
                     }
-                    if (IsoLocationRecom != null)
+                    if (Extractrecom && !String.IsNullOrEmpty(IsoLocationRecom) && GameService.DetectGameId(IsoLocationRecom)?.Id == "Recom")
                     {
                         await ExtractGameData(IsoLocationRecom, GameDataLocation);
                     }
