@@ -122,7 +122,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
 
                 OnPropertyChanged();
-                OnPropertyChanged(GameName);
+                OnPropertyChanged(nameof(GameName));
             }
         }
         public string IsoLocationKH2
@@ -345,7 +345,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => PageRegion,
+                    PCSX2 => !String.IsNullOrEmpty(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
