@@ -236,7 +236,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(RecomRecognizedVisibility));
             }
         }
-        public bool IsIsoSelected =>  File.Exists(IsoLocation);
+        public bool IsIsoSelected => File.Exists(IsoLocation);
         public bool IsGameRecognized => (IsIsoSelected && GameId != null);
         public Visibility GameRecognizedVisibility => IsIsoSelected && GameId != null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameNotRecognizedVisibility => IsIsoSelected && GameId == null ? Visibility.Visible : Visibility.Collapsed;
