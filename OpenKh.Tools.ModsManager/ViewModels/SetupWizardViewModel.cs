@@ -285,9 +285,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public bool IsGameRecognized => (IsIsoSelected && GameId != null);
         public Visibility GameRecognizedVisibility => IsIsoSelected && GameId != null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameNotRecognizedVisibility => IsIsoSelected && GameId == null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility KH1RecognizedVisibility => !String.IsNullOrEmpty(_isoLocationKH1) && GameService.DetectGameId(_isoLocationKH1)?.Id == "kh1" ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility KH2RecognizedVisibility => !String.IsNullOrEmpty(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility RecomRecognizedVisibility => !String.IsNullOrEmpty(_isoLocationRecom) && GameService.DetectGameId(_isoLocationRecom)?.Id == "Recom" ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility KH1RecognizedVisibility => !string.IsNullOrEmpty(_isoLocationKH1) && GameService.DetectGameId(_isoLocationKH1)?.Id == "kh1" ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility KH2RecognizedVisibility => !string.IsNullOrEmpty(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility RecomRecognizedVisibility => !string.IsNullOrEmpty(_isoLocationRecom) && GameService.DetectGameId(_isoLocationRecom)?.Id == "Recom" ? Visibility.Visible : Visibility.Collapsed;
 
         public bool IsGameSelected
         {
@@ -325,7 +325,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => !String.IsNullOrEmpty(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
+                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -345,7 +345,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => !String.IsNullOrEmpty(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
+                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -926,15 +926,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             BEGIN:
                 try
                 {
-                    if (Extractkh2 && !String.IsNullOrEmpty(IsoLocationKH2) && GameService.DetectGameId(IsoLocationKH2)?.Id == "kh2")
+                    if (Extractkh2 && !string.IsNullOrEmpty(IsoLocationKH2) && GameService.DetectGameId(IsoLocationKH2)?.Id == "kh2")
                     {
                         await ExtractGameData(IsoLocationKH2, GameDataLocation);
                     }
-                    if (Extractkh1 && !String.IsNullOrEmpty(IsoLocationKH1) && GameService.DetectGameId(IsoLocationKH1)?.Id == "kh1")
+                    if (Extractkh1 && !string.IsNullOrEmpty(IsoLocationKH1) && GameService.DetectGameId(IsoLocationKH1)?.Id == "kh1")
                     {
                         await ExtractGameData(IsoLocationKH1, GameDataLocation);
                     }
-                    if (Extractrecom && !String.IsNullOrEmpty(IsoLocationRecom) && GameService.DetectGameId(IsoLocationRecom)?.Id == "Recom")
+                    if (Extractrecom && !string.IsNullOrEmpty(IsoLocationRecom) && GameService.DetectGameId(IsoLocationRecom)?.Id == "Recom")
                     {
                         await ExtractGameData(IsoLocationRecom, GameDataLocation);
                     }
