@@ -130,7 +130,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
-        public bool GameSelectInteractable => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && MultiEmuGames) ? true : false;
+        public bool GameSelectInteractable => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && MultiEmuGames);
         public Visibility GameSelectVisible => PC || PCSX2 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameSelectKH2 => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationKH2 != null) ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameSelectKH1 => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationKH1 != null) ? Visibility.Visible : Visibility.Collapsed;
@@ -619,7 +619,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         PanaceaInstalled = ConfigurationService.PanaceaInstalled;
                         if (!Directory.Exists(ConfigurationService.PcReleaseLocation))
                         {
-                            GametoLaunch = (int)GameIDs.KH3D;
+                            if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                            {
+                                GametoLaunch = (int)GameIDs.KH3D;
+                            }
+                            else
+                            {
+                                MessageBox.Show(
+                                "Unable to locate install locations for both KINGDOM HEARTS HD 1.5+2.5 ReMIX and KINGDOM HEARTS HD 2.8 Final Chapter Prologue. They are either missing or corrupted. Please re-run the setup wizard and confirm the install paths are correct.",
+                                "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
                         }
                     }
                     else if (ConfigurationService.GameEdition == SetupWizardViewModel.PCSX2)
