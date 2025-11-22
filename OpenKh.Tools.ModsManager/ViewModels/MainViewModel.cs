@@ -272,6 +272,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
                 OnPropertyChanged(nameof(GameSelectVisible));
+                OnPropertyChanged(nameof(GameSelectInteractable));
                 OnPropertyChanged(nameof(PanaceaSettings));
             }
         }
