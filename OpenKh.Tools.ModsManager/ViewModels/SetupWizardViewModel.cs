@@ -892,9 +892,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 case "Recom":
                                     IsoLocationRecom = fileName;
                                     break;
-                                default:
-                                    IsoLocationKH2 = fileName;
-                                    break;
                             }
                         }
                         else
