@@ -1,18 +1,13 @@
 using OpenKh.Common;
-using OpenKh.Kh1;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.ModsManager.Interfaces;
-using OpenKh.Tools.ModsManager.ViewModels;
-using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Tools.ModsManager.Services

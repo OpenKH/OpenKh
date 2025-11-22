@@ -926,17 +926,24 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             BEGIN:
                 try
                 {
-                    if (Extractkh2 && !string.IsNullOrEmpty(IsoLocationKH2) && GameService.DetectGameId(IsoLocationKH2)?.Id == "kh2")
+                    if (GameEdition == PCSX2)
                     {
-                        await ExtractGameData(IsoLocationKH2, GameDataLocation);
+                        if (Extractkh2 && !string.IsNullOrEmpty(IsoLocationKH2) && GameService.DetectGameId(IsoLocationKH2)?.Id == "kh2")
+                        {
+                            await ExtractGameData(IsoLocationKH2, GameDataLocation);
+                        }
+                        if (Extractkh1 && !string.IsNullOrEmpty(IsoLocationKH1) && GameService.DetectGameId(IsoLocationKH1)?.Id == "kh1")
+                        {
+                            await ExtractGameData(IsoLocationKH1, GameDataLocation);
+                        }
+                        if (Extractrecom && !string.IsNullOrEmpty(IsoLocationRecom) && GameService.DetectGameId(IsoLocationRecom)?.Id == "Recom")
+                        {
+                            await ExtractGameData(IsoLocationRecom, GameDataLocation);
+                        }
                     }
-                    if (Extractkh1 && !string.IsNullOrEmpty(IsoLocationKH1) && GameService.DetectGameId(IsoLocationKH1)?.Id == "kh1")
+                    else if (GameEdition == PC)
                     {
-                        await ExtractGameData(IsoLocationKH1, GameDataLocation);
-                    }
-                    if (Extractrecom && !string.IsNullOrEmpty(IsoLocationRecom) && GameService.DetectGameId(IsoLocationRecom)?.Id == "Recom")
-                    {
-                        await ExtractGameData(IsoLocationRecom, GameDataLocation);
+                        await ExtractGameData(null, GameDataLocation);
                     }
                 }
                 catch (OperationCanceledException)

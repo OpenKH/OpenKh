@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Xceed.Wpf.Toolkit.Core.Converters;
 using Xe.IO;
 
 namespace OpenKh.Tools.ModsManager.Services
