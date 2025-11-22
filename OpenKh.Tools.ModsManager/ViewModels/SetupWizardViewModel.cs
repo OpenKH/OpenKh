@@ -278,7 +278,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => File.Exists(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
+                    PCSX2 => _isoLocationKH2 != null ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -298,7 +298,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => File.Exists(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
+                    PCSX2 => _isoLocationKH2!= null ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
