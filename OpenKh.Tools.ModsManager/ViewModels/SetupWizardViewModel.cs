@@ -236,7 +236,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(RecomRecognizedVisibility));
             }
         }
-        public bool IsIsoSelected => File.Exists(IsoLocation);
+        public bool IsIsoSelected => (!string.IsNullOrEmpty(IsoLocation) && File.Exists(IsoLocation));
         public bool IsGameRecognized => (IsIsoSelected && GameId != null);
         public Visibility GameRecognizedVisibility => IsIsoSelected && GameId != null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameNotRecognizedVisibility => IsIsoSelected && GameId == null ? Visibility.Visible : Visibility.Collapsed;
@@ -250,12 +250,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 return GameEdition switch
                 {
-                    OpenKHGameEngine => File.Exists(OpenKhGameEngineLocation),
-                    PCSX2 => File.Exists(Pcsx2Location),
-                    PC => (Directory.Exists(PcReleaseLocation) &&
+                    OpenKHGameEngine => !string.IsNullOrEmpty(OpenKhGameEngineLocation) && File.Exists(OpenKhGameEngineLocation),
+                    PCSX2 => !string.IsNullOrEmpty(Pcsx2Location) && File.Exists(Pcsx2Location),
+                    PC => (!string.IsNullOrEmpty(PcReleaseLocation) &&
+                        Directory.Exists(PcReleaseLocation) &&
                         (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
                         File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))))||
-                        (Directory.Exists(PcReleaseLocationKH3D) &&
+                        (!string.IsNullOrEmpty(PcReleaseLocationKH3D) &&
+                        Directory.Exists(PcReleaseLocationKH3D) &&
                         (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
                         File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll")))),
                     _ => false,
