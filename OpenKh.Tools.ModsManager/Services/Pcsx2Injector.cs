@@ -753,7 +753,6 @@ namespace OpenKh.Tools.ModsManager.Services
             stream.SetPosition(OperationAddress - 4).Write(returnValue);
         }
 
-        private int count = 0;
         private void OperationLoadFileTask(Stream stream)
         {
             const int ParameterCount = 3;

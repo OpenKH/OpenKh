@@ -131,14 +131,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameSelectVisible => PC || PCSX2 ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectKH2 => PC || PCSX2 && ConfigurationService.IsoLocationKH2 != null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectKH1 => PC || PCSX2 && ConfigurationService.IsoLocationKH1 != null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectBBS => PC ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectRecom => PC || PCSX2 && ConfigurationService.IsoLocationRecom != null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectKH3D => PC ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH2 => PC && Directory.Exists(ConfigurationService.PcReleaseLocation) || PCSX2 && ConfigurationService.IsoLocationKH2 != null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH1 => PC && Directory.Exists(ConfigurationService.PcReleaseLocation) || PCSX2 && ConfigurationService.IsoLocationKH1 != null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectBBS => PC && Directory.Exists(ConfigurationService.PcReleaseLocation) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectRecom => PC && Directory.Exists(ConfigurationService.PcReleaseLocation) || PCSX2 && ConfigurationService.IsoLocationRecom != null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH3D => PC && Directory.Exists(ConfigurationService.PcReleaseLocationKH3D) ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PanaceaSettings => PC && PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
 
-        public enum GameIDs { 
+        public enum GameIDs {
             KH2 = 0,
             KH1 = 1,
             BBS = 2,
@@ -859,19 +859,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         if (ConfigurationService.PcReleaseLocationKH3D != null)
                         {
-                            string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
                             if (ConfigurationService.PanaceaInstalled)
                             {
+                                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
                                 if (!File.Exists(panaceaSettings))
                                 {
-                                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
-                                    {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
                                         [
                                         $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
                                         $"show_console={false}",
                                         ]);
-                                    }
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
@@ -937,14 +934,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             {
                                 if (!File.Exists(panaceaSettings))
                                 {
-                                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
-                                    {
-                                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
-                                        [
-                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
-                                        $"show_console={false}",
-                                        ]);
-                                    }
+                                    File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
+                                    [
+                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                    $"show_console={false}",
+                                    ]);
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
@@ -974,10 +968,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             if (!(_launchGame == "kh3d"))
                             {
-                                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
-                                if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
+                                if (ConfigurationService.PcReleaseLocation != null)
                                 {
-                                    if (Directory.Exists(ConfigurationService.PcReleaseLocation))
+                                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
+                                    if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
                                     {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
                                         [
@@ -985,24 +979,27 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         $"show_console={false}",
                                         ]);
                                     }
+                                    filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
                                 }
-                                filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
                             }
                             else
                             {
-                                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
-                                if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
+                                if (ConfigurationService.PcReleaseLocationKH3D != null)
                                 {
-                                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
+                                    if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
                                     {
-                                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
-                                        [
-                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
-                                        $"show_console={false}",
-                                        ]);
+                                        if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                                        {
+                                            File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
+                                            [
+                                            $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                            $"show_console={false}",
+                                            ]);
+                                        }
                                     }
+                                    filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
                                 }
-                                filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
                             }
                             processStartInfo = new ProcessStartInfo
                             {
