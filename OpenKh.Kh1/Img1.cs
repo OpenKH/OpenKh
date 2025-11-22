@@ -57,9 +57,13 @@ namespace OpenKh.Kh1
 
         public Stream FileOpen(Idx1 entry)
         {
+            var startOffset = (_firstBlock + entry.IsoBlock) * IsoBlockAlign;
+            if ((int)(startOffset + entry.Length) < 0 || startOffset + entry.Length != (int)(startOffset + entry.Length))
+                return null;
+
             if (entry.CompressionFlag != 0)
             {
-                var fileStream = new SubStream(_stream, (_firstBlock + entry.IsoBlock) * IsoBlockAlign, entry.Length);
+                var fileStream = new SubStream(_stream, startOffset, entry.Length);
                 return new MemoryStream(Decompress(fileStream));
             }
 
@@ -75,7 +79,7 @@ namespace OpenKh.Kh1
         {
             var srcIndex = srcData.Length - 1;
 
-            if (srcIndex == 0)
+            if (srcIndex <= 2)
                 return Array.Empty<byte>();
 
             var key = srcData[srcIndex--];
@@ -96,7 +100,7 @@ namespace OpenKh.Kh1
                         var copyLength = srcData[srcIndex--];
                         for (int i = 0; i < copyLength + 3 && dstIndex >= 0; i++)
                         {
-                            if (dstIndex + copyIndex + 1 < dstData.Length)
+                            if (dstIndex + copyIndex < dstData.Length)
                                 dstData[dstIndex--] = dstData[dstIndex + copyIndex + 1];
                             else
                                 dstData[dstIndex--] = 0;

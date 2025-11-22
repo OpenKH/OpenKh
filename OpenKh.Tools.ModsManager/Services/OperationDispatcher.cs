@@ -1,5 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Tools.ModsManager.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -14,6 +15,20 @@ namespace OpenKh.Tools.ModsManager.Services
 
         private static readonly HashSet<string> _denyList = new HashSet<string>
         {
+            // KH1
+            "dkmovie.x",
+            "dktitle.x",
+            "gb.x",
+            "wm.x",
+            "xl_limit.x",
+            "xs_bambi.x",
+            "xs_dh_break.x",
+            "xs_dumbo.x",
+            "xs_genie.x",
+            "xs_mushu.x",
+            "xs_simba.x",
+            "xs_tink.x",
+            // KH2
             "ovl_title.x",
             "ovl_shop.x",
             "ovl_movie.x",
@@ -24,7 +39,8 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public int LoadFile(Stream outStream, string fileName)
         {
-            if (GetFinalNamePath(fileName, out var finalFileName))
+            int status = GetFinalNamePath(fileName, out var finalFileName);
+            if (status == 0)
             {
                 Log.Info($"Load file {finalFileName}");
                 return File.OpenRead(finalFileName).Using(x =>
@@ -33,56 +49,114 @@ namespace OpenKh.Tools.ModsManager.Services
                     return (int)x.Length;
                 });
             }
-
-            Log.Warn($"File {fileName} not found, falling back");
+            else if (status == -1)
+            {
+                Log.Warn($"File {fileName} is on the deny list, falling back");
+            }
+            else
+            {
+                Log.Warn($"File {fileName} not found, falling back");
+            }
             return 0;
         }
 
         public int GetFileSize(string fileName)
         {
-            if (GetFinalNamePath(fileName, out var finalFileName))
+            if (GetFinalNamePath(fileName, out var finalFileName) == 0)
                 return (int)new FileInfo(finalFileName).Length;
 
             return 0;
         }
 
-        private bool GetFinalNamePath(string fileName, out string finalFileName)
+        public static bool IsSymbolicLink(string fileName)
         {
-            if (_denyList.Contains(fileName))
+            if (File.Exists(fileName))
             {
-                finalFileName = null;
-                return false;
+                FileAttributes attributes = File.GetAttributes(fileName);
+                return (attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint;
             }
-
-            finalFileName = Path.Combine(ConfigurationService.GameModPath, fileName);
-            if (File.Exists(finalFileName))
-                return true;
-
-            finalFileName = Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame, fileName);
-            if (File.Exists(finalFileName))
-                return true;
-
-            var region = GetRegion(fileName);
-            if (region == null)
-                return false;
-
-            foreach (var fallback in _regionFallback)
-            {
-                var temptativeRegionalFallbackFileName = fileName
-                    .Replace($"/{region}/", $"/{fallback}/")
-                    .Replace($".a.{region}", $".a.{fallback}")
-                    .Replace($".apdx", $".a.{fallback}");
-                finalFileName = Path.Combine(ConfigurationService.GameModPath, temptativeRegionalFallbackFileName);
-                if (File.Exists(finalFileName))
-                    return true;
-
-                finalFileName = Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame, temptativeRegionalFallbackFileName);
-                if (File.Exists(finalFileName))
-                    return true;
-            }
-
-            finalFileName = null;
             return false;
+        }
+
+        private static int GetFinalNamePath(string fileName, out string finalFileName)
+        {
+            FileSystemInfo fileInfo;
+            String basePath;
+            do
+            {
+                if (_denyList.Contains(fileName))
+                {
+                    finalFileName = null;
+                    return -1;  // Error Code -1: denied
+                }
+
+                basePath = ConfigurationService.GameModPath;
+                finalFileName = Path.Combine(basePath, fileName);
+                if (File.Exists(finalFileName))
+                {
+                    if (IsSymbolicLink(finalFileName))
+                    {
+                        fileInfo = new FileInfo(finalFileName);
+                        fileName = Path.GetRelativePath(basePath, fileInfo.LinkTarget);
+                        continue;
+                    }
+                    return 0;
+                }
+
+                basePath = Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame);
+                finalFileName = Path.Combine(basePath, fileName);
+                if (File.Exists(finalFileName))
+                {
+                    if (IsSymbolicLink(finalFileName))
+                    {
+                        fileInfo = new FileInfo(finalFileName);
+                        fileName = Path.GetRelativePath(basePath, fileInfo.LinkTarget);
+                        continue;
+                    }
+                    return 0;
+                }
+
+                var region = GetRegion(fileName);
+                if (region == null)
+                    return -2;  // Error Code -2: file not found
+
+                foreach (var fallback in _regionFallback)
+                {
+                    var temptativeRegionalFallbackFileName = fileName
+                        .Replace($"/{region}/", $"/{fallback}/")
+                        .Replace($".a.{region}", $".a.{fallback}")
+                        .Replace($".apdx", $".a.{fallback}");
+                    basePath = ConfigurationService.GameModPath;
+                    finalFileName = Path.Combine(basePath, temptativeRegionalFallbackFileName);
+                    if (File.Exists(finalFileName))
+                    {
+                        if (IsSymbolicLink(finalFileName))
+                        {
+                            fileInfo = new FileInfo(finalFileName);
+                            fileName = Path.GetRelativePath(basePath, fileInfo.LinkTarget);
+                            continue;
+                        }
+                        return 0;
+                    }
+
+                    basePath = Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame);
+                    finalFileName = Path.Combine(basePath, temptativeRegionalFallbackFileName);
+                    if (File.Exists(finalFileName))
+                    {
+                        if (IsSymbolicLink(finalFileName))
+                        {
+                            fileInfo = new FileInfo(finalFileName);
+                            fileName = Path.GetRelativePath(basePath, fileInfo.LinkTarget);
+                            continue;
+                        }
+                        return 0;
+                    }
+                }
+
+                finalFileName = null;
+                return -2;  // Error Code -2: file not found
+
+            } while (true);
         }
 
         private static string GetRegion(string fileName)

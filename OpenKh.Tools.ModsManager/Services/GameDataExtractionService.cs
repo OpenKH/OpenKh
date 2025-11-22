@@ -1,5 +1,7 @@
 using OpenKh.Common;
+using OpenKh.Kh1;
 using OpenKh.Kh2;
+using OpenKh.Recom;
 using System;
 using System.IO;
 using System.Linq;
@@ -20,6 +22,80 @@ namespace OpenKh.Tools.ModsManager.Services
             {
 
             }
+        }
+
+        public async Task ExtractKh1Ps2EditionAsync(
+            string isoLocation,
+            string gameDataLocation,
+            Action<float> onProgress)
+        {
+            var fileBlocks = File.OpenRead(isoLocation).Using(stream =>
+            {
+                var bufferedStream = new BufferedStream(stream);
+                var idxBlock = IsoUtility.GetFileOffset(bufferedStream, "KINGDOM.IDX;1");
+                var firstBlock = IsoUtility.GetFileOffset(bufferedStream, "SYSTEM.CNF;1");
+                return (idxBlock, firstBlock);
+            });
+
+            if (fileBlocks.idxBlock == -1 || fileBlocks.firstBlock == -1)
+            {
+                throw new BadConfigurationException(
+                    $"Unable to find the files KINGDOM.IDX and SYSTEM.CNF in the ISO at '{isoLocation}'. The extraction will stop."
+                );
+            }
+
+            onProgress(0);
+
+            await Task.Run(() =>
+            {
+                using var isoStream = File.OpenRead(isoLocation);
+
+                var idxOffset = fileBlocks.idxBlock * 0x800L;
+                var idxEntries = Idx1.Read(new SubStream(isoStream, idxOffset, isoStream.Length - idxOffset));
+
+                var firstOffset = fileBlocks.firstBlock * 0x800L;
+                var imgStream = new SubStream(isoStream, firstOffset, isoStream.Length - firstOffset);
+                var img = new Img1(imgStream, idxEntries, 0);
+
+                var fileCount = img.Entries.Count;
+                var fileProcessed = 0;
+                foreach (var fileEntry in img.Entries)
+                {
+                    var fileName = Idx1Name.Lookup(fileEntry.Value) ?? $"@noname/{fileEntry.Value.Hash:X08}";
+                    using var stream = img.FileOpen(fileEntry.Value);
+                    if (stream == null)
+                    {
+                        Log.Warn($"Unable to extract {fileName}");
+                        continue;
+                    }
+                    var fileDestination = Path.Combine(gameDataLocation, "kh1", fileName);
+                    var directoryDestination = Path.GetDirectoryName(fileDestination);
+                    if (!Directory.Exists(directoryDestination))
+                    {
+                        Directory.CreateDirectory(directoryDestination);
+                    }
+                    File.Create(fileDestination).Using(dstStream => stream.CopyTo(dstStream, BufferSize));
+
+                    fileProcessed++;
+                    onProgress((float)fileProcessed / fileCount);
+                }
+
+                onProgress(1.0f);
+            });
+        }
+
+        public async Task ExtractRecomPs2EditionAsync(
+            string isoLocation,
+            string gameDataLocation,
+            Action<float> onProgress)
+        {
+            using var stream = File.OpenRead(isoLocation);
+            var rdi_stream = IsoUtility.GetSectors(stream, 0x244, stream.SetPosition(0x244 * 0x800).ReadByte());
+            var rdi = RootDirInfo.Read(rdi_stream);
+            await Task.Run(() => {
+                rdi.ExtractFiles(stream, Path.Combine(gameDataLocation, "Recom"), onProgress);
+            });
+            stream.Close();
         }
 
         public async Task ExtractKh2Ps2EditionAsync(
