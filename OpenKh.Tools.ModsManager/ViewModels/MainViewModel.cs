@@ -130,6 +130,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
+        public bool GameSelectInteractable => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && MultiEmuGames) ? true : false;
         public Visibility GameSelectVisible => PC || PCSX2 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameSelectKH2 => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationKH2 != null) ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameSelectKH1 => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationKH1 != null) ? Visibility.Visible : Visibility.Collapsed;
@@ -146,6 +147,30 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             KH3D = 4,
         };
 
+        public bool MultiEmuGames
+        {
+            get
+            {
+                int count = 0;
+                if (ConfigurationService.IsoLocationKH2 != null)
+                {
+                    count++;
+                }
+                if (ConfigurationService.IsoLocationKH1 != null)
+                {
+                    count++;
+                }
+                if (ConfigurationService.IsoLocationRecom != null)
+                {
+                    count++;
+                }
+                if (count > 1)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
         public bool PanaceaConsoleEnabled
         {
             get => _panaceaConsoleEnabled;
@@ -263,6 +288,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
                 OnPropertyChanged(nameof(GameSelectVisible));
+                OnPropertyChanged(nameof(GameSelectInteractable));
                 OnPropertyChanged(nameof(PanaceaSettings));
             }
         }
@@ -591,6 +617,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         PC = true;
                         PCSX2 = false;
                         PanaceaInstalled = ConfigurationService.PanaceaInstalled;
+                        if (!Directory.Exists(ConfigurationService.PcReleaseLocation))
+                        {
+                            GametoLaunch = (int)GameIDs.KH3D;
+                        }
                     }
                     else if (ConfigurationService.GameEdition == SetupWizardViewModel.PCSX2)
                     {
