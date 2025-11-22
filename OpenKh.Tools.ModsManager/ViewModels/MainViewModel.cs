@@ -131,11 +131,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameSelectVisible => PC || PCSX2 ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectKH2 => PC && Directory.Exists(ConfigurationService.PcReleaseLocation) || PCSX2 && ConfigurationService.IsoLocationKH2 != null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectKH1 => PC && Directory.Exists(ConfigurationService.PcReleaseLocation) || PCSX2 && ConfigurationService.IsoLocationKH1 != null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectBBS => PC && Directory.Exists(ConfigurationService.PcReleaseLocation) ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectRecom => PC && Directory.Exists(ConfigurationService.PcReleaseLocation) || PCSX2 && ConfigurationService.IsoLocationRecom != null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectKH3D => PC && Directory.Exists(ConfigurationService.PcReleaseLocationKH3D) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH2 => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationKH2 != null) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH1 => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationKH1 != null) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectBBS => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectRecom => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationRecom != null) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH3D => (PC && Directory.Exists(ConfigurationService.PcReleaseLocationKH3D)) ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PanaceaSettings => PC && PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
 
         public enum GameIDs {
@@ -849,8 +849,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                         {
                             MessageBox.Show(
-                           "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
-                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
@@ -884,8 +884,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                         {
                             MessageBox.Show(
-                           "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
-                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
@@ -919,8 +919,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                         {
                             MessageBox.Show(
-                           "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
-                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
@@ -954,8 +954,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                         {
                             MessageBox.Show(
-                           "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
-                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
@@ -981,6 +981,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     }
                                     filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
                                 }
+                                else
+                                {
+                                    MessageBox.Show(
+                                    "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
+                                    "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    CloseAllWindows();
+                                    return Task.CompletedTask;
+                                }
                             }
                             else
                             {
@@ -996,6 +1004,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         ]);
                                     }
                                     filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
+                                }
+                                else
+                                {
+                                    MessageBox.Show(
+                                    "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
+                                    "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    CloseAllWindows();
+                                    return Task.CompletedTask;
                                 }
                             }
                             processStartInfo = new ProcessStartInfo
