@@ -129,7 +129,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             if (!File.Exists(_isoLocationKH2) || GameService.DetectGameId(_isoLocationKH2)?.Id != "kh2")
             {
-                WizardPageAfterGameData = LastPage;
                 _isoLocationKH2 = null;
                 ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
             }
@@ -237,7 +236,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(RecomRecognizedVisibility));
             }
         }
-        public bool IsIsoSelected => (!string.IsNullOrEmpty(IsoLocation) && File.Exists(IsoLocation));
+        public bool IsIsoSelected =>  File.Exists(IsoLocation);
         public bool IsGameRecognized => (IsIsoSelected && GameId != null);
         public Visibility GameRecognizedVisibility => IsIsoSelected && GameId != null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameNotRecognizedVisibility => IsIsoSelected && GameId == null ? Visibility.Visible : Visibility.Collapsed;
@@ -251,14 +250,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 return GameEdition switch
                 {
-                    OpenKHGameEngine => !string.IsNullOrEmpty(OpenKhGameEngineLocation) && File.Exists(OpenKhGameEngineLocation),
-                    PCSX2 => !string.IsNullOrEmpty(Pcsx2Location) && File.Exists(Pcsx2Location),
-                    PC => (!string.IsNullOrEmpty(PcReleaseLocation) &&
-                        Directory.Exists(PcReleaseLocation) &&
+                    OpenKHGameEngine => File.Exists(OpenKhGameEngineLocation),
+                    PCSX2 => File.Exists(Pcsx2Location),
+                    PC => (Directory.Exists(PcReleaseLocation) &&
                         (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
                         File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))))||
-                        (!string.IsNullOrEmpty(PcReleaseLocationKH3D) &&
-                        Directory.Exists(PcReleaseLocationKH3D) &&
+                        (Directory.Exists(PcReleaseLocationKH3D) &&
                         (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
                         File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll")))),
                     _ => false,
@@ -281,7 +278,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) && File.Exists(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
+                    PCSX2 => File.Exists(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -301,7 +298,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) && File.Exists(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
+                    PCSX2 => File.Exists(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };

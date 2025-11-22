@@ -822,7 +822,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 case SetupWizardViewModel.PC:
                     if (ConfigurationService.PCVersion == "EGS" && !(_launchGame == "kh3d"))
                     {
-                        if (ConfigurationService.PcReleaseLocation != null)
+                        if (Directory.Exists(ConfigurationService.PcReleaseLocation))
                         {
                             if (ConfigurationService.PanaceaInstalled)
                             {
@@ -857,7 +857,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     else if (ConfigurationService.PCVersion == "EGS" && _launchGame == "kh3d")
                     {
-                        if (ConfigurationService.PcReleaseLocationKH3D != null)
+                        if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
                         {
                             if (ConfigurationService.PanaceaInstalled)
                             {
@@ -892,7 +892,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     if (ConfigurationService.PCVersion == "Steam" && !(_launchGame == "kh3d") && ConfigurationService.SteamAPITrick1525 == false)
                     {
-                        if (ConfigurationService.PcReleaseLocation != null)
+                        if (Directory.Exists(ConfigurationService.PcReleaseLocation))
                         {
                             if (ConfigurationService.PanaceaInstalled)
                             {
@@ -927,7 +927,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     else if (ConfigurationService.PCVersion == "Steam" && _launchGame == "kh3d" && ConfigurationService.SteamAPITrick28 == false)
                     {
-                        if (ConfigurationService.PcReleaseLocationKH3D != null)
+                        if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
                         {
                             string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
                             if (ConfigurationService.PanaceaInstalled)
@@ -968,7 +968,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             if (!(_launchGame == "kh3d"))
                             {
-                                if (ConfigurationService.PcReleaseLocation != null)
+                                if (Directory.Exists(ConfigurationService.PcReleaseLocation))
                                 {
                                     string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
                                     if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
@@ -984,19 +984,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             }
                             else
                             {
-                                if (ConfigurationService.PcReleaseLocationKH3D != null)
+                                if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
                                 {
                                     string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
                                     if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
                                     {
-                                        if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
-                                        {
-                                            File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
-                                            [
-                                            $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
-                                            $"show_console={false}",
-                                            ]);
-                                        }
+                                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
+                                        [
+                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                        $"show_console={false}",
+                                        ]);
                                     }
                                     filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
                                 }
