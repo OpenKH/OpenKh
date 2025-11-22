@@ -139,7 +139,7 @@
                     <TextBlock>Supported games:</TextBlock>
                     <StackPanel Margin="10 3 0 10">
                         <TextBlock>Kingdom Hearts I (Final Mix)</TextBlock>
-                        <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix, PC)</TextBlock>
+                        <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix)</TextBlock>
                         <TextBlock>Kingdom Hearts Re:Chain of Memories (US)</TextBlock>
                     </StackPanel>
                     <TextBlock Margin="0 0 0 3">Please select the location of the PlayStation 2 ISO Images.</TextBlock>
