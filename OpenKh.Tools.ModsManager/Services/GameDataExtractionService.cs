@@ -89,7 +89,7 @@ namespace OpenKh.Tools.ModsManager.Services
             string gameDataLocation,
             Action<float> onProgress)
         {
-            var stream = File.OpenRead(isoLocation);
+            using var stream = File.OpenRead(isoLocation);
             var rdi_stream = IsoUtility.GetSectors(stream, 0x244, stream.SetPosition(0x244 * 0x800).ReadByte());
             var rdi = RootDirInfo.Read(rdi_stream);
             await Task.Run(() => {
