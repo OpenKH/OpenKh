@@ -325,7 +325,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
+                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) && File.Exists(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -345,7 +345,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
+                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) && File.Exists(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -875,7 +875,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             IsNotExtracting = true;
             SelectIsoCommand = new RelayCommand(param => {
-                String gameId = param as String;
+                string gameId = param as string;
                 FileDialog.OnOpen(
                     fileName => {
                         IsoLocation = fileName;
