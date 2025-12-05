@@ -177,14 +177,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _isoLocationKH2 = value;
-                if (string.IsNullOrEmpty(_isoLocationKH2))
-                {
-                    WizardPageAfterGameData = LastPage;
-                }
-                else
-                {
-                    WizardPageAfterGameData = PageRegion;
-                }
+                WizardPageAfterGameData = !string.IsNullOrEmpty(_isoLocationKH2) ? PageRegion : LastPage;
                 ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
 
                 OnPropertyChanged();
@@ -269,7 +262,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => _isoLocationKH2 != null ? PageRegion : LastPage,
+                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -289,7 +282,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => _isoLocationKH2!= null ? PageRegion : LastPage,
+                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
