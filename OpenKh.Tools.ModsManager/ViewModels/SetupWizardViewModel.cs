@@ -127,27 +127,49 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
         public void ValidateIsoLocations()
         {
+            GameName = null;
             if (!File.Exists(_isoLocationKH2) || GameService.DetectGameId(_isoLocationKH2)?.Id != "kh2")
             {
-                _isoLocationKH2 = null;
-                ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
+                _isoLocation = _isoLocationKH2;
+                GameId = null;
+                if (string.IsNullOrEmpty(GameName))
+                {
+                    GameName = "Kingdom Hearts II";
+                }
+                else
+                {
+                    GameName += " & Kingdom Hearts II";
+                }
             }
             if (!File.Exists(_isoLocationKH1) || GameService.DetectGameId(_isoLocationKH1)?.Id != "kh1")
             {
-                _isoLocationKH1 = null;
-                ConfigurationService.IsoLocationKH1 = _isoLocationKH1;
+                _isoLocation = _isoLocationKH1;
+                GameId = null;
+                if (string.IsNullOrEmpty(GameName))
+                {
+                    GameName = "Kingdom Hearts I";
+                }
+                else
+                {
+                    GameName += " & Kingdom Hearts I";
+                }
             }
             if (!File.Exists(_isoLocationRecom) || GameService.DetectGameId(_isoLocationRecom)?.Id != "Recom")
             {
-                _isoLocationRecom = null;
-                ConfigurationService.IsoLocationRecom = _isoLocationRecom;
+                _isoLocation = _isoLocationRecom;
+                GameId = null;
+                if (string.IsNullOrEmpty(GameName))
+                {
+                    GameName = "Kingdom Hearts Re:Chain of Memories";
+                }
+                else
+                {
+                    GameName += " & Kingdom Hearts Re:Chain of Memories";
+                }
             }
-            OnPropertyChanged(nameof(IsGameDataFound));
-            OnPropertyChanged(nameof(GameDataFoundVisibility));
-            OnPropertyChanged(nameof(GameDataNotFoundVisibility));
-            OnPropertyChanged(nameof(KH2RecognizedVisibility));
-            OnPropertyChanged(nameof(KH1RecognizedVisibility));
-            OnPropertyChanged(nameof(RecomRecognizedVisibility));
+            OnPropertyChanged(nameof(GameName));
+            OnPropertyChanged(nameof(GameNotRecognizedVisibility));
+            OnPropertyChanged(nameof(IsGameRecognized));
         }
         public string IsoLocationKH2
         {
@@ -155,23 +177,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _isoLocationKH2 = value;
-                if (File.Exists(_isoLocationKH2))
-                {
-                    if (GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2")
-                    {
-                        WizardPageAfterGameData = PageRegion;
-                    }
-                    else
-                    {
-                        WizardPageAfterGameData = LastPage;
-                        _isoLocationKH2 = null;
-                    }
-                }
-                else
-                {
-                    WizardPageAfterGameData = LastPage;
-                    _isoLocationKH2 = null;
-                }
+                WizardPageAfterGameData = !string.IsNullOrEmpty(_isoLocationKH2) ? PageRegion : LastPage;
                 ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
 
                 OnPropertyChanged();
@@ -188,18 +194,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _isoLocationKH1 = value;
-                if (File.Exists(_isoLocationKH1))
-                {
-                    var game = GameService.DetectGameId(_isoLocationKH1);
-                    if (game?.Id != "kh1")
-                    {
-                        _isoLocationKH1 = null;
-                    }
-                }
-                else
-                {
-                    _isoLocationKH1 = null;
-                }
                 ConfigurationService.IsoLocationKH1 = _isoLocationKH1;
 
                 OnPropertyChanged();
@@ -215,18 +209,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _isoLocationRecom = value;
-                if (File.Exists(_isoLocationRecom))
-                {
-                    var game = GameService.DetectGameId(_isoLocationRecom);
-                    if (game?.Id != "Recom")
-                    {
-                        _isoLocationRecom = null;
-                    }
-                }
-                else
-                {
-                    _isoLocationRecom = null;
-                }
                 ConfigurationService.IsoLocationRecom = _isoLocationRecom;
 
                 OnPropertyChanged();
@@ -240,9 +222,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public bool IsGameRecognized => (IsIsoSelected && GameId != null);
         public Visibility GameRecognizedVisibility => IsIsoSelected && GameId != null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameNotRecognizedVisibility => IsIsoSelected && GameId == null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility KH1RecognizedVisibility => _isoLocationKH1 != null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility KH2RecognizedVisibility => _isoLocationKH2 != null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility RecomRecognizedVisibility => _isoLocationRecom != null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility KH1RecognizedVisibility => !string.IsNullOrEmpty(_isoLocationKH1) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility KH2RecognizedVisibility => !string.IsNullOrEmpty(_isoLocationKH2) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility RecomRecognizedVisibility => !string.IsNullOrEmpty(_isoLocationRecom) ? Visibility.Visible : Visibility.Collapsed;
 
         public bool IsGameSelected
         {
@@ -280,7 +262,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => _isoLocationKH2 != null ? PageRegion : LastPage,
+                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -300,7 +282,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => _isoLocationKH2!= null ? PageRegion : LastPage,
+                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -835,26 +817,31 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 FileDialog.OnOpen(
                     fileName => {
                         IsoLocation = fileName;
-                        if (gameId == GameId)
+                        switch (gameId)
                         {
-                            switch (gameId)
-                            {
-                                case "kh2":
-                                    IsoLocationKH2 = fileName;
-                                    break;
-                                case "kh1":
-                                    IsoLocationKH1 = fileName;
-                                    break;
-                                case "Recom":
-                                    IsoLocationRecom = fileName;
-                                    break;
-                            }
+                            case "kh2":
+                                IsoLocationKH2 = fileName;
+                                if (string.IsNullOrEmpty(GameName))
+                                {
+                                    GameName = "Kingdom Hearts II";
+                                }
+                                break;
+                            case "kh1":
+                                IsoLocationKH1 = fileName;
+                                if (string.IsNullOrEmpty(GameName))
+                                {
+                                    GameName = "Kingdom Hearts I";
+                                }
+                                break;
+                            case "Recom":
+                                IsoLocationRecom = fileName;
+                                if (string.IsNullOrEmpty(GameName))
+                                {
+                                    GameName = "Kingdom Hearts Re:Chain of Memories";
+                                }
+                                break;
                         }
-                        else
-                        {
-                            GameId = null;
-                            GameName = null;
-                        }
+
                         OnPropertyChanged(nameof(GameName));
                         OnPropertyChanged(nameof(IsIsoSelected));
                         OnPropertyChanged(nameof(GameRecognizedVisibility));
