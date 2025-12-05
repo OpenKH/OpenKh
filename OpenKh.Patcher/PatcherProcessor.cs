@@ -11,7 +11,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization;
-using static OpenKh.Kh2.SystemData.Shop;
 
 namespace OpenKh.Patcher
 {

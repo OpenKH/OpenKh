@@ -41,7 +41,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public const int PC = 2;
 
         private int _gameEdition;
-        private string _isoLocation = null; 
+        private string _isoLocation = null;
         private string _isoLocationKH2 = ConfigurationService.IsoLocationKH2;
         private string _isoLocationKH1 = ConfigurationService.IsoLocationKH1;
         private string _isoLocationRecom = ConfigurationService.IsoLocationRecom;
@@ -125,17 +125,33 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(GameName));
             }
         }
+        public void ValidateIsoLocations()
+        {
+            if (!File.Exists(_isoLocationKH2) || GameService.DetectGameId(_isoLocationKH2)?.Id != "kh2")
+            {
+                _isoLocationKH2 = null;
+                ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
+            }
+            if (!File.Exists(_isoLocationKH1) || GameService.DetectGameId(_isoLocationKH1)?.Id != "kh1")
+            {
+                _isoLocationKH1 = null;
+                ConfigurationService.IsoLocationKH1 = _isoLocationKH1;
+            }
+            if (!File.Exists(_isoLocationRecom) || GameService.DetectGameId(_isoLocationRecom)?.Id != "Recom")
+            {
+                _isoLocationRecom = null;
+                ConfigurationService.IsoLocationRecom = _isoLocationRecom;
+            }
+            OnPropertyChanged(nameof(IsGameDataFound));
+            OnPropertyChanged(nameof(GameDataFoundVisibility));
+            OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+            OnPropertyChanged(nameof(KH2RecognizedVisibility));
+            OnPropertyChanged(nameof(KH1RecognizedVisibility));
+            OnPropertyChanged(nameof(RecomRecognizedVisibility));
+        }
         public string IsoLocationKH2
         {
-            get
-            {
-                OnPropertyChanged(nameof(IsGameDataFound));
-                OnPropertyChanged(nameof(GameDataFoundVisibility));
-                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
-                OnPropertyChanged(nameof(KH2RecognizedVisibility));
-
-                return _isoLocationKH2;
-            }
+            get => _isoLocationKH2;
             set
             {
                 _isoLocationKH2 = value;
@@ -159,15 +175,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
         public string IsoLocationKH1
         {
-            get
-            {
-                OnPropertyChanged(nameof(IsGameDataFound));
-                OnPropertyChanged(nameof(GameDataFoundVisibility));
-                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
-                OnPropertyChanged(nameof(KH1RecognizedVisibility));
-
-                return _isoLocationKH1;
-            }
+            get => _isoLocationKH1;
             set
             {
                 _isoLocationKH1 = value;
@@ -182,15 +190,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
         public string IsoLocationRecom
         {
-            get
-            {
-                OnPropertyChanged(nameof(IsGameDataFound));
-                OnPropertyChanged(nameof(GameDataFoundVisibility));
-                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
-                OnPropertyChanged(nameof(RecomRecognizedVisibility));
-
-                return _isoLocationRecom;
-            }
+            get => _isoLocationRecom;
             set
             {
                 _isoLocationRecom = value;
@@ -207,9 +207,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public bool IsGameRecognized => (IsIsoSelected && GameId != null);
         public Visibility GameRecognizedVisibility => IsIsoSelected && GameId != null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameNotRecognizedVisibility => IsIsoSelected && GameId == null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility KH1RecognizedVisibility => !string.IsNullOrEmpty(_isoLocationKH1) ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility KH2RecognizedVisibility => !string.IsNullOrEmpty(_isoLocationKH2) ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility RecomRecognizedVisibility => !string.IsNullOrEmpty(_isoLocationRecom) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility KH1RecognizedVisibility => _isoLocationKH1 != null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility KH2RecognizedVisibility => _isoLocationKH2 != null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility RecomRecognizedVisibility => _isoLocationRecom != null ? Visibility.Visible : Visibility.Collapsed;
 
         public bool IsGameSelected
         {
@@ -247,7 +247,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) && File.Exists(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
+                    PCSX2 => _isoLocationKH2 != null ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -267,7 +267,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) && File.Exists(_isoLocationKH2) && GameService.DetectGameId(_isoLocationKH2)?.Id == "kh2" ? PageRegion : LastPage,
+                    PCSX2 => _isoLocationKH2!= null ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -796,6 +796,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public SetupWizardViewModel()
         {
             IsNotExtracting = true;
+            ValidateIsoLocations();
             SelectIsoCommand = new RelayCommand(param => {
                 string gameId = param as string;
                 FileDialog.OnOpen(

@@ -130,15 +130,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
+        public bool GameSelectInteractable => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && MultiEmuGames);
         public Visibility GameSelectVisible => PC || PCSX2 ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectKH2 => PC || PCSX2 && ConfigurationService.IsoLocationKH2 != null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectKH1 => PC || PCSX2 && ConfigurationService.IsoLocationKH1 != null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectBBS => PC ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectRecom => PC || PCSX2 && ConfigurationService.IsoLocationRecom != null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility GameSelectKH3D => PC ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH2 => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationKH2 != null) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH1 => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationKH1 != null) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectBBS => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectRecom => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationRecom != null) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH3D => (PC && Directory.Exists(ConfigurationService.PcReleaseLocationKH3D)) ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PanaceaSettings => PC && PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
 
-        public enum GameIDs { 
+        public enum GameIDs {
             KH2 = 0,
             KH1 = 1,
             BBS = 2,
@@ -146,6 +147,30 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             KH3D = 4,
         };
 
+        public bool MultiEmuGames
+        {
+            get
+            {
+                int count = 0;
+                if (ConfigurationService.IsoLocationKH2 != null)
+                {
+                    count++;
+                }
+                if (ConfigurationService.IsoLocationKH1 != null)
+                {
+                    count++;
+                }
+                if (ConfigurationService.IsoLocationRecom != null)
+                {
+                    count++;
+                }
+                if (count > 1)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
         public bool PanaceaConsoleEnabled
         {
             get => _panaceaConsoleEnabled;
@@ -247,6 +272,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
                 OnPropertyChanged(nameof(GameSelectVisible));
+                OnPropertyChanged(nameof(GameSelectInteractable));
                 OnPropertyChanged(nameof(PanaceaSettings));
             }
         }
@@ -263,6 +289,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
                 OnPropertyChanged(nameof(GameSelectVisible));
+                OnPropertyChanged(nameof(GameSelectInteractable));
                 OnPropertyChanged(nameof(PanaceaSettings));
             }
         }
@@ -591,6 +618,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         PC = true;
                         PCSX2 = false;
                         PanaceaInstalled = ConfigurationService.PanaceaInstalled;
+                        if (!Directory.Exists(ConfigurationService.PcReleaseLocation))
+                        {
+                            if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                            {
+                                GametoLaunch = (int)GameIDs.KH3D;
+                            }
+                            else
+                            {
+                                MessageBox.Show(
+                                "Unable to locate install locations for both KINGDOM HEARTS HD 1.5+2.5 ReMIX and KINGDOM HEARTS HD 2.8 Final Chapter Prologue. They are either missing or corrupted. Please re-run the setup wizard and confirm the install paths are correct.",
+                                "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                        }
                     }
                     else if (ConfigurationService.GameEdition == SetupWizardViewModel.PCSX2)
                     {
@@ -822,7 +862,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 case SetupWizardViewModel.PC:
                     if (ConfigurationService.PCVersion == "EGS" && !(_launchGame == "kh3d"))
                     {
-                        if (ConfigurationService.PcReleaseLocation != null)
+                        if (Directory.Exists(ConfigurationService.PcReleaseLocation))
                         {
                             if (ConfigurationService.PanaceaInstalled)
                             {
@@ -849,29 +889,26 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                         {
                             MessageBox.Show(
-                           "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
-                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
                     }
                     else if (ConfigurationService.PCVersion == "EGS" && _launchGame == "kh3d")
                     {
-                        if (ConfigurationService.PcReleaseLocationKH3D != null)
+                        if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
                         {
-                            string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
                             if (ConfigurationService.PanaceaInstalled)
                             {
+                                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
                                 if (!File.Exists(panaceaSettings))
                                 {
-                                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
-                                    {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
                                         [
                                         $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
                                         $"show_console={false}",
                                         ]);
-                                    }
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
@@ -887,15 +924,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                         {
                             MessageBox.Show(
-                           "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
-                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
                     }
                     if (ConfigurationService.PCVersion == "Steam" && !(_launchGame == "kh3d") && ConfigurationService.SteamAPITrick1525 == false)
                     {
-                        if (ConfigurationService.PcReleaseLocation != null)
+                        if (Directory.Exists(ConfigurationService.PcReleaseLocation))
                         {
                             if (ConfigurationService.PanaceaInstalled)
                             {
@@ -922,29 +959,26 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                         {
                             MessageBox.Show(
-                           "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
-                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
                     }
                     else if (ConfigurationService.PCVersion == "Steam" && _launchGame == "kh3d" && ConfigurationService.SteamAPITrick28 == false)
                     {
-                        if (ConfigurationService.PcReleaseLocationKH3D != null)
+                        if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
                         {
                             string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
                             if (ConfigurationService.PanaceaInstalled)
                             {
                                 if (!File.Exists(panaceaSettings))
                                 {
-                                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
-                                    {
-                                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
-                                        [
-                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
-                                        $"show_console={false}",
-                                        ]);
-                                    }
+                                    File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
+                                    [
+                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                    $"show_console={false}",
+                                    ]);
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
@@ -960,8 +994,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                         {
                             MessageBox.Show(
-                           "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
-                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
@@ -974,10 +1008,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             if (!(_launchGame == "kh3d"))
                             {
-                                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
-                                if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
+                                if (Directory.Exists(ConfigurationService.PcReleaseLocation))
                                 {
-                                    if (Directory.Exists(ConfigurationService.PcReleaseLocation))
+                                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
+                                    if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
                                     {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
                                         [
@@ -985,15 +1019,23 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         $"show_console={false}",
                                         ]);
                                     }
+                                    filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
                                 }
-                                filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
+                                else
+                                {
+                                    MessageBox.Show(
+                                    "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
+                                    "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    CloseAllWindows();
+                                    return Task.CompletedTask;
+                                }
                             }
                             else
                             {
-                                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
-                                if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
+                                if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
                                 {
-                                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
+                                    if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
                                     {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
                                         [
@@ -1001,8 +1043,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         $"show_console={false}",
                                         ]);
                                     }
+                                    filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
                                 }
-                                filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
+                                else
+                                {
+                                    MessageBox.Show(
+                                    "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
+                                    "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    CloseAllWindows();
+                                    return Task.CompletedTask;
+                                }
                             }
                             processStartInfo = new ProcessStartInfo
                             {

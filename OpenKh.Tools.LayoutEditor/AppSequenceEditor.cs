@@ -208,6 +208,37 @@ namespace OpenKh.Tools.LayoutEditor
 
         private void DrawSpriteGroupList()
         {
+            // Add buttons for sprite group management
+            if (ImGui.Button("Add Sprite Group"))
+            {
+                _sequence.SpriteGroups.Add(new List<Sequence.SpritePart>
+        {
+            new Sequence.SpritePart
+            {
+                Left = 0,
+                Top = 0,
+                Right = 50,
+                Bottom = 50,
+                SpriteIndex = Math.Max(0, Math.Min(0, _sequence.Sprites.Count - 1))
+            }
+        });
+
+                // Create a new model for the new sprite group
+                _spriteGroups.Add(AsSpriteGroupModel(_sequence.SpriteGroups.Count - 1));
+                _selectedSpriteGroup = _spriteGroups.Count - 1;
+            }
+
+            ImGui.SameLine();
+            if (ImGui.Button("Remove Sprite Group") && _selectedSpriteGroup >= 0 && _spriteGroups.Count > 0)
+            {
+                _spriteGroups[_selectedSpriteGroup].Dispose();
+                _spriteGroups.RemoveAt(_selectedSpriteGroup);
+                _sequence.SpriteGroups.RemoveAt(_selectedSpriteGroup);
+                _selectedSpriteGroup = Math.Max(0, _selectedSpriteGroup - 1);
+            }
+
+            ImGui.Separator();
+
             // Animate only the selected sprite
             //if (_selectedSpriteGroup >= 0)
             //    _spriteGroups[_selectedSpriteGroup].Draw(0, 0);
