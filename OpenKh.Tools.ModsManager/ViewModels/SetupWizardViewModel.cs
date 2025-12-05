@@ -127,27 +127,49 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
         public void ValidateIsoLocations()
         {
+            GameName = null;
             if (!File.Exists(_isoLocationKH2) || GameService.DetectGameId(_isoLocationKH2)?.Id != "kh2")
             {
-                _isoLocationKH2 = null;
-                ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
+                _isoLocation = _isoLocationKH2;
+                GameId = null;
+                if (string.IsNullOrEmpty(GameName))
+                {
+                    GameName = "Kingdom Hearts II";
+                }
+                else
+                {
+                    GameName += " & Kingdom Hearts II";
+                }
             }
             if (!File.Exists(_isoLocationKH1) || GameService.DetectGameId(_isoLocationKH1)?.Id != "kh1")
             {
-                _isoLocationKH1 = null;
-                ConfigurationService.IsoLocationKH1 = _isoLocationKH1;
+                _isoLocation = _isoLocationKH1;
+                GameId = null;
+                if (string.IsNullOrEmpty(GameName))
+                {
+                    GameName = "Kingdom Hearts I";
+                }
+                else
+                {
+                    GameName += " & Kingdom Hearts I";
+                }
             }
             if (!File.Exists(_isoLocationRecom) || GameService.DetectGameId(_isoLocationRecom)?.Id != "Recom")
             {
-                _isoLocationRecom = null;
-                ConfigurationService.IsoLocationRecom = _isoLocationRecom;
+                _isoLocation = _isoLocationRecom;
+                GameId = null;
+                if (string.IsNullOrEmpty(GameName))
+                {
+                    GameName = "Kingdom Hearts Re:Chain of Memories";
+                }
+                else
+                {
+                    GameName += " & Kingdom Hearts Re:Chain of Memories";
+                }
             }
-            OnPropertyChanged(nameof(IsGameDataFound));
-            OnPropertyChanged(nameof(GameDataFoundVisibility));
-            OnPropertyChanged(nameof(GameDataNotFoundVisibility));
-            OnPropertyChanged(nameof(KH2RecognizedVisibility));
-            OnPropertyChanged(nameof(KH1RecognizedVisibility));
-            OnPropertyChanged(nameof(RecomRecognizedVisibility));
+            OnPropertyChanged(nameof(GameName));
+            OnPropertyChanged(nameof(GameNotRecognizedVisibility));
+            OnPropertyChanged(nameof(IsGameRecognized));
         }
         public string IsoLocationKH2
         {
@@ -806,12 +828,24 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             case "kh2":
                                 IsoLocationKH2 = fileName;
+                                if (string.IsNullOrEmpty(GameName))
+                                {
+                                    GameName = "Kingdom Hearts II";
+                                }
                                 break;
                             case "kh1":
                                 IsoLocationKH1 = fileName;
+                                if (string.IsNullOrEmpty(GameName))
+                                {
+                                    GameName = "Kingdom Hearts I";
+                                }
                                 break;
                             case "Recom":
                                 IsoLocationRecom = fileName;
+                                if (string.IsNullOrEmpty(GameName))
+                                {
+                                    GameName = "Kingdom Hearts Re:Chain of Memories";
+                                }
                                 break;
                         }
 

@@ -182,7 +182,9 @@
                     <Run> was successfully recognized!</Run>
                     </TextBlock>
                     <TextBlock TextWrapping="Wrap" Visibility="{Binding GameNotRecognizedVisibility}">
-                    It was not possible to recognize the game of the ISO you provided. Be sure that the game is within the list of supported games and that you chose the corresponding game to provide the ISO for.
+                    <Run>It was not possible to recognize the game of the ISO you provided for </Run>
+                    <Run Text="{Binding GameName}" d:Text="Some KH game"/>
+                    <Run>. Be sure that the game is within the list of supported games and that you chose the corresponding game to provide the ISO for.</Run>
                     </TextBlock>
                 </StackPanel>
             </ScrollViewer>
