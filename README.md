@@ -57,6 +57,8 @@ The minimum requirement is [.NET 8 SDK](https://dotnet.microsoft.com/download/do
 
 There is a [guide](CONTRIBUTING.md) describing how to contact the team and contribute to the project.
 
+### Dumym change to check build system
+
 ### License
 
 The entire content of the repository is protected by the Apache 2.0 license. Some of the key points of the license are:
