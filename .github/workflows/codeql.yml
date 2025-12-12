@@ -42,16 +42,10 @@ jobs:
 
     - name: Checkout submodules
       run: git submodule update --init --recursive
-    
-    # Try to force .NET 6 build, this doesn't work atm well because we have projects that uses .net2.0 standard
-    #- name: Setup .NET
-    #  uses: actions/setup-dotnet@v1
-    #  with:
-    #    dotnet-version: '6.0'
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
         # If you wish to specify custom queries, you can do so here or in a config file.
@@ -62,10 +56,31 @@ jobs:
         # queries: security-extended,security-and-quality
 
         
-    # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
-    # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
+    # Use the same .NET setup instruction used at dotnet.yml
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: pre-build.ps1
+      run: powershell -ExecutionPolicy Unrestricted ./pre-build.ps1
+      shell: pwsh
+    - name: build.ps1
+      run: powershell -ExecutionPolicy Unrestricted ./build.ps1
+      shell: pwsh
+      
+    - name: setup-msbuild
+      uses: microsoft/setup-msbuild@v1.1.3
+    - name: msbuild panacea
+      run: |
+        msbuild OpenKh.Research.Panacea\OpenKh.Research.Panacea.vcxproj /p:Configuration=Release /p:Platform=x64
+
+    ## Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
+    ## If this step fails, then you should remove it and run the build manually (see below)
+    #- name: Autobuild
+    #  uses: github/codeql-action/autobuild@v4
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
