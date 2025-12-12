@@ -45,7 +45,7 @@ jobs:
 
     # Use the same .NET setup instruction used at dotnet.yml
     - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 8.0.x
 
