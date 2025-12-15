@@ -601,13 +601,18 @@ namespace OpenKh.Tools.LayoutEditor
         private void ProcessKeyMapping()
         {
             var k = Keyboard.GetState();
-            if (k.IsKeyDown(Keys.LeftControl))
+
+            // Check if Ctrl is pressed
+            if (k.IsKeyDown(Keys.LeftControl) || k.IsKeyDown(Keys.RightControl))
             {
                 var keys = k.GetPressedKeys();
                 foreach (var key in keys)
                 {
                     if (_keyMapping.TryGetValue(key, out var action))
+                    {
+                        // Execute the action regardless of modal state
                         action();
+                    }
                 }
             }
         }

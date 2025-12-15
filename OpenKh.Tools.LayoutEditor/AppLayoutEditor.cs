@@ -1,20 +1,22 @@
 using ImGuiNET;
-using OpenKh.Tools.LayoutEditor.Interfaces;
-using System;
-using OpenKh.Kh2;
-using OpenKh.Kh2.Extensions;
-using System.IO;
-using OpenKh.Tools.Common.CustomImGui;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 using OpenKh.Engine.Extensions;
-using OpenKh.Engine.Renders;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Renderers;
+using OpenKh.Engine.Renders;
+using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
+using OpenKh.Tools.Common.CustomImGui;
+using OpenKh.Tools.LayoutEditor.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Numerics;
+using System.Windows;
+using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
+using Xe.Tools.Wpf.Dialogs;
 
 namespace OpenKh.Tools.LayoutEditor
 {
@@ -33,6 +35,10 @@ namespace OpenKh.Tools.LayoutEditor
         private readonly DefaultDebugLayoutRenderer _debugRender;
         private readonly List<ISpriteTexture> _spriteTextures;
         private readonly LayoutRenderer _renderer;
+        private static readonly List<FileDialogFilter> ImdFilter = FileDialogFilterComposer
+            .Compose()
+            .AddExtensions("Image IMGD", "imd")
+            .AddAllFiles();
 
         private float ZoomFactor = 1;
 
@@ -161,6 +167,41 @@ namespace OpenKh.Tools.LayoutEditor
                 SelectedLayoutIndex < _layout.SequenceGroups.Count - 1)
                 SelectedLayoutIndex++;
 
+            ImGui.SameLine();
+            if (ImGui.Button("Add", new Vector2(50, 0)))
+            {
+                var newSequenceGroup = new Layout.SequenceGroup
+                {
+                    Sequences = new List<Layout.SequenceProperty>
+            {
+                new Layout.SequenceProperty
+                {
+                    SequenceIndex = 0,      // Points to _layout.SequenceItems[0]
+                    TextureIndex = 0,       // Points to _images[0]
+                    AnimationGroup = 0,     // Uses first AnimationGroup from that Sequence
+                    ShowAtFrame = 0,
+                    PositionX = 0,
+                    PositionY = 0
+                }
+            }
+                };
+
+                _layout.SequenceGroups.Add(newSequenceGroup);
+
+                // Select the newly created sequence group
+                SelectedLayoutIndex = _layout.SequenceGroups.Count - 1;
+            }
+
+            ImGui.SameLine();
+            if (ImGui.Button("Remove", new Vector2(70, 0)) && _layout.SequenceGroups.Count > 1)
+            {
+                // Remove the currently selected sequence group
+                _layout.SequenceGroups.RemoveAt(SelectedLayoutIndex);
+
+                // Update selection to stay valid
+                SelectedLayoutIndex = Math.Max(0, Math.Min(SelectedLayoutIndex, _layout.SequenceGroups.Count - 1));
+            }
+
             Timeline();
 
             ForChild("Preview", 0, 0, false, () =>
@@ -266,11 +307,95 @@ namespace OpenKh.Tools.LayoutEditor
         private void LayoutEditing()
         {
             var sequenceGroup = _layout.SequenceGroups[SelectedLayoutIndex];
+
+            // Texture management section
+            ImGui.Text($"Textures: {_images.Count}");
+
+            if (ImGui.Button("Import IMGD Texture", new Vector2(180, 0)))
+            {
+                Xe.Tools.Wpf.Dialogs.FileDialog.OnOpen(fileName =>
+                {
+                    try
+                    {
+                        using var stream = File.OpenRead(fileName);
+                        var importedImage = Imgd.Read(stream);
+
+                        _images.Add(importedImage);
+
+                        // Create sprite texture for rendering
+                        var newSpriteTexture = _drawing.CreateSpriteTexture(importedImage);
+                        _spriteTextures.Add(newSpriteTexture);
+
+                        MessageBox.Show($"Successfully imported texture!\nNew texture index: {_images.Count - 1}",
+                            "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Failed to import texture:\n{ex.Message}",
+                            "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }, ImdFilter);
+            }
+
+            ImGui.SameLine();
+            if (ImGui.Button("Remove Last Texture", new Vector2(160, 0)) && _images.Count > 1)
+            {
+                // Remove the last texture
+                _spriteTextures[_spriteTextures.Count - 1].Dispose();
+                _spriteTextures.RemoveAt(_spriteTextures.Count - 1);
+                _images.RemoveAt(_images.Count - 1);
+
+                // Update any sequence properties that reference the removed texture
+                foreach (var seqGroup in _layout.SequenceGroups)
+                {
+                    foreach (var seqProp in seqGroup.Sequences)
+                    {
+                        if (seqProp.TextureIndex >= _images.Count)
+                        {
+                            seqProp.TextureIndex = Math.Max(0, _images.Count - 1);
+                        }
+                    }
+                }
+            }
+
+            ImGui.Separator();
+
+            // Add sequence property button
+            if (ImGui.Button("Add Sequence Property", new Vector2(-1, 30)))
+            {
+                var newSequenceProperty = new Layout.SequenceProperty
+                {
+                    SequenceIndex = 0,
+                    TextureIndex = 0,
+                    AnimationGroup = 0,
+                    ShowAtFrame = 0,
+                    PositionX = 0,
+                    PositionY = 0
+                };
+
+                sequenceGroup.Sequences.Add(newSequenceProperty);
+            }
+
+            ImGui.Separator();
+            ImGui.Spacing();
+
+            // List all sequence properties
             for (var i = 0; i < sequenceGroup.Sequences.Count; i++)
             {
                 if (ImGui.CollapsingHeader($"Sequence property {i + 1}"))
                 {
                     SequencePropertyEdit(sequenceGroup.Sequences[i], i);
+
+                    ImGui.Spacing();
+                    ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.8f, 0.2f, 0.2f, 1.0f)); // Red button
+                    if (ImGui.Button($"Remove property {i + 1}##remove_{i}", new Vector2(-1, 0)) && sequenceGroup.Sequences.Count > 1)
+                    {
+                        sequenceGroup.Sequences.RemoveAt(i);
+                        ImGui.PopStyleColor();
+                        break; // Exit loop since we modified the collection
+                    }
+                    ImGui.PopStyleColor();
+                    ImGui.Spacing();
                 }
             }
         }

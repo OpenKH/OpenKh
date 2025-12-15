@@ -155,8 +155,8 @@ namespace OpenKh.Tools.LayoutEditor
                 .Select(x => x.Sprite)
                 .ToList();
 
-            const float SpriteListWidthMul = 1f;
-            const float SpriteListWidthMax = 192f;
+            const float SpriteListWidthMul = 1.5f;
+            const float SpriteListWidthMax = 280f;
             const float RightWidthMul = 1.5f;
             const float RightWidthMax = 384f;
             const float PreviewWidthMul = 2f;
@@ -231,17 +231,34 @@ namespace OpenKh.Tools.LayoutEditor
             ImGui.SameLine();
             if (ImGui.Button("Remove Sprite Group") && _selectedSpriteGroup >= 0 && _spriteGroups.Count > 0)
             {
+                // Update all animations that reference sprite groups after the removed one
+                foreach (var animGroup in _sequence.AnimationGroups)
+                {
+                    foreach (var animation in animGroup.Animations)
+                    {
+                        // If animation references the sprite group being removed, set it to 0
+                        if (animation.SpriteGroupIndex == _selectedSpriteGroup)
+                        {
+                            animation.SpriteGroupIndex = 0;
+                        }
+                        // If animation references a sprite group after the removed one, decrement the index
+                        else if (animation.SpriteGroupIndex > _selectedSpriteGroup)
+                        {
+                            animation.SpriteGroupIndex--;
+                        }
+                    }
+                }
+
+                // Dispose and remove the sprite group
                 _spriteGroups[_selectedSpriteGroup].Dispose();
                 _spriteGroups.RemoveAt(_selectedSpriteGroup);
                 _sequence.SpriteGroups.RemoveAt(_selectedSpriteGroup);
-                _selectedSpriteGroup = Math.Max(0, _selectedSpriteGroup - 1);
+
+                // Update selection to stay valid
+                _selectedSpriteGroup = Math.Max(0, Math.Min(_selectedSpriteGroup, _spriteGroups.Count - 1));
             }
 
             ImGui.Separator();
-
-            // Animate only the selected sprite
-            //if (_selectedSpriteGroup >= 0)
-            //    _spriteGroups[_selectedSpriteGroup].Draw(0, 0);
 
             for (int i = 0; i < _spriteGroups.Count; i++)
             {
@@ -360,6 +377,16 @@ namespace OpenKh.Tools.LayoutEditor
 
         private void DrawRight()
         {
+            var style = ImGui.GetStyle();
+            var originalScrollbarSize = style.ScrollbarSize;
+            var originalScrollbarRounding = style.ScrollbarRounding;
+
+            style.ScrollbarSize = 32f; // you can change this, if it's to big or to small
+            style.ScrollbarRounding = 8f;
+
+            // Create a scrollable child window for the entire right panel (in sequence editor)
+            ImGui.BeginChild("RightPanelScroll", new Vector2(0, 0), ImGuiChildFlags.Border);
+
             var animationGroup = _sequence.AnimationGroups[_selectedAnimGroup];
             if (ImGui.CollapsingHeader($"Properties"))
                 AnimationGroupEdit(animationGroup);
@@ -371,6 +398,12 @@ namespace OpenKh.Tools.LayoutEditor
                     AnimationEdit(animationGroup.Animations[i], i);
                 }
             }
+
+            ImGui.EndChild();
+
+            // Restore original scrollbar size
+            style.ScrollbarSize = originalScrollbarSize;
+            style.ScrollbarRounding = originalScrollbarRounding;
         }
 
         public Bar.Entry SaveAnimation(string name)
@@ -731,6 +764,48 @@ namespace OpenKh.Tools.LayoutEditor
             if (ImGui.Button("+", new Vector2(30, 0)) &&
                 SelectedAnimGroup < _sequence.AnimationGroups.Count - 1)
                 SelectedAnimGroup++;
+            ImGui.SameLine();
+            if (ImGui.Button("Add", new Vector2(50, 0)))
+            {
+                // Create a new animation group with a default animation
+                var newAnimationGroup = new Sequence.AnimationGroup
+                {
+                    Animations = new List<Sequence.Animation>
+            {
+                new Sequence.Animation
+                {
+                    SpriteGroupIndex = 0,
+                    FrameStart = 0,
+                    FrameEnd = 50,
+                    ScaleStart = 1,
+                    ScaleEnd = 1,
+                    ScaleXStart = 1,
+                    ScaleXEnd = 1,
+                    ScaleYStart = 1,
+                    ScaleYEnd = 1,
+                    ColorStart = 0x80808080u,
+                    ColorEnd = 0x80808080u,
+                }
+            },
+                    LoopStart = 0,
+                    LoopEnd = 50,
+                    DoNotLoop = 0
+                };
+
+                _sequence.AnimationGroups.Add(newAnimationGroup);
+
+                // Select the newly created animation group
+                SelectedAnimGroup = _sequence.AnimationGroups.Count - 1;
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Remove", new Vector2(70, 0)) && _sequence.AnimationGroups.Count > 1)
+            {
+                // Remove the currently selected animation group
+                _sequence.AnimationGroups.RemoveAt(SelectedAnimGroup);
+
+                // Update selection to stay valid
+                SelectedAnimGroup = Math.Max(0, Math.Min(SelectedAnimGroup, _sequence.AnimationGroups.Count - 1));
+            }
         }
 
         private unsafe void Timeline()
