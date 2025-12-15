@@ -653,7 +653,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 break;
                         }
                         GameInfoModel? game;
-                        if (launchIso != null)
+                        if (!String.IsNullOrEmpty(launchIso))
                         {
                             game = GameService.DetectGameId(launchIso);
                         }
