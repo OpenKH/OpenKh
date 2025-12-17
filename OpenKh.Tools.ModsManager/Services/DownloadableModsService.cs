@@ -553,7 +553,7 @@ namespace OpenKh.Tools.ModsManager.Services
                             using (var ms = new MemoryStream(imageData))
                             {
                                 bitmap.BeginInit();
-                                bitmap.CreateOptions = BitmapCreateOptions.None;
+                                bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                                 bitmap.StreamSource = ms;
                                 bitmap.EndInit();
