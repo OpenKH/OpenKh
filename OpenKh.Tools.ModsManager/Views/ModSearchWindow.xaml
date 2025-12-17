@@ -197,7 +197,7 @@
                                     </Hyperlink>
                                 </TextBlock>
 
-                                <!-- El botón de instalación ha sido eliminado -->
+                                <!-- Installation button has been removed from details panel -->
                             </StackPanel>
                         </Grid>
 

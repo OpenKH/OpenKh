@@ -33,6 +33,7 @@ namespace OpenKh.Tools.ModsManager.Views
         private readonly Subject<DownloadableModViewModel> _onModInstalled = new Subject<DownloadableModViewModel>();
         private readonly ObservableCollection<string> _messages = new ObservableCollection<string>();
         private readonly Subject<string> _emitMessage = new Subject<string>();
+        private readonly Subject<DownloadableModModel> _modEmitter = new Subject<DownloadableModModel>();
         private System.Windows.Data.FilterEventHandler _lastFilter = null;
 
         /// <summary>
@@ -178,6 +179,18 @@ namespace OpenKh.Tools.ModsManager.Views
             // Use the current game ID from configuration
             _currentGameId = ConfigurationService.LaunchGame;
 
+            _modEmitter
+                .ObserveOn(DispatcherSynchronizationContext.Current)
+                .Subscribe(
+                    mod =>
+                    {
+                        var modVm = new DownloadableModViewModel(mod);
+                        modVm.ModInstalled += OnModInstalled;
+                        AddOrUpdateMod(modVm);
+                    }
+                )
+                .AddTo(_disposables);
+
             // Initialize commands
             VM.ClearSearchCommand = new RelayCommand(_ => ClearSearch());
 
@@ -226,6 +239,9 @@ namespace OpenKh.Tools.ModsManager.Views
 
             // Cancel any previous operation in progress
             _cts.Cancel();
+            // We won't dispose CancellationTokenSource.
+            // It may cause ObjectDisposedException in normal flow.
+            // Make GC collect it later.
             _cts = new CancellationTokenSource();
 
             try
@@ -233,33 +249,19 @@ namespace OpenKh.Tools.ModsManager.Views
                 VM.IsLoading = true;
                 VM.LoadingStatusText = $"Loading mods for {GetGameName(_currentGameId)}...";
 
-                var modEmitter = new Subject<DownloadableModModel>();
-
                 _allMods.Clear();
-
-                modEmitter
-                    .ObserveOn(DispatcherSynchronizationContext.Current)
-                    .Subscribe(
-                        mod =>
-                        {
-                            var modVm = new DownloadableModViewModel(mod);
-                            modVm.ModInstalled += OnModInstalled;
-                            AddOrUpdateMod(modVm);
-                        }
-                    )
-                    .AddTo(_disposables);
 
                 try
                 {
                     foreach (var one in await _downloadableModsService.GetDownloadableModsLocallyAsync(_currentGameId))
                     {
-                        modEmitter.OnNext(one);
+                        _modEmitter.OnNext(one);
                     }
 
                     // Use the new method with cancellation support
                     await _downloadableModsService.GetDownloadableModsForGameAsync(
                         gameId: _currentGameId,
-                        emitAsync: async mod => modEmitter.OnNext(mod),
+                        emitAsync: async mod => _modEmitter.OnNext(mod),
                         fallbackToLocalCache: false,
                         cancellationToken: _cts.Token
                     );

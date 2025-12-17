@@ -1,9 +1,7 @@
-using LibGit2Sharp;
 using OpenKh.Patcher;
 using OpenKh.Tools.ModsManager.Models;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -264,10 +262,15 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 OnStatusUpdate?.Invoke("Processing server data...");
 
-                var modData = System.Text.Json.JsonDocument.Parse(jsonContent);
-                var gameModsElement = modData.RootElement.GetProperty("mods").GetProperty(gameId);
+                using var modData = System.Text.Json.JsonDocument.Parse(jsonContent);
 
-                if (gameModsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                if (true
+                    && modData.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object
+                    && modData.RootElement.TryGetProperty("mods", out var modsElements)
+                    && modsElements.ValueKind == System.Text.Json.JsonValueKind.Object
+                    && modsElements.TryGetProperty(gameId, out var gameModsElement)
+                    && gameModsElement.ValueKind == System.Text.Json.JsonValueKind.Array
+                )
                 {
                     // Get list of installed mods to filter
                     var installedMods = ModsService.Mods.ToHashSet();
