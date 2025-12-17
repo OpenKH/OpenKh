@@ -41,6 +41,11 @@ namespace OpenKh.Tools.ModsManager.Views
         /// </summary>
         private CancellationTokenSource _cts = new CancellationTokenSource();
 
+        /// <summary>
+        /// CancellationToken of _cts. Safe for disposal of _cts.
+        /// </summary>
+        private CancellationToken _ct = CancellationToken.None;
+
         public ModSearchVM VM { get; }
 
         public ModSearchWindow(Action reloadModsList = null)
@@ -239,10 +244,9 @@ namespace OpenKh.Tools.ModsManager.Views
 
             // Cancel any previous operation in progress
             _cts.Cancel();
-            // We won't dispose CancellationTokenSource.
-            // It may cause ObjectDisposedException in normal flow.
-            // Make GC collect it later.
+            _cts.Dispose();
             _cts = new CancellationTokenSource();
+            _ct = _cts.Token;
 
             try
             {
@@ -263,7 +267,7 @@ namespace OpenKh.Tools.ModsManager.Views
                         gameId: _currentGameId,
                         emitAsync: async mod => _modEmitter.OnNext(mod),
                         fallbackToLocalCache: false,
-                        cancellationToken: _cts.Token
+                        cancellationToken: _ct
                     );
                 }
                 catch (OperationCanceledException)
