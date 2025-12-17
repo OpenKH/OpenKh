@@ -274,6 +274,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 {
                     // Get list of installed mods to filter
                     var installedMods = ModsService.Mods.ToHashSet();
+                    var blacklistedMods = ConfigurationService.BlacklistedMods ?? Enumerable.Empty<string>();
                     var modTasks = new List<Task<DownloadableModModel>>();
                     var allMods = new List<DownloadableModModel>(); // List of all mods (installed or not) for caching
 
@@ -297,7 +298,17 @@ namespace OpenKh.Tools.ModsManager.Services
                         // Update status before processing batch
                         OnStatusUpdate?.Invoke($"Loading mod details... ({processedMods}/{totalMods})");
 
-                        var repo = modElement.GetProperty("repo").GetString();
+                        if (false
+                            // skip if repo property is missing or invalid
+                            || !modElement.TryGetProperty("repo", out var repoElement)
+                            // skip if repo is null or not a string
+                            || repoElement.ValueKind != System.Text.Json.JsonValueKind.String
+                            || !(repoElement.GetString() is string repo)
+                            || repo == null
+                        )
+                        {
+                            continue;
+                        }
 
                         // Create base mod entry for all mods (for caching)
                         var mod = new DownloadableModModel
@@ -310,8 +321,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
                         // Skip already installed mods from the result list but still process for caching
                         bool isInstalled = installedMods.Contains(repo);
-                        bool isBlacklisted = ConfigurationService.BlacklistedMods != null &&
-                                           ConfigurationService.BlacklistedMods.Contains(repo);
+                        bool isBlacklisted = blacklistedMods.Contains(repo);
 
                         // Add task to load this mod
                         try
@@ -380,19 +390,38 @@ namespace OpenKh.Tools.ModsManager.Services
             if (File.Exists(jsonCachePath))
             {
                 var jsonContent = await File.ReadAllTextAsync(jsonCachePath);
-                var modData = System.Text.Json.JsonDocument.Parse(jsonContent);
-                var gameModsElement = modData.RootElement.GetProperty("mods").GetProperty(gameId);
+                using var modData = System.Text.Json.JsonDocument.Parse(jsonContent);
 
-                if (gameModsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                var blacklistedMods = ConfigurationService.BlacklistedMods ?? Enumerable.Empty<string>();
+
+                if (true
+                    && modData.RootElement.TryGetProperty("mods", out var modsElement)
+                    && modsElement.ValueKind == System.Text.Json.JsonValueKind.Object
+                    && modsElement.TryGetProperty(gameId, out var gameModsElement)
+                    && gameModsElement.ValueKind == System.Text.Json.JsonValueKind.Array
+                )
                 {
                     var installedMods = ModsService.Mods.ToHashSet();
-                    foreach (var modElement in gameModsElement.EnumerateArray())
+                    foreach (var modElement in gameModsElement
+                        .EnumerateArray()
+                        .Where(it => it.ValueKind == System.Text.Json.JsonValueKind.Object)
+                    )
                     {
-                        var repo = modElement.GetProperty("repo").GetString();
-                        if (installedMods.Contains(repo) ||
-                            (ConfigurationService.BlacklistedMods != null &&
-                             ConfigurationService.BlacklistedMods.Contains(repo)))
+                        if (false
+                            // skip if repo property is missing or invalid
+                            || !modElement.TryGetProperty("repo", out var repoElement)
+                            // skip if repo is null or not a string
+                            || repoElement.ValueKind != System.Text.Json.JsonValueKind.String
+                            || !(repoElement.GetString() is string repo)
+                            || repo == null
+                            // skip if already installed
+                            || installedMods.Contains(repo)
+                            // skip if blacklisted
+                            || blacklistedMods.Contains(repo)
+                        )
+                        {
                             continue;
+                        }
 
                         var mod = new DownloadableModModel
                         {
