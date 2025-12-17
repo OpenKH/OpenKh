@@ -226,6 +226,9 @@ namespace OpenKh.Tools.ModsManager.Views
             {
                 _cts.Cancel();
                 _cts.Dispose();
+                _modEmitter.OnCompleted();
+                _onModInstalled.OnCompleted();
+                _emitMessage.OnCompleted();
                 _disposables.Dispose();
             };
         }

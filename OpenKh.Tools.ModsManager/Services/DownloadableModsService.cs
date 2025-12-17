@@ -65,7 +65,7 @@ namespace OpenKh.Tools.ModsManager.Services
         /// <summary>
         /// Cache expiration time (1 day)
         /// </summary>
-        private static TimeSpan CacheExpiration = TimeSpan.FromDays(1);
+        private static readonly TimeSpan CacheExpiration = TimeSpan.FromDays(1);
 
         private static Lazy<DownloadableModsService> _lazyDefault = new Lazy<DownloadableModsService>(
             () => new DownloadableModsService()
@@ -547,7 +547,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 // Add text with repo name
                 var formattedText = new System.Windows.Media.FormattedText(
-                    (name + "  ").Substring(0, 2),
+                    (name + "  ").Substring(0, 2).Trim(),
                     System.Globalization.CultureInfo.InvariantCulture,
                     System.Windows.FlowDirection.LeftToRight,
                     new System.Windows.Media.Typeface("Arial"),
@@ -747,7 +747,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
                 encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(renderTarget));
 
-                var memoryStream = new System.IO.MemoryStream();
+                using var memoryStream = new System.IO.MemoryStream();
                 encoder.Save(memoryStream);
                 memoryStream.Position = 0;
 
@@ -757,8 +757,6 @@ namespace OpenKh.Tools.ModsManager.Services
                 bitmapImage.StreamSource = memoryStream;
                 bitmapImage.EndInit();
                 bitmapImage.Freeze();
-
-                memoryStream.Close();
 
                 // Set the placeholder image
                 setImage(bitmapImage);
