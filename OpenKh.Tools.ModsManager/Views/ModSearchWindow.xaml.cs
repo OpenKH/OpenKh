@@ -225,6 +225,7 @@ namespace OpenKh.Tools.ModsManager.Views
             Closed += (s, e) =>
             {
                 _cts.Cancel();
+                _cts.Dispose();
                 _disposables.Dispose();
             };
         }
