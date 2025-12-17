@@ -1,7 +1,9 @@
+using LibGit2Sharp;
 using OpenKh.Patcher;
 using OpenKh.Tools.ModsManager.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -11,36 +13,77 @@ using System.Windows.Media.Imaging;
 
 namespace OpenKh.Tools.ModsManager.Services
 {
-    public static class DownloadableModsService
+    public class DownloadableModsService
     {
-        // Delegate and event for status updates notification
+        /// <summary>
+        /// Delegate and event for status updates notification
+        /// </summary>
+        /// <param name="status"></param>
         public delegate void StatusUpdateHandler(string status);
-        public static event StatusUpdateHandler OnStatusUpdate;
+
+        /// <summary>
+        /// Notify for status updates
+        /// </summary>
+        public event StatusUpdateHandler OnStatusUpdate;
+
+        /// <summary>
+        /// Notify for diagnostic log messages
+        /// </summary>
+        /// <param name="status"></param>
+        public delegate void DiagLogHandler(string status);
+
+        /// <summary>
+        /// Notify for diagnostic log messages
+        /// </summary>
+        public event DiagLogHandler OnDiagLog;
+
         private const string DownloadableModsJsonUrl = "https://raw.githubusercontent.com/OpenKH/mods-manager-feed/main/downloadable-mods.json";
+
         private const string ModMetadataFileName = "mod.yml";
-        // Different file name variants for better compatibility
+
+        /// <summary>
+        /// Different file name variants for better compatibility
+        /// </summary>
         private static readonly string[] ModIconFileNames = { "icon.png", "Icon.png", "ICON.png", "Icon.PNG", "icon.PNG" };
+
         private static readonly string[] ModPreviewFileNames = { "preview.png", "Preview.png", "PREVIEW.png", "Preview.PNG", "preview.PNG" };
+
+        /// <summary>
+        /// A cache directory name for cache mechanism of this DownloadableModsService.
+        /// This directory will be placed like `%LOCALAPPDATA%/OpenKh/downloadable-mods-cache`
+        /// </summary>
         private const string CacheDirectoryName = "downloadable-mods-cache";
 
-        // HTTP request timeout (5 seconds)
+        /// <summary>
+        /// HTTP request timeout (5 seconds)
+        /// </summary>
         private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(5);
 
-        // Maximum parallel requests (to avoid overloading GitHub)
-        private static readonly int MaxParallelRequests = 10;
+        /// <summary>
+        /// Cache of downloadable mods by game
+        /// </summary>
+        private readonly Dictionary<string, List<DownloadableModModel>> _modsCache = new Dictionary<string, List<DownloadableModModel>>();
 
-        // Cache of downloadable mods by game
-        private static readonly Dictionary<string, List<DownloadableModModel>> _modsCache = new Dictionary<string, List<DownloadableModModel>>();
-
-        // Cache expiration time (1 day)
+        /// <summary>
+        /// Cache expiration time (1 day)
+        /// </summary>
         private static TimeSpan CacheExpiration = TimeSpan.FromDays(1);
+
+        private static Lazy<DownloadableModsService> _lazyDefault = new Lazy<DownloadableModsService>(
+            () => new DownloadableModsService()
+        );
+
+        /// <summary>
+        /// Provide a singleton default instance
+        /// </summary>
+        public static DownloadableModsService Default => _lazyDefault.Value;
 
         /// <summary>
         /// Encodes the repository path to handle special characters in URLs
         /// </summary>
         /// <param name="repositoryPath">Repository path in username/repository format</param>
         /// <returns>URL-safe encoded path</returns>
-        private static string EncodeRepositoryPath(string repo)
+        private string EncodeRepositoryPath(string repo)
         {
             if (string.IsNullOrEmpty(repo))
                 return string.Empty;
@@ -52,14 +95,14 @@ namespace OpenKh.Tools.ModsManager.Services
                 if (parts.Length != 2)
                     return repo;
 
-                string encodedOwner = System.Web.HttpUtility.UrlEncode(parts[0]);
-                string encodedRepo = System.Web.HttpUtility.UrlEncode(parts[1]);
+                string encodedOwner = Uri.EscapeDataString(parts[0]);
+                string encodedRepo = Uri.EscapeDataString(parts[1]);
 
                 return $"{encodedOwner}/{encodedRepo}";
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error encoding repository path: {ex.Message}");
+                OnDiagLog?.Invoke($"Error encoding repository path: {ex.Message}");
                 return repo; // In case of error, return the original
             }
         }
@@ -67,7 +110,7 @@ namespace OpenKh.Tools.ModsManager.Services
         /// <summary>
         /// Attempts to load an image by trying different filename variants and branches
         /// </summary>
-        private static async Task TryLoadImageWithVariants(
+        private async Task TryLoadImageWithVariants(
             DownloadableModModel mod,
             string cachePath,
             string encodedRepo,
@@ -81,7 +124,8 @@ namespace OpenKh.Tools.ModsManager.Services
 
             foreach (var branch in branches)
             {
-                if (success) break;
+                if (success)
+                    break;
 
                 foreach (var fileName in fileNameVariants)
                 {
@@ -93,19 +137,19 @@ namespace OpenKh.Tools.ModsManager.Services
                             Path.GetDirectoryName(cachePath),
                             $"{branch}_{fileName}_{Path.GetFileName(cachePath)}");
 
-                        System.Diagnostics.Debug.WriteLine($"Trying URL: {url}");
+                        OnDiagLog?.Invoke($"Trying URL: {url}");
 
                         // Try to load this variant
                         await LoadImageWithCache(mod, specificCachePath, url, setImage, cancellationToken);
 
                         // If we get here, we assume it was successful
-                        System.Diagnostics.Debug.WriteLine($"Success with URL: {url}");
+                        OnDiagLog?.Invoke($"Success with URL: {url}");
                         success = true;
                         break;
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Error with variant {fileName} in branch {branch}: {ex.Message}");
+                        OnDiagLog?.Invoke($"Error with variant {fileName} in branch {branch}: {ex.Message}");
                         // Continue with the next variant
                     }
                 }
@@ -113,41 +157,51 @@ namespace OpenKh.Tools.ModsManager.Services
 
             if (!success)
             {
-                System.Diagnostics.Debug.WriteLine($"Could not load any image variant for {mod.Repo}");
+                OnDiagLog?.Invoke($"Could not load any image variant for {mod.Repo}");
             }
         }
 
-        // Last cache update time by game
-        private static readonly Dictionary<string, DateTime> _lastCacheUpdate = new Dictionary<string, DateTime>();
+        /// <summary>
+        /// Last cache update time by game
+        /// </summary>
+        private readonly Dictionary<string, DateTime> _lastCacheUpdate = new Dictionary<string, DateTime>();
 
-        // Base directory for file cache
-        private static readonly string _cacheDirectory = Path.Combine(
+        /// <summary>
+        /// Base directory for file cache
+        /// </summary>
+        private readonly string _cacheDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "OpenKh", CacheDirectoryName);
 
-        // Make sure the cache directory exists
-        static DownloadableModsService()
+        public DownloadableModsService(
+            string cacheDirectory = null)
         {
-            try
-            {
-                if (!Directory.Exists(_cacheDirectory))
-                    Directory.CreateDirectory(_cacheDirectory);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error creating cache directory: {ex.Message}");
-            }
+            _cacheDirectory = cacheDirectory ?? _cacheDirectory;
+
+            if (!Directory.Exists(_cacheDirectory))
+                Directory.CreateDirectory(_cacheDirectory);
         }
 
-        // Method with cancellation token support
-        public static async Task<List<DownloadableModModel>> GetDownloadableModsForGameAsync(string gameId, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Get the list of downloadable mods for a specific game
+        /// </summary>
+        public async Task GetDownloadableModsForGameAsync(
+            string gameId,
+            Func<DownloadableModModel, Task> emitAsync,
+            bool fallbackToLocalCache = true,
+            CancellationToken cancellationToken = default)
         {
             OnStatusUpdate?.Invoke("Starting mod loading...");
-            return await GetDownloadableModsForGame(gameId, cancellationToken);
+
+            await GetDownloadableModsForGameInternalAsync(gameId, emitAsync, fallbackToLocalCache, cancellationToken);
         }
 
-        // Original method with cancellation support
-        private static async Task<List<DownloadableModModel>> GetDownloadableModsForGame(string gameId, CancellationToken cancellationToken = default)
+        private async Task GetDownloadableModsForGameInternalAsync(
+            string gameId,
+            Func<DownloadableModModel, Task> emitAsync,
+            bool fallbackToLocalCache = true,
+            CancellationToken cancellationToken = default
+        )
         {
             // Check if cancellation is requested
             cancellationToken.ThrowIfCancellationRequested();
@@ -167,11 +221,14 @@ namespace OpenKh.Tools.ModsManager.Services
                     .ToList();
 
                 OnStatusUpdate?.Invoke($"Found {filteredMods.Count} available mods in cache");
-                return filteredMods;
+
+                foreach (var mod in filteredMods)
+                {
+                    await emitAsync(mod);
+                }
             }
 
             // No cache or it's expired, load from network
-            var result = new List<DownloadableModModel>();
 
             try
             {
@@ -191,12 +248,15 @@ namespace OpenKh.Tools.ModsManager.Services
                 var jsonContent = await response.Content.ReadAsStringAsync();
 
                 // Save JSON to cache
-                try {
+                try
+                {
                     OnStatusUpdate?.Invoke("Saving data to cache...");
                     var jsonCachePath = Path.Combine(_cacheDirectory, "downloadable-mods.json");
                     await File.WriteAllTextAsync(jsonCachePath, jsonContent, cancellationToken);
-                } catch (Exception ex) {
-                    System.Diagnostics.Debug.WriteLine($"Error caching JSON: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    OnDiagLog?.Invoke($"Error caching JSON: {ex.Message}");
                 }
 
                 // Check if cancellation is requested
@@ -214,18 +274,26 @@ namespace OpenKh.Tools.ModsManager.Services
                     var modTasks = new List<Task<DownloadableModModel>>();
                     var allMods = new List<DownloadableModModel>(); // List of all mods (installed or not) for caching
 
-                    int totalMods = 0;
-                    foreach (var _ in gameModsElement.EnumerateArray())
-                        totalMods++;
+                    int totalMods = gameModsElement.EnumerateArray().Count();
 
                     OnStatusUpdate?.Invoke($"Found {totalMods} mods for {gameId}. Loading details...");
 
                     // Check if cancellation is requested
                     cancellationToken.ThrowIfCancellationRequested();
 
+                    var modElements = gameModsElement.EnumerateArray().ToArray();
+
+                    var numEmitted = 0;
+
                     // Process each mod entry and create tasks for parallel loading
-                    foreach (var modElement in gameModsElement.EnumerateArray())
+                    foreach (var (modElement, processedMods) in modElements.Select((modElement, processedMods) => (modElement, processedMods)))
                     {
+                        // Check if cancellation is requested
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        // Update status before processing batch
+                        OnStatusUpdate?.Invoke($"Loading mod details... ({processedMods}/{totalMods})");
+
                         var repo = modElement.GetProperty("repo").GetString();
 
                         // Create base mod entry for all mods (for caching)
@@ -242,92 +310,103 @@ namespace OpenKh.Tools.ModsManager.Services
                         bool isBlacklisted = ConfigurationService.BlacklistedMods != null &&
                                            ConfigurationService.BlacklistedMods.Contains(repo);
 
-                        // Add task to load this mod (will run in parallel)
-                        modTasks.Add(Task.Run(async () => {
-                            try {
-                                cancellationToken.ThrowIfCancellationRequested();
-                                // Use file cache for metadata/images
-                                await LoadMetadataWithCache(mod, cancellationToken);
-                                return isInstalled || isBlacklisted ? null : mod;
-                            }
-                            catch (OperationCanceledException) {
-                                throw; // Re-throw cancellation exceptions
-                            }
-                            catch (Exception ex) {
-                                System.Diagnostics.Debug.WriteLine($"Error loading mod {repo}: {ex.Message}");
-                                return isInstalled || isBlacklisted ? null : mod; // Still return the mod with partial data
-                            }
-                        }, cancellationToken));
-                    }
+                        // Add task to load this mod
+                        try
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            // Use file cache for metadata/images
+                            await LoadMetadataWithCache(mod, cancellationToken);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw; // Re-throw cancellation exceptions
+                        }
+                        catch (Exception ex)
+                        {
+                            OnDiagLog?.Invoke($"Error loading mod {repo}: {ex.Message}");
+                        }
 
-                    // Process tasks in batches to limit concurrent requests
-                    int processedMods = 0;
-                    for (int i = 0; i < modTasks.Count; i += MaxParallelRequests) {
-                        // Check if cancellation is requested
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        // Update status before processing batch
-                        OnStatusUpdate?.Invoke($"Loading mod details... ({processedMods}/{modTasks.Count})");
-
-                        var batch = modTasks.Skip(i).Take(MaxParallelRequests);
-                        int batchSize = batch.Count();
-
-                        var completedMods = await Task.WhenAll(batch);
-                        result.AddRange(completedMods.Where(m => m != null));
-
-                        processedMods += batchSize;
-
-                        // Update status after each batch completes
-                        OnStatusUpdate?.Invoke($"Loading mod details... ({processedMods}/{modTasks.Count})");
+                        if (isInstalled || isBlacklisted)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            await emitAsync(mod);
+                            numEmitted += 1;
+                        }
                     }
 
                     // Update cache
                     _modsCache[gameId] = allMods;
                     _lastCacheUpdate[gameId] = DateTime.Now;
 
-                    OnStatusUpdate?.Invoke($"Loading completed. {result.Count} mods available for installation.");
+                    OnStatusUpdate?.Invoke($"Loading completed. {numEmitted} mods available for installation.");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error loading downloadable mods: {ex.Message}");
+                OnDiagLog?.Invoke($"Error loading downloadable mods: {ex.Message}");
 
-                // Try to load from local cache in case of network error
-                try {
-                    var jsonCachePath = Path.Combine(_cacheDirectory, "downloadable-mods.json");
-                    if (File.Exists(jsonCachePath)) {
-                        var jsonContent = await File.ReadAllTextAsync(jsonCachePath);
-                        var modData = System.Text.Json.JsonDocument.Parse(jsonContent);
-                        var gameModsElement = modData.RootElement.GetProperty("mods").GetProperty(gameId);
-
-                        if (gameModsElement.ValueKind == System.Text.Json.JsonValueKind.Array) {
-                            var installedMods = ModsService.Mods.ToHashSet();
-                            foreach (var modElement in gameModsElement.EnumerateArray()) {
-                                var repo = modElement.GetProperty("repo").GetString();
-                                if (installedMods.Contains(repo) ||
-                                    (ConfigurationService.BlacklistedMods != null &&
-                                     ConfigurationService.BlacklistedMods.Contains(repo)))
-                                    continue;
-
-                                var mod = new DownloadableModModel {
-                                    Repo = repo,
-                                    Game = gameId,
-                                    Title = repo.Split('/').Last(),
-                                    Description = "Loaded from local cache. Limited information available."
-                                };
-                                result.Add(mod);
-                            }
+                if (fallbackToLocalCache)
+                {
+                    // Try to load from local cache in case of network error
+                    try
+                    {
+                        foreach (var it in await GetDownloadableModsLocallyAsync(gameId))
+                        {
+                            await emitAsync(it);
                         }
                     }
-                } catch (Exception cacheEx) {
-                    System.Diagnostics.Debug.WriteLine($"Error loading from cache: {cacheEx.Message}");
+                    catch (Exception cacheEx)
+                    {
+                        OnDiagLog?.Invoke($"Error loading from cache: {cacheEx.Message}");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get downloadable mods from local cache only
+        /// </summary>
+        public async Task<List<DownloadableModModel>> GetDownloadableModsLocallyAsync(string gameId)
+        {
+            var mods = new List<DownloadableModModel>();
+
+            var jsonCachePath = Path.Combine(_cacheDirectory, "downloadable-mods.json");
+            if (File.Exists(jsonCachePath))
+            {
+                var jsonContent = await File.ReadAllTextAsync(jsonCachePath);
+                var modData = System.Text.Json.JsonDocument.Parse(jsonContent);
+                var gameModsElement = modData.RootElement.GetProperty("mods").GetProperty(gameId);
+
+                if (gameModsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    var installedMods = ModsService.Mods.ToHashSet();
+                    foreach (var modElement in gameModsElement.EnumerateArray())
+                    {
+                        var repo = modElement.GetProperty("repo").GetString();
+                        if (installedMods.Contains(repo) ||
+                            (ConfigurationService.BlacklistedMods != null &&
+                             ConfigurationService.BlacklistedMods.Contains(repo)))
+                            continue;
+
+                        var mod = new DownloadableModModel
+                        {
+                            Repo = repo,
+                            Game = gameId,
+                            Title = repo.Split('/').Last(),
+                            Description = "Loaded from local cache. Limited information available."
+                        };
+                        mods.Add(mod);
+                    }
                 }
             }
 
-            return result;
+            return mods;
         }
 
-        private static async Task LoadMetadataWithCache(DownloadableModModel mod, CancellationToken cancellationToken = default)
+        private async Task LoadMetadataWithCache(DownloadableModModel mod, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -346,11 +425,14 @@ namespace OpenKh.Tools.ModsManager.Services
                 // Try loading from cache first
                 if (File.Exists(metadataPath) && (DateTime.Now - File.GetLastWriteTime(metadataPath) < CacheExpiration))
                 {
-                    try {
+                    try
+                    {
                         using var stream = File.OpenRead(metadataPath);
                         metadata = Metadata.Read(stream);
-                    } catch (Exception ex) {
-                        System.Diagnostics.Debug.WriteLine($"Error reading cached metadata: {ex.Message}");
+                    }
+                    catch (Exception ex)
+                    {
+                        OnDiagLog?.Invoke($"Error reading cached metadata: {ex.Message}");
                     }
                 }
 
@@ -369,10 +451,13 @@ namespace OpenKh.Tools.ModsManager.Services
                     metadata = Metadata.Read(stream);
 
                     // Save to cache
-                    try {
+                    try
+                    {
                         await File.WriteAllTextAsync(metadataPath, metadataContent);
-                    } catch (Exception ex) {
-                        System.Diagnostics.Debug.WriteLine($"Error caching metadata: {ex.Message}");
+                    }
+                    catch (Exception ex)
+                    {
+                        OnDiagLog?.Invoke($"Error caching metadata: {ex.Message}");
                     }
                 }
 
@@ -385,8 +470,8 @@ namespace OpenKh.Tools.ModsManager.Services
                 string encodedRepo = EncodeRepositoryPath(mod.Repo);
 
                 // DEBUG: Show all possible paths for debugging
-                System.Diagnostics.Debug.WriteLine($"Original repository: {mod.Repo}");
-                System.Diagnostics.Debug.WriteLine($"Encoded repository: {encodedRepo}");
+                OnDiagLog?.Invoke($"Original repository: {mod.Repo}");
+                OnDiagLog?.Invoke($"Encoded repository: {encodedRepo}");
 
                 // Load the icon by trying different variants
                 await TryLoadImageWithVariants(mod, iconPath, encodedRepo, ModIconFileNames, image => mod.IconImage = image, cancellationToken);
@@ -396,7 +481,7 @@ namespace OpenKh.Tools.ModsManager.Services
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error loading metadata for {mod.Repo}: {ex.Message}");
+                OnDiagLog?.Invoke($"Error loading metadata for {mod.Repo}: {ex.Message}");
                 // Set default values if metadata loading fails
                 mod.Title = mod.Title ?? mod.RepoName;
                 mod.OriginalAuthor = mod.OriginalAuthor ?? mod.RepoOwner;
@@ -405,65 +490,71 @@ namespace OpenKh.Tools.ModsManager.Services
                 // Create default image if needed
                 if (mod.IconImage == null)
                 {
-                    System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                        try {
-                            // Create a simple colored rectangle as placeholder
-                            var drawingVisual = new System.Windows.Media.DrawingVisual();
-                            using (var drawingContext = drawingVisual.RenderOpen())
-                            {
-                                drawingContext.DrawRectangle(
-                                    new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(100, 149, 237)), // Cornflower blue
-                                    null,
-                                    new System.Windows.Rect(0, 0, 64, 64));
-
-                                // Add text with repo name
-                                var formattedText = new System.Windows.Media.FormattedText(
-                                    mod.RepoName?.Substring(0, Math.Min(mod.RepoName.Length, 2)) ?? "?",
-                                    System.Globalization.CultureInfo.InvariantCulture,
-                                    System.Windows.FlowDirection.LeftToRight,
-                                    new System.Windows.Media.Typeface("Arial"),
-                                    24,
-                                    System.Windows.Media.Brushes.White,
-                                    1.0);
-
-                                drawingContext.DrawText(formattedText,
-                                    new System.Windows.Point((64 - formattedText.Width) / 2, (64 - formattedText.Height) / 2));
-                            }
-
-                            var renderTarget = new System.Windows.Media.Imaging.RenderTargetBitmap(
-                                64, 64, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
-                            renderTarget.Render(drawingVisual);
-                            renderTarget.Freeze();
-
-                            // Convert RenderTargetBitmap to BitmapImage
-                            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
-                            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(renderTarget));
-
-                            // Don't dispose the stream until after the BitmapImage has loaded from it
-                            var memoryStream = new System.IO.MemoryStream();
-                            encoder.Save(memoryStream);
-                            memoryStream.Position = 0;
-
-                            var bitmapImage = new BitmapImage();
-                            bitmapImage.BeginInit();
-                            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                            bitmapImage.StreamSource = memoryStream;
-                            bitmapImage.EndInit();
-                            bitmapImage.Freeze();
-
-                            // Safe to dispose now that image is frozen
-                            memoryStream.Dispose();
-
-                            mod.IconImage = bitmapImage;
-                        } catch (Exception ex) {
-                            System.Diagnostics.Debug.WriteLine($"Error creating placeholder: {ex.Message}");
-                        }
-                    });
+                    try
+                    {
+                        mod.IconImage = GetTextBasedAvatarImageOf(mod.RepoName ?? "?");
+                    }
+                    catch (Exception exIconImage)
+                    {
+                        OnDiagLog?.Invoke($"Error creating placeholder: {exIconImage.Message}");
+                    }
                 }
             }
         }
 
-        private static async Task LoadImageWithCache(DownloadableModModel mod, string cachePath, string url, Action<BitmapImage> setImage, CancellationToken cancellationToken = default)
+        private BitmapImage GetTextBasedAvatarImageOf(string name)
+        {
+            // Create a simple colored rectangle as placeholder
+            var drawingVisual = new System.Windows.Media.DrawingVisual();
+            using (var drawingContext = drawingVisual.RenderOpen())
+            {
+                drawingContext.DrawRectangle(
+                    new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(100, 149, 237)), // Cornflower blue
+                    null,
+                    new System.Windows.Rect(0, 0, 64, 64));
+
+                // Add text with repo name
+                var formattedText = new System.Windows.Media.FormattedText(
+                    (name + "  ").Substring(0, 2),
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Windows.FlowDirection.LeftToRight,
+                    new System.Windows.Media.Typeface("Arial"),
+                    24,
+                    System.Windows.Media.Brushes.White,
+                    1.0);
+
+                drawingContext.DrawText(formattedText,
+                    new System.Windows.Point((64 - formattedText.Width) / 2, (64 - formattedText.Height) / 2));
+            }
+
+            var renderTarget = new System.Windows.Media.Imaging.RenderTargetBitmap(
+                64, 64, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+            renderTarget.Render(drawingVisual);
+            renderTarget.Freeze();
+
+            // Convert RenderTargetBitmap to BitmapImage
+            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(renderTarget));
+
+            // Don't dispose the stream until after the BitmapImage has loaded from it
+            var memoryStream = new System.IO.MemoryStream();
+            encoder.Save(memoryStream);
+            memoryStream.Position = 0;
+
+            var bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.StreamSource = memoryStream;
+            bitmapImage.EndInit();
+            bitmapImage.Freeze();
+
+            // Safe to dispose now that image is frozen
+            memoryStream.Dispose();
+
+            return bitmapImage;
+        }
+
+        private async Task LoadImageWithCache(DownloadableModModel mod, string cachePath, string url, Action<BitmapImage> setImage, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -476,8 +567,8 @@ namespace OpenKh.Tools.ModsManager.Services
                 bool forceRefresh = true; // Temporarily always download images
 
                 // Extra debugging for URL
-                System.Diagnostics.Debug.WriteLine($"Attempting to load image from URL: {url}");
-                System.Diagnostics.Debug.WriteLine($"Cache path: {cachePath}");
+                OnDiagLog?.Invoke($"Attempting to load image from URL: {url}");
+                OnDiagLog?.Invoke($"Cache path: {cachePath}");
 
                 // Try to load from cache first if not forcing refresh
                 if (!forceRefresh && File.Exists(cachePath))
@@ -485,13 +576,15 @@ namespace OpenKh.Tools.ModsManager.Services
                     try
                     {
                         imageData = File.ReadAllBytes(cachePath);
-                        System.Diagnostics.Debug.WriteLine($"Image loaded from cache: {cachePath}");
+                        OnDiagLog?.Invoke($"Image loaded from cache: {cachePath}");
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Error reading cached image: {ex.Message}");
+                        OnDiagLog?.Invoke($"Error reading cached image: {ex.Message}");
                         // Delete corrupt cache file
-                        try { File.Delete(cachePath); } catch { }
+                        try
+                        { File.Delete(cachePath); }
+                        catch { }
                     }
                 }
 
@@ -506,13 +599,13 @@ namespace OpenKh.Tools.ModsManager.Services
                         // Add User-Agent to avoid potential blocks
                         client.DefaultRequestHeaders.Add("User-Agent", "OpenKh-ModManager/1.0");
 
-                        System.Diagnostics.Debug.WriteLine($"Downloading image from URL: {url}");
+                        OnDiagLog?.Invoke($"Downloading image from URL: {url}");
                         var response = await client.GetAsync(url, cancellationToken);
 
                         if (response.IsSuccessStatusCode)
                         {
                             imageData = await response.Content.ReadAsByteArrayAsync();
-                            System.Diagnostics.Debug.WriteLine($"Image downloaded successfully: {imageData.Length} bytes");
+                            OnDiagLog?.Invoke($"Image downloaded successfully: {imageData.Length} bytes");
 
                             try
                             {
@@ -528,163 +621,119 @@ namespace OpenKh.Tools.ModsManager.Services
                             }
                             catch (Exception ex)
                             {
-                                System.Diagnostics.Debug.WriteLine($"Error saving image to cache: {ex.Message}");
+                                OnDiagLog?.Invoke($"Error saving image to cache: {ex.Message}");
                             }
                         }
                         else
                         {
-                            System.Diagnostics.Debug.WriteLine($"Failed to download image: {response.StatusCode} for {url}");
+                            OnDiagLog?.Invoke($"Failed to download image: {response.StatusCode} for {url}");
                         }
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Error downloading image: {ex.Message} for {url}");
+                        OnDiagLog?.Invoke($"Error downloading image: {ex.Message} for {url}");
                     }
                 }
 
                 // If we have image data, create a BitmapImage from it
                 if (imageData != null)
                 {
-                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    try
                     {
-                        try
+                        var bitmap = new BitmapImage();
+                        using (var ms = new MemoryStream(imageData))
                         {
-                            var bitmap = new BitmapImage();
-                            using (var ms = new MemoryStream(imageData))
-                            {
-                                bitmap.BeginInit();
-                                bitmap.CreateOptions = BitmapCreateOptions.None;
-                                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                                bitmap.StreamSource = ms;
-                                bitmap.EndInit();
-                                bitmap.Freeze(); // Important for cross-thread usage
-                            }
+                            bitmap.BeginInit();
+                            bitmap.CreateOptions = BitmapCreateOptions.None;
+                            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                            bitmap.StreamSource = ms;
+                            bitmap.EndInit();
+                            bitmap.Freeze(); // Important for cross-thread usage
+                        }
 
-                            setImage(bitmap);
-                            System.Diagnostics.Debug.WriteLine($"Image set successfully to UI");
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"Error creating BitmapImage: {ex.Message}");
-                        }
-                    });
+                        setImage(bitmap);
+                        OnDiagLog?.Invoke($"Image set successfully to UI");
+                    }
+                    catch (Exception ex)
+                    {
+                        OnDiagLog?.Invoke($"Error creating BitmapImage: {ex.Message}");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Unhandled error in LoadImageWithCache: {ex.Message}");
+                OnDiagLog?.Invoke($"Unhandled error in LoadImageWithCache: {ex.Message}");
             }
         }
 
-        private static void CreatePlaceholderImage(DownloadableModModel mod, Action<BitmapImage> setImage)
-        {
-            System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                try {
-                    // Create colored rectangle with text
-                    var drawingVisual = new System.Windows.Media.DrawingVisual();
-                    using (var drawingContext = drawingVisual.RenderOpen())
-                    {
-                        // Pick a color based on repository name
-                        byte[] nameBytes = System.Text.Encoding.UTF8.GetBytes(mod.Repo ?? "unknown");
-                        var r = (byte)((nameBytes.Length > 0 ? nameBytes[0] : 100) % 200 + 55);
-                        var g = (byte)((nameBytes.Length > 1 ? nameBytes[1] : 149) % 200 + 55);
-                        var b = (byte)((nameBytes.Length > 2 ? nameBytes[2] : 237) % 200 + 55);
-
-                        var brush = new System.Windows.Media.SolidColorBrush(
-                            System.Windows.Media.Color.FromRgb(r, g, b));
-
-                        drawingContext.DrawRectangle(brush, null, new System.Windows.Rect(0, 0, 64, 64));
-
-                        // Get first two letters of repo name as text
-                        string initials = "?";
-                        if (!string.IsNullOrEmpty(mod.RepoName))
-                        {
-                            initials = mod.RepoName.Substring(0, Math.Min(2, mod.RepoName.Length)).ToUpper();
-                        }
-
-                        var formattedText = new System.Windows.Media.FormattedText(
-                            initials,
-                            System.Globalization.CultureInfo.InvariantCulture,
-                            System.Windows.FlowDirection.LeftToRight,
-                            new System.Windows.Media.Typeface("Arial"),
-                            24,
-                            System.Windows.Media.Brushes.White,
-                            System.Windows.Media.VisualTreeHelper.GetDpi(drawingVisual).PixelsPerDip);
-
-                        // Center the text
-                        drawingContext.DrawText(formattedText,
-                            new System.Windows.Point((64 - formattedText.Width) / 2, (64 - formattedText.Height) / 2));
-                    }
-
-                    // Render to bitmap
-                    var renderTarget = new System.Windows.Media.Imaging.RenderTargetBitmap(
-                        64, 64, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
-                    renderTarget.Render(drawingVisual);
-
-                    // Convert to BitmapImage
-                    var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
-                    encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(renderTarget));
-
-                    var memoryStream = new System.IO.MemoryStream();
-                    encoder.Save(memoryStream);
-                    memoryStream.Position = 0;
-
-                    var bitmapImage = new BitmapImage();
-                    bitmapImage.BeginInit();
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmapImage.StreamSource = memoryStream;
-                    bitmapImage.EndInit();
-                    bitmapImage.Freeze();
-
-                    memoryStream.Close();
-
-                    // Set the placeholder image
-                    setImage(bitmapImage);
-                }
-                catch (Exception ex) {
-                    System.Diagnostics.Debug.WriteLine($"Error creating placeholder: {ex.Message}");
-                }
-            });
-        }
-
-        private static async Task LoadImageFromUrl(string url, Action<BitmapImage> setImage)
+        private void CreatePlaceholderImage(DownloadableModModel mod, Action<BitmapImage> setImage)
         {
             try
             {
-                using var client = new HttpClient();
-                client.Timeout = RequestTimeout;
-
-                // Use GetAsync with a CancellationToken that cancels after our timeout
-                using var cts = new System.Threading.CancellationTokenSource(RequestTimeout);
-                var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cts.Token);
-
-                if (response.IsSuccessStatusCode)
+                // Create colored rectangle with text
+                var drawingVisual = new System.Windows.Media.DrawingVisual();
+                using (var drawingContext = drawingVisual.RenderOpen())
                 {
-                    var imageData = await response.Content.ReadAsByteArrayAsync();
+                    // Pick a color based on repository name
+                    byte[] nameBytes = System.Text.Encoding.UTF8.GetBytes(mod.Repo ?? "unknown");
+                    var r = (byte)((nameBytes.Length > 0 ? nameBytes[0] : 100) % 200 + 55);
+                    var g = (byte)((nameBytes.Length > 1 ? nameBytes[1] : 149) % 200 + 55);
+                    var b = (byte)((nameBytes.Length > 2 ? nameBytes[2] : 237) % 200 + 55);
 
-                    // Use Application.Current.Dispatcher to handle BitmapImage creation
-                    // since it needs to run on the UI thread
-                    System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                        try {
-                            var bitmap = new BitmapImage();
-                            bitmap.BeginInit();
-                            bitmap.StreamSource = new MemoryStream(imageData);
-                            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                            bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache; // Don't use cache
-                            bitmap.DecodePixelWidth = 100; // Limit size to improve performance
-                            bitmap.EndInit();
-                            bitmap.Freeze(); // Important for cross-thread usage
+                    var brush = new System.Windows.Media.SolidColorBrush(
+                        System.Windows.Media.Color.FromRgb(r, g, b));
 
-                            setImage(bitmap);
-                        } catch (Exception innerEx) {
-                            System.Diagnostics.Debug.WriteLine($"Error creating bitmap for {url}: {innerEx.Message}");
-                        }
-                    });
+                    drawingContext.DrawRectangle(brush, null, new System.Windows.Rect(0, 0, 64, 64));
+
+                    // Get first two letters of repo name as text
+                    string initials = "?";
+                    if (!string.IsNullOrEmpty(mod.RepoName))
+                    {
+                        initials = mod.RepoName.Substring(0, Math.Min(2, mod.RepoName.Length)).ToUpper();
+                    }
+
+                    var formattedText = new System.Windows.Media.FormattedText(
+                        initials,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        System.Windows.FlowDirection.LeftToRight,
+                        new System.Windows.Media.Typeface("Arial"),
+                        24,
+                        System.Windows.Media.Brushes.White,
+                        System.Windows.Media.VisualTreeHelper.GetDpi(drawingVisual).PixelsPerDip);
+
+                    // Center the text
+                    drawingContext.DrawText(formattedText,
+                        new System.Windows.Point((64 - formattedText.Width) / 2, (64 - formattedText.Height) / 2));
                 }
+
+                // Render to bitmap
+                var renderTarget = new System.Windows.Media.Imaging.RenderTargetBitmap(
+                    64, 64, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+                renderTarget.Render(drawingVisual);
+
+                // Convert to BitmapImage
+                var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+                encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(renderTarget));
+
+                var memoryStream = new System.IO.MemoryStream();
+                encoder.Save(memoryStream);
+                memoryStream.Position = 0;
+
+                var bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.StreamSource = memoryStream;
+                bitmapImage.EndInit();
+                bitmapImage.Freeze();
+
+                memoryStream.Close();
+
+                // Set the placeholder image
+                setImage(bitmapImage);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error loading image from {url}: {ex.Message}");
+                OnDiagLog?.Invoke($"Error creating placeholder: {ex.Message}");
             }
         }
     }

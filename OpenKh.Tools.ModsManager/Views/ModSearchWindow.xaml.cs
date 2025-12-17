@@ -1,132 +1,213 @@
-using OpenKh.Tools.Common.Wpf;
+using OpenKh.Tools.ModsManager.ExtensionMethods;
 using OpenKh.Tools.ModsManager.Models;
 using OpenKh.Tools.ModsManager.Services;
 using OpenKh.Tools.ModsManager.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
+using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Navigation;
+using System.Windows.Threading;
 using Xe.Tools.Wpf.Commands;
+using static OpenKh.Tools.ModsManager.Services.DownloadableModsService;
 
 namespace OpenKh.Tools.ModsManager.Views
 {
-    public partial class ModSearchWindow : Window, INotifyPropertyChanged
+    public partial class ModSearchWindow : Window
     {
-        public ColorThemeService ColorTheme => ColorThemeService.Instance;
-        public ObservableCollection<DownloadableModViewModel> DownloadableMods { get; } = new ObservableCollection<DownloadableModViewModel>();
+        private readonly string _currentGameId;
+        private readonly ObservableCollection<DownloadableModViewModel> _allMods = new ObservableCollection<DownloadableModViewModel>();
+        private readonly Action _reloadModsList;
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
+        private readonly DownloadableModsService _downloadableModsService = DownloadableModsService.Default;
+        private readonly Subject<DownloadableModViewModel> _onModInstalled = new Subject<DownloadableModViewModel>();
+        private readonly ObservableCollection<string> _messages = new ObservableCollection<string>();
+        private readonly Subject<string> _emitMessage = new Subject<string>();
+        private System.Windows.Data.FilterEventHandler _lastFilter = null;
 
-        private bool _isLoading;
-        private string _loadingStatusText = "Initializing...";
-        private DownloadableModViewModel _selectedMod;
-        private readonly List<string> _gameIds = new List<string>() { "kh2", "kh1", "bbs", "Recom", "kh3d" };
-        private string _currentGameId;
-        private string _searchQuery = "";
-        private List<DownloadableModModel> _allMods = new List<DownloadableModModel>();
-        
-        // Reference to the main view model to update installed mods
-        private ViewModels.MainViewModel _mainViewModel;
-        
-        // Cancelation token for loading operation
-        private CancellationTokenSource _cts;
-        
-        // Command for clearing the search box
-        public ICommand ClearSearchCommand { get; private set; }
+        /// <summary>
+        /// Cancelation token for loading operation
+        /// </summary>
+        private CancellationTokenSource _cts = new CancellationTokenSource();
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public ModSearchVM VM { get; }
 
-        public bool IsLoading
-        {
-            get => _isLoading;
-            set
-            {
-                _isLoading = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsLoading)));
-            }
-        }
-        
-        public string LoadingStatusText
-        {
-            get => _loadingStatusText;
-            private set
-            {
-                _loadingStatusText = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LoadingStatusText)));
-            }
-        }
-
-        // Manejador de evento para actualizar el estado de carga
-        private void OnModLoadingStatusUpdate(string status)
-        {
-            Application.Current.Dispatcher.Invoke(() => {
-                LoadingStatusText = status;
-            });
-        }
-
-        public bool HasNoMods => !IsLoading && DownloadableMods.Count == 0;
-
-        public DownloadableModViewModel SelectedMod
-        {
-            get => _selectedMod;
-            set
-            {
-                _selectedMod = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedMod)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasSelectedMod)));
-            }
-        }
-
-        public bool HasSelectedMod => SelectedMod != null;
-        
-        public string SearchQuery
-        {
-            get => _searchQuery;
-            set
-            {
-                _searchQuery = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SearchQuery)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasSearchQuery)));
-                FilterMods();
-            }
-        }
-        
-        public bool HasSearchQuery => !string.IsNullOrWhiteSpace(SearchQuery);
-
-        public ModSearchWindow(ViewModels.MainViewModel mainViewModel = null)
+        public ModSearchWindow(Action reloadModsList = null)
         {
             InitializeComponent();
-            DataContext = this;
-            
-            // Store the reference to main view model
-            _mainViewModel = mainViewModel;
-            
+            DataContext = VM = new ModSearchVM();
+            _reloadModsList = reloadModsList;
+
+            IObservable<PropertyChangedEventArgs> OnVmPropertyChanged(string propertyName)
+                => Observable.FromEvent<PropertyChangedEventHandler, PropertyChangedEventArgs>(
+                    h => (s, e) => h(e),
+                    h => VM.PropertyChanged += h,
+                    h => VM.PropertyChanged -= h
+                )
+                    .Where(it => it.PropertyName == null || it.PropertyName == propertyName)
+                    ;
+
+            OnVmPropertyChanged(nameof(VM.SearchQuery))
+                .Subscribe(
+                    e =>
+                    {
+                        VM.HasSearchQuery = !string.IsNullOrEmpty(VM.SearchQuery);
+                        ApplyNewFilter();
+                    }
+                )
+                .AddTo(_disposables);
+
+            OnVmPropertyChanged(nameof(VM.SelectedMod))
+                .Subscribe(
+                    e =>
+                    {
+                        VM.HasSelectedMod = VM.SelectedMod != null;
+                    }
+                )
+                .AddTo(_disposables);
+
+            VM.DownloadableMods.Source = _allMods;
+
+            Observable.CombineLatest(
+                Observable.FromEvent<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+                    h => (s, e) => h(e),
+                    h => VM.DownloadableMods.View.CollectionChanged += h,
+                    h => VM.DownloadableMods.View.CollectionChanged -= h
+                ),
+                OnVmPropertyChanged(nameof(VM.IsLoading)),
+                (a, b) => !VM.IsLoading && VM.DownloadableMods.View.IsEmpty
+            )
+                .Subscribe(it => VM.HasNoMods = it)
+                .AddTo(_disposables);
+
             // Subscribe to status update events
-            DownloadableModsService.OnStatusUpdate += OnModLoadingStatusUpdate;
-            
+            Observable.FromEvent<StatusUpdateHandler, string>(
+                h => arg => h(arg),
+                h => _downloadableModsService.OnStatusUpdate += h,
+                h => _downloadableModsService.OnStatusUpdate -= h
+            )
+                .ObserveOn(DispatcherSynchronizationContext.Current)
+                .Subscribe(
+                    status =>
+                    {
+                        // Event handler to update the loading status
+                        VM.LoadingStatusText = status;
+
+                        _emitMessage.OnNext(status);
+                    }
+                )
+                .AddTo(_disposables);
+
+            // Subscribe to diag log events
+            Observable.FromEvent<DiagLogHandler, string>(
+                h => arg => h(arg),
+                h => _downloadableModsService.OnDiagLog += h,
+                h => _downloadableModsService.OnDiagLog -= h
+            )
+                .ObserveOn(DispatcherSynchronizationContext.Current)
+                .Subscribe(
+                    status =>
+                    {
+                        _emitMessage.OnNext(status);
+                    }
+                )
+                .AddTo(_disposables);
+
+            _onModInstalled
+                .ObserveOn(DispatcherSynchronizationContext.Current)
+                .Subscribe(
+                    mod =>
+                    {
+                        try
+                        {
+                            // Clear selected mod if it was the one installed
+                            if (VM.SelectedMod == mod)
+                                VM.SelectedMod = null;
+
+                            // Remove the mod from the list
+                            _allMods.Remove(mod);
+
+                            VM.DownloadableMods.View.Refresh();
+
+                            // Select another mod if available
+                            if (VM.SelectedMod == null && VM.DownloadableMods.View.MoveCurrentToFirst())
+                                VM.SelectedMod = (DownloadableModViewModel)VM.DownloadableMods.View.CurrentItem;
+
+                            // Update the main window's mod list if main view model is available
+                            // Refresh the mods list in the main window
+                            _reloadModsList?.Invoke();
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error updating mod lists: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                )
+                .AddTo(_disposables);
+
+            Observable.FromEvent<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+                h => (s, e) => h(e),
+                h => _messages.CollectionChanged += h,
+                h => _messages.CollectionChanged -= h
+            )
+                .ObserveOn(Scheduler.Immediate)
+                .Subscribe(
+                    e =>
+                    {
+                        VM.HasLog = _messages.Any();
+                        VM.NumMessages = _messages.Count;
+                    }
+                )
+                .AddTo(_disposables);
+
+            _emitMessage
+                .ObserveOn(DispatcherSynchronizationContext.Current)
+                .Subscribe(msg => _messages.Add(msg))
+                .AddTo(_disposables);
+
             // Use the current game ID from configuration
             _currentGameId = ConfigurationService.LaunchGame;
-            
+
             // Initialize commands
-            ClearSearchCommand = new RelayCommand(_ => ClearSearch());
-            
+            VM.ClearSearchCommand = new RelayCommand(_ => ClearSearch());
+
+            VM.CancelCommand = new RelayCommand(_ => _cts.Cancel());
+
+            VM.ClearLog = new RelayCommand(_ => _messages.Clear());
+
+            VM.ShowLog = new RelayCommand(_ => MessageBox.Show(string.Join("\n", _messages.TakeLast(100))));
+
+            VM.CopyLog = new RelayCommand(
+                _ =>
+                {
+                    try
+                    {
+                        Clipboard.SetText(string.Join("\n", _messages));
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error copying log to clipboard: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            );
+
             Loaded += ModSearchWindow_Loaded;
-            
+
             // Clean up resources on close
-            Closing += (s, e) => {
-                _cts?.Cancel();
-                _cts?.Dispose();
-                
-                // Unsubscribe from events
-                DownloadableModsService.OnStatusUpdate -= OnModLoadingStatusUpdate;
+            Closed += (s, e) =>
+            {
+                _cts.Cancel();
+                _disposables.Dispose();
             };
         }
 
@@ -142,66 +223,75 @@ namespace OpenKh.Tools.ModsManager.Views
         {
             if (string.IsNullOrEmpty(_currentGameId))
                 return;
-                
+
             // Cancel any previous operation in progress
-            _cts?.Cancel();
-            _cts?.Dispose();
+            _cts.Cancel();
             _cts = new CancellationTokenSource();
-            
+
             try
             {
-                IsLoading = true;
-                LoadingStatusText = $"Loading mods for {GetGameName(_currentGameId)}...";
-                
-                var mods = await Task.Run(async () => 
+                VM.IsLoading = true;
+                VM.LoadingStatusText = $"Loading mods for {GetGameName(_currentGameId)}...";
+
+                var modEmitter = new Subject<DownloadableModModel>();
+
+                _allMods.Clear();
+
+                modEmitter
+                    .ObserveOn(DispatcherSynchronizationContext.Current)
+                    .Subscribe(
+                        mod =>
+                        {
+                            var modVm = new DownloadableModViewModel(mod);
+                            modVm.ModInstalled += OnModInstalled;
+                            AddOrUpdateMod(modVm);
+                        }
+                    )
+                    .AddTo(_disposables);
+
+                try
                 {
-                    try {
-                        // Use the new method with cancellation support
-                        var mods = await DownloadableModsService.GetDownloadableModsForGameAsync(_currentGameId, _cts.Token);
-                        // Store all mods for filtering
-                        _allMods = mods;
-                        return mods;
-                    } catch (OperationCanceledException) {
-                        // Operation cancelled, return empty list
-                        _allMods.Clear();
-                        return new List<DownloadableModModel>();
-                    } catch (Exception ex) {
-                        // Capture other exceptions and display them
-                        Application.Current.Dispatcher.Invoke(() => {
-                            LoadingStatusText = $"Error: {ex.Message}";
-                        });
-                        return new List<DownloadableModModel>();
+                    foreach (var one in await _downloadableModsService.GetDownloadableModsLocallyAsync(_currentGameId))
+                    {
+                        modEmitter.OnNext(one);
                     }
-                });
-                
-                if (!_cts.Token.IsCancellationRequested)
+
+                    // Use the new method with cancellation support
+                    await _downloadableModsService.GetDownloadableModsForGameAsync(
+                        gameId: _currentGameId,
+                        emitAsync: async mod => modEmitter.OnNext(mod),
+                        fallbackToLocalCache: false,
+                        cancellationToken: _cts.Token
+                    );
+                }
+                catch (OperationCanceledException)
                 {
-                    DownloadableMods.Clear();
-                    foreach (var mod in mods)
-                    {
-                        var viewModel = new DownloadableModViewModel(mod);
-                        // Subscribe to the ModInstalled event
-                        viewModel.ModInstalled += OnModInstalled;
-                        DownloadableMods.Add(viewModel);
-                    }
-                    
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasNoMods)));
-                    
-                    // Select first item
-                    if (DownloadableMods.Count > 0)
-                        SelectedMod = DownloadableMods[0];
-                    
-                    // Apply search filter if there is a search query
-                    if (!string.IsNullOrEmpty(SearchQuery))
-                    {
-                        FilterMods();
-                    }
-                    
-                    // Show the number of mods found
-                    if (DownloadableMods.Count > 0)
-                        LoadingStatusText = $"Found {DownloadableMods.Count} available mods for {GetGameName(_currentGameId)}";
-                    else
-                        LoadingStatusText = $"No available mods found for {GetGameName(_currentGameId)}";
+                    // Operation cancelled, return empty list
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    // Capture other exceptions and display them
+                    VM.LoadingStatusText = $"Error: {ex.Message}";
+                    _emitMessage.OnNext($"Full exception data: {ex}");
+                    return;
+                }
+
+                var filtered = VM.DownloadableMods.View
+                    .Cast<DownloadableModViewModel>();
+
+                // Select first item
+                VM.SelectedMod = filtered
+                    .FirstOrDefault();
+
+                // Show the number of mods found
+                if (filtered.Any())
+                {
+                    VM.LoadingStatusText = $"Found {filtered.Count()} available mods for {GetGameName(_currentGameId)}";
+                }
+                else
+                {
+                    VM.LoadingStatusText = $"No available mods found for {GetGameName(_currentGameId)}";
                 }
             }
             catch (Exception ex)
@@ -210,84 +300,98 @@ namespace OpenKh.Tools.ModsManager.Views
             }
             finally
             {
-                // Clear status update event
-                DownloadableModsService.OnStatusUpdate -= (status) => {};
-                
-                IsLoading = false;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasNoMods)));
+                VM.IsLoading = false;
             }
         }
-        
+
+        private void AddOrUpdateMod(DownloadableModViewModel modVm)
+        {
+            for (int y = 0, cy = _allMods.Count; y < cy; y++)
+            {
+                if (_allMods[y].Repo == modVm.Repo)
+                {
+                    // Update existing mod
+                    _allMods[y] = modVm;
+                    return;
+                }
+            }
+
+            // Add new mod
+            _allMods.Add(modVm);
+        }
+
         /// <summary>
         /// Filters the mods list based on the current search query
         /// </summary>
-        private void FilterMods()
+        private void ApplyNewFilter()
         {
-            if (_allMods == null)
-                return;
-                
             // Remember selected mod
-            var selectedMod = SelectedMod;
-                
-            // Clear and refill the observable collection with filtered results
-            DownloadableMods.Clear();
-            
-            IEnumerable<DownloadableModModel> filteredMods = _allMods;
-            
+            var selectedMod = VM.SelectedMod;
+
+            if (_lastFilter != null)
+            {
+                VM.DownloadableMods.Filter -= _lastFilter;
+                _lastFilter = null;
+            }
+
             // If we have a search query, filter by title and description
-            if (!string.IsNullOrWhiteSpace(SearchQuery))
+            if (!string.IsNullOrWhiteSpace(VM.SearchQuery))
             {
-                var searchTerms = SearchQuery.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                
-                filteredMods = _allMods.Where(mod => 
+                var searchTerms = VM.SearchQuery.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                _lastFilter = (s, e) =>
                 {
-                    // Check if any search term is found in title, description, or author
-                    return searchTerms.All(term => 
-                        (mod.Title?.ToLower().Contains(term) == true) ||
-                        (mod.Description?.ToLower().Contains(term) == true) ||
-                        (mod.OriginalAuthor?.ToLower().Contains(term) == true));
-                });
+                    if (e.Item is DownloadableModViewModel mod)
+                    {
+                        // Check if any search term is found in title, description, or author
+                        e.Accepted = searchTerms.All(term =>
+                            (mod.Title?.ToLower().Contains(term) == true) ||
+                            (mod.Description?.ToLower().Contains(term) == true) ||
+                            (mod.Author?.ToLower().Contains(term) == true));
+                    }
+                    else
+                    {
+                        e.Accepted = false;
+                    }
+                };
+                VM.DownloadableMods.Filter += _lastFilter;
             }
-            
-            // Add filtered mods to the collection
-            foreach (var mod in filteredMods)
-            {
-                var viewModel = new DownloadableModViewModel(mod);
-                viewModel.ModInstalled += OnModInstalled;
-                DownloadableMods.Add(viewModel);
-            }
-            
+
+            var filtered = VM.DownloadableMods.View.Cast<DownloadableModViewModel>();
+
             // Try to restore selection or select first item
-            if (selectedMod != null && DownloadableMods.Any(vm => vm.Repo == selectedMod.Repo))
+            if (true
+                && selectedMod != null
+                && filtered
+                    .FirstOrDefault(vm => vm.Repo == selectedMod.Repo) is var found
+                && found != null
+            )
             {
-                SelectedMod = DownloadableMods.First(vm => vm.Repo == selectedMod.Repo);
+                VM.SelectedMod = found;
             }
-            else if (DownloadableMods.Count > 0)
+            else if (filtered.Any())
             {
-                SelectedMod = DownloadableMods[0];
+                VM.SelectedMod = filtered.First();
             }
             else
             {
-                SelectedMod = null;
+                VM.SelectedMod = null;
             }
-            
-            // Update UI properties
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasNoMods)));
         }
-        
+
         /// <summary>
         /// Clears the search box and shows all mods
         /// </summary>
         private void ClearSearch()
         {
-            SearchQuery = string.Empty;
+            VM.SearchQuery = string.Empty;
         }
 
         private void Mod_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is FrameworkElement element && element.DataContext is DownloadableModViewModel mod)
             {
-                SelectedMod = mod;
+                VM.SelectedMod = mod;
             }
         }
 
@@ -296,58 +400,34 @@ namespace OpenKh.Tools.ModsManager.Views
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
             e.Handled = true;
         }
-        
+
         // Helper method to get readable game name
         private string GetGameName(string gameId)
         {
             switch (gameId?.ToLower())
             {
-                case "kh1": return "Kingdom Hearts 1";
-                case "kh2": return "Kingdom Hearts 2";
-                case "bbs": return "Birth By Sleep";
-                case "recom": return "Re:Chain of Memories";
-                case "kh3d": return "Dream Drop Distance";
-                default: return gameId ?? "Unknown Game";
+                case "kh1":
+                    return "Kingdom Hearts 1";
+                case "kh2":
+                    return "Kingdom Hearts 2";
+                case "bbs":
+                    return "Birth By Sleep";
+                case "recom":
+                    return "Re:Chain of Memories";
+                case "kh3d":
+                    return "Dream Drop Distance";
+                default:
+                    return gameId ?? "Unknown Game";
             }
         }
-        
+
         /// <summary>
         /// Called when a mod has been successfully installed
         /// </summary>
         /// <param name="mod">The mod that was installed</param>
         private void OnModInstalled(DownloadableModViewModel mod)
         {
-            // Execute on UI thread
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    // Clear selected mod if it was the one installed
-                    if (SelectedMod == mod)
-                        SelectedMod = null;
-                        
-                    // Remove the mod from the list
-                    DownloadableMods.Remove(mod);
-                    
-                    // Update properties
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasNoMods)));
-                    
-                    // Select another mod if available
-                    if (DownloadableMods.Count > 0 && SelectedMod == null)
-                        SelectedMod = DownloadableMods[0];
-                    
-                    // Update the main window's mod list if main view model is available
-                    if (_mainViewModel != null)
-                    {
-                        // Refresh the mods list in the main window
-                        _mainViewModel.ReloadModsList();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error updating mod lists: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            });
+            _onModInstalled.OnNext(mod);
         }
     }
 }

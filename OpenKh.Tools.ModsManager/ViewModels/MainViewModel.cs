@@ -738,7 +738,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             OpenModSearchCommand = new RelayCommand(
                 _ =>
                 {
-                    var searchWindow = new ModSearchWindow(this)
+                    var searchWindow = new ModSearchWindow(
+                        reloadModsList: () => ReloadModsList()
+                    )
                     {
                         Owner = _getActiveWindowService.GetActiveWindow(),
                         WindowStartupLocation = WindowStartupLocation.CenterOwner
