@@ -418,6 +418,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             }
                         }
                         ConfigurationService.Updated = false;
+                        MessageBox.Show(
+                               $"Panacea has successfully been updated alongside Mods Manager.\nIf you notice any mod loading bugs you might still want to uninstall and reinstall Panacea just in case.",
+                               "Success",
+                               MessageBoxButton.OK,
+                               MessageBoxImage.Information);
                     }
                     catch
                     {
