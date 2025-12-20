@@ -232,7 +232,7 @@
                     <StackPanel Orientation="Horizontal" Visibility="{Binding PcRelease28Selected}">
                         <CheckBox IsChecked="{Binding Extractkh3d}" Content="KH3D-51GB" Margin="0 0 6 4"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding Pcsx2ConfigVisibility}">
                         <CheckBox IsChecked="{Binding Extractkh1}" Content="KH1-4GB" Margin="0 0 6 4" Visibility="{Binding KH1RecognizedVisibility}"/>
                         <CheckBox IsChecked="{Binding Extractkh2}" Content="KH2-4GB" Margin="0 0 6 4" Visibility="{Binding KH2RecognizedVisibility}"/>
                         <CheckBox IsChecked="{Binding Extractrecom}" Content="ReCoM-5GB" Margin="0 0 6 4" Visibility="{Binding RecomRecognizedVisibility}"/>
