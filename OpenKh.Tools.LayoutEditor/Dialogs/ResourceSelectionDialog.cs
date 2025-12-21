@@ -2,7 +2,10 @@ using ImGuiNET;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Windows;
+using Xe.Tools.Wpf.Dialogs;
 
 namespace OpenKh.Tools.LayoutEditor.Dialogs
 {
@@ -12,6 +15,11 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
         private readonly Bar.Entry[] _textures;
         private int _selectedAnimIndex;
         private int _selectedTextureIndex;
+
+        private static readonly List<FileDialogFilter> ImdFilter = FileDialogFilterComposer
+            .Compose()
+            .AddExtensions("Image IMGD", "imd")
+            .AddAllFiles();
 
         public bool HasResourceBeenSelected { get; private set; }
         public Bar.Entry SelectedAnimation { get; private set; }
@@ -57,6 +65,14 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
 
             ImGui.Columns(1);
             ImGui.Separator();
+
+            // Add Replace Texture button
+            if (ImGui.Button("Replace Selected Texture"))
+            {
+                ReplaceTexture(_selectedTextureIndex);
+            }
+            ImGui.SameLine();
+
             if (ImGui.Button("Open"))
             {
                 HasResourceBeenSelected = true;
@@ -64,6 +80,88 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 SelectedTexture = _textures[_selectedTextureIndex];
                 ImGui.CloseCurrentPopup();
             }
+        }
+
+        private void ReplaceTexture(int textureIndex)
+        {
+            FileDialog.OnOpen(fileName =>
+            {
+                try
+                {
+                    using var stream = File.OpenRead(fileName);
+                    var importedImage = Imgd.Read(stream);
+
+                    // Read the current texture
+                    _textures[textureIndex].Stream.Position = 0;
+                    var currentImage = Imgd.Read(_textures[textureIndex].Stream);
+
+                    // Check if aspect ratio is the same
+                    bool originalIsSquare = currentImage.Size.Width == currentImage.Size.Height;
+                    bool newIsSquare = importedImage.Size.Width == importedImage.Size.Height;
+
+                    if (originalIsSquare != newIsSquare)
+                    {
+                        MessageBox.Show($"Format mismatch!\nOriginal texture: {currentImage.Size.Width}x{currentImage.Size.Height}\nNew texture: {importedImage.Size.Width}x{importedImage.Size.Height}\n\nBoth textures must have the same aspect ratio.",
+                            "Invalid Format", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    if (!originalIsSquare)
+                    {
+                        float originalRatio = (float)currentImage.Size.Width / currentImage.Size.Height;
+                        float newRatio = (float)importedImage.Size.Width / importedImage.Size.Height;
+
+                        if (Math.Abs(originalRatio - newRatio) > 0.01f)
+                        {
+                            MessageBox.Show($"Aspect ratio mismatch!\nOriginal: {currentImage.Size.Width}x{currentImage.Size.Height} (ratio: {originalRatio:F2})\nNew: {importedImage.Size.Width}x{importedImage.Size.Height} (ratio: {newRatio:F2})",
+                                "Invalid Format", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+
+                    // Calculate scale factors
+                    float scaleX = (float)importedImage.Size.Width / currentImage.Size.Width;
+                    float scaleY = (float)importedImage.Size.Height / currentImage.Size.Height;
+
+                    // Replace the texture in the BAR entry
+                    var newTextureStream = new MemoryStream();
+                    importedImage.Write(newTextureStream);
+                    newTextureStream.Position = 0;
+                    _textures[textureIndex].Stream = newTextureStream;
+
+                    // Update the animation's sprite UV coordinates
+                    _animations[_selectedAnimIndex].Stream.Position = 0;
+                    var sequence = Sequence.Read(_animations[_selectedAnimIndex].Stream);
+
+                    int updatedSprites = 0;
+                    foreach (var sprite in sequence.Sprites)
+                    {
+                        sprite.Left = (short)(sprite.Left * scaleX);
+                        sprite.Top = (short)(sprite.Top * scaleY);
+                        sprite.Right = (short)(sprite.Right * scaleX);
+                        sprite.Bottom = (short)(sprite.Bottom * scaleY);
+                        updatedSprites++;
+                    }
+
+                    // Write the updated sequence back
+                    var updatedSequenceStream = new MemoryStream();
+                    sequence.Write(updatedSequenceStream);
+                    updatedSequenceStream.Position = 0;
+                    _animations[_selectedAnimIndex].Stream = updatedSequenceStream;
+
+                    string scaleInfo = (scaleX != 1.0f || scaleY != 1.0f)
+                        ? $"\nScaled UV coordinates by {scaleX}x (width) and {scaleY}x (height) for {updatedSprites} sprite(s)."
+                        : "\nNo scaling needed - resolution unchanged.";
+
+                    MessageBox.Show($"Successfully replaced texture in BAR file!{scaleInfo}\n\nClick 'Open' to load the file with the new texture.",
+                        "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to replace texture:\n{ex.Message}",
+                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }, ImdFilter);
         }
 
         public void Dispose()

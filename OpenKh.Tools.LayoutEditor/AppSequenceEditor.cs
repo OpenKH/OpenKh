@@ -229,7 +229,7 @@ namespace OpenKh.Tools.LayoutEditor
             }
 
             ImGui.SameLine();
-            if (ImGui.Button("Remove Sprite Group") && _selectedSpriteGroup >= 0 && _spriteGroups.Count > 0)
+            if (ImGui.Button("Remove Sprite Group") && _selectedSpriteGroup >= 0 && _spriteGroups.Count > 1)
             {
                 // Update all animations that reference sprite groups after the removed one
                 foreach (var animGroup in _sequence.AnimationGroups)
@@ -339,13 +339,17 @@ namespace OpenKh.Tools.LayoutEditor
                 _drawing.FillRectangle(originX - 1 + _renderer.PanFactorX, -2048 + _renderer.PanFactorX, 1, Infinite, backgroundColorInverse);
                 _drawing.FillRectangle(0 + _renderer.PanFactorX - 2048, originY - 1 + _renderer.PanFactorY, Infinite, 1, backgroundColorInverse);
 
-                if (Mouse.GetState().ScrollWheelValue - PastScrollValue > 0)
-                    ZoomFactor -= 0.05F;
+                // FIXED: Only apply zoom when mouse is hovering over this child window
+                if (ImGui.IsWindowHovered())
+                {
+                    if (Mouse.GetState().ScrollWheelValue - PastScrollValue > 0)
+                        ZoomFactor -= 0.05F;
 
-                if (Mouse.GetState().ScrollWheelValue - PastScrollValue < 0)
-                    ZoomFactor += 0.05F;
+                    if (Mouse.GetState().ScrollWheelValue - PastScrollValue < 0)
+                        ZoomFactor += 0.05F;
 
-                PastScrollValue = Mouse.GetState().ScrollWheelValue;
+                    PastScrollValue = Mouse.GetState().ScrollWheelValue;
+                }
 
                 if (Keyboard.GetState().IsKeyDown(Keys.Right))
                     _renderer.PanFactorX += 5;

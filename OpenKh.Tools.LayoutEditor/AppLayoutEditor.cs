@@ -39,6 +39,8 @@ namespace OpenKh.Tools.LayoutEditor
             .Compose()
             .AddExtensions("Image IMGD", "imd")
             .AddAllFiles();
+        private bool _isReplacingTexture;
+        private int _replaceTextureIndex;
 
         private float ZoomFactor = 1;
 
@@ -142,6 +144,116 @@ namespace OpenKh.Tools.LayoutEditor
                 ImGui.OpenPopup(SequenceEditorDialogName);
             }
 
+            // Handle texture replacement popup
+            if (_isReplacingTexture)
+            {
+                ImGui.OpenPopup("Replace Texture Index");
+                _isReplacingTexture = false;
+            }
+
+            bool replacePopupOpen = true;
+            if (ImGui.BeginPopupModal("Replace Texture Index", ref replacePopupOpen, ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                ImGui.Text($"Select texture index to replace (0-{_images.Count - 1}):");
+                ImGui.InputInt("Texture Index", ref _replaceTextureIndex);
+                _replaceTextureIndex = Math.Max(0, Math.Min(_replaceTextureIndex, _images.Count - 1));
+
+                if (ImGui.Button("Select File", new Vector2(120, 0)))
+                {
+                    var indexToReplace = _replaceTextureIndex;
+                    Xe.Tools.Wpf.Dialogs.FileDialog.OnOpen(fileName =>
+                    {
+                        try
+                        {
+                            using var stream = File.OpenRead(fileName);
+                            var importedImage = Imgd.Read(stream);
+
+                            var originalImage = _images[indexToReplace];
+
+                            // Check if aspect ratio is the same (must be square if original was square)
+                            bool originalIsSquare = originalImage.Size.Width == originalImage.Size.Height;
+                            bool newIsSquare = importedImage.Size.Width == importedImage.Size.Height;
+
+                            if (originalIsSquare != newIsSquare)
+                            {
+                                MessageBox.Show($"Format mismatch!\nOriginal texture: {originalImage.Size.Width}x{originalImage.Size.Height}\nNew texture: {importedImage.Size.Width}x{importedImage.Size.Height}\n\nBoth textures must have the same aspect ratio.",
+                                    "Invalid Format", MessageBoxButton.OK, MessageBoxImage.Error);
+                                return;
+                            }
+
+                            // If not square, check if aspect ratio matches
+                            if (!originalIsSquare)
+                            {
+                                float originalRatio = (float)originalImage.Size.Width / originalImage.Size.Height;
+                                float newRatio = (float)importedImage.Size.Width / importedImage.Size.Height;
+
+                                if (Math.Abs(originalRatio - newRatio) > 0.01f)
+                                {
+                                    MessageBox.Show($"Aspect ratio mismatch!\nOriginal: {originalImage.Size.Width}x{originalImage.Size.Height} (ratio: {originalRatio:F2})\nNew: {importedImage.Size.Width}x{importedImage.Size.Height} (ratio: {newRatio:F2})",
+                                        "Invalid Format", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    return;
+                                }
+                            }
+
+                            // Calculate scale factors
+                            float scaleX = (float)importedImage.Size.Width / originalImage.Size.Width;
+                            float scaleY = (float)importedImage.Size.Height / originalImage.Size.Height;
+
+                            // Dispose old sprite texture
+                            _spriteTextures[indexToReplace].Dispose();
+
+                            // Replace the image and sprite texture
+                            _images[indexToReplace] = importedImage;
+                            _spriteTextures[indexToReplace] = _drawing.CreateSpriteTexture(importedImage);
+
+                            // Update sprite UV coordinates ONLY for sequences that use this specific texture index
+                            int updatedSequences = 0;
+                            foreach (var sequenceGroup in _layout.SequenceGroups)
+                            {
+                                foreach (var sequenceProperty in sequenceGroup.Sequences)
+                                {
+                                    // Only update if this sequence property uses the texture we're replacing
+                                    if (sequenceProperty.TextureIndex == indexToReplace)
+                                    {
+                                        var sequenceItem = _layout.SequenceItems[sequenceProperty.SequenceIndex];
+                                        foreach (var sprite in sequenceItem.Sprites)
+                                        {
+                                            // Scale the UV coordinates
+                                            sprite.Left = (short)(sprite.Left * scaleX);
+                                            sprite.Top = (short)(sprite.Top * scaleY);
+                                            sprite.Right = (short)(sprite.Right * scaleX);
+                                            sprite.Bottom = (short)(sprite.Bottom * scaleY);
+                                        }
+                                        updatedSequences++;
+                                    }
+                                }
+                            }
+
+                            string scaleInfo = (scaleX != 1.0f || scaleY != 1.0f)
+                                ? $"\nScaled UV coordinates by {scaleX}x (width) and {scaleY}x (height) for {updatedSequences} sequence(s) using this texture."
+                                : "\nNo scaling needed - resolution unchanged.";
+
+                            MessageBox.Show($"Successfully replaced texture at index {indexToReplace}!{scaleInfo}",
+                                "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Failed to replace texture:\n{ex.Message}",
+                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }, ImdFilter);
+                    ImGui.CloseCurrentPopup();
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button("Cancel", new Vector2(120, 0)))
+                {
+                    ImGui.CloseCurrentPopup();
+                }
+
+                ImGui.EndPopup();
+            }
+
             _animationFrameCurrent++;
             return true;
         }
@@ -170,9 +282,17 @@ namespace OpenKh.Tools.LayoutEditor
             ImGui.SameLine();
             if (ImGui.Button("Add", new Vector2(50, 0)))
             {
-                var newSequenceGroup = new Layout.SequenceGroup
+                // Validate that we have sequences and textures to reference
+                if (_layout.SequenceItems.Count == 0 || _images.Count == 0)
                 {
-                    Sequences = new List<Layout.SequenceProperty>
+                    MessageBox.Show("Cannot add sequence group: No sequences or textures available.",
+                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                else
+                {
+                    var newSequenceGroup = new Layout.SequenceGroup
+                    {
+                        Sequences = new List<Layout.SequenceProperty>
             {
                 new Layout.SequenceProperty
                 {
@@ -184,12 +304,13 @@ namespace OpenKh.Tools.LayoutEditor
                     PositionY = 0
                 }
             }
-                };
+                    };
 
-                _layout.SequenceGroups.Add(newSequenceGroup);
+                    _layout.SequenceGroups.Add(newSequenceGroup);
 
-                // Select the newly created sequence group
-                SelectedLayoutIndex = _layout.SequenceGroups.Count - 1;
+                    // Select the newly created sequence group
+                    SelectedLayoutIndex = _layout.SequenceGroups.Count - 1;
+                }
             }
 
             ImGui.SameLine();
@@ -206,8 +327,8 @@ namespace OpenKh.Tools.LayoutEditor
 
             ForChild("Preview", 0, 0, false, () =>
             {
-                 float PositionX = 128f;
-                 float PositionY = 32f;
+                float PositionX = 128f;
+                float PositionY = 32f;
                 const float ViewportWidth = 2048;
                 const float ViewportHeight = 2048;
                 var width = ImGui.GetWindowContentRegionMax().X;
@@ -220,14 +341,18 @@ namespace OpenKh.Tools.LayoutEditor
 
                 _drawing.DestinationTexture = _destinationTexture;
                 _drawing.Clear(_settings.EditorBackground);
-                
-                if (Mouse.GetState().ScrollWheelValue - PastScrollValue > 0)
-                    ZoomFactor -= 0.05F;
 
-                if (Mouse.GetState().ScrollWheelValue - PastScrollValue < 0)
-                    ZoomFactor += 0.05F;
+                //Only apply zoom when mouse is hovering over this child window
+                if (ImGui.IsWindowHovered())
+                {
+                    if (Mouse.GetState().ScrollWheelValue - PastScrollValue > 0)
+                        ZoomFactor -= 0.05F;
 
-                PastScrollValue = Mouse.GetState().ScrollWheelValue;
+                    if (Mouse.GetState().ScrollWheelValue - PastScrollValue < 0)
+                        ZoomFactor += 0.05F;
+
+                    PastScrollValue = Mouse.GetState().ScrollWheelValue;
+                }
 
                 if (Keyboard.GetState().IsKeyDown(Keys.Right))
                     _renderer.PanFactorX += 5;
@@ -244,7 +369,7 @@ namespace OpenKh.Tools.LayoutEditor
 
                 _drawing.SetViewport(-PositionX, ViewportWidth - PositionX, -PositionY, ViewportHeight - PositionY);
                 _drawing.SetProjection(ViewportWidth - PositionX, ViewportHeight - PositionY, (ViewportWidth - PositionX) * ZoomFactor, (ViewportHeight - PositionY) * ZoomFactor, 1);
-            
+
                 _renderer.FrameIndex = _animationFrameCurrent;
                 _renderer.SelectedSequenceGroupIndex = SelectedLayoutIndex;
 
@@ -320,10 +445,12 @@ namespace OpenKh.Tools.LayoutEditor
                         using var stream = File.OpenRead(fileName);
                         var importedImage = Imgd.Read(stream);
 
-                        _images.Add(importedImage);
-
-                        // Create sprite texture for rendering
+                        // Create sprite texture for rendering BEFORE adding to collections
+                        // This ensures both collections stay synchronized if texture creation fails
                         var newSpriteTexture = _drawing.CreateSpriteTexture(importedImage);
+
+                        // Only add to collections if sprite texture creation succeeded
+                        _images.Add(importedImage);
                         _spriteTextures.Add(newSpriteTexture);
 
                         MessageBox.Show($"Successfully imported texture!\nNew texture index: {_images.Count - 1}",
@@ -335,6 +462,13 @@ namespace OpenKh.Tools.LayoutEditor
                             "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }, ImdFilter);
+            }
+
+            ImGui.SameLine();
+            if (ImGui.Button("Replace Texture", new Vector2(140, 0)) && _images.Count > 0)
+            {
+                _replaceTextureIndex = 0;
+                _isReplacingTexture = true;
             }
 
             ImGui.SameLine();
