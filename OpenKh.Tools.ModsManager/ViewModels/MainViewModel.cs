@@ -418,6 +418,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             }
                         }
                         ConfigurationService.Updated = false;
+                        MessageBox.Show(
+                               $"Panacea has successfully been updated alongside Mods Manager.\nIf you notice any mod loading bugs you might still want to uninstall and reinstall Panacea just in case.",
+                               "Success",
+                               MessageBoxButton.OK,
+                               MessageBoxImage.Information);
                     }
                     catch
                     {
@@ -653,7 +658,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 break;
                         }
                         GameInfoModel? game;
-                        if (launchIso != null)
+                        if (!String.IsNullOrEmpty(launchIso))
                         {
                             game = GameService.DetectGameId(launchIso);
                         }
@@ -738,7 +743,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             OpenModSearchCommand = new RelayCommand(
                 _ =>
                 {
-                    var searchWindow = new ModSearchWindow(this)
+                    var searchWindow = new ModSearchWindow(
+                        reloadModsList: () => ReloadModsList()
+                    )
                     {
                         Owner = _getActiveWindowService.GetActiveWindow(),
                         WindowStartupLocation = WindowStartupLocation.CenterOwner

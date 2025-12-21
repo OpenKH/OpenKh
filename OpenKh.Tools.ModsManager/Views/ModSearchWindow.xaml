@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=local:ModSearchVM}"
         Title="Online Mods" Height="500" Width="800"
         WindowStartupLocation="CenterOwner" Background="{Binding ColorTheme.BackgroundColor}">
     <Grid Margin="10">
@@ -19,10 +20,10 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            
+
             <TextBlock Grid.Row="0" Text="Available Online Mods" FontSize="18" FontWeight="Bold" 
                        Foreground="{Binding ColorTheme.TextColor}" VerticalAlignment="Center"/>
-            
+
             <!-- Search box -->
             <Grid Grid.Row="1" Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
@@ -30,9 +31,9 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                
+
                 <Image Grid.Column="0" Source="{StaticResource Search_16x}" Width="16" Height="16" Margin="5,0,5,0" VerticalAlignment="Center"/>
-                
+
                 <TextBox Grid.Column="1" x:Name="SearchBox" Padding="5,3" Margin="0,0,0,0"
                          Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
                          VerticalContentAlignment="Center"
@@ -60,7 +61,7 @@
                         </Style>
                     </TextBox.Style>
                 </TextBox>
-                
+
                 <Button Grid.Column="2" Content="Clear" Width="60" Margin="5,0,0,0" 
                         Command="{Binding ClearSearchCommand}" 
                         Visibility="{Binding HasSearchQuery, Converter={StaticResource BooleanToVisibilityConverter}}"/>
@@ -75,75 +76,92 @@
                 <ColumnDefinition Width="300"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Mods list with loading indicator -->
+            <!-- Mods list with top info bars including loading indicator -->
             <Grid Grid.Column="0">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding DownloadableMods}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Margin="0,5" Padding="10" Background="#22FFFFFF" BorderBrush="#33FFFFFF" BorderThickness="1" 
-                                        CornerRadius="5" Cursor="Hand" MouseLeftButtonDown="Mod_MouseLeftButtonDown">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="64"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
+                <DockPanel LastChildFill="True">
+                    <!-- Loading indicator with more detailed information -->
+                    <Grid Background="#DD000000" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" DockPanel.Dock="Top">
+                        <Border BorderBrush="#888888" BorderThickness="2">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2">
+                                <TextBlock Text="Loading mods..." FontSize="18" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding LoadingStatusText}" FontSize="14" Foreground="White" HorizontalAlignment="Center" Margin="0,2,0,2" TextWrapping="Wrap" TextAlignment="Center"/>
+                                <ProgressBar IsIndeterminate="True" Height="10" Width="250" Margin="0,2,0,2"/>
+                                <Button HorizontalAlignment="Center" Margin="0,5,0,0" Command="{Binding CancelCommand}">Cancel</Button>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
 
-                                        <!-- Mod icon -->
-                                        <Image Grid.Column="0" Width="64" Height="64" Source="{Binding IconImage}" 
-                                               RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,10,0"/>
+                    <!-- Local log messages -->
+                    <Grid Background="#DD000000" Visibility="{Binding HasLog, Converter={StaticResource BooleanToVisibilityConverter}}" DockPanel.Dock="Top">
+                        <Border BorderBrush="#888888" BorderThickness="2">
+                            <DockPanel LastChildFill="True" Margin="3">
+                                <Button Command="{Binding ClearLog}" DockPanel.Dock="Right" Margin="3,0">Clear</Button>
+                                <Button Command="{Binding ShowLog}" DockPanel.Dock="Right" Margin="3,0">Show last 100</Button>
+                                <Button Command="{Binding CopyLog}" DockPanel.Dock="Right" Margin="3,0">Copy to clipboard</Button>
+                                <TextBlock Foreground="White">Has <Run Text="{Binding NumMessages,FallbackValue=0}" /> messages</TextBlock>
+                            </DockPanel>
+                        </Border>
+                    </Grid>
 
-                                        <!-- Mod info -->
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="14" 
-                                                       TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
-                                                       Foreground="{Binding DataContext.ColorTheme.TextColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
-                                            <TextBlock Text="{Binding Author}" FontSize="12" Opacity="0.7" 
-                                                       TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
-                                                       Foreground="{Binding DataContext.ColorTheme.TextColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
-                                            <TextBlock Text="{Binding Description}" FontSize="12" TextWrapping="Wrap" MaxHeight="40" 
-                                                       TextTrimming="CharacterEllipsis" Margin="0,5,0,0"
-                                                       Foreground="{Binding DataContext.ColorTheme.TextColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
-                                        </StackPanel>
+                    <!-- Coexist empty list message and mod list by placing this Grid -->
+                    <Grid>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding DownloadableMods.View}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,5" Padding="10" Background="#22FFFFFF" BorderBrush="#33FFFFFF" BorderThickness="1" 
+                                                CornerRadius="5" Cursor="Hand" MouseLeftButtonDown="Mod_MouseLeftButtonDown">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="64"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
 
-                                        <!-- Install button -->
-                                        <Button Grid.Column="2" Content="Install" Command="{Binding InstallCommand}" 
-                                                Padding="8,3" Margin="10,0,0,0" VerticalAlignment="Center" Width="70" Height="28"
-                                                IsEnabled="{Binding IsInstalling, Converter={StaticResource InverseBooleanConverter}}">
-                                            <Button.Style>
-                                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsInstalling}" Value="True">
-                                                            <Setter Property="Content" Value="Installing..."/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Button.Style>
-                                        </Button>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                                                <!-- Mod icon -->
+                                                <Image Grid.Column="0" Width="64" Height="64" Source="{Binding IconImage}" 
+                                                       RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,10,0"/>
 
-                <!-- Loading indicator with more detailed information -->
-                <Grid Background="#DD000000" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20">
-                        <TextBlock Text="Loading mods..." FontSize="18" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding LoadingStatusText}" FontSize="14" Foreground="White" HorizontalAlignment="Center" Margin="0,5,0,10" TextWrapping="Wrap" TextAlignment="Center"/>
-                        <ProgressBar IsIndeterminate="True" Height="10" Width="250" Margin="0,10,0,10"/>
-                        <TextBlock Text="Optimized loading with caching" FontSize="12" Foreground="#AAFFFFFF" HorizontalAlignment="Center" FontStyle="Italic"/>
-                        <TextBlock Text="Press ESC to cancel" FontSize="12" Foreground="#AAFFFFFF" HorizontalAlignment="Center" Margin="0,5,0,0"/>
-                    </StackPanel>
-                </Grid>
-                
-                <!-- Empty list message -->
-                <TextBlock Text="No mods available for this game" 
-                           Visibility="{Binding HasNoMods, Converter={StaticResource BooleanToVisibilityConverter}}"
-                           HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"
-                           Foreground="{Binding ColorTheme.TextColor}"/>
+                                                <!-- Mod info -->
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="14" 
+                                                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                                                               Foreground="{Binding DataContext.ColorTheme.TextColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                    <TextBlock Text="{Binding Author}" FontSize="12" Opacity="0.7" 
+                                                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                                                               Foreground="{Binding DataContext.ColorTheme.TextColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                    <TextBlock Text="{Binding Description}" FontSize="12" TextWrapping="Wrap" MaxHeight="40" 
+                                                               TextTrimming="CharacterEllipsis" Margin="0,5,0,0"
+                                                               Foreground="{Binding DataContext.ColorTheme.TextColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                </StackPanel>
+
+                                                <!-- Install button -->
+                                                <Button Grid.Column="2" Content="Install" Command="{Binding InstallCommand}" 
+                                                        Padding="8,3" Margin="10,0,0,0" VerticalAlignment="Center" Width="70" Height="28"
+                                                        IsEnabled="{Binding IsInstalling, Converter={StaticResource InverseBooleanConverter}}">
+                                                    <Button.Style>
+                                                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsInstalling}" Value="True">
+                                                                    <Setter Property="Content" Value="Installing..."/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <!-- Empty list message -->
+                        <TextBlock Text="No mods available for this game" 
+                                   Visibility="{Binding HasNoMods, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"
+                                   Foreground="{Binding ColorTheme.TextColor}"/>
+                    </Grid>
+                </DockPanel>
             </Grid>
 
             <!-- Mod details panel -->
@@ -163,10 +181,10 @@
                                 <TextBlock Text="{Binding SelectedMod.Title}" FontWeight="Bold" FontSize="18" 
                                            TextWrapping="Wrap" Margin="0,0,0,5"
                                            Foreground="{Binding ColorTheme.TextColor}"/>
-                                           
+
                                 <TextBlock Text="{Binding SelectedMod.Author, StringFormat=Author: {0}}" FontSize="14" 
                                            Margin="0,0,0,10" Foreground="{Binding ColorTheme.TextColor}"/>
-                                           
+
                                 <TextBlock Text="Description:" FontWeight="Bold" Foreground="{Binding ColorTheme.TextColor}"/>
                                 <TextBlock Text="{Binding SelectedMod.Description}" TextWrapping="Wrap" Margin="0,5,0,10"
                                            Foreground="{Binding ColorTheme.TextColor}"/>
@@ -179,10 +197,10 @@
                                     </Hyperlink>
                                 </TextBlock>
 
-                                <!-- El botón de instalación ha sido eliminado -->
+                                <!-- Installation button has been removed from details panel -->
                             </StackPanel>
                         </Grid>
-                        
+
                         <!-- No selection message -->
                         <TextBlock Text="Select a mod to view details" 
                                    Visibility="{Binding HasSelectedMod, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
