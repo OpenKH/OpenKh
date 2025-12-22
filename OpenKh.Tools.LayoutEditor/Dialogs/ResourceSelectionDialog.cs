@@ -129,32 +129,49 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                     newTextureStream.Position = 0;
                     _textures[textureIndex].Stream = newTextureStream;
 
-                    // Update the animation's sprite UV coordinates
-                    _animations[_selectedAnimIndex].Stream.Position = 0;
-                    var sequence = Sequence.Read(_animations[_selectedAnimIndex].Stream);
+                    // Update sprite UV coordinates ONLY for sprites used by animations that reference this specific texture
+                    // We need to check if this is a sequence (2DD) or layout (2LD) file
+                    bool isSequenceFile = _animations[_selectedAnimIndex].Type == Bar.EntryType.Seqd;
 
                     int updatedSprites = 0;
-                    foreach (var sprite in sequence.Sprites)
+
+                    if (isSequenceFile)
                     {
-                        sprite.Left = (short)(sprite.Left * scaleX);
-                        sprite.Top = (short)(sprite.Top * scaleY);
-                        sprite.Right = (short)(sprite.Right * scaleX);
-                        sprite.Bottom = (short)(sprite.Bottom * scaleY);
-                        updatedSprites++;
+                        // For sequence files (2DD), all sprites in the sequence use the same texture,
+                        // so we can safely scale all sprites
+                        _animations[_selectedAnimIndex].Stream.Position = 0;
+                        var sequence = Sequence.Read(_animations[_selectedAnimIndex].Stream);
+
+                        foreach (var sprite in sequence.Sprites)
+                        {
+                            sprite.Left = (short)(sprite.Left * scaleX);
+                            sprite.Top = (short)(sprite.Top * scaleY);
+                            sprite.Right = (short)(sprite.Right * scaleX);
+                            sprite.Bottom = (short)(sprite.Bottom * scaleY);
+                            updatedSprites++;
+                        }
+
+                        // Write the updated sequence back
+                        var updatedSequenceStream = new MemoryStream();
+                        sequence.Write(updatedSequenceStream);
+                        updatedSequenceStream.Position = 0;
+                        _animations[_selectedAnimIndex].Stream = updatedSequenceStream;
+
+                        string scaleInfo = (scaleX != 1.0f || scaleY != 1.0f)
+                            ? $"\nScaled UV coordinates by {scaleX}x (width) and {scaleY}x (height) for {updatedSprites} sprite(s)."
+                            : "\nNo scaling needed - resolution unchanged.";
+
+                        MessageBox.Show($"Successfully replaced texture in BAR file!{scaleInfo}\n\nClick 'Open' to load the file with the new texture.",
+                            "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
-
-                    // Write the updated sequence back
-                    var updatedSequenceStream = new MemoryStream();
-                    sequence.Write(updatedSequenceStream);
-                    updatedSequenceStream.Position = 0;
-                    _animations[_selectedAnimIndex].Stream = updatedSequenceStream;
-
-                    string scaleInfo = (scaleX != 1.0f || scaleY != 1.0f)
-                        ? $"\nScaled UV coordinates by {scaleX}x (width) and {scaleY}x (height) for {updatedSprites} sprite(s)."
-                        : "\nNo scaling needed - resolution unchanged.";
-
-                    MessageBox.Show($"Successfully replaced texture in BAR file!{scaleInfo}\n\nClick 'Open' to load the file with the new texture.",
-                        "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    else
+                    {
+                        // For layout files (2LD), we cannot scale sprites here because we don't know
+                        // which sequence properties reference which textures without loading the full layout structure.
+                        // This scenario should be handled in AppLayoutEditor instead.
+                        MessageBox.Show($"Successfully replaced texture in BAR file!\n\nNote: For layout files (2LD), UV coordinate scaling must be done through the main editor's 'Replace Texture' feature after opening the file, which properly tracks texture-to-sequence relationships.\n\nClick 'Open' to load the file with the new texture.",
+                            "Success - Manual Scaling Required", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
                 }
                 catch (Exception ex)
                 {

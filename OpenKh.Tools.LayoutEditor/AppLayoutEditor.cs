@@ -17,6 +17,8 @@ using System.Numerics;
 using System.Windows;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 using Xe.Tools.Wpf.Dialogs;
+using OpenKh.Tools.LayoutEditor.Helpers;
+using System.Drawing;
 
 namespace OpenKh.Tools.LayoutEditor
 {
@@ -57,6 +59,11 @@ namespace OpenKh.Tools.LayoutEditor
         private bool _isOpeningSequenceEditor;
         private AppSequenceEditor _sequenceEditor;
 
+        public int GetCurrentLayoutFrameCount()
+        {
+            return _layout.GetFrameLengthFromSequenceGroup(SelectedLayoutIndex);
+        }
+
         public int SelectedLayoutIndex
         {
             get => _selectedLayoutIndex;
@@ -93,6 +100,244 @@ namespace OpenKh.Tools.LayoutEditor
             _debugRender = new DefaultDebugLayoutRenderer();
             _spriteTextures = images.Select(x => _drawing.CreateSpriteTexture(x)).ToList();
             _renderer = new LayoutRenderer(_layout, _drawing, _spriteTextures);
+        }
+
+        public void ExportCurrentLayoutAsGif(string fileName, int frameDelay = 33, int quality = 10)
+        {
+            var layout = _layout.SequenceGroups[SelectedLayoutIndex];
+            var frameCount = _layout.GetFrameLengthFromSequenceGroup(SelectedLayoutIndex);
+
+            const float OriginalViewportWidth = 512f;
+            const float RemixViewportWidth = 684f;
+            const float ViewportHeight = 416f;
+
+            // Calculate the offset needed to center the Remix viewport around the PS2 viewport
+            const float viewportOffsetX = (RemixViewportWidth - OriginalViewportWidth) / 2f;
+
+            int width = (int)RemixViewportWidth;
+            int height = (int)ViewportHeight;
+
+            using (var gifEncoder = new AnimatedGifEncoder())
+            {
+                gifEncoder.Start(fileName);
+                gifEncoder.SetDelay(frameDelay); // milliseconds per frame
+                gifEncoder.SetRepeat(0); // 0 = infinite loop
+
+                // Set transparent color BEFORE adding any frames
+                if (_settings.UseBlankBackground)
+                {
+                    // Set bright cyan (0, 255, 255) as the transparent color
+                    gifEncoder.SetTransparent(System.Drawing.Color.FromArgb(0, 255, 255));
+                }
+
+                gifEncoder.SetQuality(quality); // 1-20, lower = better quality
+                gifEncoder.SetSize(width, height);
+
+                // Set transparent color if blank background is enabled
+                if (_settings.UseBlankBackground)
+                {
+                    gifEncoder.SetTransparent(System.Drawing.Color.FromArgb(0, 255, 0)); // GREEN
+                }
+
+                // Create a sprite texture for capturing frames
+                var renderTarget = _drawing.CreateSpriteTexture(width, height);
+
+                // Save the original animation frame
+                var originalFrame = _animationFrameCurrent;
+
+                try
+                {
+                    for (int frame = 0; frame < frameCount; frame++)
+                    {
+                        _animationFrameCurrent = frame;
+
+                        // Render to the render target
+                        var actualRenderTarget = ((MonoSpriteDrawing.CSpriteTexture)renderTarget).Texture as RenderTarget2D;
+                        _graphics.SetRenderTarget(actualRenderTarget);
+
+                        // Clear with background color
+                        _drawing.DestinationTexture = renderTarget;
+                        if (_settings.UseBlankBackground)
+                        {
+                            // Clear with TRANSPARENT
+                            _graphics.Clear(new Microsoft.Xna.Framework.Color(0, 0, 0, 0));
+                        }
+                        else
+                        {
+                            _drawing.Clear(_settings.EditorBackground);
+                        }
+
+                        // Set viewport to capture the full Remix viewport area
+                        _drawing.SetViewport(0, RemixViewportWidth, 0, ViewportHeight);
+                        _drawing.SetProjection(RemixViewportWidth, ViewportHeight, RemixViewportWidth, ViewportHeight, 1);
+
+                        // Save and adjust pan factors to center the PS2 content within the Remix viewport
+                        var originalPanX = _renderer.PanFactorX;
+                        var originalPanY = _renderer.PanFactorY;
+
+                        // Offset the content by the viewport offset to center it in the Remix viewport
+                        _renderer.PanFactorX = (int)viewportOffsetX;
+                        _renderer.PanFactorY = 0;
+
+                        // Render the frame
+                        _renderer.FrameIndex = frame;
+                        _renderer.SelectedSequenceGroupIndex = SelectedLayoutIndex;
+                        _renderer.Draw();
+
+                        // Restore pan factors
+                        _renderer.PanFactorX = originalPanX;
+                        _renderer.PanFactorY = originalPanY;
+                        _drawing.Flush();
+                        _drawing.DestinationTexture = null;
+
+                        _graphics.SetRenderTarget(null);
+
+                        // Convert render target to bitmap and add to GIF
+                        var bitmap = RenderTargetToBitmapWithTransparency(
+                            (MonoSpriteDrawing.CSpriteTexture)renderTarget,
+                            _settings.UseBlankBackground);
+
+                        gifEncoder.AddFrame(bitmap);
+                        bitmap.Dispose();
+                    }
+                }
+                finally
+                {
+                    // Restore original frame
+                    _animationFrameCurrent = originalFrame;
+                    renderTarget?.Dispose();
+                }
+
+                gifEncoder.Finish();
+            }
+        }
+
+        private Bitmap RenderTargetToBitmapWithTransparency(MonoSpriteDrawing.CSpriteTexture spriteTexture, bool useTransparency)
+        {
+            var renderTarget = spriteTexture.Texture as RenderTarget2D;
+            int width = spriteTexture.Width;
+            int height = spriteTexture.Height;
+
+            byte[] data = new byte[width * height * 4];
+            renderTarget.GetData(data);
+
+            var bitmap = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var bitmapData = bitmap.LockBits(
+                new System.Drawing.Rectangle(0, 0, width, height),
+                System.Drawing.Imaging.ImageLockMode.WriteOnly,
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            for (int i = 0; i < data.Length; i += 4)
+            {
+                byte r = data[i];
+                byte g = data[i + 1];
+                byte b = data[i + 2];
+                byte a = data[i + 3];
+
+                if (useTransparency)
+                {
+                    if (a < 10)
+                    {
+                        // Fully transparent
+                        data[i] = 0;   // B
+                        data[i + 1] = 255; // G
+                        data[i + 2] = 0;   // R
+                        data[i + 3] = 255;
+                    }
+                    else
+                    {
+                        // keep RGB, make fully opaque
+                        data[i] = b;
+                        data[i + 1] = g;
+                        data[i + 2] = r;
+                        data[i + 3] = 255;
+                    }
+                }
+                else
+                {
+                    data[i] = b;
+                    data[i + 1] = g;
+                    data[i + 2] = r;
+                    data[i + 3] = 255;
+                }
+            }
+
+            System.Runtime.InteropServices.Marshal.Copy(data, 0, bitmapData.Scan0, data.Length);
+            bitmap.UnlockBits(bitmapData);
+
+            return bitmap;
+        }
+
+        public int ExportCurrentLayoutAsPngSequence(string folderPath)
+        {
+            var layout = _layout.SequenceGroups[SelectedLayoutIndex];
+            var frameCount = _layout.GetFrameLengthFromSequenceGroup(SelectedLayoutIndex);
+
+            const float RemixViewportWidth = 684f;
+            const float ViewportHeight = 416f;
+            const float OriginalViewportWidth = 512f;
+            const float viewportOffsetX = (RemixViewportWidth - OriginalViewportWidth) / 2f;
+
+            int width = (int)RemixViewportWidth;
+            int height = (int)ViewportHeight;
+
+            var renderTarget = _drawing.CreateSpriteTexture(width, height);
+            var originalFrame = _animationFrameCurrent;
+
+            try
+            {
+                for (int frame = 0; frame < frameCount; frame++)
+                {
+                    _animationFrameCurrent = frame;
+
+                    var actualRenderTarget = ((MonoSpriteDrawing.CSpriteTexture)renderTarget).Texture as RenderTarget2D;
+                    _graphics.SetRenderTarget(actualRenderTarget);
+
+                    _drawing.DestinationTexture = renderTarget;
+                    if (_settings.UseBlankBackground)
+                    {
+                        _graphics.Clear(new Microsoft.Xna.Framework.Color(0, 0, 0, 0));
+                    }
+                    else
+                    {
+                        _drawing.Clear(_settings.EditorBackground);
+                    }
+
+                    _drawing.SetViewport(0, RemixViewportWidth, 0, ViewportHeight);
+                    _drawing.SetProjection(RemixViewportWidth, ViewportHeight, RemixViewportWidth, ViewportHeight, 1);
+
+                    var originalPanX = _renderer.PanFactorX;
+                    var originalPanY = _renderer.PanFactorY;
+
+                    _renderer.PanFactorX = (int)viewportOffsetX;
+                    _renderer.PanFactorY = 0;
+
+                    _renderer.FrameIndex = frame;
+                    _renderer.SelectedSequenceGroupIndex = SelectedLayoutIndex;
+                    _renderer.Draw();
+
+                    _renderer.PanFactorX = originalPanX;
+                    _renderer.PanFactorY = originalPanY;
+                    _drawing.Flush();
+                    _drawing.DestinationTexture = null;
+
+                    _graphics.SetRenderTarget(null);
+
+                    // Save as PNG using MonoGame's built-in SaveAsPng
+                    string fileName = Path.Combine(folderPath, $"frame_{frame:D4}.png");
+                    using (var fileStream = File.Create(fileName))
+                    {
+                        actualRenderTarget.SaveAsPng(fileStream, width, height);
+                    }
+                }
+            }
+            finally
+            {
+                _animationFrameCurrent = originalFrame;
+                renderTarget?.Dispose();
+            }
+
+            return frameCount;
         }
 
         public void Menu()
@@ -418,7 +663,7 @@ namespace OpenKh.Tools.LayoutEditor
                 ReFinedViewportWidthSecond + 2, ViewportHeight + 2, backgroundColorInverse, 1);
             }
 
-             _drawing.Flush();
+            _drawing.Flush();
         }
 
         private unsafe void Timeline()

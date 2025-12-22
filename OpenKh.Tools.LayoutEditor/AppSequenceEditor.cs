@@ -43,6 +43,7 @@ namespace OpenKh.Tools.LayoutEditor
         private IntPtr _destinationTextureId;
         private List<SpriteModel> _sprites;
         private List<SpriteGroupModel> _spriteGroups;
+        private KeyboardState _previousKeyboardState;
 
         private MySequencer _sequencer;
         int _sequencerSelectedAnimation = 0;
@@ -150,6 +151,8 @@ namespace OpenKh.Tools.LayoutEditor
                 _spriteGroupEditDialog.Run();
                 ImGui.EndPopup();
             }
+
+            ProcessCopyPasteShortcuts();
 
             _sequence.Sprites = _sprites
                 .Select(x => x.Sprite)
@@ -339,7 +342,7 @@ namespace OpenKh.Tools.LayoutEditor
                 _drawing.FillRectangle(originX - 1 + _renderer.PanFactorX, -2048 + _renderer.PanFactorX, 1, Infinite, backgroundColorInverse);
                 _drawing.FillRectangle(0 + _renderer.PanFactorX - 2048, originY - 1 + _renderer.PanFactorY, Infinite, 1, backgroundColorInverse);
 
-                // FIXED: Only apply zoom when mouse is hovering over this child window
+                // Only apply zoom when mouse is hovering over this child window
                 if (ImGui.IsWindowHovered())
                 {
                     if (Mouse.GetState().ScrollWheelValue - PastScrollValue > 0)
@@ -827,11 +830,37 @@ namespace OpenKh.Tools.LayoutEditor
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_EDIT_STARTEND |
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_ADD |
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_DEL |
-                //ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_COPYPASTE |
+                // ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_COPYPASTE | I replaced it basically with a Keyboard copy paste. Simpler approach, instead of Enabling it in the UI aswell.
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_CHANGE_FRAME);
 
             if (frameIndex != frameIndexRef)
                 _animationFrameCurrent = frameIndexRef;
+        }
+
+        private void ProcessCopyPasteShortcuts()
+        {
+            var k = Keyboard.GetState();
+            var previousK = _previousKeyboardState;
+
+            // Check if Ctrl is pressed
+            if (k.IsKeyDown(Keys.LeftControl) || k.IsKeyDown(Keys.RightControl))
+            {
+                // Ctrl+C - Copy selected animation (only on key press, not hold)
+                if (k.IsKeyDown(Keys.C) && !previousK.IsKeyDown(Keys.C) &&
+                    _sequencerSelectedAnimation >= 0)
+                {
+                    _sequencer.CopyAnimation(_sequencerSelectedAnimation);
+                }
+
+                // Ctrl+V - Paste animation (only on key press, not hold)
+                if (k.IsKeyDown(Keys.V) && !previousK.IsKeyDown(Keys.V))
+                {
+                    _sequencer.Paste();
+                }
+            }
+
+            // Store current state for next frame
+            _previousKeyboardState = k;
         }
 
         private bool ImGuiFlagBox(Sequence.Animation animation, string label, int flag, bool negate = false)
