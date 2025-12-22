@@ -116,10 +116,27 @@ namespace OpenKh.Tools.LayoutEditor
         }
 
         public bool CheckerboardBackground { get; set; }
+
+        public bool UseBlankBackground
+        {
+            get => Settings.Default.UseBlankBackground;
+            set
+            {
+                Settings.Default.UseBlankBackground = value;
+                Settings.Default.Save();
+            }
+        }
+
         public ColorF EditorBackground
         {
-            get => new ColorF(Settings.Default.BgColorR, Settings.Default.BgColorG,
-                Settings.Default.BgColorB, 1f);
+            get
+            {
+                if (UseBlankBackground)
+                    return new ColorF(0f, 0f, 0f, 0f); // Fully transparent
+
+                return new ColorF(Settings.Default.BgColorR, Settings.Default.BgColorG,
+                    Settings.Default.BgColorB, 1f);
+            }
             set
             {
                 Settings.Default.BgColorR = value.R;
@@ -291,10 +308,25 @@ namespace OpenKh.Tools.LayoutEditor
                     ForMenuItem($"{LinkToPcsx2ActionName}...", "CTRL+L", MenuFileOpenPcsx2);
                     ForMenuItem("Save", "CTRL+S", MenuFileSave, CurrentEditor != null);
                     ForMenuItem("Save as...", MenuFileSaveAs, CurrentEditor != null);
+                    ImGui.Separator();
+                    ForMenuItem("Export Animation/Layout...", MenuFileExportAnimation, CurrentEditor != null);
+                    ForMenuItem("Export Texture(s)...", MenuFileExportTexture, CurrentEditor != null);
+                    ForMenuItem("Export Layout as Animated GIF...", MenuFileExportLayoutAsGif, CurrentEditor is AppLayoutEditor);
+                    ForMenuItem("Export Layout as PNG Sequence...", MenuFileExportLayoutAsPngSequence, CurrentEditor is AppLayoutEditor);
+                    ImGui.Separator();
                     ForMenuItem("Preview In-Game...", MenuFilePreview, CurrentEditor != null);
                     ImGui.Separator();
                     ForMenu("Preferences", () =>
                     {
+                        // Add the blank background toggle FIRST
+                        ForMenuCheck("Use blank background", () => UseBlankBackground, x =>
+                        {
+                            UseBlankBackground = x;
+                            OnChangeBackground?.Invoke(this, this);
+                        });
+
+                        // Then the color picker (disabled when blank is on)
+                        ImGui.BeginDisabled(UseBlankBackground);
                         var editorBackground = new Vector3(EditorBackground.R,
                             EditorBackground.G, EditorBackground.B);
                         if (ImGui.ColorEdit3("Background color", ref editorBackground))
@@ -303,6 +335,7 @@ namespace OpenKh.Tools.LayoutEditor
                                 editorBackground.Y, editorBackground.Z, 1f);
                             OnChangeBackground?.Invoke(this, this);
                         }
+                        ImGui.EndDisabled();
 
                         ForMenuCheck("Show PS2 viewport", () => ShowViewportOriginal, x => ShowViewportOriginal = x);
                         ForMenuCheck("Show ReMIX viewport", () => ShowViewportRemix, x => ShowViewportRemix = x);
@@ -330,7 +363,7 @@ namespace OpenKh.Tools.LayoutEditor
 
         private void MenuFilePreview()
         {
-            OpenPreviewDialog(); 
+            OpenPreviewDialog();
         }
 
         private void MenuFileOpenWithoutPcsx2()
@@ -369,6 +402,70 @@ namespace OpenKh.Tools.LayoutEditor
                 SaveFile(FileName, fileName);
                 FileName = fileName;
             }, Filters);
+        }
+
+        private void MenuFileExportAnimation()
+        {
+            if (CurrentEditor == null)
+                return;
+
+            var animationEntry = CurrentEditor.SaveAnimation(AnimationName ?? "export");
+
+            // Determine file extension based on Type (EntryType)
+            string extension = animationEntry.Type == Bar.EntryType.Layout ? "lad" : "sed";
+            string filterName = animationEntry.Type == Bar.EntryType.Layout ? "Layout file" : "Sequence file";
+
+            var exportFilter = FileDialogFilterComposer
+                .Compose()
+                .AddExtensions(filterName, extension)
+                .AddAllFiles();
+
+            FileDialog.OnSave(fileName =>
+            {
+                try
+                {
+                    using var stream = File.Create(fileName);
+                    animationEntry.Stream.SetPosition(0).CopyTo(stream);
+                    MessageBox.Show($"Animation/Layout exported successfully to:\n{fileName}",
+                        "Export Successful", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    ShowError($"Failed to export animation/layout:\n{ex.Message}");
+                }
+            }, exportFilter);
+        }
+
+        private void MenuFileExportTexture()
+        {
+            if (CurrentEditor == null)
+                return;
+
+            var textureEntry = CurrentEditor.SaveTexture(TextureName ?? "export");
+
+            // Determine file extension based on Type (EntryType)
+            string extension = textureEntry.Type == Bar.EntryType.Imgz ? "imz" : "imd";
+            string filterName = textureEntry.Type == Bar.EntryType.Imgz ? "Image container IMGZ" : "Image IMGD";
+
+            var exportFilter = FileDialogFilterComposer
+                .Compose()
+                .AddExtensions(filterName, extension)
+                .AddAllFiles();
+
+            FileDialog.OnSave(fileName =>
+            {
+                try
+                {
+                    using var stream = File.Create(fileName);
+                    textureEntry.Stream.SetPosition(0).CopyTo(stream);
+                    MessageBox.Show($"Texture(s) exported successfully to:\n{fileName}",
+                        "Export Successful", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    ShowError($"Failed to export texture(s):\n{ex.Message}");
+                }
+            }, exportFilter);
         }
 
         private void MenuFileExit() => _exitFlag = true;
@@ -601,37 +698,21 @@ namespace OpenKh.Tools.LayoutEditor
         private void ProcessKeyMapping()
         {
             var k = Keyboard.GetState();
-            if (k.IsKeyDown(Keys.LeftControl))
+
+            // Check if Ctrl is pressed
+            if (k.IsKeyDown(Keys.LeftControl) || k.IsKeyDown(Keys.RightControl))
             {
                 var keys = k.GetPressedKeys();
                 foreach (var key in keys)
                 {
                     if (_keyMapping.TryGetValue(key, out var action))
+                    {
+                        // Execute the action regardless of modal state
                         action();
+                    }
                 }
             }
         }
-
-        //private void OpenLayout(LayoutEntryModel layoutEntryModel)
-        //{
-        //    AnimationName = layoutEntryModel.Layout.Name;
-        //    SpriteName = layoutEntryModel.Images.Name;
-
-        //    var texturesViewModel = new TexturesViewModel(layoutEntryModel.Images.Value);
-
-        //    var layoutEditorViewModel = new LayoutEditorViewModel(this, this, EditorDebugRenderingService)
-        //    {
-        //        SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout.Value, texturesViewModel, EditorDebugRenderingService),
-        //        Layout = layoutEntryModel.Layout.Value,
-        //        Images = layoutEntryModel.Images.Value
-        //    };
-
-        //    CurrentEditor = layoutEditorViewModel;
-        //    OnControlChanged?.Invoke(new LayoutEditorView()
-        //    {
-        //        DataContext = layoutEditorViewModel
-        //    });
-        //}
 
         private bool LinkLaydToPcs2(Stream stream) =>
             LinkToPcs2(stream, Layout.MagicCodeValidator, 0x1c);
@@ -675,6 +756,82 @@ namespace OpenKh.Tools.LayoutEditor
         {
             _processStream?.Dispose();
             _processStream = null;
+        }
+
+        private void MenuFileExportLayoutAsPngSequence()
+        {
+            if (!(CurrentEditor is AppLayoutEditor layoutEditor))
+            {
+                ShowError("This feature is only available for Layout files (2LD).");
+                return;
+            }
+
+            // Let user select a folder
+            using (var folderDialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                folderDialog.Description = "Select folder to save PNG sequence";
+                folderDialog.ShowNewFolderButton = true;
+
+                if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    try
+                    {
+                        int frameCount = layoutEditor.ExportCurrentLayoutAsPngSequence(folderDialog.SelectedPath);
+
+                        MessageBox.Show(
+                            $"PNG sequence exported successfully!\n\n" +
+                            $"Location: {folderDialog.SelectedPath}\n" +
+                            $"Frames: {frameCount} files (frame_0000.png to frame_{frameCount - 1:D4}.png)\n\n",
+                            "Export Successful",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowError($"Failed to export PNG sequence:\n{ex.Message}");
+                    }
+                }
+            }
+        }
+
+        private void MenuFileExportLayoutAsGif()
+        {
+            if (!(CurrentEditor is AppLayoutEditor layoutEditor))
+            {
+                ShowError("This feature is only available for Layout files (2LD).");
+                return;
+            }
+
+            var gifFilter = FileDialogFilterComposer
+                .Compose()
+                .AddExtensions("Animated GIF", "gif")
+                .AddAllFiles();
+
+            FileDialog.OnSave(fileName =>
+            {
+                try
+                {
+                    // Default settings optimized for quality and reasonable speed
+                    // frameDelay: 33ms = ~30 FPS, 50ms = 20 FPS (smoother, less flicker)
+                    // quality: 1 = best quality (slower), 10 = balanced, 20 = fastest (lower quality)
+                    int frameDelay = 33;
+                    int quality = 10;
+
+                    layoutEditor.ExportCurrentLayoutAsGif(fileName, frameDelay, quality);
+
+                    MessageBox.Show(
+                        $"Animated GIF exported successfully to:\n{fileName}\n\n" +
+                        $"Settings: {1000 / frameDelay} FPS, Quality: {quality}/20\n\n" +
+                        $"Note: GIF format has inherent flickering on fast color transitions due to 256-color palette limitation per frame.",
+                        "Export Successful",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    ShowError($"Failed to export animated GIF:\n{ex.Message}");
+                }
+            }, gifFilter);
         }
 
         private static bool DoesContainSequenceAnimations(IEnumerable<Bar.Entry> entries) =>
