@@ -17,8 +17,8 @@
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
   </ItemGroup>
   
-  <ItemGroup>
+  <!--<ItemGroup>
     <Reference Include="System.ComponentModel.DataAnnotations" />
-  </ItemGroup>
+  </ItemGroup>-->
   
 </Project>
