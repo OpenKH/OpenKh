@@ -28,6 +28,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
         public ObservableCollection<ImportMeshOptions> MeshOptionsList { get; set; }
 
         public bool KeepShadow { get; set; }
+        public bool KeepSkeleton { get; set; }
         public byte VertexLimitPerPacket { get; set; }
         public byte MemoryLimitPerPacket { get; set; }
 
@@ -38,6 +39,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
             MeshOptionsList = new ObservableCollection<ImportMeshOptions>();
 
             KeepShadow = false;
+            KeepSkeleton = true; // Default to true (keep original skeleton)
             VertexLimitPerPacket = (byte)VifProcessor.VERTEX_LIMIT;
             MemoryLimitPerPacket = (byte)VifProcessor.MEMORY_LIMIT;
         }
@@ -115,11 +117,12 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                 return;
 
             MdlxEditorImporter.KEEP_ORIGINAL_SHADOW = KeepShadow;
+            MdlxEditorImporter.KEEP_ORIGINAL_SKELETON = KeepSkeleton;
             VifProcessor.VERTEX_LIMIT = VertexLimitPerPacket;
             VifProcessor.MEMORY_LIMIT = MemoryLimitPerPacket;
 
             List<VifProcessor.MeshOptions> newMeshOptions = new List<VifProcessor.MeshOptions>();
-            foreach(ImportMeshOptions meshOptions in MeshOptionsList)
+            foreach (ImportMeshOptions meshOptions in MeshOptionsList)
             {
                 newMeshOptions.Add(new VifProcessor.MeshOptions(meshOptions.HasColors, meshOptions.ApplyColors, meshOptions.HasNormals, meshOptions.ApplyNormals));
             }
