@@ -87,13 +87,16 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                     case Bar.EntryType.Model:
                         barEntry.Stream = new MemoryStream();
                         ModelFile.Write(barEntry.Stream);
+                        barEntry.Stream.Position = 0;
                         break;
                     case Bar.EntryType.ModelTexture:
                         barEntry.Stream = new MemoryStream();
                         TextureFile.Write(barEntry.Stream);
+                        barEntry.Stream.Position = 0;
                         break;
                     case Bar.EntryType.ModelCollision:
                         barEntry.Stream = CollisionFile.toStream();
+                        barEntry.Stream.Position = 0;
                         break;
                     default:
                         break;
@@ -111,7 +114,8 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
 
             TextureFile = MdlxEditorImporter.createModelTexture(scene, filePath);
 
-            ModelFile = MdlxEditorImporter.replaceMeshModelSkeletal(scene, ModelFile, filePath);
+            // Pass CollisionFile to the importer so it can reset bones if needed
+            ModelFile = MdlxEditorImporter.replaceMeshModelSkeletal(scene, ModelFile, filePath, CollisionFile);
         }
     }
 }

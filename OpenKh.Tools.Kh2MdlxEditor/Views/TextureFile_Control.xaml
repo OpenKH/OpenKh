@@ -13,14 +13,14 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="200" />
         </Grid.ColumnDefinitions>
-        
+
         <!-- Texture loader -->
         <DockPanel Grid.Column="0" Background="#222222">
             <Label DockPanel.Dock="Top" Foreground="White" HorizontalAlignment="Center">Texture</Label>
             <ContentControl Background="#2d2d2d" x:Name="contentFrameTexture"/>
         </DockPanel>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
-        
+
         <!-- Texture animation loader -->
         <DockPanel Grid.Column="2" Background="#222222">
             <Label DockPanel.Dock="Top" Foreground="White" HorizontalAlignment="Center">Texture Animation</Label>
@@ -32,7 +32,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            
+
             <!-- Texture list -->
             <DockPanel Grid.Row="0" LastChildFill="True">
                 <Label DockPanel.Dock="Top" Foreground="White" HorizontalAlignment="Center">Textures</Label>
@@ -40,6 +40,7 @@
                     <ListView.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Export as PNG" Click="Texture_Export"/>
+                            <MenuItem Header="Replace Texture" Click="Texture_Replace"/>
                             <MenuItem Header="Remove texture" Click="Texture_Remove" Visibility="Collapsed"/>
                             <MenuItem Header="Add texture" Click="Texture_Add" Visibility="Collapsed"/>
                         </ContextMenu>

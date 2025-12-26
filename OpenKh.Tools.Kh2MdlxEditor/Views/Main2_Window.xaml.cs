@@ -110,7 +110,14 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         }
         private void Side_Texture(object sender, EventArgs e)
         {
-            contentFrame.Content = new TextureFile_Control(mainVM.TextureFile);
+            LoadTextureControl();
+        }
+        private void LoadTextureControl()
+        {
+            if (mainVM != null && mainVM.TextureFile != null)
+            {
+                contentFrame.Content = new TextureFile_Control(mainVM.TextureFile, mainVM, LoadTextureControl);
+            }
         }
         private void Side_Collision(object sender, EventArgs e)
         {

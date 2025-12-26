@@ -16,8 +16,11 @@
         <!-- Loader -->
         <Button Margin="10" Click="Button_LoadModel" Width="200">Select model to load</Button>
 
-        <!-- Shadow -->
-        <CheckBox Margin="5" IsChecked="{Binding Path=KeepShadow, Mode=TwoWay}">Keep shadow</CheckBox>
+        <!-- Keep options -->
+        <StackPanel Margin="5" Orientation="Horizontal">
+            <CheckBox Margin="0,0,10,0" IsChecked="{Binding Path=KeepShadow, Mode=TwoWay}">Keep shadow</CheckBox>
+            <CheckBox IsChecked="{Binding Path=KeepSkeleton, Mode=TwoWay}">Keep skeleton</CheckBox>
+        </StackPanel>
 
         <!-- Limits -->
         <StackPanel Margin="10" Orientation="Horizontal">
@@ -65,8 +68,8 @@
             <!-- Import -->
             <Button Margin="0 30 0 10" Height="30" Width="70" Click="Button_Import">Import</Button>
         </StackPanel>
-        
+
         <Label Name="ErrorMessage"/>
-        
+
     </StackPanel>
 </Window>

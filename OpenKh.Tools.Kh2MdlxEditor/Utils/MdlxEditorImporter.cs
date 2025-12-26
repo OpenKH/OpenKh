@@ -5,6 +5,7 @@ using OpenKh.Kh2.Models.VIF;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.Utils
@@ -15,7 +16,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
         public static bool KEEP_ORIGINAL_SHADOW = false;
         public static bool KEEP_ORIGINAL_SKELETON = true;
 
-        public static Dictionary<int,int> materialToTexture = null;
+        public static Dictionary<int, int> materialToTexture = null;
         public static ModelTexture createModelTexture(Assimp.Scene scene, string filePath)
         {
             materialToTexture = new Dictionary<int, int>();
@@ -27,14 +28,14 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             // Note: Some materials may share a texture
             int uniqueTextureCount = 0;
             List<string> materialPaths = new List<string>();
-            for(int i = 0; i < scene.Materials.Count; i++)
+            for (int i = 0; i < scene.Materials.Count; i++)
             {
                 string texturePath = directoryPath + "\\" + Path.GetFileName(scene.Materials[i].TextureDiffuse.FilePath);
                 if (!Path.HasExtension(texturePath))
                 {
                     texturePath += ".png";
                 }
-                else if(!texturePath.EndsWith(".png"))
+                else if (!texturePath.EndsWith(".png"))
                 {
                     throw new Exception("Texture is not PNG");
                 }
@@ -65,7 +66,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             return ModelTexture.Read(tempStream);
         }
 
-        public static ModelSkeletal replaceMeshModelSkeletal(Assimp.Scene scene, ModelSkeletal oldModel, string filePath)
+        public static ModelSkeletal replaceMeshModelSkeletal(Assimp.Scene scene, ModelSkeletal oldModel, string filePath, ModelCollision collisionFile = null)
         {
             ModelSkeletal model = new ModelSkeletal();
 
@@ -74,7 +75,8 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
 
             model.ModelHeader = oldModel.ModelHeader;
             model.BoneCount = oldModel.BoneCount;
-            model.TextureCount = oldModel.TextureCount;
+            // Update texture count to match the actual number of unique textures being imported
+            model.TextureCount = (ushort)(materialToTexture?.Values.Distinct().Count() ?? oldModel.TextureCount);
             model.BoneOffset = oldModel.BoneOffset;
             model.BoneDataOffset = oldModel.BoneDataOffset;
             model.GroupCount = scene.Meshes.Count;
@@ -88,6 +90,12 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             {
                 model.Bones = getSkeleton(scene);
                 model.BoneCount = (ushort)model.Bones.Count;
+
+                // Reset all collision bones to 0 when importing new skeleton
+                if (collisionFile != null)
+                {
+                    ResetCollisionBones(collisionFile);
+                }
             }
 
             int baseAddress = VifUtils.calcBaseAddress(model.Bones.Count, model.GroupCount);
@@ -103,7 +111,6 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
                 VifMesh vifMesh = Kh2MdlxAssimp.getVifMeshFromAssimp(mesh, boneMatrices);
                 List<DmaVifPacket> dmaVifPackets = VifProcessor.vifMeshToDmaVifPackets(vifMesh);
 
-                // TEST
                 ModelSkeletal.SkeletalGroup group = VifProcessor.getSkeletalGroup(dmaVifPackets, (uint)mesh.MaterialIndex, baseAddress);
                 group.Header.TextureIndex = (uint)materialToTexture[mesh.MaterialIndex];
 
@@ -129,6 +136,18 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             return model;
         }
 
+        // Resets all collision bones to 0 to prevent crashes when referencing invalid bone indices after skeleton import
+        public static void ResetCollisionBones(ModelCollision collisionFile)
+        {
+            if (collisionFile == null || collisionFile.EntryList == null)
+                return;
+
+            foreach (var collision in collisionFile.EntryList)
+            {
+                collision.Bone = 0;
+            }
+        }
+
         public static List<ModelCommon.Bone> getSkeleton(Assimp.Scene scene)
         {
             List<ModelCommon.Bone> mdlxBones = new List<ModelCommon.Bone>();
@@ -148,9 +167,9 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
 
             // List to calc joint flag
             HashSet<int> bonesWithRig = new HashSet<int>();
-            foreach(var mesh in scene.Meshes)
+            foreach (var mesh in scene.Meshes)
             {
-                for(int i = 0; i < mesh.Bones.Count; i++)
+                for (int i = 0; i < mesh.Bones.Count; i++)
                 {
                     if (mesh.Bones[i].HasVertexWeights)
                         bonesWithRig.Add(i);
@@ -198,12 +217,13 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
 
             // Each bone has some kind of length in the Scale W value - it is unknown how it's derived except for the following
             List<bool> lengthProcessed = new List<bool>();
-            for (int i = 0; i < mdlxBones.Count; i++) {
+            for (int i = 0; i < mdlxBones.Count; i++)
+            {
                 lengthProcessed.Add(false);
             }
             foreach (ModelCommon.Bone bone in mdlxBones)
             {
-                if(bone.TranslationX != 0 && bone.TranslationY == 0 && bone.TranslationZ == 0 &&
+                if (bone.TranslationX != 0 && bone.TranslationY == 0 && bone.TranslationZ == 0 &&
                     lengthProcessed[bone.ParentIndex] == false)
                 {
                     mdlxBones[bone.ParentIndex].ScaleW = bone.TranslationX;
