@@ -225,6 +225,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility KH1RecognizedVisibility => !string.IsNullOrEmpty(_isoLocationKH1) ? Visibility.Visible : Visibility.Collapsed;
         public Visibility KH2RecognizedVisibility => !string.IsNullOrEmpty(_isoLocationKH2) ? Visibility.Visible : Visibility.Collapsed;
         public Visibility RecomRecognizedVisibility => !string.IsNullOrEmpty(_isoLocationRecom) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility OpenKhGameEngineVisible => ConfigurationService.DevView ? Visibility.Visible : Visibility.Collapsed;
 
         public bool IsGameSelected
         {

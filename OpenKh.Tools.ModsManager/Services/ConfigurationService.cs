@@ -30,7 +30,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public string ModCollectionsPath { get; internal set; }
             public string GameModPath { get; internal set; }
             public string GameDataPath { get; internal set; }
-            public int GameEdition { get; internal set; }
+            public int GameEdition { get; internal set; } = 1;
             public string IsoLocationKH2 { get; internal set; }
             public string IsoLocationKH1 { get; internal set; }
             public string IsoLocationRecom { get; internal set; }
