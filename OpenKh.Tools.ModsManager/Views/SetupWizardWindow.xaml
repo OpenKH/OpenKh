@@ -48,7 +48,7 @@
                 <StackPanel>
                     <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
                     <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
-                        <ComboBoxItem>OpenKH Game Engine</ComboBoxItem>
+                        <ComboBoxItem Visibility="{Binding OpenKhGameEngineVisible}">OpenKH Game Engine</ComboBoxItem>
                         <ComboBoxItem>PlayStation 2 using PCSX2 emulator</ComboBoxItem>
                         <ComboBoxItem>PC Release</ComboBoxItem>
                     </ComboBox>
