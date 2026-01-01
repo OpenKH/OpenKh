@@ -3,12 +3,13 @@
 USM is a container format for audio and video, provided by the CRIWARE SDK. Kingdom Hearts III uses CRIWARE mostly for its pre-rendered cutscenes.
 
 ## Format
-A good in-depth write-up of the USM format can be found [here](https://listed.to/@donmai/24921/criware-s-usm-format-part-1).
 
 With regards to Kingdom Hearts III, USM files contain:
 * **Video**: Encrypted video streams, using H264 and MPEG codecs.
 * **Audio**: Unencrypted audio streams, using the HCA codec (optional)
 * **Alpha**: Alpha masks (optional)
+
+In-depth information about the USM format can be found in the article: [Criware's USM format Part 1](https://listed.to/@donmai/24921/criware-s-usm-format-part-1)
 
 ## File List
 
@@ -45,7 +46,7 @@ Base Path: ```<Installation Path>\KINGDOM HEARTS III\Content\CriMovie\main```
 | **Folder**     | **File Name**             | **Description**                                                                             | **World**                  |
 |----------------|---------------------------|---------------------------------------------------------------------------------------------|----------------------------|
 | Base Path      | ca406_shot010.usm         | [Air Raid](https://www.youtube.com/watch?v=LXotoQgGnVo)                                     | The Caribbean              |
-| Base Path      | ew_timelapse.usm          | [Timelapse of Clouds in Tutorial Section]()                                                 | The Final World            |
+| Base Path      | ew_timelapse.usm          | Timelapse of Clouds in Tutorial Section                                                 | The Final World            |
 | Base Path      | mv_bt051.usm              | [Gambit](https://www.youtube.com/watch?v=6KhyyBBPgtU)                                       | Scala ad Caelum            |
 | Base Path      | mv_bx551_c20.usm          | [City of Superheroes (Overlay at 1:07)](https://youtu.be/5M9ixYnG7zY?t=67)                  | San Fransokyo              |
 | Base Path      | mv_bx559_c28.usm          | [Enter the Supervillain (Overlay at 1:50)](https://youtu.be/Ihd3Y8yuMZI?t=110)              | San Fransokyo              |
