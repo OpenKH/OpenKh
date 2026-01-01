@@ -5,7 +5,7 @@
 * [Editions and updates](updates.md)
 * [Worlds](worlds.md)
 * Save editing
-    * [Pawns](pawns.md)
+  * [Pawns](pawns.md)
 * Other
-    * [Battle Quotes](battlequotes.md)
-    * [USM Files (CriMovie)](crimovie.md)
+  * [Battle Quotes](battlequotes.md)
+  * [USM Files (CriMovie)](crimovie.md)
