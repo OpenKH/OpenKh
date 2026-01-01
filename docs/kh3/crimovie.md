@@ -39,7 +39,7 @@ Base Path: ```<Installation Path>\KINGDOM HEARTS III\Content\CriMovie\day1```
 
 ### main
 
-Files ending with with ```cXX``` are usually flashback scenes or overlays within a bigger cutscene.
+Files ending with ```cXX``` are usually flashback scenes or overlays within a bigger cutscene.
 
 Base Path: ```<Installation Path>\KINGDOM HEARTS III\Content\CriMovie\main```
 
