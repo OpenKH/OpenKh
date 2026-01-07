@@ -242,7 +242,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 _yamlGen.OriginalAuthor = "Unknown";
                 _yamlGen.Assets = new List<AssetFile>();
 
-                foreach (var entry in zipFile.Entries.Where(x => (x.ExternalAttributes & 0x10) != 0x10))
+                foreach (var entry in zipFile.Entries.Where(x => !string.IsNullOrEmpty(x.Name)))
                 {
                     var _str = entry.FullName;
                     var _strSplitter = _str.IndexOf('/') > -1 ? "/" : "\\";
