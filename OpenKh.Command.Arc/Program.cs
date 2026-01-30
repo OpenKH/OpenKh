@@ -87,8 +87,7 @@ namespace OpenKh.Command.Arc
 
                 if (!outputPath.StartsWith(outputDirectory + Path.DirectorySeparatorChar, comparison))
                 {
-                    Console.WriteLine($"Skipping {entry.Name} because it tried to write outside of the output directory");
-                    continue;
+                    throw new Exception($"The file {entry.Name} is outside the output directory");
                 }
 
                 using (var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None))
