@@ -1,10 +1,11 @@
-using OpenKh.Common;
 using McMaster.Extensions.CommandLineUtils;
+using OpenKh.Common;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 
 namespace OpenKh.Command.Arc
 {
@@ -72,15 +73,19 @@ namespace OpenKh.Command.Arc
 
             if (string.IsNullOrEmpty(outputDirectory))
                 outputDirectory = Path.Combine(Path.GetDirectoryName(inputFile), Path.GetFileNameWithoutExtension(inputFile));
-            Directory.CreateDirectory(outputDirectory);
+            string outputRoot = Path.TrimEndingDirectorySeparator(Path.GetFullPath(outputDirectory));
+            Directory.CreateDirectory(outputRoot);
 
             foreach (var entry in entries.Where(x => !x.IsLink))
             {
                 Console.WriteLine(entry.Name);
 
-                string outputPath = Path.GetFullPath(Path.Combine(outputDirectory, entry.Name));
+                string outputPath = Path.GetFullPath(Path.Combine(outputRoot, entry.Name));
+                var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) 
+                    ? StringComparison.OrdinalIgnoreCase 
+                    : StringComparison.Ordinal;
 
-                if (!outputPath.StartsWith(outputDirectory))
+                if (!outputPath.StartsWith(outputDirectory + Path.DirectorySeparatorChar, comparison))
                 {
                     Console.WriteLine($"Skipping {entry.Name} because it tried to write outside of the output directory");
                     continue;
