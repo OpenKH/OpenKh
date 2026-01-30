@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
+using System.ComponentModel;
 
 namespace OpenKh.Command.Arc
 {
@@ -78,10 +80,18 @@ namespace OpenKh.Command.Arc
             {
                 Console.WriteLine(entry.Name);
 
-                File.Create(Path.Combine(outputDirectory, entry.Name)).Using(stream =>
+                string outputPath = Path.GetFullPath(Path.Combine(outputDirectory, entry.Name));
+
+                if (!outputPath.StartsWith(outputDirectory))
+                {
+                    Console.WriteLine($"Skipping {entry.Name} because it tried to write outside of the output directory");
+                    continue;
+                }
+
+                using (var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
                     stream.Write(entry.Data, 0, entry.Data.Length);
-                });
+                }
             }
 
             File.CreateText(Path.Combine(outputDirectory, "@ARC.txt")).Using(stream =>
