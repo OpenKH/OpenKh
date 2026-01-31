@@ -1,10 +1,11 @@
-using OpenKh.Common;
 using McMaster.Extensions.CommandLineUtils;
+using OpenKh.Common;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 
 namespace OpenKh.Command.Arc
 {
@@ -72,16 +73,27 @@ namespace OpenKh.Command.Arc
 
             if (string.IsNullOrEmpty(outputDirectory))
                 outputDirectory = Path.Combine(Path.GetDirectoryName(inputFile), Path.GetFileNameWithoutExtension(inputFile));
-            Directory.CreateDirectory(outputDirectory);
+            string outputRoot = Path.TrimEndingDirectorySeparator(Path.GetFullPath(outputDirectory));
+            Directory.CreateDirectory(outputRoot);
 
             foreach (var entry in entries.Where(x => !x.IsLink))
             {
                 Console.WriteLine(entry.Name);
 
-                File.Create(Path.Combine(outputDirectory, entry.Name)).Using(stream =>
+                string outputPath = Path.GetFullPath(Path.Combine(outputRoot, entry.Name));
+                var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) 
+                    ? StringComparison.OrdinalIgnoreCase 
+                    : StringComparison.Ordinal;
+
+                if (!outputPath.StartsWith(outputDirectory + Path.DirectorySeparatorChar, comparison))
+                {
+                    throw new Exception($"The file {entry.Name} is outside the output directory");
+                }
+
+                using (var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
                     stream.Write(entry.Data, 0, entry.Data.Length);
-                });
+                }
             }
 
             File.CreateText(Path.Combine(outputDirectory, "@ARC.txt")).Using(stream =>
