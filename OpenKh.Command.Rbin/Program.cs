@@ -221,7 +221,6 @@ namespace OpenKh.Command.Rbin
                 }
                 else
                 {
-                    //var writeStream = File.OpenWrite(outPath);
                     using var writeStream = new FileStream(outPath, FileMode.Create, FileAccess.Write, FileShare.None);
                     writeStream.Write(stream.ReadBytes((int)tocEntry.Size));
                 }
