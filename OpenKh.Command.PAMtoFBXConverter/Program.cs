@@ -67,8 +67,13 @@ namespace OpenKh.Command.PAMtoFBXConverter
             pmoStream.Close();
             pamStream.Close();
 
+
+            var OutputName = "Test.fbx";
+            var OutputPath = ".";
+            var FullPath = Path.GetFullPath(Path.Combine(OutputPath, OutputName));
+
             using var ctx = new AssimpContext();
-            ctx.ExportFile(nScene, "Test.fbx", "fbx");
+            ctx.ExportFile(nScene, FullPath, "fbx");
             
         }
 
