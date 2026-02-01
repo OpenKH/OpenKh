@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace OpenKh.Command.Bar
 {
@@ -92,7 +93,16 @@ namespace OpenKh.Command.Bar
                 var binarc = Core.ImportProject(InputProject, out var originalFileName);
 
                 if (string.IsNullOrEmpty(OutputFile))
-                    OutputFile = Path.Combine(baseDirectory, originalFileName);
+                    OutputFile = Path.GetFullPath(Path.Combine(baseDirectory, originalFileName));
+
+                var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
+
+                if (!OutputFile.StartsWith(baseDirectory + Path.DirectorySeparatorChar, comparison))
+                {
+                    throw new Exception($"The file {originalFileName} is outside the output directory");
+                }
 
                 if (!File.Exists(OutputFile) && Directory.Exists(OutputFile) &&
                     File.GetAttributes(OutputFile).HasFlag(FileAttributes.Directory))

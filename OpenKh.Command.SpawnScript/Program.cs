@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace OpenKh.Command.SpawnScript
 {
@@ -57,9 +58,24 @@ namespace OpenKh.Command.SpawnScript
 
             protected int OnExecute(CommandLineApplication app)
             {
-                OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), $"{Path.GetFileNameWithoutExtension(InputPath)}.txt");
-                var spawnScript = File.OpenRead(InputPath).Using(AreaDataScript.Read);
-                File.WriteAllText(OutputPath, AreaDataScript.Decompile(spawnScript));
+                var OutputName = $"{Path.GetFileNameWithoutExtension(InputPath)}.txt";
+                OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), OutputName);
+                if (!String.IsNullOrEmpty(OutputPath))
+                {
+                    var spawnScript = File.OpenRead(InputPath).Using(AreaDataScript.Read);
+
+                    var fullPath = Path.GetFullPath(OutputPath);
+                    var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
+
+                    if (!fullPath.StartsWith(InputPath + Path.DirectorySeparatorChar, comparison))
+                    {
+                        throw new Exception($"The file {OutputName} is outside the output directory");
+                    }
+
+                    File.WriteAllText(fullPath, AreaDataScript.Decompile(spawnScript));
+                }
                 return 0;
             }
         }
@@ -76,9 +92,24 @@ namespace OpenKh.Command.SpawnScript
 
             protected int OnExecute(CommandLineApplication app)
             {
-                OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), $"{Path.GetFileNameWithoutExtension(InputPath)}.spawnscript");
-                var spawnScript = AreaDataScript.Compile(File.ReadAllText(InputPath));
-                File.Create(OutputPath).Using(stream => AreaDataScript.Write(stream, spawnScript));
+                var OutputName = $"{Path.GetFileNameWithoutExtension(InputPath)}.spawnscript";
+                OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), OutputName);
+                if (!String.IsNullOrEmpty(OutputPath))
+                {
+                    var spawnScript = AreaDataScript.Compile(File.ReadAllText(InputPath));
+                    var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
+
+                    var fullPath = Path.GetFullPath(OutputPath);
+
+                    if (!fullPath.StartsWith(InputPath + Path.DirectorySeparatorChar, comparison))
+                    {
+                        throw new Exception($"The file {OutputName} is outside the output directory");
+                    }
+                    using var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                    AreaDataScript.Write(stream, spawnScript);
+                }
                 return 0;
             }
         }

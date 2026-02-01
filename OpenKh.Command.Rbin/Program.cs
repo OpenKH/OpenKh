@@ -1,12 +1,13 @@
-using OpenKh.Common;
 using McMaster.Extensions.CommandLineUtils;
+using OpenKh.Common;
+using OpenKh.Common.Exceptions;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.ComponentModel.DataAnnotations;
-using OpenKh.Common.Exceptions;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace OpenKh.Command.Rbin
 {
@@ -203,7 +204,15 @@ namespace OpenKh.Command.Rbin
         {
             try
             {
-                var outPath = Path.Combine(outputFolder, tocEntry.Name);
+                var outPath = Path.GetFullPath(Path.Combine(outputFolder, tocEntry.Name));
+                var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
+
+                if (!outPath.StartsWith(outputFolder + Path.DirectorySeparatorChar, comparison))
+                {
+                    throw new Exception($"The file {tocEntry.Name} is outside the output directory");
+                }
 
                 stream.Seek(tocEntry.Offset, SeekOrigin.Begin);
                 if (tocEntry.IsCompressed)
@@ -212,9 +221,9 @@ namespace OpenKh.Command.Rbin
                 }
                 else
                 {
-                    var writeStream = File.OpenWrite(outPath);
+                    //var writeStream = File.OpenWrite(outPath);
+                    using var writeStream = new FileStream(outPath, FileMode.Create, FileAccess.Write, FileShare.None);
                     writeStream.Write(stream.ReadBytes((int)tocEntry.Size));
-                    writeStream.Close();
                 }
 
                 return true;
