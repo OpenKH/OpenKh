@@ -340,7 +340,9 @@ namespace OpenKh.Command.PmpConverter
                     throw new Exception($"Material '{mat.Name}' has no diffuse texture specified");
                 }
 
-                var texPath = Path.GetFullPath(mat.TextureDiffuse.FilePath);
+                var texPath = Path.IsPathRooted(mat.TextureDiffuse.FilePath)
+                    ? Path.GetFullPath(mat.TextureDiffuse.FilePath)
+                    : Path.GetFullPath(Path.Combine(baseFilePath, mat.TextureDiffuse.FilePath));
 
                 var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? StringComparison.OrdinalIgnoreCase
