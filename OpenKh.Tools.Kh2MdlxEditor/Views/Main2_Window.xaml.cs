@@ -197,17 +197,13 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 {
 
                     string dirPath;
-                    if (String.IsNullOrEmpty(sfd.FileName))
-                    {
-                        throw new Exception("No filename provided");
-                    }
 
                     dirPath = Path.GetDirectoryName(sfd.FileName);
 
                     if (!Directory.Exists(dirPath))
                         return;
 
-                    dirPath += "\\";
+                    dirPath += Path.DirectorySeparatorChar;
 
                     AssimpGeneric.ExportScene(scene, fileFormat, sfd.FileName);
                     exportTextures(dirPath);

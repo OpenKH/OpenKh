@@ -329,7 +329,11 @@ namespace OpenKh.Command.PmpConverter
             const float Scale = 1.0f;
             var assimp = new Assimp.AssimpContext();
             var scene = assimp.ImportFile(filePath, Assimp.PostProcessSteps.PreTransformVertices);
-            var baseFilePath = Path.GetDirectoryName(filePath) ?? ".";
+            var baseFilePath = Path.GetDirectoryName(filePath);
+            if (String.IsNullOrEmpty(baseFilePath))
+            {
+                baseFilePath = ".";
+            }
             TexList = new List<string>();
             TextureData = new List<Tm2>();
 
