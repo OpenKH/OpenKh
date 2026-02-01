@@ -85,7 +85,7 @@ namespace OpenKh.Command.Arc
                     ? StringComparison.OrdinalIgnoreCase 
                     : StringComparison.Ordinal;
 
-                if (!outputPath.StartsWith(outputDirectory + Path.DirectorySeparatorChar, comparison))
+                if (!outputPath.StartsWith(Path.GetFullPath(outputRoot + Path.DirectorySeparatorChar), comparison))
                 {
                     throw new Exception($"The file {entry.Name} is outside the output directory");
                 }

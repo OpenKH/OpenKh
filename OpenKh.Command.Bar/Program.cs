@@ -92,23 +92,33 @@ namespace OpenKh.Command.Bar
                 var baseDirectory = Path.GetDirectoryName(InputProject);
                 var binarc = Core.ImportProject(InputProject, out var originalFileName);
 
+                var OutputBaseDirectory = baseDirectory;
+                var OutputFileName = originalFileName;
+
                 if (string.IsNullOrEmpty(OutputFile))
-                    OutputFile = Path.GetFullPath(Path.Combine(baseDirectory, originalFileName));
+                {
+                    OutputFile = Path.Combine(OutputBaseDirectory, OutputFileName);
+                }
+
+                if (!File.Exists(OutputFile) && Directory.Exists(OutputFile) &&
+                    File.GetAttributes(OutputFile).HasFlag(FileAttributes.Directory))
+                {
+                    OutputBaseDirectory = OutputFile;
+                    OutputFile = Path.Combine(OutputBaseDirectory, originalFileName);
+                }
+
+                var fullPath = Path.GetFullPath(OutputFile);
 
                 var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? StringComparison.OrdinalIgnoreCase
                     : StringComparison.Ordinal;
 
-                if (!OutputFile.StartsWith(baseDirectory + Path.DirectorySeparatorChar, comparison))
+                if (!fullPath.StartsWith(Path.GetFullPath(OutputBaseDirectory + Path.DirectorySeparatorChar), comparison))
                 {
                     throw new Exception($"The file {originalFileName} is outside the output directory");
                 }
 
-                if (!File.Exists(OutputFile) && Directory.Exists(OutputFile) &&
-                    File.GetAttributes(OutputFile).HasFlag(FileAttributes.Directory))
-                    OutputFile = Path.Combine(OutputFile, originalFileName);
-
-                using var outputStream = File.Create(OutputFile);
+                using var outputStream = File.Create(fullPath);
                 Kh2.Bar.Write(outputStream, binarc);
 
                 foreach (var entry in binarc)

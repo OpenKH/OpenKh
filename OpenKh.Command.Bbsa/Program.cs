@@ -3,9 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Text;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 
 namespace OpenKh.Command.Bbsa
@@ -291,9 +292,13 @@ namespace OpenKh.Command.Bbsa
                 entryName = entryName.Replace(c, '_');
 
             var dest = Path.GetFullPath(Path.Combine(baseDir, entryName));
-            var fullBase = Path.GetFullPath(baseDir) + Path.DirectorySeparatorChar;
+            var fullBase = Path.GetFullPath(baseDir + Path.DirectorySeparatorChar);
 
-            if (!dest.StartsWith(fullBase, StringComparison.OrdinalIgnoreCase))
+            var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
+
+            if (!dest.StartsWith(fullBase, comparison))
                 throw new InvalidOperationException($"Unsafe archive path: {entryName}");
 
             return dest;

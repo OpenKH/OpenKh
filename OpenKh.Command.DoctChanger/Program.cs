@@ -83,7 +83,7 @@ namespace OpenKh.Command.DoctChanger
                     ? StringComparison.OrdinalIgnoreCase
                     : StringComparison.Ordinal;
 
-                    if (!mapOut.StartsWith(Output + Path.DirectorySeparatorChar, comparison))
+                    if (!mapOut.StartsWith(Path.GetFullPath(Output + Path.DirectorySeparatorChar), comparison))
                     {
                         throw new Exception($"The file {fileName} is outside the output directory");
                     }

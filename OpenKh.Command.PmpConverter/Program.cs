@@ -329,19 +329,24 @@ namespace OpenKh.Command.PmpConverter
             const float Scale = 1.0f;
             var assimp = new Assimp.AssimpContext();
             var scene = assimp.ImportFile(filePath, Assimp.PostProcessSteps.PreTransformVertices);
-            var baseFilePath = Path.GetDirectoryName(filePath);
+            var baseFilePath = Path.GetDirectoryName(filePath) ?? ".";
             TexList = new List<string>();
             TextureData = new List<Tm2>();
 
             foreach (Assimp.Material mat in scene.Materials)
             {
+                if (String.IsNullOrEmpty(mat.TextureDiffuse.FilePath))
+                {
+                    throw new Exception($"Material '{mat.Name}' has no diffuse texture specified");
+                }
+
                 var texPath = Path.GetFullPath(mat.TextureDiffuse.FilePath);
 
                 var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? StringComparison.OrdinalIgnoreCase
                     : StringComparison.Ordinal;
 
-                if (!texPath.StartsWith(baseFilePath + Path.DirectorySeparatorChar, comparison))
+                if (!texPath.StartsWith(Path.GetFullPath(baseFilePath + Path.DirectorySeparatorChar), comparison))
                 {
                     throw new Exception($"The file {texPath} is outside the output directory");
                 }

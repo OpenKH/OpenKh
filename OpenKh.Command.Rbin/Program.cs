@@ -209,7 +209,7 @@ namespace OpenKh.Command.Rbin
                     ? StringComparison.OrdinalIgnoreCase
                     : StringComparison.Ordinal;
 
-                if (!outPath.StartsWith(outputFolder + Path.DirectorySeparatorChar, comparison))
+                if (!outPath.StartsWith(Path.GetFullPath(outputFolder + Path.DirectorySeparatorChar), comparison))
                 {
                     throw new Exception($"The file {tocEntry.Name} is outside the output directory");
                 }

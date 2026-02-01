@@ -59,7 +59,8 @@ namespace OpenKh.Command.SpawnScript
             protected int OnExecute(CommandLineApplication app)
             {
                 var OutputName = $"{Path.GetFileNameWithoutExtension(InputPath)}.txt";
-                OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), OutputName);
+                var OutputBaseDir = Path.GetDirectoryName(InputPath);
+                OutputPath ??= Path.Combine(OutputBaseDir, OutputName);
                 if (!String.IsNullOrEmpty(OutputPath))
                 {
                     var spawnScript = File.OpenRead(InputPath).Using(AreaDataScript.Read);
@@ -69,7 +70,7 @@ namespace OpenKh.Command.SpawnScript
                     ? StringComparison.OrdinalIgnoreCase
                     : StringComparison.Ordinal;
 
-                    if (!fullPath.StartsWith(InputPath + Path.DirectorySeparatorChar, comparison))
+                    if (!fullPath.StartsWith(Path.GetFullPath(OutputBaseDir + Path.DirectorySeparatorChar), comparison))
                     {
                         throw new Exception($"The file {OutputName} is outside the output directory");
                     }
@@ -93,7 +94,8 @@ namespace OpenKh.Command.SpawnScript
             protected int OnExecute(CommandLineApplication app)
             {
                 var OutputName = $"{Path.GetFileNameWithoutExtension(InputPath)}.spawnscript";
-                OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), OutputName);
+                var OutputBaseDir = Path.GetDirectoryName(InputPath);
+                OutputPath ??= Path.Combine(OutputBaseDir, OutputName);
                 if (!String.IsNullOrEmpty(OutputPath))
                 {
                     var spawnScript = AreaDataScript.Compile(File.ReadAllText(InputPath));
@@ -103,7 +105,7 @@ namespace OpenKh.Command.SpawnScript
 
                     var fullPath = Path.GetFullPath(OutputPath);
 
-                    if (!fullPath.StartsWith(InputPath + Path.DirectorySeparatorChar, comparison))
+                    if (!fullPath.StartsWith(Path.GetFullPath(OutputBaseDir + Path.DirectorySeparatorChar), comparison))
                     {
                         throw new Exception($"The file {OutputName} is outside the output directory");
                     }
