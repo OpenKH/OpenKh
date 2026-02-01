@@ -223,7 +223,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
 
                 string fileName = "Texture" + i.ToString("D4");
                 string fullPath = filePath + fileName;
-                string finalPath = Path.GetFullPath(fullPath);
+                string finalPath = fullPath;
 
                 int repeat = 0;
                 while (File.Exists(finalPath))
@@ -231,6 +231,8 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                     repeat++;
                     finalPath = fullPath + " (" + repeat + ")";
                 }
+
+                finalPath = Path.GetFullPath(finalPath);
 
                 var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? StringComparison.OrdinalIgnoreCase
