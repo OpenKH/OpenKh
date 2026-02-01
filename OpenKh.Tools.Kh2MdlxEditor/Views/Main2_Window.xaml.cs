@@ -6,6 +6,7 @@ using OpenKh.Tools.Kh2MdlxEditor.ViewModels;
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -194,7 +195,14 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 sfd.ShowDialog();
                 if (sfd.FileName != "")
                 {
-                    string dirPath = System.IO.Path.GetDirectoryName(sfd.FileName);
+
+                    string dirPath;
+                    if (String.IsNullOrEmpty(sfd.FileName))
+                    {
+                        throw new Exception("No filename provided");
+                    }
+
+                    dirPath = Path.GetDirectoryName(sfd.FileName);
 
                     if (!Directory.Exists(dirPath))
                         return;
@@ -213,8 +221,10 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 ModelTexture.Texture texture = mainVM.TextureFile.Images[i];
                 BitmapSource bitmapImage = texture.GetBimapSource();
 
-                string fullPath = filePath + "Texture" + i.ToString("D4");
-                string finalPath = fullPath;
+                string fileName = "Texture" + i.ToString("D4");
+                string fullPath = filePath + fileName;
+                string finalPath = Path.GetFullPath(fullPath);
+
                 int repeat = 0;
                 while (File.Exists(finalPath))
                 {
@@ -222,7 +232,16 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                     finalPath = fullPath + " (" + repeat + ")";
                 }
 
-                AssimpGeneric.ExportBitmapSourceAsPng(bitmapImage, fullPath);
+                var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
+
+                if (!finalPath.StartsWith(filePath + Path.DirectorySeparatorChar, comparison))
+                {
+                    throw new Exception($"The file {fileName} is outside the output directory");
+                }
+
+                AssimpGeneric.ExportBitmapSourceAsPng(bitmapImage, finalPath);
             }
         }
         public void reloadModelControl()
