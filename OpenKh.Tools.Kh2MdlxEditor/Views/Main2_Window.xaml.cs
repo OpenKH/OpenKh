@@ -236,7 +236,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                     ? StringComparison.OrdinalIgnoreCase
                     : StringComparison.Ordinal;
 
-                if (!finalPath.StartsWith(filePath + Path.DirectorySeparatorChar, comparison))
+                if (!finalPath.StartsWith(filePath, comparison))
                 {
                     throw new Exception($"The file {fileName} is outside the output directory");
                 }
