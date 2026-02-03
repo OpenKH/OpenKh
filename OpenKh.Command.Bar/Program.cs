@@ -109,14 +109,17 @@ namespace OpenKh.Command.Bar
 
                 var fullPath = Path.GetFullPath(OutputFile);
 
+                /*
                 var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? StringComparison.OrdinalIgnoreCase
                     : StringComparison.Ordinal;
 
+                
                 if (!fullPath.StartsWith(Path.GetFullPath(OutputBaseDirectory + Path.DirectorySeparatorChar), comparison))
                 {
                     throw new Exception($"The file {originalFileName} is outside the output directory");
                 }
+                */
 
                 using var outputStream = File.Create(fullPath);
                 Kh2.Bar.Write(outputStream, binarc);
