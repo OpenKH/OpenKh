@@ -90,6 +90,10 @@ namespace OpenKh.Command.Bar
             protected int OnExecute(CommandLineApplication app)
             {
                 var baseDirectory = Path.GetDirectoryName(InputProject);
+                if (String.IsNullOrEmpty(baseDirectory))
+                {
+                    baseDirectory = Environment.CurrentDirectory;
+                }
                 var binarc = Core.ImportProject(InputProject, out var originalFileName);
 
                 var OutputBaseDirectory = baseDirectory;
@@ -100,26 +104,13 @@ namespace OpenKh.Command.Bar
                     OutputFile = Path.Combine(OutputBaseDirectory, OutputFileName);
                 }
 
-                if (!File.Exists(OutputFile) && Directory.Exists(OutputFile) &&
-                    File.GetAttributes(OutputFile).HasFlag(FileAttributes.Directory))
+                if (!File.Exists(OutputFile) && Directory.Exists(OutputFile))
                 {
                     OutputBaseDirectory = OutputFile;
                     OutputFile = Path.Combine(OutputBaseDirectory, originalFileName);
                 }
 
                 var fullPath = Path.GetFullPath(OutputFile);
-
-                /*
-                var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                    ? StringComparison.OrdinalIgnoreCase
-                    : StringComparison.Ordinal;
-
-                
-                if (!fullPath.StartsWith(Path.GetFullPath(OutputBaseDirectory + Path.DirectorySeparatorChar), comparison))
-                {
-                    throw new Exception($"The file {originalFileName} is outside the output directory");
-                }
-                */
 
                 using var outputStream = File.Create(fullPath);
                 Kh2.Bar.Write(outputStream, binarc);
