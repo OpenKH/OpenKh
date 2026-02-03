@@ -1,13 +1,14 @@
 using McMaster.Extensions.CommandLineUtils;
-using OpenKh.Kh2;
+using OpenKh.Command.DoctChanger.Utils;
 using OpenKh.Common;
+using OpenKh.Kh2;
+using OpenKh.Kh2.Utils;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Reflection;
 using System.Linq;
-using OpenKh.Kh2.Utils;
-using OpenKh.Command.DoctChanger.Utils;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace OpenKh.Command.DoctChanger
 {
@@ -76,7 +77,16 @@ namespace OpenKh.Command.DoctChanger
                 {
                     Console.WriteLine(mapIn);
 
-                    var mapOut = Path.Combine(Output, Path.GetFileName(mapIn));
+                    var fileName = Path.GetFileName(mapIn);
+                    var mapOut = Path.GetFullPath(Path.Combine(Output, fileName));
+                    var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
+
+                    if (!mapOut.StartsWith(Path.GetFullPath(Output + Path.DirectorySeparatorChar), comparison))
+                    {
+                        throw new Exception($"The file {fileName} is outside the output directory");
+                    }
 
                     var entries = File.OpenRead(mapIn).Using(s => Bar.Read(s))
                         .Select(

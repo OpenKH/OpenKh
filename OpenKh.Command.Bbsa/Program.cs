@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Text;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
 
 namespace OpenKh.Command.Bbsa
 {
@@ -140,10 +142,9 @@ namespace OpenKh.Command.Bbsa
                     if (bbsaFileStream == null)
                         continue;
 
-                    var destinationFileName = Path.Combine(Path.Combine(outputDir, $"{prefix}{file.ArchiveIndex}"), name);
-                    var destinationFolder = Path.GetDirectoryName(destinationFileName);
-                    if (!Directory.Exists(destinationFolder))
-                        Directory.CreateDirectory(destinationFolder);
+                    var baseDir = Path.Combine(outputDir, $"{prefix}{file.ArchiveIndex}");
+                    var destinationFileName = MakeSafeDestination(baseDir, name);
+                    Directory.CreateDirectory(Path.GetDirectoryName(destinationFileName)!);
                     streams[0].Position = file.Location + 4;
                     
                     Bbs.Bbsa.CalculateArchiveOffset(bbsa.GetHeader(), file.offset, out var nuind, out var coffs);
@@ -178,8 +179,8 @@ namespace OpenKh.Command.Bbsa
                     }
 
 
-                    using (var outStream = File.Create(destinationFileName))
-                        bbsaFileStream.CopyTo(outStream);
+                    using var outStream = File.Create(destinationFileName);
+                    bbsaFileStream.CopyTo(outStream);
                 }
 
                 if (log)
@@ -280,5 +281,27 @@ namespace OpenKh.Command.Bbsa
 
         private static bool DoesContainBbsa(string path, string prefix) =>
             File.Exists(Path.Combine(path, $"{prefix}{0}.DAT"));
+
+        private static string MakeSafeDestination(string baseDir, string entryName)
+        {
+            // Prevent absolute paths
+            entryName = entryName.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            // Replace invalid filename chars (optional; you can be stricter)
+            foreach (var c in Path.GetInvalidPathChars())
+                entryName = entryName.Replace(c, '_');
+
+            var dest = Path.GetFullPath(Path.Combine(baseDir, entryName));
+            var fullBase = Path.GetFullPath(baseDir + Path.DirectorySeparatorChar);
+
+            var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
+
+            if (!dest.StartsWith(fullBase, comparison))
+                throw new InvalidOperationException($"Unsafe archive path: {entryName}");
+
+            return dest;
+        }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace OpenKh.Command.Bar
 {
@@ -89,16 +90,29 @@ namespace OpenKh.Command.Bar
             protected int OnExecute(CommandLineApplication app)
             {
                 var baseDirectory = Path.GetDirectoryName(InputProject);
+                if (String.IsNullOrEmpty(baseDirectory))
+                {
+                    baseDirectory = Environment.CurrentDirectory;
+                }
                 var binarc = Core.ImportProject(InputProject, out var originalFileName);
 
+                var OutputBaseDirectory = baseDirectory;
+                var OutputFileName = originalFileName;
+
                 if (string.IsNullOrEmpty(OutputFile))
-                    OutputFile = Path.Combine(baseDirectory, originalFileName);
+                {
+                    OutputFile = Path.Combine(OutputBaseDirectory, OutputFileName);
+                }
 
-                if (!File.Exists(OutputFile) && Directory.Exists(OutputFile) &&
-                    File.GetAttributes(OutputFile).HasFlag(FileAttributes.Directory))
-                    OutputFile = Path.Combine(OutputFile, originalFileName);
+                if (!File.Exists(OutputFile) && Directory.Exists(OutputFile))
+                {
+                    OutputBaseDirectory = OutputFile;
+                    OutputFile = Path.Combine(OutputBaseDirectory, originalFileName);
+                }
 
-                using var outputStream = File.Create(OutputFile);
+                var fullPath = Path.GetFullPath(OutputFile);
+
+                using var outputStream = File.Create(fullPath);
                 Kh2.Bar.Write(outputStream, binarc);
 
                 foreach (var entry in binarc)
