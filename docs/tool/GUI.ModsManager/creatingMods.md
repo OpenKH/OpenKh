@@ -41,6 +41,7 @@ This document will focus on teaching you how to create mods using the OpenKH Mod
       * [soundinfo](#soundinfo-source-example)
       * [place](#place-source-example)
       * [jigsaw](#jigsaw-source-example)
+      * [slct](#slct-source-example)
   * [bbsarc](#bbsarc-bbs)
   * [Example of a Fully Complete `mod.yml` File](#an-example-of-a-fully-complete-modyml-can-be-seen-below-and-the-full-source-of-the-mod-can-be-seen-here)
 * [Generating a Simple `mod.yml` for New Mod Authors](#generating-a-simple-modyml-for-new-mod-authors)
@@ -332,6 +333,7 @@ Asset Example
  * `soundinfo`
  * `place`
  * `jigsaw`
+ * `slct`
 
 Asset Example
 ```
@@ -862,6 +864,31 @@ Sora:
   JigsawIdWorld: 99
   Unk07: 0
   Unk08: 0
+```
+### `slct` Source Example
+```
+- Id: 1
+  ChoiceNum: 4 #Amount of options
+  ChoiceDefault: 3 #Option to default to
+  Choice:
+  - Id: 0 #Choice "Function"
+    MessageId: 0 #MessageID to assign to the Choice
+  - Id: 1
+    MessageId: 1
+  - Id: 2
+    MessageId: 2
+  - Id: 3
+    MessageId: 3
+  BaseSequence: 12 #Signed short, can be negative
+  TitleSequence: 13 #Signed short, can be negative
+  Information: 14
+  EntryId: 15
+  Task: 16
+  PauseMode: 17
+  Flag: 18
+  SoundPause: 19
+  Padding: #There are 25 padding bytes in total
+  - 0
 ```
 
 * `synthpatch` (KH2) - Modifies Mixdata.bar, a file used for various properties related to synthesis in KH2. 
