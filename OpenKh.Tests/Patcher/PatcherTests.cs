@@ -3188,6 +3188,94 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
+        public void ListPatchSlctTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "14mission.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "slct",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "SlctList.yml",
+                                        Type = "slct"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "14mission.bar")).Using(stream =>
+            {
+                var slctEntry = new List<Kh2.Slct>()
+                {
+                    new Kh2.Slct
+                    {
+                        Id = 1,
+                        ChoiceNum = 2,
+                        ChoiceDefault = 3,
+                        Choice = Enumerable.Range(0, 4).Select(_ => new Kh2.ChoiceEntry { Id = 0, MessageId = 0 }).ToArray(),
+                        Padding = new byte[25]
+                    }
+                    };
+                using var slctStream = new MemoryStream();
+                Kh2.Slct.Write(slctStream, slctEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "slct",
+                        Type = Bar.EntryType.List,
+                        Stream = slctStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "SlctList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- Id: 1");
+                writer.WriteLine("  ChoiceNum: 2");
+                writer.WriteLine("  ChoiceDefault: 3");
+                writer.WriteLine("  Choice:");
+                writer.WriteLine("  - Id: 0");
+                writer.WriteLine("    MessageId: 0");
+                writer.WriteLine("  Padding:");
+                writer.WriteLine("    - 0");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            AssertFileExists(ModOutputDir, "14mission.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "14mission.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var slctStream = Kh2.Slct.Read(binarc[0].Stream);
+                Assert.Equal(1, slctStream[0].Id);
+                Assert.Equal(2, slctStream[0].ChoiceNum);
+                Assert.Equal(3, slctStream[0].ChoiceDefault);
+            });
+        }
+
+
+        [Fact]
         public void ListPatchPlacesTest()
         {
             var patcher = new PatcherProcessor();
