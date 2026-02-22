@@ -881,11 +881,11 @@ Sora:
     MessageId: 3
   BaseSequence: 12 #Signed short, can be negative
   TitleSequence: 13 #Signed short, can be negative
-  Information: 14
-  EntryId: 15
+  Information: 14 #Value tends to always be 0?
+  EntryId: 15 #
   Task: 16
-  PauseMode: 17
-  Flag: 18
+  PauseMode: 0 #6 possible values. 0 = Null, 1 = Battle, 2 = Form, 3 = Mission, 4 = Event, 5 = Musical
+  Flag: 1 #Two possible flags. 0 Allows you to unpause, 1 disables unpausing to get out of the menu.
   SoundPause: 19
   Padding: #There are 25 padding bytes in total
   - 0
