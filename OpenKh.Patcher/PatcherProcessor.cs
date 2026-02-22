@@ -940,6 +940,27 @@ namespace OpenKh.Patcher
                         Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList);
                         break;
 
+                    case "slct":
+                        var slctList = Kh2.Slct.Read(stream);
+                        var moddedSlct = deserializer.Deserialize<List<Kh2.Slct>>(sourceText);
+
+                        foreach (var entries in moddedSlct)
+                        {
+                            var existingEntry = slctList.FirstOrDefault(x => x.Id == entries.Id);
+
+                            if (existingEntry != null)
+                            {
+                                slctList[slctList.IndexOf(existingEntry)] = entries;
+                            }
+                            else
+                            {
+                                slctList.Add(entries);
+                            }
+                        }
+
+                        Kh2.Slct.Write(stream.SetPosition(0), slctList);
+                        break;
+                        
                     case "localset":
                         var localList = Kh2.Localset.Read(stream);
                         var moddedLocal = deserializer.Deserialize<List<Kh2.Localset>>(sourceText);
@@ -1627,3 +1648,4 @@ namespace OpenKh.Patcher
         }
     }
 }
+
