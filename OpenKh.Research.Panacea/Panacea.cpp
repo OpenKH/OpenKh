@@ -419,7 +419,7 @@ void GetIMZOffsets(void* addr, int baseoff, std::vector<int>& entries)
     }
 }
 
-void GetTM2Offsets(void* addr, int baseoff, std::vector<int>& entries)
+void GetTM2Offsets(void* addr, int baseoff, std::vector<int>& entries, int flags = 0x20000000)
 {
     if (*(int*)addr == '2MIT')
     {
@@ -429,7 +429,7 @@ void GetTM2Offsets(void* addr, int baseoff, std::vector<int>& entries)
         while (texcnt-- > 0)
         {
             int next = *(int*)off;
-            entries.push_back(*(short*)(off + 12) + baseoff + 0x20000000);
+            entries.push_back(*(short*)(off + 12) + baseoff + flags);
             off += next;
             baseoff += next;
         }
@@ -722,6 +722,146 @@ void GetBAROffsets(void* addr, int baseoff, std::vector<int>& entries)
     }
 }
 
+void GetPMOOffsets(void* addr, int baseoff, std::vector<int>& entries)
+{
+    if (*(int*)addr == '\0OMP')
+    {
+        int texCount = ((short*)addr)[4];
+        char* texOffset = (char*)addr + 0xA0;
+        for (int i = 0; i < texCount; i++)
+        {
+            int pTm2 = *(int*)(texOffset + (0x20 * i));
+            GetTM2Offsets((char*)addr + pTm2, baseoff + pTm2, entries, 0);
+        }
+    }
+}
+
+void GetPMPOffsets(void* addr, int baseoff, std::vector<int>& entries)
+{
+    if (*(int*)addr == '\0PMP')
+    {
+        int texCount = ((short*)addr)[13];
+        int texOffset = ((int*)addr)[7];
+        char* pTex = ((char*)addr + texOffset);
+        for (int i = 0; i < texCount; i++)
+        {
+            int pTm2 = *(int*)(pTex + (0x20 * i));
+            GetTM2Offsets((char*)addr + pTm2, baseoff + pTm2, entries, 0);
+        }
+    }
+}
+
+void GetL2DOffsets(void* addr, int baseoff, std::vector<int>& entries)
+{
+    if (*(int*)addr == '@D2L')
+    {
+        int sq2pCount = ((int*)addr)[8];
+        int oOffsets = ((int*)addr)[9];
+        int* offsets = (int*)((char*)addr + oOffsets);
+        for (int i = 0; i < sq2pCount; i++)
+        {
+            int oSQ2P = offsets[i];
+            char* pSQ2P = (char*)offsets + oSQ2P;
+            int oTM2 = ((int*)pSQ2P)[6];
+            char* pTM2 = pSQ2P + oTM2;
+            GetTM2Offsets(pTM2, baseoff + oOffsets + oSQ2P + oTM2, entries, 0);
+        }
+    }
+}
+
+void GetTXAOffsets(void* addr, int baseoff, std::vector<int>& entries)
+{
+    // TODO: Recheck all the sizes and offsets here
+    if (*(int*)addr == '\0AXT')
+    {
+        // Animations can reuse frames. We only want each frame once.
+        std::set<int> frames = std::set<int>();
+        short tex0Count = ((short*)addr)[3];
+        int* pTex0 = (int*)((char*)addr + 0x10);
+        for (int i = 0; i < tex0Count; i++)
+        {
+            short tex1Count = ((short*)pTex0)[24];
+            int* pTex1 = (int*)((char*)addr + pTex0[13]);
+
+            for (int j = 0; j < tex1Count; j++)
+            {
+                short tex2Count = ((short*)pTex1)[9];
+                int* pTex2 = (int*)((char*)addr + pTex1[5]);
+
+                for (int k = 0; k < tex2Count; k++)
+                {
+                    int pframe = *pTex2;
+                    if (pframe != 0)
+                        frames.emplace(baseoff + pframe);
+                    pTex2 += 3;
+                }
+
+                pTex1 += 6;
+            }
+
+            pTex0 += 14;
+        }
+        entries.insert(entries.end(), frames.begin(), frames.end());
+    }
+}
+
+void GetFEPOffsets(void* addr, int baseoff, std::vector<int>& entries)
+{
+    if ((*(int*)addr & 0x00FFFFFF) == '\0PEF')
+    {
+        std::set<int> frames = std::set<int>();
+        unsigned short tex_c = ((unsigned short*)addr)[16];
+        int* texbp = (int*)((char*)addr + ((int*)addr)[12]);
+        for (int i = 0; i < tex_c; i++)
+        {
+            char* pTexRes = (char*)addr + texbp[i];
+            int texSize = ((int*)pTexRes)[2];
+            if (texSize > 0)
+            {
+                int oTex = ((int*)pTexRes)[3];
+                int* pTex = (int*)((char*)addr + oTex);
+                char hSize = *((char*)pTex + 0x18);
+                frames.emplace(baseoff + oTex + hSize);
+            }
+        }
+        entries.insert(entries.end(), frames.begin(), frames.end());
+    }
+
+    return;
+}
+
+void GetARCOffsets(void* addr, int baseoff, std::vector<int>& entries)
+{
+    if (*(int*)addr == '\0CRA')
+    {
+        short count = ((short*)addr)[3];
+        char* pEntry = (char*)addr + 0x10;
+        char nameBuf[17] = { 0 };
+        for (int i = 0; i < count; i++)
+        {
+            std::vector<int> currOffs{};
+            int offset = ((int*)pEntry)[1];
+            char* pName = pEntry + 0x10;
+            strncpy_s(nameBuf, 17, pName, 16);
+            char* ext = PathFindExtensionA(nameBuf);
+            if (!_stricmp(ext, ".pmo"))
+                GetPMOOffsets((char*)addr + offset, baseoff + offset, currOffs);
+            else if (!_stricmp(ext, ".pmp"))
+                GetPMPOffsets((char*)addr + offset, baseoff + offset, currOffs);
+            else if (!_stricmp(ext, ".tm2"))
+                GetTM2Offsets((char*)addr + offset, baseoff + offset, currOffs, 0);
+            else if (!_stricmp(ext, ".l2d"))
+                GetL2DOffsets((char*)addr + offset, baseoff + offset, currOffs);
+            else if (!_stricmp(ext, ".txa"))
+                GetTXAOffsets((char*)addr + offset, baseoff + offset, currOffs);
+            else if (!_stricmp(ext, ".fep"))
+                GetFEPOffsets((char*)addr + offset, baseoff + offset, currOffs);
+            pEntry += 0x20;
+            entries.insert(entries.end(), currOffs.begin(), currOffs.end());
+        }
+    }
+}
+
 void ScanFolder(const std::wstring& folder, std::vector<Axa::RemasteredEntry>& files)
 {
     std::queue<std::wstring> folq;
@@ -845,6 +985,22 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
             for (int i = 0; i < entries.size(); ++i)
                 assetoffs.push_back(entries[i].origOffset);
         break;
+    case OpenKH::GameId::KingdomHeartsBbs:
+        if (!_wcsicmp(ext, L".arc"))
+            GetARCOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".pmo"))
+            GetPMOOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".pmp"))
+            GetPMPOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".tm2"))
+            GetTM2Offsets(addr, 0, assetoffs, 0);
+        else if (!_wcsicmp(ext, L".l2d"))
+            GetL2DOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".txa"))
+            GetTXAOffsets(addr, 0, assetoffs);
+        else if (!_wcsicmp(ext, L".fep"))
+            GetFEPOffsets(addr, 0, assetoffs);
+        // TODO: Font support: CLU COD INF MTX
     default:
         for (int i = 0; i < entries.size(); ++i)
             assetoffs.push_back(entries[i].origOffset);
