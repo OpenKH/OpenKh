@@ -17,10 +17,6 @@
 #include "bass.h"
 #include "bass_vgmstream.h"
 #include <set>
-#include <filesystem>
-#include <Psapi.h>
-
-bool ENSURE_DIRECTORY = false;
 
 template <class TFunc>
 class Hook
@@ -288,29 +284,6 @@ void LoadDLLs(const std::wstring& folder)
     }
     for (auto f : initfuncs)
         f(folder.c_str());
-}
-
-char* FetchPattern(const char* pattern, const char* patvalid)
-{
-    HINSTANCE g_hInstance = GetModuleHandle(NULL);
-    MODULEINFO moduleInfo;
-    GetModuleInformation(GetCurrentProcess(), g_hInstance, &moduleInfo, sizeof(MODULEINFO));
-    const void* endAddress = (const char*)g_hInstance + moduleInfo.SizeOfImage;
-
-    for (char* addr = (char*)g_hInstance; addr < (char*)endAddress - 0x10; addr += 0x10)
-    {
-        size_t patlen = strlen(patvalid);
-
-        int i = 0;
-        for (; i < patlen; i++)
-            if (patvalid[i] != '?' && pattern[i] != addr[i])
-                break;
-
-        if (i == patlen)
-            return addr;
-    }
-
-    return nullptr;
 }
 
 void Panacea::Initialize()
@@ -1164,33 +1137,6 @@ long __cdecl Panacea::LoadFileWithSize(Axa::CFileMan* _this, const char* filenam
 
 void* __cdecl Panacea::LoadFileWithMalloc(Axa::CFileMan* _this, const char* filename, int* sizePtr, bool useHdAsset, const char* filename2)
 {
-    if (!ENSURE_DIRECTORY)
-    {
-        char _stringBuffer[256];
-        bool(*_fetchFunc)(const char* str, char* buff, char* a3) = reinterpret_cast<bool(*)(const char*, char*, char*)>(FetchPattern("\x48\x89\x5C\x24\x20\x55\x56\x57\x48\x81\xEC\x60\x01\x00\x00", "xxxxxxxxxxxxxxx"));
-
-        if (!_fetchFunc)
-        {
-            _fetchFunc = reinterpret_cast<bool(*)(const char*, char*, char*)>(FetchPattern("\x48\x89\x5C\x24\x20\x55\x56\x57\x48\x81\xEC\x40\x01\x00\x00", "xxxxxxxxxxxxxxx"));
-
-            if (!_fetchFunc)
-            { 
-                ENSURE_DIRECTORY = true;
-                goto CONTINUE_FUNC;
-            }
-
-            _fetchFunc("KINGDOM HEARTS HD 1.5+2.5 ReMIX\\Epic Games Store", _stringBuffer, nullptr);
-        }
-        
-        else
-            _fetchFunc("KINGDOM HEARTS HD 1.5+2.5 ReMIX\\Steam", _stringBuffer, nullptr);
-
-        std::filesystem::create_directories(_stringBuffer);
-        ENSURE_DIRECTORY = true;
-    }
-
-CONTINUE_FUNC:
-
     wchar_t path[MAX_PATH];
     if (GetRawFile(path, sizeof(path), filename))
     {
