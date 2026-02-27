@@ -730,8 +730,9 @@ void GetPMOOffsets(void* addr, int baseoff, std::vector<int>& entries)
         char* texOffset = (char*)addr + 0xA0;
         for (int i = 0; i < texCount; i++)
         {
-            int pTm2 = *(int*)(texOffset + (0x20 * i));
-            GetTM2Offsets((char*)addr + pTm2, baseoff + pTm2, entries, 0);
+            int oTm2 = *(int*)(texOffset + (0x20 * i));
+            if (oTm2 != 0)
+                GetTM2Offsets((char*)addr + oTm2, baseoff + oTm2, entries, 0);
         }
     }
 }
@@ -745,8 +746,9 @@ void GetPMPOffsets(void* addr, int baseoff, std::vector<int>& entries)
         char* pTex = ((char*)addr + texOffset);
         for (int i = 0; i < texCount; i++)
         {
-            int pTm2 = *(int*)(pTex + (0x20 * i));
-            GetTM2Offsets((char*)addr + pTm2, baseoff + pTm2, entries, 0);
+            int oTm2 = *(int*)(pTex + (0x20 * i));
+            if (oTm2 != 0)
+                GetTM2Offsets((char*)addr + oTm2, baseoff + oTm2, entries, 0);
         }
     }
 }
@@ -1001,6 +1003,7 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
         else if (!_wcsicmp(ext, L".fep"))
             GetFEPOffsets(addr, 0, assetoffs);
         // TODO: Font support: CLU COD INF MTX
+        break;
     default:
         for (int i = 0; i < entries.size(); ++i)
             assetoffs.push_back(entries[i].origOffset);
