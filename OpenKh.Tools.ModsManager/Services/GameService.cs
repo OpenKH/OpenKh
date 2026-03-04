@@ -46,6 +46,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 UniqueFileName = "CST_sora.pss",
                 Detectors = new()
                 {
+                    new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPM_666.76;1" },
                     new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLUS_217.99;1" },
                 }
             }
