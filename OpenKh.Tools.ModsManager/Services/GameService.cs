@@ -19,6 +19,8 @@ namespace OpenKh.Tools.ModsManager.Services
                 UniqueFileName = "btltbl.bin",
                 Detectors = new()
                 {
+                    new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPS_251.05;1" },
+                    new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLUS_203.70;1" },
                     new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPS_251.97;1" },
                     new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPS_251.98;1" },
                 }
