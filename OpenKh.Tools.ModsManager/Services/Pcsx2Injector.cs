@@ -20,9 +20,12 @@ namespace OpenKh.Tools.ModsManager.Services
             public int LoadFile { get; init; }
             public int GetFileSize { get; init; }
             public int LoadFileTask { get; init; }
+            public int LoadFileTaskVanilla { get; init; }
             public int LoadFileAsync { get; init; }
+            public int LoadFileAsyncJp { get; init; }
 
             public int GetFileSizeRecom { get; init; }
+            public int GetFileSizeRecomJp { get; init; }
             public int RegionInit { get; init; }
             public int BufferPointer { get; init; }
             public int RegionForce { get; init; }
@@ -421,6 +424,36 @@ namespace OpenKh.Tools.ModsManager.Services
             NOP(),
         };
 
+        private static readonly uint[] LoadFileTaskHookVanilla = new uint[]
+        {
+            // Input:
+            // S0 DstPtr
+            // S1 Filename
+            // T4 return program counter
+            // T5 Operation
+            // V0 IdxFilePtr
+            //
+            // Work:
+            // T6 Hook stack
+            // V0 Return value
+            // 
+            LUI(T6, HookStack),
+            SW(S1, T6, Param1), // Filename
+            SW(S0, T6, Param2), // DstPtr
+            SW(V0, T6, Param3), // LoadFileTask
+            SW(T5, T6, ParamOperator), // Operation
+            LW(T5, T6, ParamOperator),
+            BNE(T5, (byte)Operation.HookExit, -2),
+            LW(V1, T6, ParamReturn),
+            BEQ(V1, Zero, 3),
+            MOVE(S2, V0),
+            BEQ(Zero, Zero, 2),
+            ADDIU(RA, RA, 0x64), // skip the remainder of the function
+            LI(V0, -1),
+            JR(RA),
+            NOP(),
+        };
+
         private static readonly uint[] LoadFileAsyncHook = new uint[]
         {
             // Input:
@@ -482,6 +515,67 @@ namespace OpenKh.Tools.ModsManager.Services
             SW(V1, S1, 0x28),
         };
 
+        private static readonly uint[] LoadFileAsyncHookJp = new uint[]
+        {
+            // Input:
+            //
+            // Work:
+            //
+            LUI(T6, HookStack),
+            LW(T2, V0, 0x18B0),
+            LW(T3, V0, 0x189C),
+            ADDI(T4, V0, 0x18C8),
+            LW(T0, T4, 0),
+            ADDIU(T1, T3, 8),
+            LW(T4, T3, 0x38),
+            LW(T4, T4, 0),
+            SW(T0, T6, Param1), // FileDirID
+            BEQ(T2, T4, 9),
+            SW(T1, T6, Param2), // FileNamePtr
+            ADDIU(T4, Zero, (byte)Operation.GetFileSizeRecom),
+            SW(T4, T6, ParamOperator), // Operation
+            LW(T4, T6, ParamOperator),
+            BNE(T4, (byte)Operation.HookExit, -2),
+            LW(T4, T6, ParamReturn),
+            BEQ(T4, Zero, 7),
+            NOP(),
+            BEQ(Zero, Zero, 8),
+            SW(T2, T6, Param3), // MemDstPtr
+            SW(T5, T6, ParamOperator), // Operation
+            LW(T5, T6, ParamOperator),
+            BNE(T5, (byte)Operation.HookExit, -2),
+            LW(T4, T6, ParamReturn),
+            LUI(V1, 0x5B), // For Fallback
+            BEQ(T4, Zero, 5),
+            LW(A2, V0, 0x18CC),
+            ADD(T2, T2, T4),
+            SW(T2, V0, 0x18B0),
+            ADDIU(V0, Zero, 1),
+            ADDIU(RA, RA, 0x64),
+            JR(RA),
+            NOP(),
+        };
+
+        private static readonly uint[] GetFileSizeRecomHookJp = new uint[]
+        {
+            LUI(T6, HookStack),
+            LUI(V1, 0x5C),
+            ADDI(T4, V1, 0x18C8),
+            LW(T4, T4, 0),
+            SW(T4, T6, Param1), // FileDirID
+            SW(S2, T6, Param2), // FileNamePtr
+            SW(T5, T6, ParamOperator), // Operation
+            LW(T5, T6, ParamOperator),
+            BNE(T5, (byte)Operation.HookExit, -2),
+            LW(V1, T6, ParamReturn),
+            // For Fallback
+            BNE(V1, Zero, 2),
+            NOP(),
+            LW(V1, S2, 0x18),
+            JR(RA),
+            SW(V1, S1, 0x28),
+        };
+
 
 
         private static readonly uint[] RegionInitPatch = new uint[]
@@ -501,6 +595,16 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             new Offsets
             {
+                GameName = "SLPS_251.05;1",
+                LoadFileTaskVanilla = 0x120308,
+            },
+            new Offsets
+            {
+                GameName = "SLUS_203.70;1",
+                LoadFileTaskVanilla = 0x11FEA8,
+            },
+            new Offsets
+            {
                 GameName = "SLPS_251.97;1",
                 LoadFileTask = 0x1204C0,
             },
@@ -513,6 +617,11 @@ namespace OpenKh.Tools.ModsManager.Services
                 GameName = "SLUS_217.99;1",
                 LoadFileAsync = 0x1A0C6C,
                 GetFileSizeRecom = 0x1A11A0,
+            },
+            new Offsets {
+                GameName = "SLPM_666.76;1",
+                LoadFileAsyncJp = 0x1A0CFC,
+                GetFileSizeRecomJp = 0x1A1230,
             },
             new Offsets
             {
@@ -826,11 +935,28 @@ namespace OpenKh.Tools.ModsManager.Services
                         ADDIU(T5, Zero, (byte)Operation.LoadFileTask));
                 }
 
+                if (offsets.LoadFileTaskVanilla > 0)
+                {
+                    Log.Info("Injecting {0} function", nameof(offsets.LoadFileTaskVanilla));
+                    WritePatch(stream, offsets.LoadFileTaskVanilla,
+                        ADDIU(T4, RA, 0),
+                        JAL(WriteHook(stream, LoadFileTaskHookVanilla)),
+                        ADDIU(T5, Zero, (byte)Operation.LoadFileTask));
+                }
+
                 if (offsets.LoadFileAsync > 0)
                 {
                     Log.Info("Injecting {0} function", nameof(offsets.LoadFileAsync));
                     WritePatch(stream, offsets.LoadFileAsync,
                         JAL(WriteHook(stream, LoadFileAsyncHook)),
+                        ADDIU(T5, Zero, (byte)Operation.LoadFileAsync));
+                }
+
+                if (offsets.LoadFileAsyncJp > 0)
+                {
+                    Log.Info("Injecting {0} function", nameof(offsets.LoadFileAsyncJp));
+                    WritePatch(stream, offsets.LoadFileAsyncJp,
+                        JAL(WriteHook(stream, LoadFileAsyncHookJp)),
                         ADDIU(T5, Zero, (byte)Operation.LoadFileAsync));
                 }
 
@@ -866,6 +992,14 @@ namespace OpenKh.Tools.ModsManager.Services
                     Log.Info("Injecting {0} function", nameof(offsets.GetFileSizeRecom));
                     WritePatch(stream, offsets.GetFileSizeRecom,
                         JAL(WriteHook(stream, GetFileSizeRecomHook)),
+                        ADDIU(T5, Zero, (byte)Operation.GetFileSizeRecom));
+                }
+
+                if (offsets.GetFileSizeRecomJp > 0)
+                {
+                    Log.Info("Injecting {0} function", nameof(offsets.GetFileSizeRecomJp));
+                    WritePatch(stream, offsets.GetFileSizeRecomJp,
+                        JAL(WriteHook(stream, GetFileSizeRecomHookJp)),
                         ADDIU(T5, Zero, (byte)Operation.GetFileSizeRecom));
                 }
 
