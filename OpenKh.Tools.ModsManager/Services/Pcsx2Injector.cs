@@ -20,6 +20,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public int LoadFile { get; init; }
             public int GetFileSize { get; init; }
             public int LoadFileTask { get; init; }
+            public int LoadFileTaskVanilla { get; init; }
             public int LoadFileAsync { get; init; }
             public int LoadFileAsyncJp { get; init; }
 
@@ -423,6 +424,36 @@ namespace OpenKh.Tools.ModsManager.Services
             NOP(),
         };
 
+        private static readonly uint[] LoadFileTaskHookVanilla = new uint[]
+        {
+            // Input:
+            // S0 DstPtr
+            // S1 Filename
+            // T4 return program counter
+            // T5 Operation
+            // V0 IdxFilePtr
+            //
+            // Work:
+            // T6 Hook stack
+            // V0 Return value
+            // 
+            LUI(T6, HookStack),
+            SW(S1, T6, Param1), // Filename
+            SW(S0, T6, Param2), // DstPtr
+            SW(V0, T6, Param3), // LoadFileTask
+            SW(T5, T6, ParamOperator), // Operation
+            LW(T5, T6, ParamOperator),
+            BNE(T5, (byte)Operation.HookExit, -2),
+            LW(V1, T6, ParamReturn),
+            BEQ(V1, Zero, 3),
+            MOVE(S2, V0),
+            BEQ(Zero, Zero, 2),
+            ADDIU(RA, RA, 0x64), // skip the remainder of the function
+            LI(V0, -1),
+            JR(RA),
+            NOP(),
+        };
+
         private static readonly uint[] LoadFileAsyncHook = new uint[]
         {
             // Input:
@@ -562,6 +593,16 @@ namespace OpenKh.Tools.ModsManager.Services
 
         private static readonly Offsets[] _offsets = new Offsets[]
         {
+            new Offsets
+            {
+                GameName = "SLPS_251.05;1",
+                LoadFileTaskVanilla = 0x120308,
+            },
+            new Offsets
+            {
+                GameName = "SLUS_203.70;1",
+                LoadFileTaskVanilla = 0x11FEA8,
+            },
             new Offsets
             {
                 GameName = "SLPS_251.97;1",
@@ -891,6 +932,15 @@ namespace OpenKh.Tools.ModsManager.Services
                     WritePatch(stream, offsets.LoadFileTask,
                         ADDIU(T4, RA, 0),
                         JAL(WriteHook(stream, LoadFileTaskHook)),
+                        ADDIU(T5, Zero, (byte)Operation.LoadFileTask));
+                }
+
+                if (offsets.LoadFileTaskVanilla > 0)
+                {
+                    Log.Info("Injecting {0} function", nameof(offsets.LoadFileTaskVanilla));
+                    WritePatch(stream, offsets.LoadFileTaskVanilla,
+                        ADDIU(T4, RA, 0),
+                        JAL(WriteHook(stream, LoadFileTaskHookVanilla)),
                         ADDIU(T5, Zero, (byte)Operation.LoadFileTask));
                 }
 
