@@ -138,7 +138,7 @@
                 <StackPanel>
                     <TextBlock>Supported games:</TextBlock>
                     <StackPanel Margin="10 3 0 10">
-                        <TextBlock>Kingdom Hearts I (Final Mix)</TextBlock>
+                        <TextBlock>Kingdom Hearts I (JP, US, Final Mix)</TextBlock>
                         <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix)</TextBlock>
                         <TextBlock>Kingdom Hearts Re:Chain of Memories (JP, US)</TextBlock>
                     </StackPanel>
