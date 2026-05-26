@@ -24,15 +24,10 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
             <TextBlock Margin="0 0 0 3">Add a new mod from GitHub</TextBlock>
-            <Grid Margin="0 0 0 3" Background="White">
+            <Grid Margin="0 0 0 5" Background="White">
                 <TextBlock Margin="5,1" MinWidth="50" Text="eg. openkh/my-kingdomhearts-mod"
                    Foreground="Gray" Visibility="{Binding ElementName=txtSourceModUrl, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" IsHitTestVisible="False"/>
                 <TextBox Name="txtSourceModUrl" Background="Transparent" Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" KeyUp="txtSourceModUrl_KeyUp" />
-            </Grid>
-            <Grid Margin="0 0 0 5" Background="White">
-                <TextBlock Margin="5,1" MinWidth="50" Text="Branch (optional, eg. dev)"
-                   Foreground="Gray" Visibility="{Binding ElementName=txtBranchName, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" IsHitTestVisible="False"/>
-                <TextBox Name="txtBranchName" Background="Transparent" Text="{Binding BranchName, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
 
             <TextBlock Margin="0 0 0 3">Install a Mod Archive or Lua Script</TextBlock>

@@ -283,6 +283,13 @@ namespace OpenKh.Tools.ModsManager.Services
             Action<float> progressNumber = null,
             string branchName = null)
         {
+            var parts = repositoryName.Split('/');
+            if (parts.Length == 3 && string.IsNullOrWhiteSpace(branchName))
+            {
+                branchName = parts[2];
+                repositoryName = $"{parts[0]}/{parts[1]}";
+            }
+
             if (!string.IsNullOrWhiteSpace(branchName))
             {
                 progressOutput?.Invoke($"Fetching file {ModMetadata} from branch {branchName}");

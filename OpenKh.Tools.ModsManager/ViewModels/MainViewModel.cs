@@ -513,7 +513,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
                         }, branchName);
-                        var actualName = isZipFile || isLuaFile ? Path.GetFileNameWithoutExtension(name) : name;
+                        var repoName = name;
+                        if (!isZipFile && !isLuaFile)
+                        {
+                            var nameParts = name.Split('/');
+                            if (nameParts.Length == 3)
+                                repoName = $"{nameParts[0]}/{nameParts[1]}";
+                        }
+                        var actualName = isZipFile || isLuaFile ? Path.GetFileNameWithoutExtension(name) : repoName;
                         var mod = ModsService.GetMods(new string[] { actualName }).First();
                         Application.Current.Dispatcher.Invoke(() =>
                         {
