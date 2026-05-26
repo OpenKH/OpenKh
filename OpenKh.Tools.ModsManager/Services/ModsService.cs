@@ -120,11 +120,12 @@ namespace OpenKh.Tools.ModsManager.Services
             bool isZipFile,
             bool isLuaFile,
             Action<string> progressOutput = null,
-            Action<float> progressNumber = null)
+            Action<float> progressNumber = null,
+            string branchName = null)
         {
             if (!isZipFile && !isLuaFile)
             {
-                return Task.Run(() => InstallModFromGithub(name, progressOutput, progressNumber));
+                return Task.Run(() => InstallModFromGithub(name, progressOutput, progressNumber, branchName));
             }
             else if (isZipFile && !isLuaFile)
             {
@@ -279,24 +280,35 @@ namespace OpenKh.Tools.ModsManager.Services
         public static async Task InstallModFromGithub(
             string repositoryName,
             Action<string> progressOutput = null,
-            Action<float> progressNumber = null)
+            Action<float> progressNumber = null,
+            string branchName = null)
         {
-            var branchName = DefaultGitBranch;
-            progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
-            var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
-            if (!isValidMod)
+            if (!string.IsNullOrWhiteSpace(branchName))
             {
-                progressOutput?.Invoke($"{ModMetadata} not found, fetching default branch name");
-                branchName = await RepositoryService.GetMainBranchFromRepository(repositoryName);
-                if (branchName == null)
-                    throw new RepositoryNotFoundException(repositoryName);
-
-                progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
-                isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
+                progressOutput?.Invoke($"Fetching file {ModMetadata} from branch {branchName}");
+                var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
+                if (!isValidMod)
+                    throw new ModNotValidException(repositoryName);
             }
+            else
+            {
+                branchName = DefaultGitBranch;
+                progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
+                var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
+                if (!isValidMod)
+                {
+                    progressOutput?.Invoke($"{ModMetadata} not found, fetching default branch name");
+                    branchName = await RepositoryService.GetMainBranchFromRepository(repositoryName);
+                    if (branchName == null)
+                        throw new RepositoryNotFoundException(repositoryName);
 
-            if (!isValidMod)
-                throw new ModNotValidException(repositoryName);
+                    progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
+                    isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
+                }
+
+                if (!isValidMod)
+                    throw new ModNotValidException(repositoryName);
+            }
 
             var modPaths = new List<string> {
                 GetModPath(repositoryName),
@@ -329,6 +341,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 var options = new CloneOptions
                 {
                     RecurseSubmodules = true,
+                    BranchName = branchName,
                 };
                 options.FetchOptions.OnProgress = (serverProgressOutput) =>
                 {
