@@ -813,19 +813,20 @@ void GetFEPOffsets(void* addr, int baseoff, std::vector<int>& entries)
     {
         std::set<int> frames = std::set<int>();
         unsigned short tex_c = ((unsigned short*)addr)[16];
-        int* texbp = (int*)((char*)addr + ((int*)addr)[12]);
+        int* pTexResArr = (int*)((char*)addr + ((int*)addr)[12]);
         for (int i = 0; i < tex_c; i++)
         {
-            char* pTexRes = (char*)addr + texbp[i];
+            char* pTexRes = (char*)addr + pTexResArr[i];
             int texSize = ((int*)pTexRes)[2];
             if (texSize > 0)
             {
                 int oTex = ((int*)pTexRes)[3];
                 int* pTex = (int*)((char*)addr + oTex);
-                char hSize = *((char*)pTex + 0x18);
-                frames.emplace(baseoff + oTex + hSize);
+                int oPixels = pTex[9];
+                frames.emplace(baseoff + oTex + oPixels);
             }
         }
+
         entries.insert(entries.end(), frames.begin(), frames.end());
     }
 
@@ -839,28 +840,63 @@ void GetARCOffsets(void* addr, int baseoff, std::vector<int>& entries)
         short count = ((short*)addr)[3];
         char* pEntry = (char*)addr + 0x10;
         char nameBuf[17] = { 0 };
+        std::unordered_map<std::string, std::vector<int>> fileMap{};
+        std::vector<std::pair<std::string, std::vector<int>>> fileList{};
         for (int i = 0; i < count; i++)
         {
             std::vector<int> currOffs{};
+
             int offset = ((int*)pEntry)[1];
             char* pName = pEntry + 0x10;
             strncpy_s(nameBuf, 17, pName, 16);
             char* ext = PathFindExtensionA(nameBuf);
             if (!_stricmp(ext, ".pmo"))
+            {
                 GetPMOOffsets((char*)addr + offset, baseoff + offset, currOffs);
+            }
             else if (!_stricmp(ext, ".pmp"))
+            {
                 GetPMPOffsets((char*)addr + offset, baseoff + offset, currOffs);
+            }
             else if (!_stricmp(ext, ".tm2"))
+            {
                 GetTM2Offsets((char*)addr + offset, baseoff + offset, currOffs, 0);
+            }
             else if (!_stricmp(ext, ".l2d"))
+            {
                 GetL2DOffsets((char*)addr + offset, baseoff + offset, currOffs);
+            }
             else if (!_stricmp(ext, ".txa"))
+            {
                 GetTXAOffsets((char*)addr + offset, baseoff + offset, currOffs);
+            }
             else if (!_stricmp(ext, ".fep"))
+            {
                 GetFEPOffsets((char*)addr + offset, baseoff + offset, currOffs);
+            }
             pEntry += 0x20;
-            entries.insert(entries.end(), currOffs.begin(), currOffs.end());
+            auto name = std::string(nameBuf);
+            fileMap.emplace(name, currOffs);
+            fileList.emplace_back(name, currOffs);
         }
+
+        // TXA files immediatly preceed the file they're attatched to. Everything else shows up in order.
+        for (auto& pair : fileList)
+        {
+            auto path = PathFindExtensionA(pair.first.c_str());
+            if (!_stricmp(path, ".txa")) continue;
+            if (!_stricmp(path, ".pmo") || !_stricmp(path, ".pmp"))
+            {
+                std::string name2 = pair.first.substr(0, pair.first.length() - 4) + ".txa";
+                auto itr = fileMap.find(name2);
+                if (itr != fileMap.end())
+                {
+                    entries.insert(entries.end(), itr->second.begin(), itr->second.end());
+                }
+            }
+            entries.insert(entries.end(), pair.second.begin(), pair.second.end());
+        }
+
     }
 }
 
@@ -948,6 +984,13 @@ bool sortRemasteredFiles(const Axa::RemasteredEntry& a, const Axa::RemasteredEnt
     return false;
 }
 
+bool sortRemasteredFiles_BBS(const Axa::RemasteredEntry& a, const Axa::RemasteredEntry& b)
+{
+    std::string na = std::string(a.name);
+    std::string nb = std::string(b.name);
+    return na < nb;
+}
+
 void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remasteredFolder, std::vector<Axa::RemasteredEntry>& entries)
 {
     std::vector<int> assetoffs{};
@@ -1002,7 +1045,11 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
             GetTXAOffsets(addr, 0, assetoffs);
         else if (!_wcsicmp(ext, L".fep"))
             GetFEPOffsets(addr, 0, assetoffs);
+        // TODO: .frr
         // TODO: Font support: CLU COD INF MTX
+        else // unknown file type
+            for (int i = 0; i < entries.size(); ++i)
+                assetoffs.push_back(entries[i].origOffset);
         break;
     default:
         for (int i = 0; i < entries.size(); ++i)
@@ -1013,7 +1060,10 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
     ScanFolder(remasteredFolder, modfiles);
     if (modfiles.size() >= assetoffs.size())
     {
-        std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
+        if (OpenKH::m_GameID == OpenKH::GameId::KingdomHeartsBbs)
+            std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles_BBS);
+        else
+            std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
         entries = modfiles;
         entries.resize(assetoffs.size());
         for (int i = 0; i < entries.size(); ++i)
