@@ -984,15 +984,42 @@ bool sortRemasteredFiles(const Axa::RemasteredEntry& a, const Axa::RemasteredEnt
     return false;
 }
 
-bool sortRemasteredFiles_BBS(const Axa::RemasteredEntry& a, const Axa::RemasteredEntry& b)
+bool sortRemasteredFiles_LexBBS(const Axa::RemasteredEntry& a, const Axa::RemasteredEntry& b)
 {
     std::string na = std::string(a.name);
     std::string nb = std::string(b.name);
     return na < nb;
 }
 
+bool sortRemasteredFiles_NumBBS(const Axa::RemasteredEntry& a, const Axa::RemasteredEntry& b)
+{
+    // this doesn't work, we need to start at the end and walk back until we find a digit (.dds), then until we find not a digit.
+    /*const char* pa = a.name;
+    while (*pa != '\0' && !isdigit(*pa)) pa++;
+    const char* pb = b.name;
+    while (*pb != '\0' && !isdigit(*pb)) pb++;
+    if (*pa == '\0' || *pb == '\0') return false;
+    int ia = atoi(pa);
+    int ib = atoi(pb);
+    return ia < ib;*/
+
+    char* pa = PathFindExtensionA(a.name) - 1;
+    while (isdigit(*(pa - 1)) && pa > a.name) pa--;
+
+    char* pb = PathFindExtensionA(b.name) - 1;
+    while (isdigit(*(pb - 1)) && pb > b.name) pb--;
+
+    int ia = atoi(pa);
+    int ib = atoi(pb);
+    return ia < ib;
+}
+
 void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remasteredFolder, std::vector<Axa::RemasteredEntry>& entries)
 {
+    // BBS wants it's files as 0, 1, 10, 11, 12, 2, 3..., so we need to sort them numerically to work with them then sort them lexically to send to the game.
+    if (OpenKH::m_GameID == OpenKH::GameId::KingdomHeartsBbs)
+        std::stable_sort(entries.begin(), entries.end(), sortRemasteredFiles_NumBBS);
+
     std::vector<int> assetoffs{};
     const wchar_t* ext = PathFindExtensionW(path);
     switch (OpenKH::m_GameID)
@@ -1061,7 +1088,7 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
     if (modfiles.size() >= assetoffs.size())
     {
         if (OpenKH::m_GameID == OpenKH::GameId::KingdomHeartsBbs)
-            std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles_BBS);
+            std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles_NumBBS);
         else
             std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
         entries = modfiles;
@@ -1092,6 +1119,9 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
                 }
         }
     }
+
+    if (OpenKH::m_GameID == OpenKH::GameId::KingdomHeartsBbs)
+        std::stable_sort(entries.begin(), entries.end(), sortRemasteredFiles_LexBBS);
 }
 
 void GetRemasteredFiles(Axa::PackageFile* fileinfo, const wchar_t* path, void* addr)
