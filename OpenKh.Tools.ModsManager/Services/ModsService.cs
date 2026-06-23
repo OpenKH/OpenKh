@@ -284,9 +284,10 @@ namespace OpenKh.Tools.ModsManager.Services
             string branchName = null)
         {
             var parts = repositoryName.Split('/');
-            if (parts.Length == 3 && string.IsNullOrWhiteSpace(branchName))
+            if (parts.Length == 3)
             {
-                branchName = parts[2];
+                if (string.IsNullOrWhiteSpace(branchName))
+                    branchName = parts[2];
                 repositoryName = $"{parts[0]}/{parts[1]}";
             }
 
@@ -328,17 +329,15 @@ namespace OpenKh.Tools.ModsManager.Services
                 switch (errorMessage)
                 {
                     case MessageBoxResult.Yes:
-                        Handle(() =>
-                        {
-                            MainViewModel.overwriteMod = true;
-                            ClearOldMods(repositoryName);
-                        });
+                        MainViewModel.overwriteMod = true;
+                        foreach (var existingModPath in modPaths.Where(Directory.Exists))
+                            await CleanModFiles(existingModPath);
+                        await ClearOldMods(repositoryName);
                         break;
                     case MessageBoxResult.No:
                         throw new ModAlreadyExistsExceptions(repositoryName);
                 }
             }
-            await Task.Delay(1); // fixes a bug where folder creation and deletions collide
             var modPath = modPaths[0];
             Directory.CreateDirectory(modPath);
 
