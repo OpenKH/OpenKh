@@ -284,10 +284,10 @@ namespace OpenKh.Tools.ModsManager.Services
             string branchName = null)
         {
             var parts = repositoryName.Split('/');
-            if (parts.Length == 3)
+            if (parts.Length >= 3)
             {
                 if (string.IsNullOrWhiteSpace(branchName))
-                    branchName = parts[2];
+                    branchName = string.Join("/", parts.Skip(2));
                 repositoryName = $"{parts[0]}/{parts[1]}";
             }
 
@@ -633,25 +633,29 @@ namespace OpenKh.Tools.ModsManager.Services
             }
             else
             {
-                ClearOldMods(modName);
+                ClearOldModsCore(modName);
                 throw new ModMovedWithoutGameException(modName);
             }
         }));
 
-        public static Task ClearOldMods(string modName) => Task.Run(() => Handle(() =>
+        public static Task ClearOldMods(string modName) => Task.Run(() => Handle(() => ClearOldModsCore(modName)));
+
+        private static void ClearOldModsCore(string modName)
         {
             foreach (var game in new List<string> { "kh1", "kh2", "bbs", "Recom", "kh3d" })
             {
                 var modPath = GetModsGamePath(modName, game);
                 if (Directory.Exists(modPath))
-                    CleanModFiles(modPath);
+                    CleanModFilesCore(modPath);
             }
             var collectionPath = GetCollectionPath(modName);
             if (Directory.Exists(collectionPath))
-                CleanModFiles(collectionPath);
-        }));
+                CleanModFilesCore(collectionPath);
+        }
 
-        public static Task CleanModFiles(string modPath) => Task.Run(() => Handle(() =>
+        public static Task CleanModFiles(string modPath) => Task.Run(() => Handle(() => CleanModFilesCore(modPath)));
+
+        private static void CleanModFilesCore(string modPath)
         {
             foreach (var filePath in Directory.GetFiles(modPath, "*", SearchOption.AllDirectories))
             {
@@ -660,7 +664,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
             }
             Directory.Delete(modPath, true);
-        }));
+        }
 
         public static Metadata GetMetadata(string modPath)
         {
