@@ -296,7 +296,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 progressOutput?.Invoke($"Fetching file {ModMetadata} from branch {branchName}");
                 var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
                 if (!isValidMod)
-                    throw new ModNotValidException(repositoryName);
+                    throw new BranchNotValidException(repositoryName, branchName);
             }
             else
             {
