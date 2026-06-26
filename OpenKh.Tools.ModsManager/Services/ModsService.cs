@@ -120,11 +120,12 @@ namespace OpenKh.Tools.ModsManager.Services
             bool isZipFile,
             bool isLuaFile,
             Action<string> progressOutput = null,
-            Action<float> progressNumber = null)
+            Action<float> progressNumber = null,
+            string branchName = null)
         {
             if (!isZipFile && !isLuaFile)
             {
-                return Task.Run(() => InstallModFromGithub(name, progressOutput, progressNumber));
+                return Task.Run(() => InstallModFromGithub(name, progressOutput, progressNumber, branchName));
             }
             else if (isZipFile && !isLuaFile)
             {
@@ -279,24 +280,43 @@ namespace OpenKh.Tools.ModsManager.Services
         public static async Task InstallModFromGithub(
             string repositoryName,
             Action<string> progressOutput = null,
-            Action<float> progressNumber = null)
+            Action<float> progressNumber = null,
+            string branchName = null)
         {
-            var branchName = DefaultGitBranch;
-            progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
-            var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
-            if (!isValidMod)
+            var parts = repositoryName.Split('/');
+            if (parts.Length >= 3)
             {
-                progressOutput?.Invoke($"{ModMetadata} not found, fetching default branch name");
-                branchName = await RepositoryService.GetMainBranchFromRepository(repositoryName);
-                if (branchName == null)
-                    throw new RepositoryNotFoundException(repositoryName);
-
-                progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
-                isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
+                if (string.IsNullOrWhiteSpace(branchName))
+                    branchName = string.Join("/", parts.Skip(2));
+                repositoryName = $"{parts[0]}/{parts[1]}";
             }
 
-            if (!isValidMod)
-                throw new ModNotValidException(repositoryName);
+            if (!string.IsNullOrWhiteSpace(branchName))
+            {
+                progressOutput?.Invoke($"Fetching file {ModMetadata} from branch {branchName}");
+                var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
+                if (!isValidMod)
+                    throw new BranchNotValidException(repositoryName, branchName);
+            }
+            else
+            {
+                branchName = DefaultGitBranch;
+                progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
+                var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
+                if (!isValidMod)
+                {
+                    progressOutput?.Invoke($"{ModMetadata} not found, fetching default branch name");
+                    branchName = await RepositoryService.GetMainBranchFromRepository(repositoryName);
+                    if (branchName == null)
+                        throw new RepositoryNotFoundException(repositoryName);
+
+                    progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
+                    isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
+                }
+
+                if (!isValidMod)
+                    throw new ModNotValidException(repositoryName);
+            }
 
             var modPaths = new List<string> {
                 GetModPath(repositoryName),
@@ -309,17 +329,15 @@ namespace OpenKh.Tools.ModsManager.Services
                 switch (errorMessage)
                 {
                     case MessageBoxResult.Yes:
-                        Handle(() =>
-                        {
-                            MainViewModel.overwriteMod = true;
-                            ClearOldMods(repositoryName);
-                        });
+                        MainViewModel.overwriteMod = true;
+                        foreach (var existingModPath in modPaths.Where(Directory.Exists))
+                            await CleanModFiles(existingModPath);
+                        await ClearOldMods(repositoryName);
                         break;
                     case MessageBoxResult.No:
                         throw new ModAlreadyExistsExceptions(repositoryName);
                 }
             }
-            await Task.Delay(1); // fixes a bug where folder creation and deletions collide
             var modPath = modPaths[0];
             Directory.CreateDirectory(modPath);
 
@@ -329,6 +347,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 var options = new CloneOptions
                 {
                     RecurseSubmodules = true,
+                    BranchName = branchName,
                 };
                 options.FetchOptions.OnProgress = (serverProgressOutput) =>
                 {
@@ -614,25 +633,29 @@ namespace OpenKh.Tools.ModsManager.Services
             }
             else
             {
-                ClearOldMods(modName);
+                ClearOldModsCore(modName);
                 throw new ModMovedWithoutGameException(modName);
             }
         }));
 
-        public static Task ClearOldMods(string modName) => Task.Run(() => Handle(() =>
+        public static Task ClearOldMods(string modName) => Task.Run(() => Handle(() => ClearOldModsCore(modName)));
+
+        private static void ClearOldModsCore(string modName)
         {
             foreach (var game in new List<string> { "kh1", "kh2", "bbs", "Recom", "kh3d" })
             {
                 var modPath = GetModsGamePath(modName, game);
                 if (Directory.Exists(modPath))
-                    CleanModFiles(modPath);
+                    CleanModFilesCore(modPath);
             }
             var collectionPath = GetCollectionPath(modName);
             if (Directory.Exists(collectionPath))
-                CleanModFiles(collectionPath);
-        }));
+                CleanModFilesCore(collectionPath);
+        }
 
-        public static Task CleanModFiles(string modPath) => Task.Run(() => Handle(() =>
+        public static Task CleanModFiles(string modPath) => Task.Run(() => Handle(() => CleanModFilesCore(modPath)));
+
+        private static void CleanModFilesCore(string modPath)
         {
             foreach (var filePath in Directory.GetFiles(modPath, "*", SearchOption.AllDirectories))
             {
@@ -641,7 +664,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
             }
             Directory.Delete(modPath, true);
-        }));
+        }
 
         public static Metadata GetMetadata(string modPath)
         {

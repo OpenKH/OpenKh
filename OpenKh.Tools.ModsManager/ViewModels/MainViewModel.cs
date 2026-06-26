@@ -494,6 +494,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         var name = view.RepositoryName;
                         var isZipFile = view.IsZipFile;
                         var isLuaFile = view.IsLuaFile;
+                        var branchName = view.BranchName;
                         progressWindow = Application.Current.Dispatcher.Invoke(() =>
                         {
                             var progressWindow = new InstallModProgressWindow
@@ -511,8 +512,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }, nProgress =>
                         {
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
-                        });
-                        var actualName = isZipFile || isLuaFile ? Path.GetFileNameWithoutExtension(name) : name;
+                        }, branchName);
+                        var repoName = name;
+                        if (!isZipFile && !isLuaFile)
+                        {
+                            var nameParts = name.Split('/');
+                            if (nameParts.Length == 3)
+                                repoName = $"{nameParts[0]}/{nameParts[1]}";
+                        }
+                        var actualName = isZipFile || isLuaFile ? Path.GetFileNameWithoutExtension(name) : repoName;
                         var mod = ModsService.GetMods(new string[] { actualName }).First();
                         Application.Current.Dispatcher.Invoke(() =>
                         {
