@@ -30,6 +30,13 @@
                 <TextBox Name="txtSourceModUrl" Background="Transparent" Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" KeyUp="txtSourceModUrl_KeyUp" />
             </Grid>
 
+            <TextBlock Margin="0 0 0 3">Branch (optional)</TextBlock>
+            <Grid Margin="0 0 0 5" Background="White">
+                <TextBlock Margin="5,1" MinWidth="50" Text="eg. main"
+                   Foreground="Gray" Visibility="{Binding ElementName=txtBranchName, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" IsHitTestVisible="False"/>
+                <TextBox Name="txtBranchName" Background="Transparent" Text="{Binding BranchName, UpdateSourceTrigger=PropertyChanged}" KeyUp="txtSourceModUrl_KeyUp" />
+            </Grid>
+
             <TextBlock Margin="0 0 0 3">Install a Mod Archive or Lua Script</TextBlock>
             <Button Margin="0 0 0 5" Click="InstallLocalFile_Click">Select and install Mod Archive or Lua Script</Button>
         </StackPanel>

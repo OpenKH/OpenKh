@@ -24,6 +24,20 @@ namespace OpenKh.Tools.ModsManager.Exceptions
         }
     }
 
+    public class BranchNotValidException : Exception
+    {
+        public string ModName { get; }
+
+        public string BranchName { get; }
+
+        public BranchNotValidException(string modName, string branchName) :
+            base($"The branch '{branchName}' is not valid for '{modName}'.\nOr The mod '{modName}' does not contain a valid OpenKH compatible mod due to the missing 'mod.yml' file.")
+        {
+            ModName = modName;
+            BranchName = branchName;
+        }
+    }
+
     public class RepositoryNotFoundException : Exception
     {
         public string RepositoryName { get; set; }

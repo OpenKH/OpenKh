@@ -18,6 +18,7 @@ namespace OpenKh.Tools.ModsManager.Views
 
         public RelayCommand CloseCommand { get; }
         public string RepositoryName { get; set; }
+        public string BranchName { get; set; }
         public bool IsZipFile { get; private set; }
         public bool IsLuaFile { get; private set; } = false;
 
