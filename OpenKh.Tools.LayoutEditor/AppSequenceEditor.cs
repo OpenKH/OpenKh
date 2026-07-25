@@ -471,23 +471,23 @@ namespace OpenKh.Tools.LayoutEditor
                 ImGui.Text("Child animation properties");
 
                 int lightPosX = animationGroup.LightPositionX;
-                if (ImGui.InputInt("Light pos. X", ref lightPosX))
+                if (ImGui.InputInt("ParamX", ref lightPosX))
                     animationGroup.LightPositionX = lightPosX;
 
                 int textPosY = animationGroup.TextPositionY;
-                if (ImGui.InputInt("Text position Y", ref textPosY))
+                if (ImGui.InputInt("ParamY", ref textPosY))
                     animationGroup.TextPositionY = textPosY;
 
                 int textScale = animationGroup.TextScale;
-                if (ImGui.InputInt("Text scale", ref textScale))
+                if (ImGui.InputInt("ParamSize", ref textScale))
                     animationGroup.TextScale = textScale;
 
                 int uiPadding = animationGroup.UiPadding;
-                if (ImGui.InputInt("UI padding", ref uiPadding))
+                if (ImGui.InputInt("ParamCr", ref uiPadding))
                     animationGroup.UiPadding = uiPadding;
 
                 int textPosX = animationGroup.TextPositionX;
-                if (ImGui.InputInt("Text position X", ref textPosX))
+                if (ImGui.InputInt("ParamEx", ref textPosX))
                     animationGroup.TextPositionX = textPosX;
             }
         }
