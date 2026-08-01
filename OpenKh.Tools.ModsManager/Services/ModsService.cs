@@ -121,11 +121,12 @@ namespace OpenKh.Tools.ModsManager.Services
             bool isLuaFile,
             Action<string> progressOutput = null,
             Action<float> progressNumber = null,
+            string platformUrl = null,
             string branchName = null)
         {
             if (!isZipFile && !isLuaFile)
             {
-                return Task.Run(() => InstallModFromGithub(name, progressOutput, progressNumber, branchName));
+                return Task.Run(() => InstallModFromGit(name, progressOutput, progressNumber, platformUrl, branchName));
             }
             else if (isZipFile && !isLuaFile)
             {
@@ -277,10 +278,11 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        public static async Task InstallModFromGithub(
+        public static async Task InstallModFromGit(
             string repositoryName,
             Action<string> progressOutput = null,
             Action<float> progressNumber = null,
+            string platformName = null,
             string branchName = null)
         {
             var parts = repositoryName.Split('/');
@@ -294,7 +296,7 @@ namespace OpenKh.Tools.ModsManager.Services
             if (!string.IsNullOrWhiteSpace(branchName))
             {
                 progressOutput?.Invoke($"Fetching file {ModMetadata} from branch {branchName}");
-                var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
+                var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata, platformName);
                 if (!isValidMod)
                     throw new BranchNotValidException(repositoryName, branchName);
             }
@@ -302,7 +304,7 @@ namespace OpenKh.Tools.ModsManager.Services
             {
                 branchName = DefaultGitBranch;
                 progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
-                var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
+                var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata, platformName);
                 if (!isValidMod)
                 {
                     progressOutput?.Invoke($"{ModMetadata} not found, fetching default branch name");
@@ -311,7 +313,7 @@ namespace OpenKh.Tools.ModsManager.Services
                         throw new RepositoryNotFoundException(repositoryName);
 
                     progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
-                    isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
+                    isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata, platformName);
                 }
 
                 if (!isValidMod)
@@ -363,7 +365,16 @@ namespace OpenKh.Tools.ModsManager.Services
                     return true;
                 };
 
-                Repository.Clone($"https://github.com/{repositoryName}", modPath, options);
+                var _fetchPlatformUrl = new Uri("https://github.com/");
+                var _fetchRelativeUri = new Uri(_fetchPlatformUrl, $"{repositoryName}");
+
+                if (!String.IsNullOrWhiteSpace(platformName))
+                {
+                    _fetchPlatformUrl = new Uri(platformName.Contains("http") ? platformName : "https://" + platformName);
+                    _fetchRelativeUri = new Uri(_fetchPlatformUrl, $"{repositoryName}");
+                }
+
+                Repository.Clone(_fetchRelativeUri.ToString(), modPath, options);
             });
             if (IsCollection(repositoryName))
                 await MoveToCollection(repositoryName);

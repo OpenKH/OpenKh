@@ -494,6 +494,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         var name = view.RepositoryName;
                         var isZipFile = view.IsZipFile;
                         var isLuaFile = view.IsLuaFile;
+                        var platformUrl = view.PlatformURL;
                         var branchName = view.BranchName;
                         progressWindow = Application.Current.Dispatcher.Invoke(() =>
                         {
@@ -512,7 +513,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }, nProgress =>
                         {
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
-                        }, branchName);
+                        }, platformUrl, branchName);
                         var repoName = name;
                         if (!isZipFile && !isLuaFile)
                         {

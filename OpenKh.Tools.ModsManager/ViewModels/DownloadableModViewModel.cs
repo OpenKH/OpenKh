@@ -71,7 +71,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 });
 
                 // Install mod with progress updates
-                await Task.Run(() => ModsService.InstallModFromGithub(Repo,
+                await Task.Run(() => ModsService.InstallModFromGit(Repo,
                     progress => {
                         Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
                     },

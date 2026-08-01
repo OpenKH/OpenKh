@@ -1,3 +1,4 @@
+using LibGit2Sharp;
 using OpenKh.Common;
 using OpenKh.Tools.ModsManager.Models;
 using OpenKh.Tools.ModsManager.Services;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -41,6 +43,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 Author = Source[0..nameIndex];
                 Name = Source[(nameIndex + 1)..];
+
+                var _fetchRepository = new Repository(_model.Path);
+                var _fetchRemoteUrl = _fetchRepository.Network.Remotes.ElementAt(0).Url.TrimEnd('/');
+
+                SourceUrl = _fetchRemoteUrl;
+                ReportBugUrl = _fetchRemoteUrl += "/issues";
+
+                AuthorUrl = _fetchRemoteUrl.Substring(0, _fetchRemoteUrl.LastIndexOf('/') + 1);
             }
             else
             {
@@ -175,9 +185,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string Name { get; }
         public string Author { get; }
         public string Source => _model.Name;
-        public string AuthorUrl => $"https://github.com/{Author}";
-        public string SourceUrl => $"https://github.com/{Source}";
-        public string ReportBugUrl => $"https://github.com/{Source}/issues";
+        public string AuthorUrl { get; set; }
+        public string SourceUrl { get; set; }
+        public string ReportBugUrl { get; set; }
         public string FilesToPatch
         {
             get

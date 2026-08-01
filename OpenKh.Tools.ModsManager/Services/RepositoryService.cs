@@ -1,6 +1,8 @@
 using LibGit2Sharp;
 using Newtonsoft.Json;
 using System;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -38,8 +40,52 @@ namespace OpenKh.Tools.ModsManager.Services
             return JsonConvert.DeserializeObject<ReposResponse>(await response.Content.ReadAsStringAsync())?.DefaultBranch;
         }
 
-        public static Task<bool> IsFileExists(string repoName, string branch, string filePath) =>
-            IsFileExists($"https://raw.githubusercontent.com/{repoName}/{branch}/{filePath}");
+        public static Task<bool> IsFileExists(string repoName, string branch, string filePath, string platformUrl = null)
+        {
+            if (!string.IsNullOrEmpty(platformUrl))
+            {
+                var _fetchBaseUri = new Uri(platformUrl.Contains("http") ? platformUrl : "https://" + platformUrl);
+                var _fetchRelativeUri = new Uri(_fetchBaseUri, $"{repoName}");
+
+                var _fetchRepoDirectory = $"gitfetch/{repoName}/{branch}";
+
+                var _cloneOptions = new CloneOptions
+                {
+                    Checkout = false,
+                    IsBare = true,
+                    BranchName = branch
+                };
+
+                _cloneOptions.FetchOptions.Prune = true;
+
+                Repository.Clone(_fetchRelativeUri.ToString(), _fetchRepoDirectory, _cloneOptions);
+                var _fetchRepository = new Repository(_fetchRepoDirectory);
+
+                var _fetchCommit = _fetchRepository.Head.Tip;
+                var _doesModFileExist = _fetchCommit["mod.yml"] != null;
+
+                _fetchRepository.Dispose();
+
+                if (Directory.Exists(_fetchRepoDirectory))
+                {
+                    var _fetchAllFiles = Directory.GetFiles(_fetchRepoDirectory, "*", SearchOption.AllDirectories);
+                    var _fetchAllDirectories = Directory.GetDirectories(_fetchRepoDirectory, "*", SearchOption.AllDirectories);
+
+                    foreach (var _fetchFile in _fetchAllFiles)
+                        File.SetAttributes(_fetchFile, FileAttributes.Normal);
+
+                    foreach (string _fetchDirectory in _fetchAllDirectories)
+                        File.SetAttributes(_fetchDirectory, FileAttributes.Normal);
+
+                    Directory.Delete(_fetchRepoDirectory, true);
+                }
+
+                return Task.FromResult(_doesModFileExist);
+            }
+
+            else
+                return IsFileExists($"https://raw.githubusercontent.com/{repoName}/{branch}/{filePath}");
+        }
 
         public static async Task<bool> IsFileExists(string url)
         {
