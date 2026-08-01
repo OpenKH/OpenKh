@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
          FocusManager.FocusedElement="{Binding ElementName=txtSourceModUrl}"
-        Title="Install a new mod or Lua Script..." Height="160" Width="300" SizeToContent="Height" Background="{Binding ColorTheme.BackgroundColor}" Foreground="{Binding ColorTheme.TextColor}">
+        Title="Install a new mod or Lua Script..." Height="183" Width="300" SizeToContent="Height" Background="{Binding ColorTheme.BackgroundColor}" Foreground="{Binding ColorTheme.TextColor}">
     <Window.InputBindings>
         <KeyBinding Key="Esc" Command="{Binding CloseCommand}"/>
     </Window.InputBindings>
@@ -29,16 +29,35 @@
                    Foreground="Gray" Visibility="{Binding ElementName=txtSourceModUrl, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" IsHitTestVisible="False"/>
                 <TextBox Name="txtSourceModUrl" Background="Transparent" Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" KeyUp="txtSourceModUrl_KeyUp" />
             </Grid>
-
-            <TextBlock Margin="0 0 0 3">Branch (optional)</TextBlock>
-            <Grid Margin="0 0 0 5" Background="White">
-                <TextBlock Margin="5,1" MinWidth="50" Text="eg. main"
-                   Foreground="Gray" Visibility="{Binding ElementName=txtBranchName, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" IsHitTestVisible="False"/>
-                <TextBox Name="txtBranchName" Background="Transparent" Text="{Binding BranchName, UpdateSourceTrigger=PropertyChanged}" KeyUp="txtSourceModUrl_KeyUp" />
-            </Grid>
-
+            
             <TextBlock Margin="0 0 0 3">Install a Mod Archive or Lua Script</TextBlock>
             <Button Margin="0 0 0 5" Click="InstallLocalFile_Click">Select and install Mod Archive or Lua Script</Button>
+           
+            <Expander Header="More Options" Foreground="{Binding ColorTheme.TextColor}">
+                <StackPanel>
+                    <TextBlock Margin="0 0 0 3">Hosted Platform (optional)</TextBlock>
+                    <Grid Margin="0 0 0 5" Background="White">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="211*"/>
+                            <ColumnDefinition Width="70*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Margin="5,1,5,1" MinWidth="50" Text="eg. https://github.com/"
+                   Foreground="Gray" Visibility="{Binding ElementName=txtPlatformUrl, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" IsHitTestVisible="False" Grid.ColumnSpan="2"/>
+                        <TextBox Name="txtPlatformUrl" Background="Transparent" Text="{Binding PlatformURL, UpdateSourceTrigger=PropertyChanged}" KeyUp="txtSourceModUrl_KeyUp" Grid.ColumnSpan="2" />
+                    </Grid>
+
+                    <TextBlock Margin="0 0 0 3">Branch (optional)</TextBlock>
+                    <Grid Margin="0 0 0 5" Background="White">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="211*"/>
+                            <ColumnDefinition Width="70*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Margin="5,1,5,1" MinWidth="50" Text="eg. main"
+                   Foreground="Gray" Visibility="{Binding ElementName=txtBranchName, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" IsHitTestVisible="False" Grid.ColumnSpan="2"/>
+                        <TextBox Name="txtBranchName" Background="Transparent" Text="{Binding BranchName, UpdateSourceTrigger=PropertyChanged}" KeyUp="txtSourceModUrl_KeyUp" Grid.ColumnSpan="2" />
+                    </Grid>
+                </StackPanel>
+            </Expander>
         </StackPanel>
 
         <Grid Grid.Row="2">
