@@ -48,7 +48,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 var _fetchRemoteUrl = _fetchRepository.Network.Remotes.ElementAt(0).Url.TrimEnd('/');
 
                 SourceUrl = _fetchRemoteUrl;
-                ReportBugUrl = _fetchRemoteUrl += "/issues";
+                ReportBugUrl = _fetchRemoteUrl + "/issues";
 
                 AuthorUrl = _fetchRemoteUrl.Substring(0, _fetchRemoteUrl.LastIndexOf('/') + 1);
             }
