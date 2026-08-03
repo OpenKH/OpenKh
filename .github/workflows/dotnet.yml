@@ -56,7 +56,7 @@ jobs:
     - name: validate update archive
       shell: pwsh
       run: |
-        $archiveListing = 7z l openkh.zip
+        $archiveListing = (7z l openkh.zip) -join "`n"
         $requiredEntries = @(
           "openkh\OpenKh.Launcher.exe",
           "openkh\OpenKh.Tools.ModsManager.exe",
