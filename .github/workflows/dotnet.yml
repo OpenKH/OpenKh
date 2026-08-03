@@ -53,6 +53,21 @@ jobs:
         filename: openkh.zip
         path: openkh
 
+    - name: validate update archive
+      shell: pwsh
+      run: |
+        $archiveListing = 7z l openkh.zip
+        $requiredEntries = @(
+          "openkh\OpenKh.Launcher.exe",
+          "openkh\OpenKh.Tools.ModsManager.exe",
+          "openkh\Apps\ModManager\OpenKh.Tools.ModsManager.exe"
+        )
+        foreach ($entry in $requiredEntries) {
+          if ($archiveListing -notmatch [regex]::Escape($entry)) {
+            throw "Required update entry '$entry' is missing from openkh.zip."
+          }
+        }
+
     - name: "GitHub release latest"
       if: ${{ github.ref_name == 'master' }}
       uses: "marvinpinto/action-automatic-releases@latest"

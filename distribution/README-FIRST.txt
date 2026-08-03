@@ -11,6 +11,9 @@ programs in AdvancedTools.
 The Apps folder contains application dependencies and should remain next to the
 launcher. There is no need to open it manually.
 
+When updating an older OpenKH installation, settings, presets, mod lists, and
+user content are preserved while obsolete application files are removed.
+
 ADVANCED TOOLS
 ==============
 

@@ -6,7 +6,7 @@
 # Project specific files
 .tests/
 /openkh/
-/openkh-clean/
+/openkh-*/
 /OpenKh-*-release.zip
 
 # User-specific files

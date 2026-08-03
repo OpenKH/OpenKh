@@ -44,7 +44,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 var remoteReleaseTag = latestAsset.Release.TagName;
 
-                var localReleaseTagFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "openkh-release");
+                var localReleaseTagFile = Path.Combine(OpenkhInstallation.Directory, "openkh-release");
                 var localReleaseTag = File.Exists(localReleaseTagFile)
                     ? File.ReadAllLines(localReleaseTagFile).First()
                     : "(Unknown version)";

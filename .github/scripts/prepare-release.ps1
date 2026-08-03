@@ -20,6 +20,17 @@ $applicationsDirectory = Join-Path $ReleaseDirectory "Apps"
 $modManagerDirectory = Join-Path $applicationsDirectory "ModManager"
 New-Item -ItemType Directory -Path $modManagerDirectory -Force | Out-Null
 
+$legacyFileManifest = Join-Path $applicationsDirectory "legacy-release-files.txt"
+$legacyDirectoryManifest = Join-Path $applicationsDirectory "legacy-release-directories.txt"
+Get-ChildItem -LiteralPath $BuildDirectory -File |
+    Select-Object -ExpandProperty Name |
+    Sort-Object |
+    Set-Content -LiteralPath $legacyFileManifest -Encoding UTF8
+Get-ChildItem -LiteralPath $BuildDirectory -Directory |
+    Select-Object -ExpandProperty Name |
+    Sort-Object |
+    Set-Content -LiteralPath $legacyDirectoryManifest -Encoding UTF8
+
 dotnet publish `
     "OpenKh.Tools.Launcher/OpenKh.Tools.Launcher.csproj" `
     --configuration $Configuration `
@@ -33,6 +44,12 @@ dotnet publish `
 if ($LASTEXITCODE -ne 0) {
     throw "Publishing OpenKH Launcher failed with exit code $LASTEXITCODE."
 }
+
+$compatibilityExecutable = Join-Path $ReleaseDirectory "OpenKh.Tools.ModsManager.exe"
+Copy-Item `
+    -LiteralPath (Join-Path $ReleaseDirectory "OpenKh.Launcher.exe") `
+    -Destination $compatibilityExecutable
+(Get-Item -LiteralPath $compatibilityExecutable).Attributes += "Hidden"
 
 dotnet publish `
     "OpenKh.Tools.ModsManager/OpenKh.Tools.ModsManager.csproj" `
