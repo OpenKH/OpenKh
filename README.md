@@ -18,6 +18,8 @@ New builds of OpenKH are automatically generated every time one of the contribut
 
 All the builds from `master` and from pull requestes are generated from [GitHub Actions](https://github.com/OpenKh/OpenKh/actions).
 
+After extracting a release, open `OpenKh.Launcher.exe`. The launcher presents the Mod Manager as the recommended option for installing and playing mods, while editors, converters, and command-line utilities for mod creators are kept in the separate `AdvancedTools` section. Application dependencies are organized under `Apps`, leaving the release root with a single executable entry point.
+
 OpenKH tools require the installation of the [.NET 8.0 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0). All the UI tools are designed to work on Windows, while command line tools will work on any operating system.
 
 

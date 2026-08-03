@@ -11,6 +11,8 @@ namespace OpenKh.Tools.ModsManager.Services
 {
     public class OpenkhUpdateProceederService
     {
+        private const string ModManagerExecutableName = "OpenKh.Tools.ModsManager.exe";
+
         public async Task UpdateAsync(string downloadZipUrl, Action<float> progress, CancellationToken cancellation)
         {
             var tempId = Guid.NewGuid().ToString("N");
@@ -40,13 +42,14 @@ namespace OpenKh.Tools.ModsManager.Services
             File.Delete(tempZipFile);
             var tempBatFile = Path.Combine(Path.GetTempPath(), $"openkh-{tempId}.bat");
 
-            var copyTo = AppDomain.CurrentDomain.BaseDirectory;
+            var copyTo = GetInstallationDirectory();
+            var modManagerExecutable = GetModManagerExecutable(copyTo);
 
             await CreateBatchFileAsync(
                 tempBatFile: tempBatFile,
                 copyFrom: Path.Combine(tempZipDir, "openkh"),
                 copyTo: copyTo,
-                execAfter: $"start \"\" \"{Path.Combine(copyTo, "OpenKh.Tools.ModsManager.exe")}\""
+                execAfter: $"start \"\" \"{modManagerExecutable}\""
             );
 
             Process.Start(
@@ -57,6 +60,35 @@ namespace OpenKh.Tools.ModsManager.Services
                     UseShellExecute = true,
                 }
             );
+        }
+
+        private static string GetInstallationDirectory()
+        {
+            var applicationDirectory = new DirectoryInfo(
+                AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            );
+            var appsDirectory = applicationDirectory.Parent;
+            var installationDirectory = appsDirectory?.Parent;
+
+            return applicationDirectory.Name.Equals("ModManager", StringComparison.OrdinalIgnoreCase)
+                && appsDirectory?.Name.Equals("Apps", StringComparison.OrdinalIgnoreCase) == true
+                && installationDirectory != null
+                    ? installationDirectory.FullName
+                    : applicationDirectory.FullName;
+        }
+
+        private static string GetModManagerExecutable(string installationDirectory)
+        {
+            var packagedPath = Path.Combine(
+                installationDirectory,
+                "Apps",
+                "ModManager",
+                ModManagerExecutableName
+            );
+
+            return File.Exists(packagedPath)
+                ? packagedPath
+                : Path.Combine(installationDirectory, ModManagerExecutableName);
         }
 
         private async Task CopyToAsyncWithProgress(Stream input, Stream output, long? maxLen, Action<float> progress, CancellationToken cancellation)
