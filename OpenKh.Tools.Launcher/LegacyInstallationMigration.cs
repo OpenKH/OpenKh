@@ -61,14 +61,19 @@ internal static class LegacyInstallationMigration
 
         try
         {
-            Process.Start(new ProcessStartInfo
+            var startInfo = new ProcessStartInfo
             {
                 FileName = modManagerPath,
                 WorkingDirectory = Path.GetDirectoryName(modManagerPath),
                 UseShellExecute = true,
-            });
+            };
 
-            ScheduleLegacyFileCleanup(installationDirectory);
+            foreach (var argument in Environment.GetCommandLineArgs().Skip(1))
+                startInfo.ArgumentList.Add(argument);
+
+            Process.Start(startInfo);
+
+            ScheduleCleanupIfNeeded(installationDirectory);
         }
         catch (Exception exception)
         {
@@ -83,28 +88,28 @@ internal static class LegacyInstallationMigration
         return true;
     }
 
-    public static void RemoveCompatibilityBootstrap()
+    public static void ScheduleCleanupIfNeeded()
     {
-        var compatibilityPath = Path.Combine(AppContext.BaseDirectory, CompatibilityExecutableName);
-        if (!File.Exists(compatibilityPath)
-            || string.Equals(Environment.ProcessPath, compatibilityPath, StringComparison.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
-        try
-        {
-            File.SetAttributes(compatibilityPath, FileAttributes.Normal);
-            File.Delete(compatibilityPath);
-        }
-        catch
-        {
-            // A future update can remove the compatibility bootstrap.
-        }
+        var installationDirectory = AppContext.BaseDirectory.TrimEnd(
+            Path.DirectorySeparatorChar,
+            Path.AltDirectorySeparatorChar
+        );
+        ScheduleCleanupIfNeeded(installationDirectory);
     }
 
-    private static void ScheduleLegacyFileCleanup(string installationDirectory)
+    private static void ScheduleCleanupIfNeeded(string installationDirectory)
     {
+        var legacyFiles = GetLegacyApplicationFiles(installationDirectory)
+            .Where(File.Exists)
+            .ToArray();
+        var legacyDirectories = GetLegacyResourceDirectories(installationDirectory)
+            .Select(directoryName => Path.Combine(installationDirectory, directoryName))
+            .Where(Directory.Exists)
+            .ToArray();
+
+        if (legacyFiles.Length == 0 && legacyDirectories.Length == 0)
+            return;
+
         var batchPath = Path.Combine(Path.GetTempPath(), $"openkh-migrate-{Guid.NewGuid():N}.bat");
         var batch = new StringBuilder();
 
@@ -117,18 +122,16 @@ internal static class LegacyInstallationMigration
         batch.AppendLine("    goto wait_for_launcher");
         batch.AppendLine(")");
 
-        foreach (var filePath in GetLegacyApplicationFiles(installationDirectory))
+        foreach (var filePath in legacyFiles)
         {
             var escapedPath = EscapeBatchPath(filePath);
             batch.AppendLine($"attrib -h -r {escapedPath} 2>nul");
             batch.AppendLine($"del /f /q {escapedPath} 2>nul");
         }
 
-        foreach (var directoryName in GetLegacyResourceDirectories(installationDirectory))
+        foreach (var directoryPath in legacyDirectories)
         {
-            var directoryPath = Path.Combine(installationDirectory, directoryName);
-            if (Directory.Exists(directoryPath))
-                batch.AppendLine($"rmdir /s /q {EscapeBatchPath(directoryPath)} 2>nul");
+            batch.AppendLine($"rmdir /s /q {EscapeBatchPath(directoryPath)} 2>nul");
         }
 
         batch.AppendLine("del /f /q \"%~f0\"");
@@ -154,14 +157,13 @@ internal static class LegacyInstallationMigration
         var legacyFileNames = File.ReadAllLines(manifestPath)
             .Where(fileName => !string.IsNullOrWhiteSpace(fileName))
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
-        legacyFileNames.Add(CompatibilityExecutableName);
-
         return Directory.EnumerateFiles(installationDirectory, "*", SearchOption.TopDirectoryOnly)
             .Where(filePath =>
                 legacyFileNames.Contains(Path.GetFileName(filePath))
                 || Path.GetFileName(filePath).StartsWith("OpenKh.Tools.ModsManager.", StringComparison.OrdinalIgnoreCase)
             )
-            .Where(filePath => !Path.GetFileName(filePath).Equals(LauncherExecutableName, StringComparison.OrdinalIgnoreCase));
+            .Where(filePath => !Path.GetFileName(filePath).Equals(LauncherExecutableName, StringComparison.OrdinalIgnoreCase))
+            .Where(filePath => !Path.GetFileName(filePath).Equals(CompatibilityExecutableName, StringComparison.OrdinalIgnoreCase));
     }
 
     private static IEnumerable<string> GetLegacyResourceDirectories(string installationDirectory)
@@ -175,7 +177,8 @@ internal static class LegacyInstallationMigration
     private static bool IsLegacyApplicationFile(string filePath)
     {
         var fileName = Path.GetFileName(filePath);
-        if (fileName.Equals(LauncherExecutableName, StringComparison.OrdinalIgnoreCase))
+        if (fileName.Equals(LauncherExecutableName, StringComparison.OrdinalIgnoreCase)
+            || fileName.Equals(CompatibilityExecutableName, StringComparison.OrdinalIgnoreCase))
             return false;
 
         if (Path.GetExtension(fileName).Equals(".dll", StringComparison.OrdinalIgnoreCase))

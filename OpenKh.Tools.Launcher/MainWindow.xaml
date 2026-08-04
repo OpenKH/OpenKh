@@ -126,7 +126,8 @@
                             </StackPanel>
                             <StackPanel Grid.Row="2">
                                 <Button x:Name="LaunchModManagerButton" Style="{StaticResource PrimaryButton}" Content="Open Mod Manager" Click="LaunchModManager_Click"/>
-                                <TextBlock x:Name="ModManagerStatusText" Margin="0,9,0,0" Text="Ready" Foreground="#7FDCAD" FontSize="12" TextAlignment="Center"/>
+                                <Button x:Name="CreateShortcutButton" Margin="0,8,0,0" Style="{StaticResource SecondaryButton}" Padding="15,7" Content="Create Desktop Shortcut" Click="CreateShortcut_Click"/>
+                                <TextBlock x:Name="ModManagerStatusText" Margin="0,9,0,0" Foreground="#EE8989" FontSize="12" TextAlignment="Center" Visibility="Collapsed"/>
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -230,6 +231,7 @@
             <Grid>
                 <TextBlock Text="OpenKH" Foreground="#718099" FontSize="12"/>
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button x:Name="CheckForUpdatesButton" Padding="0" Margin="0,0,20,0" Background="Transparent" BorderThickness="0" Foreground="#8FB9F8" Content="Check for Updates" Cursor="Hand" Click="CheckForUpdates_Click"/>
                     <Button Padding="0" Margin="0,0,20,0" Background="Transparent" BorderThickness="0" Foreground="#8FB9F8" Content="Documentation" Cursor="Hand" Click="OpenDocumentation_Click"/>
                     <TextBlock x:Name="VersionText" Foreground="#718099" FontSize="12" VerticalAlignment="Center"/>
                 </StackPanel>

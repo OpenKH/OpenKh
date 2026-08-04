@@ -53,6 +53,7 @@ public partial class MainWindow : Window
         }
     }
     private string AdvancedToolsPath => Path.Combine(BaseDirectory, AdvancedToolsDirectory);
+    private string CompatibilityModManagerPath => Path.Combine(BaseDirectory, ModManagerExecutable);
 
     public MainWindow()
     {
@@ -66,10 +67,10 @@ public partial class MainWindow : Window
 
         var modManagerAvailable = File.Exists(ModManagerPath);
         LaunchModManagerButton.IsEnabled = modManagerAvailable;
-        ModManagerStatusText.Text = modManagerAvailable ? "Ready" : "Mod Manager was not found";
-        ModManagerStatusText.Foreground = modManagerAvailable
-            ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(127, 220, 173))
-            : new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(238, 137, 137));
+        CheckForUpdatesButton.IsEnabled = modManagerAvailable;
+        CreateShortcutButton.IsEnabled = File.Exists(CompatibilityModManagerPath);
+        ModManagerStatusText.Text = modManagerAvailable ? string.Empty : "Mod Manager was not found";
+        ModManagerStatusText.Visibility = modManagerAvailable ? Visibility.Collapsed : Visibility.Visible;
 
         LoadTools();
     }
@@ -142,6 +143,32 @@ public partial class MainWindow : Window
 
     private void LaunchModManager_Click(object sender, RoutedEventArgs e) => Launch(ModManagerPath);
 
+    private void CheckForUpdates_Click(object sender, RoutedEventArgs e) =>
+        Launch(ModManagerPath, "--check-for-updates");
+
+    private void CreateShortcut_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var shortcutPath = DesktopShortcutService.CreateModManagerShortcut(CompatibilityModManagerPath);
+            MessageBox.Show(
+                $"The OpenKH Mod Manager shortcut was created on your desktop.\n\n{shortcutPath}",
+                "Shortcut created",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(
+                $"OpenKH could not create the desktop shortcut.\n\n{exception.Message}",
+                "Unable to create shortcut",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
+        }
+    }
+
     private void ShowTools_Click(object sender, RoutedEventArgs e)
     {
         LoadTools();
@@ -183,7 +210,7 @@ public partial class MainWindow : Window
 
     private void OpenDocumentation_Click(object sender, RoutedEventArgs e) => Launch("https://openkh.dev/");
 
-    private static void Launch(string target)
+    private static void Launch(string target, params string[] arguments)
     {
         try
         {
@@ -191,12 +218,17 @@ public partial class MainWindow : Window
                 ? Path.GetDirectoryName(target)
                 : AppContext.BaseDirectory;
 
-            Process.Start(new ProcessStartInfo
+            var startInfo = new ProcessStartInfo
             {
                 FileName = target,
                 WorkingDirectory = workingDirectory,
                 UseShellExecute = true,
-            });
+            };
+
+            foreach (var argument in arguments)
+                startInfo.ArgumentList.Add(argument);
+
+            Process.Start(startInfo);
         }
         catch (Exception exception)
         {

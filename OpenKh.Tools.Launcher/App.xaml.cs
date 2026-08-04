@@ -14,7 +14,7 @@ public partial class App : Application
             return;
         }
 
-        LegacyInstallationMigration.RemoveCompatibilityBootstrap();
+        LegacyInstallationMigration.ScheduleCleanupIfNeeded();
         new MainWindow().Show();
     }
 }

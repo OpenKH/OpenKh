@@ -51,15 +51,10 @@ namespace OpenKh.Tools.ModsManager.Services
             var modManagerExecutable = File.Exists(packagedModManagerExecutable)
                 ? Path.Combine(copyTo, "Apps", "ModManager", "OpenKh.Tools.ModsManager.exe")
                 : OpenkhInstallation.GetModManagerExecutable(copyTo);
-            var compatibilityExecutable = File.Exists(packagedModManagerExecutable)
-                ? Path.Combine(copyTo, "OpenKh.Tools.ModsManager.exe")
-                : null;
-
             await CreateBatchFileAsync(
                 tempBatFile: tempBatFile,
                 copyFrom: copyFrom,
                 copyTo: copyTo,
-                deleteAfterCopy: compatibilityExecutable,
                 execAfter: $"start \"\" \"{modManagerExecutable}\""
             );
 
@@ -97,7 +92,6 @@ namespace OpenKh.Tools.ModsManager.Services
             string tempBatFile,
             string copyFrom,
             string copyTo,
-            string deleteAfterCopy,
             string execAfter
         )
         {
@@ -106,11 +100,6 @@ namespace OpenKh.Tools.ModsManager.Services
             bat.WriteLine($"taskkill /im OpenKh.Tools.ModsManager.exe");
             bat.WriteLine($"robocopy  {EscapeRobocopyArg(copyFrom)} {EscapeRobocopyArg(copyTo)} /e");
             bat.WriteLine($"if errorlevel 8 pause");
-            if (!string.IsNullOrWhiteSpace(deleteAfterCopy))
-            {
-                bat.WriteLine($"attrib -h -r {EscapeRobocopyArg(deleteAfterCopy)}");
-                bat.WriteLine($"del /f /q {EscapeRobocopyArg(deleteAfterCopy)}");
-            }
             bat.WriteLine($"{execAfter}");
             bat.WriteLine($"rd /s /q \"{copyFrom}\"");
             bat.WriteLine($"del %0");
