@@ -20,4 +20,14 @@
     <Resource Include="..\images\OpenKH.png" Link="Assets\OpenKH.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Octokit" Version="14.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\OpenKh.Tools.ModsManager\Services\OpenkhInstallation.cs" Link="Updates\OpenkhInstallation.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Services\OpenkhUpdateCheckerService.cs" Link="Updates\OpenkhUpdateCheckerService.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Services\OpenkhUpdateProceederService.cs" Link="Updates\OpenkhUpdateProceederService.cs" />
+  </ItemGroup>
+
 </Project>

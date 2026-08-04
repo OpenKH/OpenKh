@@ -1,9 +1,13 @@
+using OpenKh.Tools.ModsManager.Services;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace OpenKh.Tools.Launcher;
 
@@ -35,6 +39,7 @@ public partial class MainWindow : Window
         };
 
     private readonly List<ToolEntry> _allTools = new();
+    private OpenkhUpdateCheckerService.CheckResult? _availableUpdate;
     private string BaseDirectory => AppContext.BaseDirectory;
     private string ModManagerPath
     {
@@ -67,12 +72,13 @@ public partial class MainWindow : Window
 
         var modManagerAvailable = File.Exists(ModManagerPath);
         LaunchModManagerButton.IsEnabled = modManagerAvailable;
-        CheckForUpdatesButton.IsEnabled = modManagerAvailable;
+        CheckForUpdatesButton.IsEnabled = true;
         CreateShortcutButton.IsEnabled = File.Exists(CompatibilityModManagerPath);
         ModManagerStatusText.Text = modManagerAvailable ? string.Empty : "Mod Manager was not found";
         ModManagerStatusText.Visibility = modManagerAvailable ? Visibility.Collapsed : Visibility.Visible;
 
         LoadTools();
+        _ = RefreshUpdateAvailabilityAsync(showErrors: false, showProgress: false);
     }
 
     private void LoadTools()
@@ -143,8 +149,113 @@ public partial class MainWindow : Window
 
     private void LaunchModManager_Click(object sender, RoutedEventArgs e) => Launch(ModManagerPath);
 
-    private void CheckForUpdates_Click(object sender, RoutedEventArgs e) =>
-        Launch(ModManagerPath, "--check-for-updates");
+    private async void CheckForUpdates_Click(object sender, RoutedEventArgs e)
+    {
+        CheckForUpdatesButton.IsEnabled = false;
+
+        try
+        {
+            var checkResult = _availableUpdate?.HasUpdate == true
+                ? _availableUpdate
+                : await RefreshUpdateAvailabilityAsync(showErrors: true, showProgress: true);
+            if (checkResult == null)
+                return;
+
+            if (!checkResult.HasUpdate)
+            {
+                var message = string.IsNullOrWhiteSpace(checkResult.CurrentVersion)
+                    ? "No OpenKH update is currently available."
+                    : $"The latest version '{checkResult.CurrentVersion}' is already installed.";
+                MessageBox.Show(this, message, "OpenKH Update", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var updateMessage = "A new version of OpenKH is available.\n" +
+                $"Current: {checkResult.CurrentVersion}\n" +
+                $"Latest: {checkResult.NewVersion}\n\n" +
+                "Do you want to download and install it now?";
+            if (MessageBox.Show(
+                this,
+                updateMessage,
+                "OpenKH Update",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+            ) != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            CheckForUpdatesButton.Content = "Downloading Update...";
+            var launcherPath = Path.Combine(OpenkhInstallation.Directory, "OpenKh.Launcher.exe");
+            await new OpenkhUpdateProceederService().UpdateAsync(
+                checkResult.DownloadZipUrl,
+                rate => Dispatcher.Invoke(() =>
+                    CheckForUpdatesButton.Content = $"Downloading {rate:P0}"),
+                CancellationToken.None,
+                launcherPath
+            );
+
+            Application.Current.Shutdown();
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(
+                this,
+                $"OpenKH could not check for or install updates.\n\n{exception.Message}",
+                "OpenKH Update",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
+        }
+        finally
+        {
+            CheckForUpdatesButton.IsEnabled = true;
+            SetUpdateAvailability(_availableUpdate?.HasUpdate == true);
+        }
+    }
+
+    private async Task<OpenkhUpdateCheckerService.CheckResult?> RefreshUpdateAvailabilityAsync(
+        bool showErrors,
+        bool showProgress
+    )
+    {
+        if (showProgress)
+            CheckForUpdatesButton.Content = "Checking for Updates...";
+
+        try
+        {
+            var checkResult = await new OpenkhUpdateCheckerService().CheckAsync(CancellationToken.None);
+            _availableUpdate = checkResult;
+            SetUpdateAvailability(checkResult.HasUpdate);
+            return checkResult;
+        }
+        catch (Exception exception)
+        {
+            _availableUpdate = null;
+            SetUpdateAvailability(false);
+
+            if (showErrors)
+            {
+                MessageBox.Show(
+                    this,
+                    $"OpenKH could not check for updates.\n\n{exception.Message}",
+                    "OpenKH Update",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
+
+            return null;
+        }
+    }
+
+    private void SetUpdateAvailability(bool updateAvailable)
+    {
+        CheckForUpdatesButton.Content = updateAvailable ? "Update Available" : "Check for Updates";
+        CheckForUpdatesButton.Foreground = new SolidColorBrush(updateAvailable
+            ? Color.FromRgb(127, 220, 173)
+            : Color.FromRgb(143, 185, 248));
+    }
 
     private void CreateShortcut_Click(object sender, RoutedEventArgs e)
     {

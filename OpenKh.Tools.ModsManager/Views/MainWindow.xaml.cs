@@ -1,6 +1,5 @@
 using OpenKh.Tools.ModsManager.ViewModels;
 using System;
-using System.Linq;
 using System.Windows;
 
 namespace OpenKh.Tools.ModsManager.Views
@@ -13,14 +12,7 @@ namespace OpenKh.Tools.ModsManager.Views
         public MainWindow()
         {
             InitializeComponent();
-            var viewModel = new MainViewModel();
-            DataContext = viewModel;
-
-            if (Environment.GetCommandLineArgs().Any(argument =>
-                argument.Equals("--check-for-updates", StringComparison.OrdinalIgnoreCase)))
-            {
-                Loaded += (_, _) => viewModel.CheckOpenkhUpdateCommand.Execute(null);
-            }
+            DataContext = new MainViewModel();
         }
 
         protected override void OnClosed(EventArgs e)
