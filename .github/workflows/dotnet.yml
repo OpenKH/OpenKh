@@ -60,11 +60,20 @@ jobs:
         $requiredEntries = @(
           "openkh\OpenKh.Launcher.exe",
           "openkh\OpenKh.Tools.ModsManager.exe",
-          "openkh\Apps\ModManager\OpenKh.Tools.ModsManager.exe"
+          "openkh\Apps\OpenKh.Tools.ModsManager.exe"
         )
         foreach ($entry in $requiredEntries) {
           if ($archiveListing -notmatch [regex]::Escape($entry)) {
             throw "Required update entry '$entry' is missing from openkh.zip."
+          }
+        }
+        $obsoleteEntries = @(
+          "openkh\AdvancedTools",
+          "openkh\Apps\ModManager"
+        )
+        foreach ($entry in $obsoleteEntries) {
+          if ($archiveListing -match [regex]::Escape($entry)) {
+            throw "Obsolete update entry '$entry' is present in openkh.zip."
           }
         }
 

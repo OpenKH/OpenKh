@@ -186,7 +186,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="SearchBox" Grid.Column="0" Height="40" Padding="12,8" Background="#111B29" Foreground="#F5F7FB" BorderBrush="#334661" BorderThickness="1" FontSize="14" TextChanged="SearchBox_TextChanged"/>
-                    <Button Grid.Column="2" Style="{StaticResource SecondaryButton}" Content="Open AdvancedTools Folder" Click="OpenToolsFolder_Click"/>
+                    <Button Grid.Column="2" Style="{StaticResource SecondaryButton}" Content="Open Apps Folder" Click="OpenToolsFolder_Click"/>
                 </Grid>
 
                 <Border Grid.Row="4" Background="#111B29" BorderBrush="#26374E" BorderThickness="1" CornerRadius="8">
@@ -207,6 +207,7 @@
                                             <ColumnDefinition Width="42"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <Border Grid.Column="0" Width="32" Height="32" HorizontalAlignment="Left" Background="#2A4163" CornerRadius="16">
                                             <TextBlock Text="{Binding Initial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#9EC5FF"/>
@@ -215,7 +216,36 @@
                                             <TextBlock Text="{Binding DisplayName}" Foreground="#F5F7FB" FontSize="14" FontWeight="SemiBold"/>
                                             <TextBlock Margin="0,3,0,0" Text="{Binding Description}" Foreground="{StaticResource MutedTextBrush}" FontSize="12" TextTrimming="CharacterEllipsis"/>
                                         </StackPanel>
-                                        <Button Grid.Column="2" Margin="14,0,0,0" Style="{StaticResource SecondaryButton}" Padding="15,7" Content="Open" Tag="{Binding}" Click="LaunchTool_Click"/>
+                                        <Button Grid.Column="2"
+                                                Width="38"
+                                                Height="38"
+                                                Margin="12,0,0,0"
+                                                Padding="0"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                FontFamily="Segoe UI Symbol"
+                                                FontSize="22"
+                                                Content="{Binding FavoriteSymbol}"
+                                                ToolTip="{Binding FavoriteAction}"
+                                                AutomationProperties.Name="{Binding FavoriteAction}"
+                                                Tag="{Binding}"
+                                                Click="ToggleFavorite_Click">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Foreground" Value="#93A2B8"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                                            <Setter Property="Foreground" Value="#FFD166"/>
+                                                        </DataTrigger>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Foreground" Value="#FFE29A"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Grid.Column="3" Margin="10,0,0,0" Style="{StaticResource SecondaryButton}" Padding="15,7" Content="Open" Tag="{Binding}" Click="LaunchTool_Click"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

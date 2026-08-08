@@ -14,22 +14,14 @@ if (Test-Path -LiteralPath $ReleaseDirectory) {
     throw "Release directory '$ReleaseDirectory' already exists."
 }
 
+$legacyFileNames = Get-ChildItem -LiteralPath $BuildDirectory -File |
+    Select-Object -ExpandProperty Name |
+    Sort-Object
+$legacyDirectoryNames = Get-ChildItem -LiteralPath $BuildDirectory -Directory |
+    Select-Object -ExpandProperty Name |
+    Sort-Object
+
 New-Item -ItemType Directory -Path $ReleaseDirectory | Out-Null
-
-$applicationsDirectory = Join-Path $ReleaseDirectory "Apps"
-$modManagerDirectory = Join-Path $applicationsDirectory "ModManager"
-New-Item -ItemType Directory -Path $modManagerDirectory -Force | Out-Null
-
-$legacyFileManifest = Join-Path $applicationsDirectory "legacy-release-files.txt"
-$legacyDirectoryManifest = Join-Path $applicationsDirectory "legacy-release-directories.txt"
-Get-ChildItem -LiteralPath $BuildDirectory -File |
-    Select-Object -ExpandProperty Name |
-    Sort-Object |
-    Set-Content -LiteralPath $legacyFileManifest -Encoding UTF8
-Get-ChildItem -LiteralPath $BuildDirectory -Directory |
-    Select-Object -ExpandProperty Name |
-    Sort-Object |
-    Set-Content -LiteralPath $legacyDirectoryManifest -Encoding UTF8
 
 dotnet publish `
     "OpenKh.Tools.Launcher/OpenKh.Tools.Launcher.csproj" `
@@ -50,25 +42,6 @@ Copy-Item `
     -LiteralPath (Join-Path $ReleaseDirectory "OpenKh.Launcher.exe") `
     -Destination $compatibilityExecutable
 (Get-Item -LiteralPath $compatibilityExecutable).Attributes += "Hidden"
-
-dotnet publish `
-    "OpenKh.Tools.ModsManager/OpenKh.Tools.ModsManager.csproj" `
-    --configuration $Configuration `
-    --output $modManagerDirectory `
-    /p:DebugType=None `
-    /p:DebugSymbols=false
-
-if ($LASTEXITCODE -ne 0) {
-    throw "Publishing Mods Manager failed with exit code $LASTEXITCODE."
-}
-
-$referencedCommandArtifacts = Get-ChildItem -LiteralPath $modManagerDirectory -File | Where-Object {
-    $_.Name -like "OpenKh.Command.*" -and $_.Extension -ne ".dll"
-}
-
-foreach ($referencedCommandArtifact in $referencedCommandArtifacts) {
-    Remove-Item -LiteralPath $referencedCommandArtifact.FullName
-}
 
 $panaceaFiles = @(
     "OpenKH.Panacea.dll",
@@ -92,22 +65,29 @@ foreach ($fileName in $panaceaFiles) {
     if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) {
         throw "Required Panacea file '$sourcePath' does not exist."
     }
-
-    Copy-Item -LiteralPath $sourcePath -Destination $modManagerDirectory
 }
 
 Copy-Item -LiteralPath "distribution/README-FIRST.txt" -Destination $ReleaseDirectory
 Copy-Item -LiteralPath "LICENSE" -Destination $ReleaseDirectory
 Copy-Item -LiteralPath "NOTICE" -Destination $ReleaseDirectory
 
-$advancedToolsDirectory = Join-Path $ReleaseDirectory "AdvancedTools"
-Move-Item -LiteralPath $BuildDirectory -Destination $advancedToolsDirectory
+$applicationsDirectory = Join-Path $ReleaseDirectory "Apps"
+Move-Item -LiteralPath $BuildDirectory -Destination $applicationsDirectory
 
-$duplicateApplicationFiles = Get-ChildItem -LiteralPath $advancedToolsDirectory -File | Where-Object {
-    $_.Name -like "OpenKh.Launcher.*" -or
-    $_.Name -like "OpenKh.Tools.ModsManager.*"
+$duplicateLauncherFiles = Get-ChildItem -LiteralPath $applicationsDirectory -File | Where-Object {
+    $_.Name -like "OpenKh.Launcher.*"
 }
 
-foreach ($duplicateFile in $duplicateApplicationFiles) {
+foreach ($duplicateFile in $duplicateLauncherFiles) {
     Remove-Item -LiteralPath $duplicateFile.FullName
 }
+
+$packagedModManager = Join-Path $applicationsDirectory "OpenKh.Tools.ModsManager.exe"
+if (-not (Test-Path -LiteralPath $packagedModManager -PathType Leaf)) {
+    throw "Required Mod Manager executable '$packagedModManager' does not exist."
+}
+
+$legacyFileManifest = Join-Path $applicationsDirectory "legacy-release-files.txt"
+$legacyDirectoryManifest = Join-Path $applicationsDirectory "legacy-release-directories.txt"
+$legacyFileNames | Set-Content -LiteralPath $legacyFileManifest -Encoding UTF8
+$legacyDirectoryNames | Set-Content -LiteralPath $legacyDirectoryManifest -Encoding UTF8

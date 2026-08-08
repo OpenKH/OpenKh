@@ -15,8 +15,7 @@ public partial class MainWindow : Window
 {
     private const string ModManagerExecutable = "OpenKh.Tools.ModsManager.exe";
     private const string ApplicationsDirectory = "Apps";
-    private const string ModManagerDirectory = "ModManager";
-    private const string AdvancedToolsDirectory = "AdvancedTools";
+    private const string FavoritesFileName = "launcher-favorites.txt";
 
     private static readonly IReadOnlyDictionary<string, string> ToolDescriptions =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -39,25 +38,12 @@ public partial class MainWindow : Window
         };
 
     private readonly List<ToolEntry> _allTools = new();
+    private readonly HashSet<string> _favoriteToolNames = new(StringComparer.OrdinalIgnoreCase);
     private OpenkhUpdateCheckerService.CheckResult? _availableUpdate;
-    private string BaseDirectory => AppContext.BaseDirectory;
-    private string ModManagerPath
-    {
-        get
-        {
-            var packagedPath = Path.Combine(
-                BaseDirectory,
-                ApplicationsDirectory,
-                ModManagerDirectory,
-                ModManagerExecutable
-            );
-
-            return File.Exists(packagedPath)
-                ? packagedPath
-                : Path.Combine(BaseDirectory, ModManagerExecutable);
-        }
-    }
-    private string AdvancedToolsPath => Path.Combine(BaseDirectory, AdvancedToolsDirectory);
+    private string BaseDirectory => OpenkhInstallation.Directory;
+    private string ModManagerPath => OpenkhInstallation.GetModManagerExecutable(BaseDirectory);
+    private string ApplicationsPath => Path.Combine(BaseDirectory, ApplicationsDirectory);
+    private string FavoritesPath => Path.Combine(BaseDirectory, FavoritesFileName);
     private string CompatibilityModManagerPath => Path.Combine(BaseDirectory, ModManagerExecutable);
 
     public MainWindow()
@@ -77,6 +63,7 @@ public partial class MainWindow : Window
         ModManagerStatusText.Text = modManagerAvailable ? string.Empty : "Mod Manager was not found";
         ModManagerStatusText.Visibility = modManagerAvailable ? Visibility.Collapsed : Visibility.Visible;
 
+        LoadFavorites();
         LoadTools();
         _ = RefreshUpdateAvailabilityAsync(showErrors: false, showProgress: false);
     }
@@ -85,13 +72,12 @@ public partial class MainWindow : Window
     {
         _allTools.Clear();
 
-        if (Directory.Exists(AdvancedToolsPath))
+        if (Directory.Exists(ApplicationsPath))
         {
             _allTools.AddRange(
-                Directory.EnumerateFiles(AdvancedToolsPath, "OpenKh.Tools.*.exe", SearchOption.TopDirectoryOnly)
+                Directory.EnumerateFiles(ApplicationsPath, "OpenKh.Tools.*.exe", SearchOption.TopDirectoryOnly)
                     .Where(path => !Path.GetFileName(path).Equals(ModManagerExecutable, StringComparison.OrdinalIgnoreCase))
                     .Select(CreateToolEntry)
-                    .OrderBy(tool => tool.DisplayName, StringComparer.CurrentCultureIgnoreCase)
             );
         }
 
@@ -102,8 +88,9 @@ public partial class MainWindow : Window
         ApplyToolFilter();
     }
 
-    private static ToolEntry CreateToolEntry(string executablePath)
+    private ToolEntry CreateToolEntry(string executablePath)
     {
+        var identifier = Path.GetFileName(executablePath);
         var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(executablePath);
         var shortName = fileNameWithoutExtension.StartsWith("OpenKh.Tools.", StringComparison.OrdinalIgnoreCase)
             ? fileNameWithoutExtension["OpenKh.Tools.".Length..]
@@ -113,7 +100,13 @@ public partial class MainWindow : Window
             ? knownDescription
             : "Open a specialized OpenKH modding utility.";
 
-        return new ToolEntry(displayName, description, executablePath);
+        return new ToolEntry(
+            identifier,
+            displayName,
+            description,
+            executablePath,
+            _favoriteToolNames.Contains(identifier)
+        );
     }
 
     private static string HumanizeName(string value)
@@ -129,20 +122,23 @@ public partial class MainWindow : Window
     private void ApplyToolFilter()
     {
         var query = SearchBox?.Text?.Trim() ?? string.Empty;
-        var filteredTools = string.IsNullOrWhiteSpace(query)
-            ? _allTools
+        var matchingTools = string.IsNullOrWhiteSpace(query)
+            ? _allTools.AsEnumerable()
             : _allTools
                 .Where(tool => tool.DisplayName.Contains(query, StringComparison.CurrentCultureIgnoreCase)
-                    || tool.Description.Contains(query, StringComparison.CurrentCultureIgnoreCase))
-                .ToList();
+                    || tool.Description.Contains(query, StringComparison.CurrentCultureIgnoreCase));
+        var filteredTools = matchingTools
+            .OrderByDescending(tool => tool.IsFavorite)
+            .ThenBy(tool => tool.DisplayName, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
 
         if (ToolsList != null)
             ToolsList.ItemsSource = filteredTools;
 
         if (ToolsStatusText != null)
         {
-            ToolsStatusText.Text = !Directory.Exists(AdvancedToolsPath)
-                ? "The AdvancedTools folder is not available in this installation."
+            ToolsStatusText.Text = !Directory.Exists(ApplicationsPath)
+                ? "The Apps folder is not available in this installation."
                 : $"Showing {filteredTools.Count} of {_allTools.Count} tools";
         }
     }
@@ -302,21 +298,106 @@ public partial class MainWindow : Window
             Launch(tool.ExecutablePath);
     }
 
+    private void ToggleFavorite_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: ToolEntry tool })
+            return;
+
+        var isFavorite = _favoriteToolNames.Add(tool.Identifier);
+        if (!isFavorite)
+            _favoriteToolNames.Remove(tool.Identifier);
+
+        tool.IsFavorite = isFavorite;
+
+        try
+        {
+            File.WriteAllLines(
+                FavoritesPath,
+                _favoriteToolNames.OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+            );
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            tool.IsFavorite = !isFavorite;
+            if (isFavorite)
+                _favoriteToolNames.Remove(tool.Identifier);
+            else
+                _favoriteToolNames.Add(tool.Identifier);
+
+            MessageBox.Show(
+                this,
+                $"OpenKH could not save your favorites.\n\n{exception.Message}",
+                "Unable to save favorites",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
+        }
+
+        ApplyToolFilter();
+        if (ToolsList.Items.Count > 0)
+        {
+            ToolsList.SelectedItem = null;
+            ToolsList.ScrollIntoView(ToolsList.Items[0]);
+        }
+    }
+
     private void ToolsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
+        if (e.OriginalSource is DependencyObject source
+            && FindVisualAncestor<Button>(source) != null)
+        {
+            return;
+        }
+
         if (ToolsList.SelectedItem is ToolEntry tool)
             Launch(tool.ExecutablePath);
     }
 
+    private void LoadFavorites()
+    {
+        _favoriteToolNames.Clear();
+
+        try
+        {
+            if (!File.Exists(FavoritesPath))
+                return;
+
+            foreach (var favoriteToolName in File.ReadLines(FavoritesPath)
+                .Select(line => line.Trim())
+                .Where(line => line.Length > 0))
+            {
+                _favoriteToolNames.Add(favoriteToolName);
+            }
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            _favoriteToolNames.Clear();
+        }
+    }
+
+    private static T? FindVisualAncestor<T>(DependencyObject source) where T : DependencyObject
+    {
+        DependencyObject? current = source;
+        while (current != null)
+        {
+            if (current is T ancestor)
+                return ancestor;
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        return null;
+    }
+
     private void OpenToolsFolder_Click(object sender, RoutedEventArgs e)
     {
-        if (!Directory.Exists(AdvancedToolsPath))
+        if (!Directory.Exists(ApplicationsPath))
         {
-            ShowMissingItem("The AdvancedTools folder was not found.");
+            ShowMissingItem("The Apps folder was not found.");
             return;
         }
 
-        Launch(AdvancedToolsPath);
+        Launch(ApplicationsPath);
     }
 
     private void OpenDocumentation_Click(object sender, RoutedEventArgs e) => Launch("https://openkh.dev/");
@@ -357,8 +438,32 @@ public partial class MainWindow : Window
         MessageBox.Show(message, "Item not found", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
-    private sealed record ToolEntry(string DisplayName, string Description, string ExecutablePath)
+    private sealed class ToolEntry
     {
+        public string Identifier { get; }
+        public string DisplayName { get; }
+        public string Description { get; }
+        public string ExecutablePath { get; }
+        public bool IsFavorite { get; set; }
         public string Initial => DisplayName.Length == 0 ? "?" : DisplayName[..1].ToUpperInvariant();
+        public string FavoriteSymbol => IsFavorite ? "★" : "☆";
+        public string FavoriteAction => IsFavorite
+            ? $"Remove {DisplayName} from favorites"
+            : $"Add {DisplayName} to favorites";
+
+        public ToolEntry(
+            string identifier,
+            string displayName,
+            string description,
+            string executablePath,
+            bool isFavorite
+        )
+        {
+            Identifier = identifier;
+            DisplayName = displayName;
+            Description = description;
+            ExecutablePath = executablePath;
+            IsFavorite = isFavorite;
+        }
     }
 }

@@ -10,6 +10,12 @@ internal static class LegacyInstallationMigration
     private const string LauncherExecutableName = "OpenKh.Launcher.exe";
     private const string CompatibilityExecutableName = "OpenKh.Tools.ModsManager.exe";
 
+    private static readonly string[] PreviousApplicationDirectories =
+    {
+        "AdvancedTools",
+        Path.Combine("Apps", "ModManager"),
+    };
+
     private static readonly string[] FallbackLegacyResourceDirectories =
     {
         "cs-CZ",
@@ -41,12 +47,16 @@ internal static class LegacyInstallationMigration
             Path.DirectorySeparatorChar,
             Path.AltDirectorySeparatorChar
         );
-        var modManagerPath = Path.Combine(
-            installationDirectory,
-            "Apps",
-            "ModManager",
-            CompatibilityExecutableName
-        );
+        var modManagerPath = Path.Combine(installationDirectory, "Apps", CompatibilityExecutableName);
+        if (!File.Exists(modManagerPath))
+        {
+            modManagerPath = Path.Combine(
+                installationDirectory,
+                "Apps",
+                "ModManager",
+                CompatibilityExecutableName
+            );
+        }
 
         if (!File.Exists(modManagerPath))
         {
@@ -99,11 +109,16 @@ internal static class LegacyInstallationMigration
 
     private static void ScheduleCleanupIfNeeded(string installationDirectory)
     {
+        if (!IsOrganizedInstallation(installationDirectory))
+            return;
+
         var legacyFiles = GetLegacyApplicationFiles(installationDirectory)
             .Where(File.Exists)
             .ToArray();
         var legacyDirectories = GetLegacyResourceDirectories(installationDirectory)
             .Select(directoryName => Path.Combine(installationDirectory, directoryName))
+            .Concat(PreviousApplicationDirectories.Select(directoryName =>
+                Path.Combine(installationDirectory, directoryName)))
             .Where(Directory.Exists)
             .ToArray();
 
@@ -144,6 +159,14 @@ internal static class LegacyInstallationMigration
             WindowStyle = ProcessWindowStyle.Hidden,
         });
     }
+
+    private static bool IsOrganizedInstallation(string installationDirectory) =>
+        File.Exists(Path.Combine(installationDirectory, LauncherExecutableName))
+        && File.Exists(Path.Combine(
+            installationDirectory,
+            "Apps",
+            CompatibilityExecutableName
+        ));
 
     private static IEnumerable<string> GetLegacyApplicationFiles(string installationDirectory)
     {

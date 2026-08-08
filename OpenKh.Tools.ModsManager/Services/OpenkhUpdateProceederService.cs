@@ -50,12 +50,19 @@ namespace OpenKh.Tools.ModsManager.Services
             var packagedModManagerExecutable = Path.Combine(
                 copyFrom,
                 "Apps",
+                "OpenKh.Tools.ModsManager.exe"
+            );
+            var previousPackagedModManagerExecutable = Path.Combine(
+                copyFrom,
+                "Apps",
                 "ModManager",
                 "OpenKh.Tools.ModsManager.exe"
             );
             var modManagerExecutable = File.Exists(packagedModManagerExecutable)
-                ? Path.Combine(copyTo, "Apps", "ModManager", "OpenKh.Tools.ModsManager.exe")
-                : OpenkhInstallation.GetModManagerExecutable(copyTo);
+                ? Path.Combine(copyTo, "Apps", "OpenKh.Tools.ModsManager.exe")
+                : File.Exists(previousPackagedModManagerExecutable)
+                    ? Path.Combine(copyTo, "Apps", "ModManager", "OpenKh.Tools.ModsManager.exe")
+                    : OpenkhInstallation.GetModManagerExecutable(copyTo);
             var restartExecutable = string.IsNullOrWhiteSpace(executableToRestart)
                 ? modManagerExecutable
                 : executableToRestart;
@@ -63,7 +70,12 @@ namespace OpenKh.Tools.ModsManager.Services
                 tempBatFile: tempBatFile,
                 copyFrom: copyFrom,
                 copyTo: copyTo,
-                processToStop: Path.GetFileName(restartExecutable),
+                processesToStop: new[]
+                {
+                    Path.GetFileName(restartExecutable),
+                    "OpenKh.Launcher.exe",
+                    "OpenKh.Tools.ModsManager.exe",
+                },
                 execAfter: $"start \"\" \"{restartExecutable}\""
             );
 
@@ -101,13 +113,14 @@ namespace OpenKh.Tools.ModsManager.Services
             string tempBatFile,
             string copyFrom,
             string copyTo,
-            string processToStop,
+            string[] processesToStop,
             string execAfter
         )
         {
             var bat = new StringWriter();
             bat.WriteLine($"chcp 65001");
-            bat.WriteLine($"taskkill /im {EscapeRobocopyArg(processToStop)}");
+            foreach (var processToStop in processesToStop)
+                bat.WriteLine($"taskkill /f /im {EscapeRobocopyArg(processToStop)} >nul 2>&1");
             bat.WriteLine($"robocopy  {EscapeRobocopyArg(copyFrom)} {EscapeRobocopyArg(copyTo)} /e");
             bat.WriteLine($"if errorlevel 8 pause");
             bat.WriteLine($"{execAfter}");

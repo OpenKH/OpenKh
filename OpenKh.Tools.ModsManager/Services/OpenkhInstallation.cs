@@ -17,27 +17,36 @@ namespace OpenKh.Tools.ModsManager.Services
                     Path.AltDirectorySeparatorChar
                 )
             );
+            if (applicationDirectory.Name.Equals("Apps", StringComparison.OrdinalIgnoreCase)
+                && applicationDirectory.Parent != null)
+            {
+                return applicationDirectory.Parent.FullName;
+            }
+
             var appsDirectory = applicationDirectory.Parent;
             var installationDirectory = appsDirectory?.Parent;
-
             return applicationDirectory.Name.Equals("ModManager", StringComparison.OrdinalIgnoreCase)
-                && appsDirectory?.Name.Equals("Apps", StringComparison.OrdinalIgnoreCase) == true
-                && installationDirectory != null
-                    ? installationDirectory.FullName
-                    : applicationDirectory.FullName;
+                    && appsDirectory?.Name.Equals("Apps", StringComparison.OrdinalIgnoreCase) == true
+                    && installationDirectory != null
+                ? installationDirectory.FullName
+                : applicationDirectory.FullName;
         }
 
         public static string GetModManagerExecutable(string installationDirectory)
         {
-            var packagedPath = Path.Combine(
+            var packagedPath = Path.Combine(installationDirectory, "Apps", ModManagerExecutableName);
+            if (File.Exists(packagedPath))
+                return packagedPath;
+
+            var previousPackagedPath = Path.Combine(
                 installationDirectory,
                 "Apps",
                 "ModManager",
                 ModManagerExecutableName
             );
 
-            return File.Exists(packagedPath)
-                ? packagedPath
+            return File.Exists(previousPackagedPath)
+                ? previousPackagedPath
                 : Path.Combine(installationDirectory, ModManagerExecutableName);
         }
     }
