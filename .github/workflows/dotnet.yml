@@ -52,52 +52,65 @@ jobs:
         echo $RELEASE_TAG > openkh/openkh-release
         echo $RELEASE_TAG > openkh-linux-x64/openkh-release
 
-    - name: zip
-      uses: TheDoctor0/zip-release@0.6.2
-      with:
-        filename: openkh.zip
-        path: openkh
+    - name: Create Windows release archive
+      run: powershell -ExecutionPolicy Unrestricted ./.github/scripts/create-release-archive.ps1 -SourceDirectory openkh -DestinationPath openkh.zip
+      shell: pwsh
 
-    - name: zip Linux and Steam Deck release
-      uses: TheDoctor0/zip-release@0.6.2
-      with:
-        filename: openkh-linux-x64.zip
-        path: openkh-linux-x64
+    - name: Create Linux and Steam Deck release archive
+      run: powershell -ExecutionPolicy Unrestricted ./.github/scripts/create-release-archive.ps1 -SourceDirectory openkh-linux-x64 -DestinationPath openkh-linux-x64.zip
+      shell: pwsh
 
     - name: validate update archive
       shell: pwsh
       run: |
-        $archiveListing = (7z l openkh.zip) -join "`n"
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        $archive = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path "openkh.zip"))
+        try {
+          $archiveEntries = @($archive.Entries | ForEach-Object { $_.FullName })
+        }
+        finally {
+          $archive.Dispose()
+        }
         $requiredEntries = @(
-          "openkh\OpenKh.Launcher.exe",
-          "openkh\OpenKh.Tools.ModsManager.exe",
-          "openkh\Apps\OpenKh.Tools.ModsManager.exe"
+          "openkh/OpenKh.Launcher.exe",
+          "openkh/OpenKh.Tools.ModsManager.exe",
+          "openkh/Apps/OpenKh.Tools.ModsManager.exe"
         )
         foreach ($entry in $requiredEntries) {
-          if ($archiveListing -notmatch [regex]::Escape($entry)) {
+          if ($entry -notin $archiveEntries) {
             throw "Required update entry '$entry' is missing from openkh.zip."
           }
         }
         $obsoleteEntries = @(
-          "openkh\AdvancedTools",
-          "openkh\Apps\ModManager"
+          "openkh/AdvancedTools",
+          "openkh/Apps/ModManager"
         )
         foreach ($entry in $obsoleteEntries) {
-          if ($archiveListing -match [regex]::Escape($entry)) {
+          if ($archiveEntries | Where-Object { $_.StartsWith($entry, [System.StringComparison]::OrdinalIgnoreCase) }) {
             throw "Obsolete update entry '$entry' is present in openkh.zip."
           }
         }
 
-        $linuxArchiveListing = (7z l openkh-linux-x64.zip) -join "`n"
+        $linuxArchive = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path "openkh-linux-x64.zip"))
+        try {
+          $linuxArchiveEntries = @($linuxArchive.Entries | ForEach-Object { $_.FullName })
+        }
+        finally {
+          $linuxArchive.Dispose()
+        }
         $linuxRequiredEntries = @(
-          "openkh-linux-x64\OpenKh.Launcher",
-          "openkh-linux-x64\Apps\OpenKh.Tools.ModsManager",
-          "openkh-linux-x64\install-openkh-linux.sh"
+          "openkh-linux-x64/OpenKh.Launcher",
+          "openkh-linux-x64/Apps/OpenKh.Tools.ModsManager",
+          "openkh-linux-x64/install-openkh-linux.sh"
         )
         foreach ($entry in $linuxRequiredEntries) {
-          if ($linuxArchiveListing -notmatch [regex]::Escape($entry)) {
+          if ($entry -notin $linuxArchiveEntries) {
             throw "Required Linux update entry '$entry' is missing from openkh-linux-x64.zip."
           }
+        }
+        $invalidLinuxEntry = $linuxArchiveEntries | Where-Object { $_.Contains('\') } | Select-Object -First 1
+        if ($invalidLinuxEntry) {
+          throw "Linux archive entry '$invalidLinuxEntry' contains a Windows path separator."
         }
 
     - name: "GitHub release latest"

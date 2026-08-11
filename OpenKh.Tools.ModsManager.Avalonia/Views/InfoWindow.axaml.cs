@@ -6,7 +6,7 @@ using OpenKh.Tools.ModsManager.Avalonia.Services;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Views;
 
-public sealed partial class InfoWindow : Window
+public sealed partial class InfoWindow : EmbeddedDialogControl
 {
     public InfoWindow()
     {

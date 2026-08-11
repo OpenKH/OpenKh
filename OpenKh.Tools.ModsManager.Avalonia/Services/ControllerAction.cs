@@ -12,5 +12,7 @@ public enum ControllerAction
     Install,
     PreviousGame,
     NextGame,
+    ScrollUp,
+    ScrollDown,
     Refresh
 }

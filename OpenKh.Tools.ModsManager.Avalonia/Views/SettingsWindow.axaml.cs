@@ -6,7 +6,7 @@ using OpenKh.Tools.ModsManager.Core;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Views;
 
-public sealed partial class SettingsWindow : Window
+public sealed partial class SettingsWindow : EmbeddedDialogControl
 {
     private readonly ModManagerConfigurationService? _configuration;
     private readonly PanaceaService? _panacea;

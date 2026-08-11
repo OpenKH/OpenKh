@@ -38,7 +38,6 @@ public partial class MainWindow : Window
         };
 
     private readonly IControllerInputService _controller;
-    private readonly SteamworksPlatformService _steamworks;
     private readonly List<ToolEntry> _allTools = new();
     private readonly HashSet<string> _favoriteToolNames = new(StringComparer.OrdinalIgnoreCase);
     private OpenkhUpdateCheckerService.CheckResult? _availableUpdate;
@@ -50,14 +49,13 @@ public partial class MainWindow : Window
     private string ModManagerPath => FindModManagerPath();
     private string CompatibilityModManagerPath => Path.Combine(BaseDirectory, "OpenKh.Tools.ModsManager.exe");
 
-    public MainWindow() : this(new SdlControllerInputService(), new SteamworksPlatformService())
+    public MainWindow() : this(new SdlControllerInputService())
     {
     }
 
-    public MainWindow(IControllerInputService controller, SteamworksPlatformService steamworks)
+    public MainWindow(IControllerInputService controller)
     {
         _controller = controller;
-        _steamworks = steamworks;
         InitializeComponent();
         Opened += HandleOpened;
         SizeChanged += HandleSizeChanged;

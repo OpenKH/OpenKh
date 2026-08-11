@@ -9,7 +9,7 @@ using OpenKh.Tools.ModsManager.Avalonia.Services;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Views;
 
-public sealed partial class SetupWindow : Window
+public sealed partial class SetupWindow : EmbeddedDialogControl
 {
     private PanaceaService? _panacea;
     private LuaBackendService? _luaBackend;
@@ -17,6 +17,7 @@ public sealed partial class SetupWindow : Window
     private ModManagerConfigurationService? _configuration;
     private readonly GameInstallationDetectionService _installationDetector = new();
     private readonly SteamAppIdService _steamAppId = new();
+    private ComboBox? _activeComboBox;
 
     public SetupWindow()
     {
@@ -536,6 +537,9 @@ public sealed partial class SetupWindow : Window
 
     public void HandleControllerAction(ControllerAction action)
     {
+        if (HandleActiveComboBox(action))
+            return;
+
         if (action is ControllerAction.PreviousControl or ControllerAction.PreviousItem)
             ControllerWindowNavigator.MoveFocus(this, -1);
         else if (action is ControllerAction.NextControl or ControllerAction.NextItem)
@@ -548,10 +552,42 @@ public sealed partial class SetupWindow : Window
             ActivateFocusedControl();
     }
 
+    private bool HandleActiveComboBox(ControllerAction action)
+    {
+        if (_activeComboBox is not { IsDropDownOpen: true } comboBox)
+        {
+            _activeComboBox = null;
+            return false;
+        }
+
+        if (action is ControllerAction.PreviousControl or ControllerAction.PreviousItem or ControllerAction.PreviousGame)
+            ChangeSelection(comboBox, -1);
+        else if (action is ControllerAction.NextControl or ControllerAction.NextItem or ControllerAction.NextGame)
+            ChangeSelection(comboBox, 1);
+        else if (action is ControllerAction.Confirm or ControllerAction.Cancel)
+        {
+            comboBox.IsDropDownOpen = false;
+            comboBox.Focus();
+            _activeComboBox = null;
+        }
+        else
+            return false;
+
+        return true;
+    }
+
     private void ChangeFocusedSelection(int offset)
     {
         if (FocusManager?.GetFocusedElement() is not ComboBox comboBox || comboBox.ItemCount == 0)
             return;
+        ChangeSelection(comboBox, offset);
+    }
+
+    private static void ChangeSelection(ComboBox comboBox, int offset)
+    {
+        if (comboBox.ItemCount == 0)
+            return;
+
         comboBox.SelectedIndex = Math.Clamp(comboBox.SelectedIndex + offset, 0, comboBox.ItemCount - 1);
     }
 
@@ -564,6 +600,11 @@ public sealed partial class SetupWindow : Window
             Close(false);
         else if (focused is CheckBox checkBox)
             checkBox.IsChecked = checkBox.IsChecked != true;
+        else if (focused is ComboBox comboBox)
+        {
+            _activeComboBox = comboBox;
+            comboBox.IsDropDownOpen = true;
+        }
         else if (focused is Button button)
         {
             if (button == ExtractGameDataButton)

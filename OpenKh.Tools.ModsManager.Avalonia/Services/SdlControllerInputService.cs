@@ -1,5 +1,6 @@
 using Avalonia.Threading;
 using SDL3;
+using System.Runtime.InteropServices;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Services;
 
@@ -7,19 +8,28 @@ public sealed class SdlControllerInputService : IControllerInputService
 {
     private const short AxisPressThreshold = 18000;
     private const short AxisReleaseThreshold = 9000;
+    private const int AxisInitialRepeatDelayMilliseconds = 320;
+    private const int AxisRepeatIntervalMilliseconds = 90;
     private readonly DispatcherTimer _pollTimer;
     private readonly Dictionary<uint, IntPtr> _gamepads = [];
+    private readonly Dictionary<uint, XInputState> _xInputStates = [];
     private readonly HashSet<SDL.GamepadButton> _pressedButtons = [];
-    private bool _horizontalAxisPressed;
-    private bool _verticalAxisPressed;
+    private int _horizontalAxisDirection;
+    private int _verticalAxisDirection;
+    private int _rightVerticalAxisDirection;
+    private long _horizontalAxisNextRepeat;
+    private long _verticalAxisNextRepeat;
+    private long _rightVerticalAxisNextRepeat;
     private int _discoveryTicks;
     private bool _initialized;
+    private bool _xInputAvailable = OperatingSystem.IsWindows();
     private string _statusText = "No controller detected";
     private string _navigationHelpText = "";
     private Action<ControllerAction>? _capturedHandler;
 
     public SdlControllerInputService()
     {
+        SetDisconnectedStatus();
         _pollTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromMilliseconds(16)
@@ -31,7 +41,7 @@ public sealed class SdlControllerInputService : IControllerInputService
     public event Action? ConnectionChanged;
     public event Action? StatusChanged;
 
-    public bool IsConnected => _gamepads.Count > 0;
+    public bool IsConnected => _gamepads.Count > 0 || _xInputStates.Count > 0;
     public string StatusText => _statusText;
     public string NavigationHelpText => _navigationHelpText;
 
@@ -47,31 +57,68 @@ public sealed class SdlControllerInputService : IControllerInputService
             if (!_initialized)
             {
                 _statusText = $"Controller support unavailable: {SDL.GetError()}";
-                ConnectionChanged?.Invoke();
-                StatusChanged?.Invoke();
-                return;
             }
-
-            OpenConnectedGamepads();
+            else
+            {
+                RefreshConnectedGamepads();
+            }
             _pollTimer.Start();
             PollEvents();
         }
         catch (Exception exception) when (
             exception is DllNotFoundException or EntryPointNotFoundException or TypeInitializationException)
         {
-            _statusText = "Controller support unavailable, Steam Input keyboard mapping is still supported";
+            _statusText = "Controller support unavailable";
+            if (OperatingSystem.IsWindows())
+            {
+                _pollTimer.Start();
+                PollEvents();
+            }
             ConnectionChanged?.Invoke();
             StatusChanged?.Invoke();
         }
     }
 
-    private void OpenConnectedGamepads()
+    private void RefreshConnectedGamepads()
     {
         var gamepadIds = SDL.GetGamepads(out var count);
         if (gamepadIds is null)
             return;
-        foreach (var instanceId in gamepadIds.Take(count))
+
+        var connectedIds = gamepadIds.Take(count).ToHashSet();
+        foreach (var removedId in _gamepads.Keys.Except(connectedIds).ToArray())
+            RemoveGamepad(removedId);
+        foreach (var instanceId in connectedIds)
+        {
+            if (_gamepads.TryGetValue(instanceId, out var gamepad) &&
+                HasGamepadIdentityChanged(instanceId, gamepad))
+            {
+                RemoveGamepad(instanceId);
+            }
+
             AddGamepad(instanceId);
+        }
+
+        var previousStatus = _statusText;
+        var previousNavigationHelp = _navigationHelpText;
+        UpdateControllerStatus();
+        if (!string.Equals(previousStatus, _statusText, StringComparison.Ordinal) ||
+            !string.Equals(previousNavigationHelp, _navigationHelpText, StringComparison.Ordinal))
+        {
+            StatusChanged?.Invoke();
+        }
+    }
+
+    private static bool HasGamepadIdentityChanged(uint instanceId, IntPtr gamepad)
+    {
+        if (!SDL.GamepadConnected(gamepad))
+            return true;
+
+        var currentName = SDL.GetGamepadName(gamepad) ?? string.Empty;
+        var detectedName = SDL.GetGamepadNameForID(instanceId) ?? string.Empty;
+        return SDL.GetGamepadVendor(gamepad) != SDL.GetGamepadVendorForID(instanceId) ||
+               SDL.GetGamepadProduct(gamepad) != SDL.GetGamepadProductForID(instanceId) ||
+               !string.Equals(currentName, detectedName, StringComparison.OrdinalIgnoreCase);
     }
 
     public void Dispose()
@@ -80,6 +127,7 @@ public sealed class SdlControllerInputService : IControllerInputService
         foreach (var gamepad in _gamepads.Values)
             SDL.CloseGamepad(gamepad);
         _gamepads.Clear();
+        _xInputStates.Clear();
 
         if (_initialized)
             SDL.QuitSubSystem(SDL.InitFlags.Gamepad);
@@ -94,26 +142,105 @@ public sealed class SdlControllerInputService : IControllerInputService
 
     private void PollEvents()
     {
-        while (SDL.PollEvent(out var controllerEvent))
+        if (_initialized)
         {
-            switch ((SDL.EventType)controllerEvent.Type)
+            while (SDL.PollEvent(out var controllerEvent))
             {
-                case SDL.EventType.GamepadAdded:
-                    AddGamepad(controllerEvent.GDevice.Which);
-                    break;
-                case SDL.EventType.GamepadRemoved:
-                    RemoveGamepad(controllerEvent.GDevice.Which);
-                    break;
+                switch ((SDL.EventType)controllerEvent.Type)
+                {
+                    case SDL.EventType.GamepadAdded:
+                        AddGamepad(controllerEvent.GDevice.Which);
+                        break;
+                    case SDL.EventType.GamepadRemoved:
+                        RemoveGamepad(controllerEvent.GDevice.Which);
+                        break;
+                }
+            }
+
+            if (++_discoveryTicks >= 60)
+            {
+                _discoveryTicks = 0;
+                RefreshConnectedGamepads();
             }
         }
 
-        if (++_discoveryTicks >= 60)
+        if (!PollXInputState())
+            PollGamepadState();
+    }
+
+    private bool PollXInputState()
+    {
+        if (!_xInputAvailable || !OperatingSystem.IsWindows())
+            return false;
+
+        var connectionChanged = false;
+        try
         {
-            _discoveryTicks = 0;
-            OpenConnectedGamepads();
+            for (uint index = 0; index < 4; index++)
+            {
+                if (XInputGetState(index, out var currentState) != 0)
+                {
+                    connectionChanged |= _xInputStates.Remove(index);
+                    continue;
+                }
+
+                if (!_xInputStates.TryGetValue(index, out var previousState))
+                {
+                    _xInputStates[index] = currentState;
+                    connectionChanged = true;
+                    continue;
+                }
+
+                var pressedButtons = (ushort)(currentState.Gamepad.Buttons & ~previousState.Gamepad.Buttons);
+                PollXInputButtons(pressedButtons);
+                HandleAxis(SDL.GamepadAxis.LeftY, (short)-currentState.Gamepad.ThumbLY);
+                HandleAxis(SDL.GamepadAxis.LeftX, currentState.Gamepad.ThumbLX);
+                HandleAxis(SDL.GamepadAxis.RightY, (short)-currentState.Gamepad.ThumbRY);
+                _xInputStates[index] = currentState;
+            }
+        }
+        catch (DllNotFoundException)
+        {
+            _xInputAvailable = false;
+            _xInputStates.Clear();
+            return false;
+        }
+        catch (EntryPointNotFoundException)
+        {
+            _xInputAvailable = false;
+            _xInputStates.Clear();
+            return false;
         }
 
-        PollGamepadState();
+        if (connectionChanged)
+        {
+            UpdateControllerStatus();
+            ConnectionChanged?.Invoke();
+            StatusChanged?.Invoke();
+        }
+
+        return _xInputStates.Count > 0;
+    }
+
+    private void PollXInputButtons(ushort pressedButtons)
+    {
+        DispatchXInputButton(pressedButtons, 0x0001, ControllerAction.PreviousControl);
+        DispatchXInputButton(pressedButtons, 0x0002, ControllerAction.NextControl);
+        DispatchXInputButton(pressedButtons, 0x0004, ControllerAction.NextControl);
+        DispatchXInputButton(pressedButtons, 0x0008, ControllerAction.PreviousControl);
+        DispatchXInputButton(pressedButtons, 0x0010, ControllerAction.Refresh);
+        DispatchXInputButton(pressedButtons, 0x1000, ControllerAction.Confirm);
+        DispatchXInputButton(pressedButtons, 0x2000, ControllerAction.Cancel);
+        DispatchXInputButton(pressedButtons, 0x4000, ControllerAction.Secondary);
+        DispatchXInputButton(pressedButtons, 0x8000, ControllerAction.Install);
+        DispatchXInputButton(pressedButtons, 0x0100, ControllerAction.PreviousGame);
+        DispatchXInputButton(pressedButtons, 0x0200, ControllerAction.NextGame);
+    }
+
+    private void DispatchXInputButton(ushort pressedButtons, ushort mask, ControllerAction action)
+    {
+        if ((pressedButtons & mask) != 0)
+            Dispatch(action);
     }
 
     private void PollGamepadState()
@@ -136,6 +263,7 @@ public sealed class SdlControllerInputService : IControllerInputService
         PollButton(gamepad, SDL.GamepadButton.Start);
         HandleAxis(SDL.GamepadAxis.LeftY, SDL.GetGamepadAxis(gamepad, SDL.GamepadAxis.LeftY));
         HandleAxis(SDL.GamepadAxis.LeftX, SDL.GetGamepadAxis(gamepad, SDL.GamepadAxis.LeftX));
+        HandleAxis(SDL.GamepadAxis.RightY, SDL.GetGamepadAxis(gamepad, SDL.GamepadAxis.RightY));
     }
 
     private void PollButton(IntPtr gamepad, SDL.GamepadButton button)
@@ -162,8 +290,9 @@ public sealed class SdlControllerInputService : IControllerInputService
 
         _gamepads[instanceId] = gamepad;
         var name = SDL.GetGamepadName(gamepad) ?? "Gamepad";
+        var vendor = SDL.GetGamepadVendor(gamepad);
         _statusText = $"Controller connected: {name}";
-        _navigationHelpText = GetNavigationHelpText(name);
+        _navigationHelpText = GetNavigationHelpText(name, vendor);
         ConnectionChanged?.Invoke();
         StatusChanged?.Invoke();
     }
@@ -173,20 +302,16 @@ public sealed class SdlControllerInputService : IControllerInputService
         if (_gamepads.Remove(instanceId, out var gamepad))
             SDL.CloseGamepad(gamepad);
 
-        if (IsConnected)
-        {
-            var remainingGamepad = _gamepads.Values.First();
-            var name = SDL.GetGamepadName(remainingGamepad) ?? "Gamepad";
-            _statusText = $"Controller connected: {name}";
-            _navigationHelpText = GetNavigationHelpText(name);
-        }
-        else
+        UpdateControllerStatus();
+        if (!IsConnected)
         {
             _pressedButtons.Clear();
-            _horizontalAxisPressed = false;
-            _verticalAxisPressed = false;
-            _statusText = "No controller detected";
-            _navigationHelpText = "";
+            _horizontalAxisDirection = 0;
+            _verticalAxisDirection = 0;
+            _rightVerticalAxisDirection = 0;
+            _horizontalAxisNextRepeat = 0;
+            _verticalAxisNextRepeat = 0;
+            _rightVerticalAxisNextRepeat = 0;
         }
         ConnectionChanged?.Invoke();
         StatusChanged?.Invoke();
@@ -198,8 +323,8 @@ public sealed class SdlControllerInputService : IControllerInputService
         {
             SDL.GamepadButton.DPadUp => ControllerAction.PreviousControl,
             SDL.GamepadButton.DPadDown => ControllerAction.NextControl,
-            SDL.GamepadButton.DPadLeft => ControllerAction.PreviousGame,
-            SDL.GamepadButton.DPadRight => ControllerAction.NextGame,
+            SDL.GamepadButton.DPadLeft => ControllerAction.NextControl,
+            SDL.GamepadButton.DPadRight => ControllerAction.PreviousControl,
             SDL.GamepadButton.South => ControllerAction.Confirm,
             SDL.GamepadButton.East => ControllerAction.Cancel,
             SDL.GamepadButton.West => ControllerAction.Secondary,
@@ -218,36 +343,66 @@ public sealed class SdlControllerInputService : IControllerInputService
     {
         if (axis == SDL.GamepadAxis.LeftY)
         {
-            if (Math.Abs(value) < AxisReleaseThreshold)
-            {
-                _verticalAxisPressed = false;
-                return;
-            }
-
-            if (_verticalAxisPressed || Math.Abs(value) < AxisPressThreshold)
-                return;
-
-            _verticalAxisPressed = true;
-            Dispatch(value < 0
-                ? ControllerAction.PreviousItem
-                : ControllerAction.NextItem);
+            HandleAxisDirection(
+                value,
+                ref _verticalAxisDirection,
+                ref _verticalAxisNextRepeat,
+                ControllerAction.PreviousItem,
+                ControllerAction.NextItem);
         }
         else if (axis == SDL.GamepadAxis.LeftX)
         {
-            if (Math.Abs(value) < AxisReleaseThreshold)
-            {
-                _horizontalAxisPressed = false;
-                return;
-            }
-
-            if (_horizontalAxisPressed || Math.Abs(value) < AxisPressThreshold)
-                return;
-
-            _horizontalAxisPressed = true;
-            Dispatch(value < 0
-                ? ControllerAction.PreviousGame
-                : ControllerAction.NextGame);
+            HandleAxisDirection(
+                value,
+                ref _horizontalAxisDirection,
+                ref _horizontalAxisNextRepeat,
+                ControllerAction.NextControl,
+                ControllerAction.PreviousControl);
         }
+        else if (axis == SDL.GamepadAxis.RightY)
+        {
+            HandleAxisDirection(
+                value,
+                ref _rightVerticalAxisDirection,
+                ref _rightVerticalAxisNextRepeat,
+                ControllerAction.ScrollUp,
+                ControllerAction.ScrollDown);
+        }
+    }
+
+    private void HandleAxisDirection(
+        short value,
+        ref int currentDirection,
+        ref long nextRepeat,
+        ControllerAction negativeAction,
+        ControllerAction positiveAction)
+    {
+        var magnitude = Math.Abs((int)value);
+        if (magnitude < AxisReleaseThreshold)
+        {
+            currentDirection = 0;
+            nextRepeat = 0;
+            return;
+        }
+
+        if (magnitude < AxisPressThreshold)
+            return;
+
+        var direction = value < 0 ? -1 : 1;
+        var now = Environment.TickCount64;
+        if (currentDirection != direction)
+        {
+            currentDirection = direction;
+            nextRepeat = now + AxisInitialRepeatDelayMilliseconds;
+            Dispatch(direction < 0 ? negativeAction : positiveAction);
+            return;
+        }
+
+        if (now < nextRepeat)
+            return;
+
+        nextRepeat = now + AxisRepeatIntervalMilliseconds;
+        Dispatch(direction < 0 ? negativeAction : positiveAction);
     }
 
     public void Dispatch(ControllerAction action)
@@ -258,48 +413,115 @@ public sealed class SdlControllerInputService : IControllerInputService
             ActionTriggered?.Invoke(action);
     }
 
-    public void SetSteamInputFallback(bool enabled, bool isSteamDeck)
+    private static string GetNavigationHelpText(string gamepadName, ushort vendor)
     {
-        if (IsConnected)
-            return;
-
-        var statusText = enabled
-            ? isSteamDeck
-                ? "Controller input managed by Steam Deck"
-                : "Controller input managed by Steam Input"
-            : "No controller detected";
-        var helpText = enabled
-            ? isSteamDeck
-                ? "D-pad / left stick: navigate   A: select   B: back   Steam + X: keyboard"
-                : "Use your Steam controller layout to navigate and select"
-            : string.Empty;
-        if (_statusText == statusText && _navigationHelpText == helpText)
-            return;
-
-        _statusText = statusText;
-        _navigationHelpText = helpText;
-        StatusChanged?.Invoke();
-    }
-
-    private static string GetNavigationHelpText(string gamepadName)
-    {
-        if (gamepadName.Contains("DualSense", StringComparison.OrdinalIgnoreCase) ||
+        if (vendor == 0x054c ||
+            gamepadName.Contains("DualSense", StringComparison.OrdinalIgnoreCase) ||
             gamepadName.Contains("DualShock", StringComparison.OrdinalIgnoreCase) ||
             gamepadName.Contains("PlayStation", StringComparison.OrdinalIgnoreCase) ||
             gamepadName.Contains("PS4", StringComparison.OrdinalIgnoreCase) ||
             gamepadName.Contains("PS5", StringComparison.OrdinalIgnoreCase))
         {
-            return "D-pad: navigate   Left stick: mods   Cross: select   Circle: back   Square: open folder   Triangle: install   L1/R1: game   Options: updates";
+            return "D-pad / left stick: navigate   Right stick: scroll   Cross: select   Circle: back   Square: open folder   Triangle: install   L1/R1: game   Options: updates";
         }
 
-        if (gamepadName.Contains("Nintendo", StringComparison.OrdinalIgnoreCase) ||
+        if (vendor == 0x057e ||
+            gamepadName.Contains("Nintendo", StringComparison.OrdinalIgnoreCase) ||
             gamepadName.Contains("Switch", StringComparison.OrdinalIgnoreCase) ||
             gamepadName.Contains("Joy-Con", StringComparison.OrdinalIgnoreCase))
         {
-            return "D-pad: navigate   Left stick: mods   B: select   A: back   Y: open folder   X: install   L/R: game   Plus: updates";
+            return "D-pad / left stick: navigate   Right stick: scroll   B: select   A: back   Y: open folder   X: install   L/R: game   Plus: updates";
         }
 
-        return "D-pad: navigate   Left stick: mods   A: select   B: back   X: open folder   Y: install   LB/RB: game   Menu: updates";
+        if (vendor == 0x28de ||
+            gamepadName.Contains("Steam Deck", StringComparison.OrdinalIgnoreCase) ||
+            gamepadName.Contains("Steam Virtual", StringComparison.OrdinalIgnoreCase))
+        {
+            return "D-pad / left stick: navigate   Right stick: scroll   A: select   B: back   X: open folder   Y: install   L1/R1: game   Menu: updates   Steam + X: keyboard";
+        }
+
+        return "D-pad / left stick: navigate   Right stick: scroll   A: select   B: back   X: open folder   Y: install   LB/RB: game   Menu: updates";
+    }
+
+    private void SetDisconnectedStatus()
+    {
+        if (IsSteamDeckEnvironment())
+        {
+            _statusText = "Steam Deck detected, waiting for controller input";
+            _navigationHelpText = "Open the app from its Steam shortcut. Use Steam + X for the keyboard.";
+            return;
+        }
+
+        _statusText = "No controller detected";
+        _navigationHelpText = string.Empty;
+    }
+
+    private void UpdateControllerStatus()
+    {
+        if (_gamepads.Count > 0)
+        {
+            var gamepad = _gamepads.Values.First();
+            var name = SDL.GetGamepadName(gamepad) ?? "Gamepad";
+            _statusText = $"Controller connected: {name}";
+            _navigationHelpText = GetNavigationHelpText(name, SDL.GetGamepadVendor(gamepad));
+            return;
+        }
+
+        if (_xInputStates.Count > 0)
+        {
+            _statusText = "Controller connected: Xbox controller";
+            _navigationHelpText = GetNavigationHelpText("Xbox controller", 0x045e);
+            return;
+        }
+
+        SetDisconnectedStatus();
+    }
+
+    private static bool IsSteamDeckEnvironment()
+    {
+        if (!OperatingSystem.IsLinux())
+            return false;
+
+        if (Environment.GetEnvironmentVariable("SteamDeck") == "1" ||
+            Environment.GetEnvironmentVariable("SteamGamepadUI") == "1")
+            return true;
+
+        try
+        {
+            return File.Exists("/etc/os-release") &&
+                   File.ReadAllText("/etc/os-release")
+                       .Contains("steamos", StringComparison.OrdinalIgnoreCase);
+        }
+        catch (IOException)
+        {
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
+    [DllImport("xinput1_4.dll", EntryPoint = "XInputGetState")]
+    private static extern uint XInputGetState(uint userIndex, out XInputState state);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct XInputState
+    {
+        public uint PacketNumber;
+        public XInputGamepad Gamepad;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct XInputGamepad
+    {
+        public ushort Buttons;
+        public byte LeftTrigger;
+        public byte RightTrigger;
+        public short ThumbLX;
+        public short ThumbLY;
+        public short ThumbRX;
+        public short ThumbRY;
     }
 
     private sealed class CaptureScope(

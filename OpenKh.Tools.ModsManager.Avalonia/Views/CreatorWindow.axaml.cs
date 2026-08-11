@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Views;
 
-public sealed partial class CreatorWindow : Window
+public sealed partial class CreatorWindow : EmbeddedDialogControl
 {
     private readonly ModCreatorService? _creator;
     private readonly IControllerInputService? _controller;
@@ -131,8 +131,11 @@ public sealed partial class CreatorWindow : Window
             DirectoryTextBox.Text ?? string.Empty,
             GameDataTextBox.Text ?? string.Empty,
             TargetSearchTextBox.Text ?? string.Empty);
-        using var capture = _controller?.Capture(window.HandleControllerAction);
-        var result = await window.ShowDialog<bool>(this);
+        if (TopLevel.GetTopLevel(this) is not MainWindow owner)
+            return;
+        using var capture = _controller?.Capture(
+            ControllerWindowNavigator.WithScrolling(window, window.HandleControllerAction));
+        var result = await owner.ShowPageAsync<bool>(window);
         if (result)
             SetStatus("Selected target files were copied and appended to mod.yml.", true);
     }

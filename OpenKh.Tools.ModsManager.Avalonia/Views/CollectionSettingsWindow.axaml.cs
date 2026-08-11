@@ -6,7 +6,7 @@ using OpenKh.Tools.ModsManager.Avalonia.Services;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Views;
 
-public sealed partial class CollectionSettingsWindow : Window
+public sealed partial class CollectionSettingsWindow : EmbeddedDialogControl
 {
     private readonly CollectionSettingsService? _settings;
     private readonly ModEntry? _mod;

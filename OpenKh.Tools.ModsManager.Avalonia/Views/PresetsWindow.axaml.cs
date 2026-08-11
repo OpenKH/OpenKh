@@ -5,7 +5,7 @@ using OpenKh.Tools.ModsManager.Core;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Views;
 
-public sealed partial class PresetsWindow : Window
+public sealed partial class PresetsWindow : EmbeddedDialogControl
 {
     private readonly PresetService? _presets;
     private readonly IReadOnlyCollection<string> _enabledModIds = [];
@@ -86,7 +86,20 @@ public sealed partial class PresetsWindow : Window
         else if (action == ControllerAction.Cancel)
             Close(null);
         else if (action == ControllerAction.Confirm)
-            Apply_OnClick(ApplyButton, new RoutedEventArgs());
+            ActivateFocusedControl();
         RefreshButtons();
+    }
+
+    private void ActivateFocusedControl()
+    {
+        var focused = FocusManager?.GetFocusedElement();
+        if (focused == CloseButton)
+            Close(null);
+        else if (focused == RemoveButton)
+            Remove_OnClick(RemoveButton, new RoutedEventArgs());
+        else if (focused == ApplyButton || focused == PresetList)
+            Apply_OnClick(ApplyButton, new RoutedEventArgs());
+        else if (focused == SavePresetButton)
+            SavePreset_OnClick(SavePresetButton, new RoutedEventArgs());
     }
 }

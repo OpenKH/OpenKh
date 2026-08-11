@@ -5,7 +5,7 @@ using OpenKh.Tools.ModsManager.Core;
 namespace OpenKh.Tools.ModsManager.Avalonia.Services;
 
 public sealed class AvaloniaOnlineModsPrompt(
-    Window owner,
+    MainWindow owner,
     OnlineModCatalogService catalog,
     RepositoryModInstaller installer,
     IControllerInputService controller) : IOnlineModsPrompt
@@ -16,8 +16,9 @@ public sealed class AvaloniaOnlineModsPrompt(
         Func<Task> onModInstalled)
     {
         var window = new OnlineModsWindow(catalog, installer, game, installedIds, onModInstalled);
-        using var capture = controller.Capture(window.HandleControllerAction);
-        await window.ShowDialog<bool>(owner);
+        using var capture = controller.Capture(
+            ControllerWindowNavigator.WithScrolling(window, window.HandleControllerAction));
+        await owner.ShowPageAsync<bool>(window);
         return window.InstalledAny;
     }
 }

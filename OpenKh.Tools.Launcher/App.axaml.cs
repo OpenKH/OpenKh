@@ -11,7 +11,6 @@ namespace OpenKh.Tools.Launcher;
 public partial class App : Application
 {
     private readonly IControllerInputService _controller = new SdlControllerInputService();
-    private SteamworksPlatformService? _steamworks;
 
     internal IControllerInputService Controller => _controller;
 
@@ -19,7 +18,6 @@ public partial class App : Application
     {
         AvaloniaXamlLoader.Load(this);
         InputElement.KeyDownEvent.AddClassHandler<Window>(HandleGlobalKeyDown, RoutingStrategies.Tunnel);
-        InputElement.GotFocusEvent.AddClassHandler<TextBox>(HandleTextBoxFocus, RoutingStrategies.Bubble);
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -40,43 +38,24 @@ public partial class App : Application
             }
 
             LegacyInstallationMigration.ScheduleCleanupIfNeeded();
-            _steamworks = new SteamworksPlatformService();
-            _steamworks.TryStart();
             _controller.Start();
-            _controller.ConnectionChanged += HandleControllerConnectionChanged;
-            UpdateSteamLauncherMode();
 
-            var mainWindow = new MainWindow(_controller, _steamworks);
+            var mainWindow = new MainWindow(_controller);
             _controller.ActionTriggered += mainWindow.HandleControllerAction;
             desktop.MainWindow = mainWindow;
             desktop.Exit += (_, _) =>
             {
                 _controller.ActionTriggered -= mainWindow.HandleControllerAction;
-                _controller.ConnectionChanged -= HandleControllerConnectionChanged;
                 _controller.Dispose();
-                _steamworks?.Dispose();
             };
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private void HandleControllerConnectionChanged() =>
-        UpdateSteamLauncherMode();
-
-    private void UpdateSteamLauncherMode()
-    {
-        var useSteamInput = !_controller.IsConnected && _steamworks?.IsRunning == true;
-        _steamworks?.SetLauncherMode(useSteamInput);
-        _controller.SetSteamInputFallback(useSteamInput, _steamworks?.IsSteamDeck == true);
-    }
-
-    private void HandleTextBoxFocus(TextBox textBox, FocusChangedEventArgs eventArgs) =>
-        _steamworks?.ShowFloatingKeyboard(textBox);
-
     private void HandleGlobalKeyDown(Window window, KeyEventArgs eventArgs)
     {
-        if (_steamworks?.IsLauncherModeEnabled != true)
+        if (eventArgs.KeyModifiers != KeyModifiers.None)
             return;
 
         if (eventArgs.Source is TextBox && eventArgs.Key is not Key.Escape)

@@ -15,7 +15,6 @@ namespace OpenKh.Tools.ModsManager.Avalonia;
 public sealed partial class App : Application
 {
     private IControllerInputService? _controllerInput;
-    private SteamworksPlatformService? _steamworks;
 
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
@@ -33,8 +32,6 @@ public sealed partial class App : Application
             var panaceaService = new PanaceaService(configuration);
             var luaBackendService = new LuaBackendService(configuration);
             var gameLaunchService = new GameLaunchService(configuration);
-            _steamworks = new SteamworksPlatformService();
-            _steamworks.TryStart();
             _controllerInput = new SdlControllerInputService();
             var mainViewModel = new MainWindowViewModel(
                 new ModCatalogService(configuration),
@@ -75,36 +72,21 @@ public sealed partial class App : Application
                 DispatcherPriority.Background);
             _controllerInput.ActionTriggered += mainWindow.HandleControllerAction;
             InputElement.KeyDownEvent.AddClassHandler<Window>(HandleGlobalKeyDown, RoutingStrategies.Tunnel);
-            InputElement.GotFocusEvent.AddClassHandler<TextBox>(HandleTextBoxFocus, RoutingStrategies.Bubble);
             desktop.MainWindow = mainWindow;
             desktop.Exit += (_, _) =>
             {
                 gameLaunchService.Stop();
                 _controllerInput.Dispose();
-                _steamworks.Dispose();
             };
             _controllerInput.Start();
-            _controllerInput.ConnectionChanged += UpdateSteamLauncherMode;
-            UpdateSteamLauncherMode();
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private void UpdateSteamLauncherMode()
-    {
-        var useSteamInput = _controllerInput?.IsConnected != true && _steamworks?.IsRunning == true;
-        _steamworks?.SetLauncherMode(useSteamInput);
-        _controllerInput?.SetSteamInputFallback(useSteamInput, _steamworks?.IsSteamDeck == true);
-    }
-
-    private void HandleTextBoxFocus(TextBox textBox, FocusChangedEventArgs eventArgs) =>
-        _steamworks?.ShowFloatingKeyboard(textBox);
-
     private void HandleGlobalKeyDown(Window window, KeyEventArgs eventArgs)
     {
-        if (_controllerInput is null || _steamworks?.IsLauncherModeEnabled != true ||
-            eventArgs.KeyModifiers != KeyModifiers.None)
+        if (_controllerInput is null || eventArgs.KeyModifiers != KeyModifiers.None)
             return;
 
         if (window.FocusManager?.GetFocusedElement() is TextBox && eventArgs.Key != Key.Escape)
@@ -114,8 +96,8 @@ public sealed partial class App : Application
         {
             Key.Up => ControllerAction.PreviousControl,
             Key.Down => ControllerAction.NextControl,
-            Key.Left => ControllerAction.PreviousGame,
-            Key.Right => ControllerAction.NextGame,
+            Key.Left => ControllerAction.NextControl,
+            Key.Right => ControllerAction.PreviousControl,
             Key.Enter or Key.Space => ControllerAction.Confirm,
             Key.Escape => ControllerAction.Cancel,
             Key.F5 => ControllerAction.Refresh,

@@ -11,6 +11,5 @@ public interface IControllerInputService : IDisposable
     string NavigationHelpText { get; }
     void Start();
     void Dispatch(ControllerAction action);
-    void SetSteamInputFallback(bool enabled, bool isSteamDeck);
     IDisposable Capture(Action<ControllerAction> handler);
 }

@@ -5,7 +5,7 @@ using OpenKh.Tools.ModsManager.Avalonia.Services;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Views;
 
-public sealed partial class InstallModWindow : Window
+public sealed partial class InstallModWindow : EmbeddedDialogControl
 {
     public InstallModWindow()
     {

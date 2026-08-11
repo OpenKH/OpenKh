@@ -25,12 +25,10 @@
     <PackageReference Include="Avalonia.Desktop" Version="12.1.0" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.0" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0" />
-    <PackageReference Include="Facepunch.Steamworks.Dll" Version="1.62.0" />
     <PackageReference Include="Octokit" Version="14.0.0" />
     <PackageReference Include="SDL3-CS" Version="3.4.12.3" />
     <PackageReference Include="SDL3-CS.Linux" Version="3.4.12.1" />
     <PackageReference Include="SDL3-CS.Windows" Version="3.4.12.1" />
-    <PackageReference Include="Steamworks.NET" Version="2024.8.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,14 +39,7 @@
     <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\ControllerWindowNavigator.cs" Link="Input\ControllerWindowNavigator.cs" />
     <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\IControllerInputService.cs" Link="Input\IControllerInputService.cs" />
     <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\SdlControllerInputService.cs" Link="Input\SdlControllerInputService.cs" />
-    <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\SteamworksPlatformService.cs" Link="Input\SteamworksPlatformService.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\VirtualKeyboardService.cs" Link="Input\VirtualKeyboardService.cs" />
   </ItemGroup>
-
-  <Target Name="RemoveSteamImportLibraries" AfterTargets="ResolvePackageAssets">
-    <ItemGroup>
-      <NativeCopyLocalItems Remove="@(NativeCopyLocalItems)"
-                            Condition="'%(NativeCopyLocalItems.Extension)' == '.lib'" />
-    </ItemGroup>
-  </Target>
 
 </Project>

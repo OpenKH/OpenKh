@@ -4,7 +4,7 @@ using OpenKh.Tools.ModsManager.Avalonia.Services;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Views;
 
-public sealed partial class ConfirmationWindow : Window
+public sealed partial class ConfirmationWindow : EmbeddedDialogControl
 {
     public ConfirmationWindow()
         : this("Confirm action", string.Empty, "Confirm")
@@ -14,7 +14,6 @@ public sealed partial class ConfirmationWindow : Window
     public ConfirmationWindow(string title, string message, string confirmText)
     {
         InitializeComponent();
-        Title = title;
         TitleText.Text = title;
         MessageText.Text = message;
         ConfirmButton.Content = confirmText;

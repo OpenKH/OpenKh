@@ -7,7 +7,7 @@ using OpenKh.Tools.ModsManager.Core;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Views;
 
-public sealed partial class OnlineModsWindow : Window
+public sealed partial class OnlineModsWindow : EmbeddedDialogControl
 {
     private readonly OnlineModCatalogService? _catalog;
     private readonly RepositoryModInstaller? _installer;

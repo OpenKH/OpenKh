@@ -5,7 +5,7 @@ using OpenKh.Tools.ModsManager.Core;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Views;
 
-public sealed partial class TargetFilesWindow : Window
+public sealed partial class TargetFilesWindow : EmbeddedDialogControl
 {
     private readonly ModCreatorService? _creator;
     private readonly string _modDirectory = string.Empty;

@@ -1,8 +1,8 @@
-<Window xmlns="https://github.com/avaloniaui"
+<views:EmbeddedDialogControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:OpenKh.Tools.ModsManager.Avalonia.Views"
         x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.InfoWindow"
-        Title="OpenKH information" Width="620" Height="620" MinWidth="520" MinHeight="520"
-        WindowStartupLocation="CenterOwner" XYFocus.NavigationModes="Enabled">
+        XYFocus.NavigationModes="Enabled">
   <Grid Margin="28" RowDefinitions="Auto,18,*,18,Auto">
     <StackPanel Spacing="8">
       <Image Source="avares://OpenKh.Tools.ModsManager/Assets/OpenKH.png" Width="220" HorizontalAlignment="Left" />
@@ -22,4 +22,4 @@
     <Button x:Name="CloseButton" Grid.Row="4" Content="Close" MinWidth="120"
             HorizontalAlignment="Right" Click="Close_OnClick" />
   </Grid>
-</Window>
+</views:EmbeddedDialogControl>

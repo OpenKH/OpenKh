@@ -14,6 +14,27 @@ public sealed partial class MainWindow : Window
         Opened += (_, _) => UpdateResponsiveLayout();
     }
 
+    public async Task<T?> ShowPageAsync<T>(EmbeddedDialogControl page)
+    {
+        var previousPage = DialogContent.Content;
+        DialogContent.Content = page;
+        DialogOverlay.IsVisible = true;
+
+        try
+        {
+            var result = await page.ShowEmbeddedAsync();
+            return result is T value ? value : default;
+        }
+        finally
+        {
+            if (ReferenceEquals(DialogContent.Content, page))
+            {
+                DialogContent.Content = previousPage;
+                DialogOverlay.IsVisible = previousPage is not null;
+            }
+        }
+    }
+
     private void UpdateResponsiveLayout()
     {
         var compact = Bounds.Width < 1120;
@@ -49,6 +70,11 @@ public sealed partial class MainWindow : Window
 
     public void HandleControllerAction(ControllerAction action)
     {
+        if (ControllerWindowNavigator.TryHideVirtualKeyboard(action) ||
+            ControllerWindowNavigator.TryShowVirtualKeyboard(this, action) ||
+            ControllerWindowNavigator.TryScroll(this, action))
+            return;
+
         if (action == ControllerAction.PreviousControl)
         {
             ControllerWindowNavigator.MoveFocus(this, -1);

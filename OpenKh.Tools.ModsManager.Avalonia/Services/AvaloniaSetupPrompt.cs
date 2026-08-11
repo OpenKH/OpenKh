@@ -5,7 +5,7 @@ using OpenKh.Tools.ModsManager.Core;
 namespace OpenKh.Tools.ModsManager.Avalonia.Services;
 
 public sealed class AvaloniaSetupPrompt(
-    Window owner,
+    MainWindow owner,
     ModManagerConfigurationService configuration,
     PanaceaService panacea,
     LuaBackendService luaBackend,
@@ -15,7 +15,8 @@ public sealed class AvaloniaSetupPrompt(
     public async Task<bool> ShowAsync()
     {
         var window = new SetupWindow(configuration, panacea, luaBackend, extraction);
-        using var capture = controller.Capture(window.HandleControllerAction);
-        return await window.ShowDialog<bool>(owner);
+        using var capture = controller.Capture(
+            ControllerWindowNavigator.WithScrolling(window, window.HandleControllerAction));
+        return await owner.ShowPageAsync<bool>(window);
     }
 }

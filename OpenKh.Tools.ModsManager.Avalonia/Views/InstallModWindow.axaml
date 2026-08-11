@@ -1,13 +1,7 @@
-<Window xmlns="https://github.com/avaloniaui"
+<views:EmbeddedDialogControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:OpenKh.Tools.ModsManager.Avalonia.Views"
         x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.InstallModWindow"
-        Title="Install mod"
-        Width="620"
-        Height="500"
-        MinWidth="520"
-        MinHeight="460"
-        WindowStartupLocation="CenterOwner"
-        CanResize="True"
         XYFocus.NavigationModes="Enabled">
   <Grid Margin="28" RowDefinitions="Auto,20,Auto,12,Auto,20,Auto,*,Auto">
     <StackPanel Spacing="5">
@@ -48,4 +42,4 @@
       <Button x:Name="InstallButton" Classes="primary" Content="Install" MinWidth="140" Click="Install_OnClick" />
     </StackPanel>
   </Grid>
-</Window>
+</views:EmbeddedDialogControl>

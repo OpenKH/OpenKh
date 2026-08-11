@@ -1,8 +1,8 @@
-<Window xmlns="https://github.com/avaloniaui"
+<views:EmbeddedDialogControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:OpenKh.Tools.ModsManager.Avalonia.Views"
         x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.CreatorWindow"
-        Title="Mod creator" Width="820" Height="780" MinWidth="620" MinHeight="600"
-        WindowStartupLocation="CenterOwner" XYFocus.NavigationModes="Enabled">
+        XYFocus.NavigationModes="Enabled">
   <Grid Margin="28" RowDefinitions="Auto,18,*,18,Auto">
     <StackPanel Spacing="5">
       <TextBlock Text="Mod creator" FontSize="27" FontWeight="Bold" />
@@ -68,4 +68,4 @@
       <Button x:Name="CreateButton" Classes="primary" Content="Generate or update" MinWidth="170" Click="Create_OnClick" />
     </StackPanel>
   </Grid>
-</Window>
+</views:EmbeddedDialogControl>

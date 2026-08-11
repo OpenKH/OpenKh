@@ -1,8 +1,8 @@
-<Window xmlns="https://github.com/avaloniaui"
+<views:EmbeddedDialogControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:OpenKh.Tools.ModsManager.Avalonia.Views"
         x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.TargetFilesWindow"
-        Title="Select target files" Width="860" Height="650" MinWidth="620" MinHeight="480"
-        WindowStartupLocation="CenterOwner" XYFocus.NavigationModes="Enabled">
+        XYFocus.NavigationModes="Enabled">
   <Grid Margin="28" RowDefinitions="Auto,16,Auto,16,*,16,Auto">
     <StackPanel Spacing="5">
       <TextBlock Text="Select target files" FontSize="27" FontWeight="Bold" />
@@ -24,4 +24,4 @@
       <Button x:Name="AppendButton" Classes="primary" Content="Append selected" MinWidth="160" Click="Append_OnClick" />
     </StackPanel>
   </Grid>
-</Window>
+</views:EmbeddedDialogControl>

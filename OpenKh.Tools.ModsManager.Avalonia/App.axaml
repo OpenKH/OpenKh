@@ -24,6 +24,10 @@
       <Setter Property="Background" Value="#18243A" />
       <Setter Property="Foreground" Value="#DCE7F8" />
     </Style>
+    <Style Selector="Button:focus">
+      <Setter Property="BorderBrush" Value="#8DB5FF" />
+      <Setter Property="BorderThickness" Value="3" />
+    </Style>
     <Style Selector="TextBox">
       <Setter Property="MinHeight" Value="44" />
       <Setter Property="CornerRadius" Value="10" />
@@ -31,11 +35,25 @@
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="Padding" Value="12,0" />
     </Style>
+    <Style Selector="TextBox:focus">
+      <Setter Property="BorderBrush" Value="#8DB5FF" />
+      <Setter Property="BorderThickness" Value="3" />
+    </Style>
     <Style Selector="ComboBox">
       <Setter Property="MinHeight" Value="44" />
       <Setter Property="CornerRadius" Value="10" />
       <Setter Property="Background" Value="#111C2E" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ComboBox:focus">
+      <Setter Property="BorderBrush" Value="#8DB5FF" />
+      <Setter Property="BorderThickness" Value="3" />
+    </Style>
+    <Style Selector="CheckBox:focus">
+      <Setter Property="Foreground" Value="#8DB5FF" />
+    </Style>
+    <Style Selector="ToggleSwitch:focus">
+      <Setter Property="Foreground" Value="#8DB5FF" />
     </Style>
     <Style Selector="Border.settings-card">
       <Setter Property="Background" Value="#0F192A" />

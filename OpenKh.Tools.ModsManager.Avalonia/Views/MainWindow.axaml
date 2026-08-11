@@ -9,6 +9,7 @@
         MinWidth="960"
         MinHeight="640"
         XYFocus.NavigationModes="Enabled">
+  <Grid>
   <Grid x:Name="RootLayoutGrid" ColumnDefinitions="220,*" RowDefinitions="*,Auto">
     <Border Grid.RowSpan="2" Background="#0F192A" BorderBrush="#22324C" BorderThickness="0,0,1,0">
       <Grid Margin="22" RowDefinitions="Auto,20,*,20,Auto">
@@ -263,5 +264,21 @@
                    TextWrapping="Wrap" />
       </Grid>
     </Border>
+  </Grid>
+  <Border x:Name="DialogOverlay"
+          IsVisible="False"
+          Background="#F20A1220"
+          Padding="18"
+          ZIndex="100">
+    <Border Background="#0D1829"
+            BorderBrush="#314664"
+            BorderThickness="1"
+            CornerRadius="12"
+            ClipToBounds="True">
+      <ContentControl x:Name="DialogContent"
+                      HorizontalContentAlignment="Stretch"
+                      VerticalContentAlignment="Stretch" />
+    </Border>
+  </Border>
   </Grid>
 </Window>

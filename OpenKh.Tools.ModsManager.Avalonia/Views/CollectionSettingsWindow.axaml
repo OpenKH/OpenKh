@@ -1,13 +1,8 @@
-<Window xmlns="https://github.com/avaloniaui"
+<views:EmbeddedDialogControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:OpenKh.Tools.ModsManager.Avalonia.Views"
         xmlns:vm="using:OpenKh.Tools.ModsManager.Avalonia.ViewModels"
         x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.CollectionSettingsWindow"
-        Title="Collection settings"
-        Width="620"
-        Height="600"
-        MinWidth="480"
-        MinHeight="480"
-        WindowStartupLocation="CenterOwner"
         XYFocus.NavigationModes="Enabled">
   <Grid Margin="28" RowDefinitions="Auto,18,*,18,Auto">
     <StackPanel Spacing="5">
@@ -32,4 +27,4 @@
       <Button x:Name="SaveButton" Classes="primary" Content="Save collection" MinWidth="160" Click="Save_OnClick" />
     </StackPanel>
   </Grid>
-</Window>
+</views:EmbeddedDialogControl>
