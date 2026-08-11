@@ -198,7 +198,11 @@ public partial class MainWindow : Window
         }
     }
 
-    private void LaunchModManager_Click(object? sender, RoutedEventArgs eventArgs) => Launch(ModManagerPath);
+    private async void LaunchModManager_Click(object? sender, RoutedEventArgs eventArgs)
+    {
+        if (await TryLaunchAsync(ModManagerPath))
+            Close();
+    }
 
     private async void CheckForUpdates_Click(object? sender, RoutedEventArgs eventArgs)
     {
@@ -385,7 +389,9 @@ public partial class MainWindow : Window
 
     private void OpenDocumentation_Click(object? sender, RoutedEventArgs eventArgs) => Launch("https://openkh.dev/");
 
-    private async void Launch(string target)
+    private async void Launch(string target) => await TryLaunchAsync(target);
+
+    private async Task<bool> TryLaunchAsync(string target)
     {
         try
         {
@@ -395,10 +401,12 @@ public partial class MainWindow : Window
                 WorkingDirectory = File.Exists(target) ? Path.GetDirectoryName(target) : AppContext.BaseDirectory,
                 UseShellExecute = true,
             });
+            return true;
         }
         catch (Exception exception)
         {
             await MessageDialog.ShowAsync(this, "Unable to open item", $"OpenKH could not open this item.\n\n{exception.Message}");
+            return false;
         }
     }
 
