@@ -136,6 +136,7 @@ public sealed class MainWindowViewModel : ObservableObject
     public string ControllerStatusText => _controllerInput.StatusText;
     public string ControllerHelpText => _controllerInput.NavigationHelpText;
     public bool IsControllerConnected => _controllerInput.IsConnected;
+    public bool ShowControllerHelp => IsControllerConnected || !string.IsNullOrWhiteSpace(ControllerHelpText);
     public bool IsGameRunning => _launchService.IsRunning;
 
     public GameInfo SelectedGame
@@ -814,5 +815,6 @@ public sealed class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(ControllerStatusText));
         OnPropertyChanged(nameof(ControllerHelpText));
         OnPropertyChanged(nameof(IsControllerConnected));
+        OnPropertyChanged(nameof(ShowControllerHelp));
     }
 }
