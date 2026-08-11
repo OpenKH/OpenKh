@@ -1,0 +1,36 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="OpenKh.Tools.ModsManager.Avalonia.App"
+             RequestedThemeVariant="Dark">
+  <Application.Styles>
+    <FluentTheme />
+    <Style Selector="Window">
+      <Setter Property="Background" Value="#0B1220" />
+      <Setter Property="FontFamily" Value="avares://Avalonia.Fonts.Inter/Assets#Inter" />
+    </Style>
+    <Style Selector="Button">
+      <Setter Property="MinHeight" Value="44" />
+      <Setter Property="Padding" Value="18,10" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#377DFF" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.subtle">
+      <Setter Property="Background" Value="#18243A" />
+      <Setter Property="Foreground" Value="#DCE7F8" />
+    </Style>
+    <Style Selector="TextBox">
+      <Setter Property="MinHeight" Value="44" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Background" Value="#111C2E" />
+    </Style>
+    <Style Selector="ComboBox">
+      <Setter Property="MinHeight" Value="44" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Background" Value="#111C2E" />
+    </Style>
+  </Application.Styles>
+</Application>
