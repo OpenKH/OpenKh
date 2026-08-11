@@ -39,7 +39,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             _changeModEnableState = changeModEnableState;
 
             var nameIndex = Source.IndexOf('/');
-            if (nameIndex > 0)
+            if (nameIndex > 0 && Repository.IsValid(_model.Path))
             {
                 Author = Source[0..nameIndex];
                 Name = Source[(nameIndex + 1)..];
