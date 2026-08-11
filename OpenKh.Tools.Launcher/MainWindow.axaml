@@ -1,0 +1,145 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.Launcher.MainWindow"
+        Title="OpenKH Launcher"
+        Width="1100"
+        Height="740"
+        MinWidth="640"
+        MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        Background="#0D1420"
+        Foreground="#F5F7FB"
+        XYFocus.NavigationModes="Enabled">
+  <Grid RowDefinitions="Auto,*,Auto">
+    <Border Grid.Row="0" Padding="36,22" Background="#111B29" BorderBrush="#26354A" BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="*,Auto">
+        <Image Width="210" Height="64" HorizontalAlignment="Left"
+               Source="avares://OpenKh.Launcher/Assets/OpenKH.png" Stretch="Uniform" />
+        <TextBlock Grid.Column="1" Text="LAUNCHER" Foreground="#7890B1" FontSize="13"
+                   FontWeight="SemiBold" VerticalAlignment="Center" />
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1" Margin="36,28">
+      <Grid x:Name="HomePanel" RowDefinitions="Auto,24,*">
+        <StackPanel>
+          <TextBlock Text="What would you like to do?" FontSize="30" FontWeight="SemiBold" />
+          <TextBlock Margin="0,7,0,0"
+                     Text="Choose the Mod Manager to play with mods, or open the creator tools when you need them."
+                     Foreground="#AAB5C6" FontSize="15" TextWrapping="Wrap" />
+        </StackPanel>
+
+        <Grid x:Name="HomeCardsGrid" Grid.Row="2" ColumnDefinitions="*,22,*" RowDefinitions="*">
+          <Border x:Name="ModManagerCard" Grid.Column="0" Padding="28" Background="#172131"
+                  BorderBrush="#3978E6" BorderThickness="1" CornerRadius="12">
+            <Grid RowDefinitions="Auto,*,Auto">
+              <StackPanel>
+                <Border HorizontalAlignment="Left" Padding="10,4" Background="#193C73" CornerRadius="12">
+                  <TextBlock Text="RECOMMENDED" Foreground="#9EC5FF" FontSize="11" FontWeight="Bold" />
+                </Border>
+                <TextBlock Margin="0,18,0,0" Text="Play with mods" FontSize="25" FontWeight="SemiBold" />
+                <TextBlock Margin="0,10,0,0"
+                           Text="Install, enable, update, and launch game mods from the OpenKH Mod Manager."
+                           Foreground="#AAB5C6" FontSize="15" TextWrapping="Wrap" LineHeight="22" />
+              </StackPanel>
+              <StackPanel Grid.Row="2" Spacing="8">
+                <Button x:Name="LaunchModManagerButton" Classes="primary" Content="Open Mod Manager"
+                        Click="LaunchModManager_Click" />
+                <Button x:Name="CreateShortcutButton" Classes="secondary" Content="Create Desktop Shortcut"
+                        Click="CreateShortcut_Click" />
+                <TextBlock x:Name="ModManagerStatusText" Foreground="#EE8989" FontSize="12"
+                           TextAlignment="Center" IsVisible="False" />
+              </StackPanel>
+            </Grid>
+          </Border>
+
+          <Border x:Name="ToolsCard" Grid.Column="2" Padding="28" Background="#172131"
+                  BorderBrush="#2A3850" BorderThickness="1" CornerRadius="12">
+            <Grid RowDefinitions="Auto,*,Auto">
+              <StackPanel>
+                <Border HorizontalAlignment="Left" Padding="10,4" Background="#342D59" CornerRadius="12">
+                  <TextBlock Text="FOR MOD CREATORS" Foreground="#C8B8FF" FontSize="11" FontWeight="Bold" />
+                </Border>
+                <TextBlock Margin="0,18,0,0" Text="Create and inspect mods" FontSize="25" FontWeight="SemiBold" />
+                <TextBlock Margin="0,10,0,0"
+                           Text="Browse editors, viewers, map studios, and other specialized OpenKH utilities."
+                           Foreground="#AAB5C6" FontSize="15" TextWrapping="Wrap" LineHeight="22" />
+              </StackPanel>
+              <StackPanel Grid.Row="2" Spacing="8">
+                <Button Classes="secondary" Content="Browse Modding Tools" Click="ShowTools_Click" />
+                <TextBlock x:Name="ToolCountText" Foreground="#AAB5C6" FontSize="12" TextAlignment="Center" />
+              </StackPanel>
+            </Grid>
+          </Border>
+        </Grid>
+      </Grid>
+
+      <Grid x:Name="ToolsPanel" RowDefinitions="Auto,18,Auto,14,*,16,Auto" IsVisible="False">
+        <Grid ColumnDefinitions="Auto,18,*">
+          <Button Classes="secondary" Content="&#x2190; Back" Click="ShowHome_Click" />
+          <StackPanel Grid.Column="2" VerticalAlignment="Center">
+            <TextBlock Text="Modding Tools" FontSize="28" FontWeight="SemiBold" />
+            <TextBlock Text="Specialized utilities for creating and inspecting game content."
+                       Foreground="#AAB5C6" TextWrapping="Wrap" />
+          </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,12,Auto">
+          <TextBox x:Name="SearchBox" PlaceholderText="Search tools" TextChanged="SearchBox_TextChanged" />
+          <Button Grid.Column="2" Classes="secondary" Content="Open Apps Folder" Click="OpenToolsFolder_Click" />
+        </Grid>
+
+        <Border Grid.Row="4" Background="#111B29" BorderBrush="#26374E" BorderThickness="1" CornerRadius="10">
+          <ListBox x:Name="ToolsList" Background="Transparent" BorderThickness="0" Padding="8"
+                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" DoubleTapped="ToolsList_DoubleTapped">
+            <ListBox.Styles>
+              <Style Selector="ListBoxItem">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Margin" Value="0,0,0,6" />
+              </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <Border Padding="14,11" Background="#182435" CornerRadius="8">
+                  <Grid ColumnDefinitions="44,*,Auto,Auto">
+                    <Border Width="34" Height="34" HorizontalAlignment="Left" Background="#2A4163" CornerRadius="17">
+                      <TextBlock Text="{Binding Initial}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                 FontWeight="Bold" Foreground="#9EC5FF" />
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding DisplayName}" Foreground="#F5F7FB" FontSize="15" FontWeight="SemiBold" />
+                      <TextBlock Margin="0,3,0,0" Text="{Binding Description}" Foreground="#AAB5C6"
+                                 FontSize="12" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                    <Button Grid.Column="2" Width="44" Height="44" Margin="10,0,0,0" Padding="0"
+                            Background="Transparent" BorderThickness="0" FontSize="22"
+                            Foreground="{Binding FavoriteColor}" Content="{Binding FavoriteSymbol}"
+                            ToolTip.Tip="{Binding FavoriteAction}" Tag="{Binding}"
+                            Click="ToggleFavorite_Click" />
+                    <Button Grid.Column="3" Margin="10,0,0,0" Classes="secondary" Padding="16,8"
+                            Content="Open" Tag="{Binding}" Click="LaunchTool_Click" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Border>
+
+        <TextBlock x:Name="ToolsStatusText" Grid.Row="6" Foreground="#AAB5C6" />
+      </Grid>
+    </Grid>
+
+    <Border Grid.Row="2" Padding="36,13" Background="#0A101A" BorderBrush="#26354A" BorderThickness="0,1,0,0">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <TextBlock Text="OpenKH" Foreground="#718099" FontSize="12" VerticalAlignment="Center" />
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="16">
+          <Button x:Name="CheckForUpdatesButton" Classes="link" Content="Check for Updates"
+                  Click="CheckForUpdates_Click" />
+          <Button Classes="link" Content="Documentation" Click="OpenDocumentation_Click" />
+          <TextBlock x:Name="VersionText" Foreground="#718099" FontSize="12" VerticalAlignment="Center" />
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

@@ -1,0 +1,45 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="OpenKh.Tools.Launcher.App"
+             RequestedThemeVariant="Dark">
+  <Application.Styles>
+    <FluentTheme />
+    <Style Selector="Window">
+      <Setter Property="Background" Value="#0D1420" />
+      <Setter Property="FontFamily" Value="avares://Avalonia.Fonts.Inter/Assets#Inter" />
+    </Style>
+    <Style Selector="Button">
+      <Setter Property="MinHeight" Value="44" />
+      <Setter Property="Padding" Value="18,10" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#3978E6" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.secondary">
+      <Setter Property="Background" Value="#27364D" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="#3D506E" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="Button.link">
+      <Setter Property="MinHeight" Value="28" />
+      <Setter Property="Padding" Value="4" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#8FB9F8" />
+    </Style>
+    <Style Selector="TextBox">
+      <Setter Property="MinHeight" Value="44" />
+      <Setter Property="Padding" Value="12,0" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Background" Value="#111B29" />
+      <Setter Property="Foreground" Value="#F5F7FB" />
+      <Setter Property="BorderBrush" Value="#334661" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+  </Application.Styles>
+</Application>

@@ -2,8 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>OpenKh.Launcher</AssemblyName>
@@ -14,20 +13,42 @@
     <Company>OpenKH</Company>
     <Description>Start OpenKH applications from one organized place.</Description>
     <ApplicationIcon>..\images\openKH_Old.ico</ApplicationIcon>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="..\images\OpenKH.png" Link="Assets\OpenKH.png" />
+    <AvaloniaResource Include="..\images\OpenKH.png" Link="Assets\OpenKH.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0" />
+    <PackageReference Include="Facepunch.Steamworks.Dll" Version="1.62.0" />
     <PackageReference Include="Octokit" Version="14.0.0" />
+    <PackageReference Include="SDL3-CS" Version="3.4.12.3" />
+    <PackageReference Include="SDL3-CS.Linux" Version="3.4.12.1" />
+    <PackageReference Include="SDL3-CS.Windows" Version="3.4.12.1" />
+    <PackageReference Include="Steamworks.NET" Version="2024.8.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\OpenKh.Tools.ModsManager\Services\OpenkhInstallation.cs" Link="Updates\OpenkhInstallation.cs" />
     <Compile Include="..\OpenKh.Tools.ModsManager\Services\OpenkhUpdateCheckerService.cs" Link="Updates\OpenkhUpdateCheckerService.cs" />
     <Compile Include="..\OpenKh.Tools.ModsManager\Services\OpenkhUpdateProceederService.cs" Link="Updates\OpenkhUpdateProceederService.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\ControllerAction.cs" Link="Input\ControllerAction.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\ControllerWindowNavigator.cs" Link="Input\ControllerWindowNavigator.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\IControllerInputService.cs" Link="Input\IControllerInputService.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\SdlControllerInputService.cs" Link="Input\SdlControllerInputService.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\SteamworksPlatformService.cs" Link="Input\SteamworksPlatformService.cs" />
   </ItemGroup>
+
+  <Target Name="RemoveSteamImportLibraries" AfterTargets="ResolvePackageAssets">
+    <ItemGroup>
+      <NativeCopyLocalItems Remove="@(NativeCopyLocalItems)"
+                            Condition="'%(NativeCopyLocalItems.Extension)' == '.lib'" />
+    </ItemGroup>
+  </Target>
 
 </Project>

@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Windows;
 
 namespace OpenKh.Tools.Launcher;
 
@@ -9,6 +8,8 @@ internal static class LegacyInstallationMigration
 {
     private const string LauncherExecutableName = "OpenKh.Launcher.exe";
     private const string CompatibilityExecutableName = "OpenKh.Tools.ModsManager.exe";
+
+    public static string? LastError { get; private set; }
 
     private static readonly string[] PreviousApplicationDirectories =
     {
@@ -36,6 +37,7 @@ internal static class LegacyInstallationMigration
 
     public static bool TryStartModManager()
     {
+        LastError = null;
         var processPath = Environment.ProcessPath;
         if (string.IsNullOrWhiteSpace(processPath)
             || !Path.GetFileName(processPath).Equals(CompatibilityExecutableName, StringComparison.OrdinalIgnoreCase))
@@ -60,12 +62,7 @@ internal static class LegacyInstallationMigration
 
         if (!File.Exists(modManagerPath))
         {
-            MessageBox.Show(
-                "The updated Mod Manager could not be found. Extract the latest OpenKH release again.",
-                "OpenKH Update",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error
-            );
+            LastError = "The updated Mod Manager could not be found. Extract the latest OpenKH release again.";
             return true;
         }
 
@@ -87,12 +84,7 @@ internal static class LegacyInstallationMigration
         }
         catch (Exception exception)
         {
-            MessageBox.Show(
-                $"OpenKH could not complete the update.\n\n{exception.Message}",
-                "OpenKH Update",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error
-            );
+            LastError = $"OpenKH could not complete the update.\n\n{exception.Message}";
         }
 
         return true;
@@ -124,6 +116,15 @@ internal static class LegacyInstallationMigration
 
         if (legacyFiles.Length == 0 && legacyDirectories.Length == 0)
             return;
+
+        if (!OperatingSystem.IsWindows())
+        {
+            foreach (var filePath in legacyFiles)
+                TryDeleteFile(filePath);
+            foreach (var directoryPath in legacyDirectories)
+                TryDeleteDirectory(directoryPath);
+            return;
+        }
 
         var batchPath = Path.Combine(Path.GetTempPath(), $"openkh-migrate-{Guid.NewGuid():N}.bat");
         var batch = new StringBuilder();
@@ -161,12 +162,10 @@ internal static class LegacyInstallationMigration
     }
 
     private static bool IsOrganizedInstallation(string installationDirectory) =>
-        File.Exists(Path.Combine(installationDirectory, LauncherExecutableName))
-        && File.Exists(Path.Combine(
-            installationDirectory,
-            "Apps",
-            CompatibilityExecutableName
-        ));
+        (File.Exists(Path.Combine(installationDirectory, LauncherExecutableName))
+            || File.Exists(Path.Combine(installationDirectory, "OpenKh.Launcher")))
+        && (File.Exists(Path.Combine(installationDirectory, "Apps", CompatibilityExecutableName))
+            || File.Exists(Path.Combine(installationDirectory, "Apps", "OpenKh.Tools.ModsManager")));
 
     private static IEnumerable<string> GetLegacyApplicationFiles(string installationDirectory)
     {
@@ -218,4 +217,26 @@ internal static class LegacyInstallationMigration
     }
 
     private static string EscapeBatchPath(string path) => $"\"{path.Replace("\"", "\"\"")}\"";
+
+    private static void TryDeleteFile(string path)
+    {
+        try
+        {
+            File.Delete(path);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+        }
+    }
+
+    private static void TryDeleteDirectory(string path)
+    {
+        try
+        {
+            Directory.Delete(path, recursive: true);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+        }
+    }
 }

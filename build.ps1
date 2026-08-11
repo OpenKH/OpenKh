@@ -60,10 +60,12 @@ Test-Success $LASTEXITCODE
 Get-CSProjects "OpenKh.Command.*" | ForEach-Object {
     dotnet sln $solution add $_
 }
-Get-CSProjects "OpenKh.Tools.*" | ForEach-Object {
-    dotnet sln $solution add $_
-    Test-Success $LASTEXITCODE
-}
+Get-CSProjects "OpenKh.Tools.*" |
+    Where-Object { (Split-Path $_ -Leaf) -ne "OpenKh.Tools.ModsManager.csproj" } |
+    ForEach-Object {
+        dotnet sln $solution add $_
+        Test-Success $LASTEXITCODE
+    }
 Get-CSProjects "OpenKh.WinShell.*" | ForEach-Object {
     dotnet sln $solution add $_
     Test-Success $LASTEXITCODE

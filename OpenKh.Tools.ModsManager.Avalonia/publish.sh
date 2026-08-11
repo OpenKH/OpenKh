@@ -24,5 +24,5 @@ publish_target linux-x64 linux-x64
 publish_target linux-x64 steam-deck
 cp "$SCRIPT_DIR/Packaging/SteamDeck/install-openkh-mod-manager.sh" \
    "$OUTPUT_ROOT/steam-deck/install-openkh-mod-manager.sh"
-chmod +x "$OUTPUT_ROOT/steam-deck/OpenKh.ModManager" \
+chmod +x "$OUTPUT_ROOT/steam-deck/OpenKh.Tools.ModsManager" \
          "$OUTPUT_ROOT/steam-deck/install-openkh-mod-manager.sh"

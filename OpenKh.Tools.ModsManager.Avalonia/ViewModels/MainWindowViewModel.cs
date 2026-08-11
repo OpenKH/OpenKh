@@ -99,7 +99,7 @@ public sealed class MainWindowViewModel : ObservableObject
         RestoreGameCommand = new AsyncRelayCommand(RestoreGameAsync, () => !IsBusy);
         FastRestoreCommand = new AsyncRelayCommand(FastRestoreAsync, () => !IsBusy);
         ToggleAdvancedOptionsCommand = new RelayCommand(() => ShowAdvancedOptions = !ShowAdvancedOptions);
-        _controllerInput.ConnectionChanged += ControllerConnectionChanged;
+        _controllerInput.StatusChanged += ControllerConnectionChanged;
         _launchService.RunningStateChanged += LaunchRunningStateChanged;
 
         _ = RefreshAsync();

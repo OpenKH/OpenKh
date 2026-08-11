@@ -27,15 +27,20 @@ dotnet publish `
     "OpenKh.Tools.Launcher/OpenKh.Tools.Launcher.csproj" `
     --configuration $Configuration `
     --runtime win-x64 `
-    --self-contained false `
+    --self-contained true `
+    --source "https://api.nuget.org/v3/index.json" `
     --output $ReleaseDirectory `
     /p:PublishSingleFile=true `
+    /p:IncludeNativeLibrariesForSelfExtract=true `
     /p:DebugType=None `
     /p:DebugSymbols=false
 
 if ($LASTEXITCODE -ne 0) {
     throw "Publishing OpenKH Launcher failed with exit code $LASTEXITCODE."
 }
+
+Get-ChildItem -LiteralPath $ReleaseDirectory -Filter "*.pdb" -File |
+    Remove-Item -Force
 
 $compatibilityExecutable = Join-Path $ReleaseDirectory "OpenKh.Tools.ModsManager.exe"
 Copy-Item `

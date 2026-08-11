@@ -32,7 +32,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 .Where(release => _validTag.IsMatch(release.TagName))
                 .SelectMany(
                     release => release.Assets
-                        .Where(asset => asset.Name == "openkh.zip" && asset.State == "uploaded")
+                        .Where(asset => asset.Name == GetReleaseAssetName() && asset.State == "uploaded")
                         .Select(asset => (Release: release, Asset: asset))
                 )
                 .Take(1)
@@ -64,5 +64,8 @@ namespace OpenKh.Tools.ModsManager.Services
                 DownloadZipUrl: ""
             );
         }
+
+        private static string GetReleaseAssetName() =>
+            OperatingSystem.IsWindows() ? "openkh.zip" : "openkh-linux-x64.zip";
     }
 }

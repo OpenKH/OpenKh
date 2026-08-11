@@ -40,18 +40,29 @@ jobs:
       run: powershell -ExecutionPolicy Unrestricted ./.github/scripts/prepare-release.ps1
       shell: pwsh
 
+    - name: Build Linux and Steam Deck release
+      run: powershell -ExecutionPolicy Unrestricted ./.github/scripts/prepare-linux-release.ps1
+      shell: pwsh
+
     - name: create openkh-release
       shell: bash
       env:
         RELEASE_TAG: "release2-${{github.run_number}}"
       run: |
         echo $RELEASE_TAG > openkh/openkh-release
+        echo $RELEASE_TAG > openkh-linux-x64/openkh-release
 
     - name: zip
       uses: TheDoctor0/zip-release@0.6.2
       with:
         filename: openkh.zip
         path: openkh
+
+    - name: zip Linux and Steam Deck release
+      uses: TheDoctor0/zip-release@0.6.2
+      with:
+        filename: openkh-linux-x64.zip
+        path: openkh-linux-x64
 
     - name: validate update archive
       shell: pwsh
@@ -77,6 +88,18 @@ jobs:
           }
         }
 
+        $linuxArchiveListing = (7z l openkh-linux-x64.zip) -join "`n"
+        $linuxRequiredEntries = @(
+          "openkh-linux-x64\OpenKh.Launcher",
+          "openkh-linux-x64\Apps\OpenKh.Tools.ModsManager",
+          "openkh-linux-x64\install-openkh-linux.sh"
+        )
+        foreach ($entry in $linuxRequiredEntries) {
+          if ($linuxArchiveListing -notmatch [regex]::Escape($entry)) {
+            throw "Required Linux update entry '$entry' is missing from openkh-linux-x64.zip."
+          }
+        }
+
     - name: "GitHub release latest"
       if: ${{ github.ref_name == 'master' }}
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -88,6 +111,7 @@ jobs:
         title: "OpenKh Latest Build"
         files: |
           openkh.zip
+          openkh-linux-x64.zip
 
     - name: "GitHub release numbered"
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -99,3 +123,4 @@ jobs:
         title: "OpenKh Build ${{github.run_number}} (${{github.ref_name}})"
         files: |
           openkh.zip
+          openkh-linux-x64.zip

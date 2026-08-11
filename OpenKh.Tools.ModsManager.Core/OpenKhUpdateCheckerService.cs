@@ -63,6 +63,7 @@ public sealed class OpenKhUpdateCheckerService
     private static ReleaseAsset? FindLatestRelease(JsonElement releases)
     {
         ReleaseAsset? latest = null;
+        var assetName = OperatingSystem.IsWindows() ? "openkh.zip" : "openkh-linux-x64.zip";
         foreach (var release in releases.EnumerateArray())
         {
             var tag = release.GetProperty("tag_name").GetString() ?? string.Empty;
@@ -72,7 +73,7 @@ public sealed class OpenKhUpdateCheckerService
 
             foreach (var asset in release.GetProperty("assets").EnumerateArray())
             {
-                if (!string.Equals(asset.GetProperty("name").GetString(), "openkh.zip", StringComparison.OrdinalIgnoreCase) ||
+                if (!string.Equals(asset.GetProperty("name").GetString(), assetName, StringComparison.OrdinalIgnoreCase) ||
                     !string.Equals(asset.GetProperty("state").GetString(), "uploaded", StringComparison.OrdinalIgnoreCase))
                 {
                     continue;

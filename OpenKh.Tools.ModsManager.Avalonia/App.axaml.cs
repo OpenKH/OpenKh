@@ -1,5 +1,8 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using OpenKh.Tools.ModsManager.Avalonia.ViewModels;
@@ -71,6 +74,8 @@ public sealed partial class App : Application
                 async () => await mainViewModel.RunInitialSetupAsync(),
                 DispatcherPriority.Background);
             _controllerInput.ActionTriggered += mainWindow.HandleControllerAction;
+            InputElement.KeyDownEvent.AddClassHandler<Window>(HandleGlobalKeyDown, RoutingStrategies.Tunnel);
+            InputElement.GotFocusEvent.AddClassHandler<TextBox>(HandleTextBoxFocus, RoutingStrategies.Bubble);
             desktop.MainWindow = mainWindow;
             desktop.Exit += (_, _) =>
             {
@@ -79,8 +84,48 @@ public sealed partial class App : Application
                 _steamworks.Dispose();
             };
             _controllerInput.Start();
+            _controllerInput.ConnectionChanged += UpdateSteamLauncherMode;
+            UpdateSteamLauncherMode();
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void UpdateSteamLauncherMode()
+    {
+        var useSteamInput = _controllerInput?.IsConnected != true && _steamworks?.IsRunning == true;
+        _steamworks?.SetLauncherMode(useSteamInput);
+        _controllerInput?.SetSteamInputFallback(useSteamInput, _steamworks?.IsSteamDeck == true);
+    }
+
+    private void HandleTextBoxFocus(TextBox textBox, FocusChangedEventArgs eventArgs) =>
+        _steamworks?.ShowFloatingKeyboard(textBox);
+
+    private void HandleGlobalKeyDown(Window window, KeyEventArgs eventArgs)
+    {
+        if (_controllerInput is null || _steamworks?.IsLauncherModeEnabled != true ||
+            eventArgs.KeyModifiers != KeyModifiers.None)
+            return;
+
+        if (window.FocusManager?.GetFocusedElement() is TextBox && eventArgs.Key != Key.Escape)
+            return;
+
+        var action = eventArgs.Key switch
+        {
+            Key.Up => ControllerAction.PreviousControl,
+            Key.Down => ControllerAction.NextControl,
+            Key.Left => ControllerAction.PreviousGame,
+            Key.Right => ControllerAction.NextGame,
+            Key.Enter or Key.Space => ControllerAction.Confirm,
+            Key.Escape => ControllerAction.Cancel,
+            Key.F5 => ControllerAction.Refresh,
+            _ => (ControllerAction?)null
+        };
+
+        if (action is not { } controllerAction)
+            return;
+
+        _controllerInput.Dispatch(controllerAction);
+        eventArgs.Handled = true;
     }
 }

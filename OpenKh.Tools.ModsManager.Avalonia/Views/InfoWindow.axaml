@@ -5,7 +5,7 @@
         WindowStartupLocation="CenterOwner" XYFocus.NavigationModes="Enabled">
   <Grid Margin="28" RowDefinitions="Auto,18,*,18,Auto">
     <StackPanel Spacing="8">
-      <Image Source="avares://OpenKh.ModManager/Assets/OpenKH.png" Width="220" HorizontalAlignment="Left" />
+      <Image Source="avares://OpenKh.Tools.ModsManager/Assets/OpenKH.png" Width="220" HorizontalAlignment="Left" />
       <TextBlock Text="OpenKH Mod Manager" FontSize="27" FontWeight="Bold" />
       <TextBlock x:Name="VersionText" Foreground="#91A2BA" />
     </StackPanel>

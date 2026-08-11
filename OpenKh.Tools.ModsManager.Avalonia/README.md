@@ -1,6 +1,6 @@
 # OpenKH Mod Manager for Avalonia
 
-This project is the cross-platform replacement for the WPF Mod Manager. It runs alongside the current application while features are migrated and verified.
+This project is the cross-platform replacement for the WPF Mod Manager and is the version packaged in new OpenKH releases.
 
 ## Current functionality
 
@@ -19,6 +19,8 @@ This project is the cross-platform replacement for the WPF Mod Manager. It runs 
 - Provides creator workflows for metadata, target-file search, copy assets, preferences, and diff previews.
 - Checks the complete OpenKH package for updates.
 - Supports SDL gamepads with controller-specific PlayStation, Nintendo, and Xbox labels.
+- Uses Steam launcher mode when Steam Input owns the controller instead of exposing it to SDL.
+- Opens the Steam Deck floating keyboard when a text field receives focus.
 - Opens the selected mod directory.
 - Provides responsive layouts designed for Windows, Linux, and the Steam Deck screen.
 

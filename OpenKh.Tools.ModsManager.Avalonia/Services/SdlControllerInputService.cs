@@ -29,6 +29,7 @@ public sealed class SdlControllerInputService : IControllerInputService
 
     public event Action<ControllerAction>? ActionTriggered;
     public event Action? ConnectionChanged;
+    public event Action? StatusChanged;
 
     public bool IsConnected => _gamepads.Count > 0;
     public string StatusText => _statusText;
@@ -38,11 +39,16 @@ public sealed class SdlControllerInputService : IControllerInputService
     {
         try
         {
+            SDL.SetHint("SDL_JOYSTICK_HIDAPI", "1");
+            SDL.SetHint("SDL_JOYSTICK_HIDAPI_STEAM", "1");
+            SDL.SetHint("SDL_JOYSTICK_HIDAPI_STEAMDECK", "1");
+            SDL.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
             _initialized = SDL.Init(SDL.InitFlags.Gamepad);
             if (!_initialized)
             {
                 _statusText = $"Controller support unavailable: {SDL.GetError()}";
                 ConnectionChanged?.Invoke();
+                StatusChanged?.Invoke();
                 return;
             }
 
@@ -55,6 +61,7 @@ public sealed class SdlControllerInputService : IControllerInputService
         {
             _statusText = "Controller support unavailable, Steam Input keyboard mapping is still supported";
             ConnectionChanged?.Invoke();
+            StatusChanged?.Invoke();
         }
     }
 
@@ -118,6 +125,8 @@ public sealed class SdlControllerInputService : IControllerInputService
         var gamepad = _gamepads.Values.First();
         PollButton(gamepad, SDL.GamepadButton.DPadUp);
         PollButton(gamepad, SDL.GamepadButton.DPadDown);
+        PollButton(gamepad, SDL.GamepadButton.DPadLeft);
+        PollButton(gamepad, SDL.GamepadButton.DPadRight);
         PollButton(gamepad, SDL.GamepadButton.South);
         PollButton(gamepad, SDL.GamepadButton.East);
         PollButton(gamepad, SDL.GamepadButton.West);
@@ -156,6 +165,7 @@ public sealed class SdlControllerInputService : IControllerInputService
         _statusText = $"Controller connected: {name}";
         _navigationHelpText = GetNavigationHelpText(name);
         ConnectionChanged?.Invoke();
+        StatusChanged?.Invoke();
     }
 
     private void RemoveGamepad(uint instanceId)
@@ -179,6 +189,7 @@ public sealed class SdlControllerInputService : IControllerInputService
             _navigationHelpText = "";
         }
         ConnectionChanged?.Invoke();
+        StatusChanged?.Invoke();
     }
 
     private void HandleButton(SDL.GamepadButton button)
@@ -187,6 +198,8 @@ public sealed class SdlControllerInputService : IControllerInputService
         {
             SDL.GamepadButton.DPadUp => ControllerAction.PreviousControl,
             SDL.GamepadButton.DPadDown => ControllerAction.NextControl,
+            SDL.GamepadButton.DPadLeft => ControllerAction.PreviousGame,
+            SDL.GamepadButton.DPadRight => ControllerAction.NextGame,
             SDL.GamepadButton.South => ControllerAction.Confirm,
             SDL.GamepadButton.East => ControllerAction.Cancel,
             SDL.GamepadButton.West => ControllerAction.Secondary,
@@ -237,12 +250,35 @@ public sealed class SdlControllerInputService : IControllerInputService
         }
     }
 
-    private void Dispatch(ControllerAction action)
+    public void Dispatch(ControllerAction action)
     {
         if (_capturedHandler is { } handler)
             handler(action);
         else
             ActionTriggered?.Invoke(action);
+    }
+
+    public void SetSteamInputFallback(bool enabled, bool isSteamDeck)
+    {
+        if (IsConnected)
+            return;
+
+        var statusText = enabled
+            ? isSteamDeck
+                ? "Controller input managed by Steam Deck"
+                : "Controller input managed by Steam Input"
+            : "No controller detected";
+        var helpText = enabled
+            ? isSteamDeck
+                ? "D-pad / left stick: navigate   A: select   B: back   Steam + X: keyboard"
+                : "Use your Steam controller layout to navigate and select"
+            : string.Empty;
+        if (_statusText == statusText && _navigationHelpText == helpText)
+            return;
+
+        _statusText = statusText;
+        _navigationHelpText = helpText;
+        StatusChanged?.Invoke();
     }
 
     private static string GetNavigationHelpText(string gamepadName)

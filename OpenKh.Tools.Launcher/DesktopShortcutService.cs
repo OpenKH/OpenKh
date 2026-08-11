@@ -1,5 +1,6 @@
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace OpenKh.Tools.Launcher;
 
@@ -7,6 +8,9 @@ internal static class DesktopShortcutService
 {
     public static string CreateModManagerShortcut(string targetPath, string? shortcutDirectory = null)
     {
+        if (!OperatingSystem.IsWindows())
+            return CreateLinuxShortcut(targetPath, shortcutDirectory);
+
         shortcutDirectory ??= Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
         var shortcutPath = Path.Combine(shortcutDirectory, "OpenKH Mod Manager.lnk");
         var shellType = Type.GetTypeFromProgID("WScript.Shell")
@@ -43,4 +47,48 @@ internal static class DesktopShortcutService
 
         return shortcutPath;
     }
+
+    private static string CreateLinuxShortcut(string targetPath, string? shortcutDirectory)
+    {
+        if (string.IsNullOrWhiteSpace(shortcutDirectory))
+        {
+            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            shortcutDirectory = Directory.Exists(desktop)
+                ? desktop
+                : Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    ".local",
+                    "share",
+                    "applications"
+                );
+        }
+
+        Directory.CreateDirectory(shortcutDirectory);
+        var shortcutPath = Path.Combine(shortcutDirectory, "openkh-mod-manager.desktop");
+        var escapedTarget = EscapeDesktopEntryValue(targetPath);
+        var content = new StringBuilder()
+            .AppendLine("[Desktop Entry]")
+            .AppendLine("Type=Application")
+            .AppendLine("Name=OpenKH Mod Manager")
+            .AppendLine("Comment=Open OpenKH Mod Manager")
+            .AppendLine($"Exec=\"{escapedTarget}\"")
+            .AppendLine($"Path=\"{EscapeDesktopEntryValue(Path.GetDirectoryName(targetPath) ?? string.Empty)}\"")
+            .AppendLine("Terminal=false")
+            .AppendLine("Categories=Game;Utility;")
+            .ToString();
+        File.WriteAllText(shortcutPath, content, new UTF8Encoding(false));
+        if (OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
+        {
+            File.SetUnixFileMode(
+                shortcutPath,
+                UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute |
+                UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
+                UnixFileMode.OtherRead | UnixFileMode.OtherExecute
+            );
+        }
+        return shortcutPath;
+    }
+
+    private static string EscapeDesktopEntryValue(string value) =>
+        value.Replace("\\", "\\\\").Replace("\"", "\\\"");
 }

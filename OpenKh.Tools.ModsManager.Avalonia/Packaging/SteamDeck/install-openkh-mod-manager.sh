@@ -6,15 +6,15 @@ APPLICATIONS_DIR="$HOME/.local/share/applications"
 DESKTOP_FILE="$APPLICATIONS_DIR/openkh-mod-manager.desktop"
 
 mkdir -p "$APPLICATIONS_DIR"
-chmod +x "$SCRIPT_DIR/OpenKh.ModManager"
+chmod +x "$SCRIPT_DIR/OpenKh.Tools.ModsManager"
 
 {
     printf '%s\n' '[Desktop Entry]'
     printf '%s\n' 'Type=Application'
     printf '%s\n' 'Name=OpenKH Mod Manager'
     printf '%s\n' 'Comment=Manage OpenKH game mods'
-    printf 'Exec=%s\n' "$SCRIPT_DIR/OpenKh.ModManager"
-    printf 'Path=%s\n' "$SCRIPT_DIR"
+    printf 'Exec="%s"\n' "$SCRIPT_DIR/OpenKh.Tools.ModsManager"
+    printf 'Path="%s"\n' "$SCRIPT_DIR"
     printf '%s\n' 'Terminal=false'
     printf '%s\n' 'Categories=Game;Utility;'
 } > "$DESKTOP_FILE"

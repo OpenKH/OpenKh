@@ -13,7 +13,7 @@
     <Border Grid.RowSpan="2" Background="#0F192A" BorderBrush="#22324C" BorderThickness="0,0,1,0">
       <Grid Margin="22" RowDefinitions="Auto,20,*,20,Auto">
         <StackPanel Spacing="8">
-          <Image Source="avares://OpenKh.ModManager/Assets/OpenKH.png"
+          <Image Source="avares://OpenKh.Tools.ModsManager/Assets/OpenKH.png"
                  Width="164"
                  HorizontalAlignment="Left"
                  Stretch="Uniform" />
