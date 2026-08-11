@@ -15,10 +15,28 @@
     <PackageReference Include="Avalonia.Desktop" Version="12.1.0" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.0" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0" />
+    <PackageReference Include="SDL3-CS" Version="3.4.12.3" />
+    <PackageReference Include="SDL3-CS.Linux" Version="3.4.12.1" />
+    <PackageReference Include="SDL3-CS.Windows" Version="3.4.12.1" />
+    <PackageReference Include="Facepunch.Steamworks.Dll" Version="1.62.0" />
+    <PackageReference Include="Steamworks.NET" Version="2024.8.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Tools.ModsManager.Core\OpenKh.Tools.ModsManager.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="..\images\OpenKH.png" Link="Assets\OpenKH.png" />
+    <Compile Remove="artifacts\**\*.cs" />
+    <Compile Remove="preview-data\**\*.cs" />
+  </ItemGroup>
+
+  <Target Name="RemoveSteamImportLibraries" AfterTargets="ResolvePackageAssets">
+    <ItemGroup>
+      <NativeCopyLocalItems Remove="@(NativeCopyLocalItems)"
+                            Condition="'%(NativeCopyLocalItems.Extension)' == '.lib'" />
+    </ItemGroup>
+  </Target>
 
 </Project>

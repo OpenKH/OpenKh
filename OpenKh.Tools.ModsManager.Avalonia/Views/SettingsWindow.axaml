@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.SettingsWindow"
+        Title="Settings" Width="650" Height="650" MinWidth="520" MinHeight="520"
+        WindowStartupLocation="CenterOwner" XYFocus.NavigationModes="Enabled">
+  <Grid Margin="28" RowDefinitions="Auto,18,*,18,Auto">
+    <StackPanel Spacing="5">
+      <TextBlock Text="Settings" FontSize="27" FontWeight="Bold" />
+      <TextBlock Text="General Mod Manager and Panacea behavior." Foreground="#AAB9CF" />
+    </StackPanel>
+    <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Spacing="18">
+        <Border Classes="settings-card">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Mod Manager" FontSize="18" FontWeight="SemiBold" />
+            <CheckBox x:Name="AutoUpdateModsCheckBox" Content="Check repository mods for updates automatically" />
+            <Button x:Name="CheckOpenKhUpdatesButton" Content="Check for OpenKH updates" HorizontalAlignment="Left" Click="CheckOpenKhUpdates_OnClick" />
+            <TextBlock x:Name="UpdateStatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
+            <Button x:Name="InstallOpenKhUpdateButton" Content="Open Launcher to install update"
+                    Classes="primary" HorizontalAlignment="Left" IsVisible="False"
+                    Click="InstallOpenKhUpdate_OnClick" />
+          </StackPanel>
+        </Border>
+        <Border Classes="settings-card">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Panacea settings" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="These values are written to every configured Panacea installation when settings are saved."
+                       Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+            <CheckBox x:Name="ShowConsoleCheckBox" Content="Enable Console" />
+            <CheckBox x:Name="DebugLogCheckBox" Content="Enable Debug Log" />
+            <CheckBox x:Name="SoundDebugCheckBox" Content="Enable Sound Debug" />
+            <CheckBox x:Name="EnableCacheCheckBox" Content="Enable Cache" />
+            <CheckBox x:Name="QuickMenuCheckBox" Content="Enable Quick Menu" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+    <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
+      <Button x:Name="CancelButton" Content="Cancel" MinWidth="120" Click="Cancel_OnClick" />
+      <Button x:Name="SaveButton" Classes="primary" Content="Save settings" MinWidth="150" Click="Save_OnClick" />
+    </StackPanel>
+  </Grid>
+</Window>

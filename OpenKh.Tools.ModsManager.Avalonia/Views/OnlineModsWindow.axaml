@@ -1,0 +1,70 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.OnlineModsWindow"
+        Title="Browse online mods"
+        Width="980" Height="680" MinWidth="720" MinHeight="540"
+        WindowStartupLocation="CenterOwner"
+        XYFocus.NavigationModes="Enabled">
+  <Grid Margin="28" RowDefinitions="Auto,16,Auto,16,*,16,Auto">
+    <StackPanel Spacing="5">
+      <TextBlock Text="Browse online mods" FontSize="28" FontWeight="Bold" />
+      <TextBlock x:Name="GameHelpText" Foreground="#AAB9CF" />
+    </StackPanel>
+
+    <TextBox x:Name="SearchTextBox" Grid.Row="2"
+             PlaceholderText="Search by name, author, description, or repository"
+             TextChanged="Search_OnTextChanged" />
+
+    <Grid Grid.Row="4" ColumnDefinitions="3*,16,2*">
+      <Border Background="#0F192A" BorderBrush="#22324C" BorderThickness="1" CornerRadius="14" Padding="10">
+        <ListBox x:Name="ModsList" SelectionChanged="ModsList_OnSelectionChanged" Background="Transparent">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Grid Margin="6" ColumnDefinitions="52,*" MinHeight="70">
+                <Border Width="44" Height="44" CornerRadius="12" Background="#233B60" VerticalAlignment="Center">
+                  <Grid ClipToBounds="True">
+                    <TextBlock Text="{Binding Initial}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               FontWeight="Bold" Foreground="#8DB7FF" />
+                    <Image Source="{Binding IconImage}" Stretch="UniformToFill" />
+                  </Grid>
+                </Border>
+                <StackPanel Grid.Column="1" Margin="12,0" VerticalAlignment="Center" Spacing="3">
+                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Text="{Binding Author}" Foreground="#91A2BA" FontSize="12" />
+                </StackPanel>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Border>
+
+      <Border Grid.Column="2" Background="#0F192A" BorderBrush="#22324C" BorderThickness="1" CornerRadius="14" Padding="22">
+        <Grid RowDefinitions="*,Auto">
+          <ScrollViewer>
+            <StackPanel Spacing="12">
+              <Border Background="#111C2E" CornerRadius="12" ClipToBounds="True">
+                <Image x:Name="SelectedPreviewImage" MaxHeight="220" Stretch="Uniform" />
+              </Border>
+              <TextBlock x:Name="SelectedTitleText" FontSize="22" FontWeight="Bold" TextWrapping="Wrap" />
+              <TextBlock x:Name="SelectedAuthorText" Foreground="#91A2BA" />
+              <TextBlock x:Name="SelectedDescriptionText" TextWrapping="Wrap" Foreground="#C4D0E1" />
+              <Border Background="#111C2E" CornerRadius="10" Padding="12">
+                <TextBlock x:Name="SelectedRepositoryText" Foreground="#91A2BA" TextWrapping="Wrap" />
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+          <Button x:Name="InstallSelectedButton" Grid.Row="1" Classes="primary"
+                  Content="Install selected mod" Click="InstallSelected_OnClick" HorizontalAlignment="Stretch" />
+        </Grid>
+      </Border>
+    </Grid>
+
+    <Grid Grid.Row="6" ColumnDefinitions="*,16,Auto">
+      <StackPanel Spacing="6">
+        <ProgressBar x:Name="LoadingProgressBar" Minimum="0" Maximum="1" IsVisible="False" />
+        <TextBlock x:Name="StatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
+      </StackPanel>
+      <Button x:Name="CloseButton" Grid.Column="2" Content="Close" Click="Close_OnClick" />
+    </Grid>
+  </Grid>
+</Window>

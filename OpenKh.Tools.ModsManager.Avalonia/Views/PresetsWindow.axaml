@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.PresetsWindow"
+        Title="Presets" Width="560" Height="520" MinWidth="480" MinHeight="440"
+        WindowStartupLocation="CenterOwner" XYFocus.NavigationModes="Enabled">
+  <Grid Margin="28" RowDefinitions="Auto,18,*,18,Auto,12,Auto">
+    <StackPanel Spacing="5">
+      <TextBlock Text="Presets" FontSize="27" FontWeight="Bold" />
+      <TextBlock Text="Save or restore the enabled mod list for the current game."
+                 Foreground="#AAB9CF" TextWrapping="Wrap" />
+    </StackPanel>
+    <Border Grid.Row="2" Classes="settings-card">
+      <ListBox x:Name="PresetList" SelectionChanged="PresetList_OnSelectionChanged" />
+    </Border>
+    <Grid Grid.Row="4" ColumnDefinitions="*,12,Auto">
+      <TextBox x:Name="PresetNameTextBox" PlaceholderText="New preset name" />
+      <Button x:Name="SavePresetButton" Grid.Column="2" Content="Save current" Click="SavePreset_OnClick" />
+    </Grid>
+    <StackPanel Grid.Row="6" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
+      <Button x:Name="CloseButton" Content="Close" MinWidth="110" Click="Close_OnClick" />
+      <Button x:Name="RemoveButton" Content="Remove" MinWidth="110" Click="Remove_OnClick" />
+      <Button x:Name="ApplyButton" Classes="primary" Content="Apply" MinWidth="120" Click="Apply_OnClick" />
+    </StackPanel>
+  </Grid>
+</Window>

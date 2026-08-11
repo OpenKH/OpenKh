@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.ConfirmationWindow"
+        Width="480"
+        Height="270"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        XYFocus.NavigationModes="Enabled">
+  <Grid Margin="28" RowDefinitions="Auto,14,*,20,Auto">
+    <TextBlock x:Name="TitleText" FontSize="24" FontWeight="Bold" TextWrapping="Wrap" />
+    <TextBlock x:Name="MessageText" Grid.Row="2" Foreground="#C4D0E1" TextWrapping="Wrap" />
+    <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
+      <Button x:Name="CancelButton" Content="Cancel" MinWidth="110" Click="Cancel_OnClick" />
+      <Button x:Name="ConfirmButton" Classes="primary" MinWidth="130" Click="Confirm_OnClick" />
+    </StackPanel>
+  </Grid>
+</Window>

@@ -1,3 +1,4 @@
+#nullable disable
 /*
     Kingdom Save Editor
     Copyright (C) 2020 Luciano Ciccariello

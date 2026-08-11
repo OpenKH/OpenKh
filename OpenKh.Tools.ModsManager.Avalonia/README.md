@@ -9,11 +9,18 @@ This project is the cross-platform replacement for the WPF Mod Manager. It runs 
 - Searches by title, author, or repository.
 - Enables and disables mods with automatic saving.
 - Changes mod priority.
-- Installs local ZIP packages with safe path validation.
+- Installs local packages, repository URLs, ZIP URLs, Lua files, and mods from the official online catalog.
+- Shows online and installed mod icons, previews, authors, descriptions, and repository information.
+- Installs, removes, updates, and configures mods and collections.
+- Saves and loads mod presets.
+- Extracts game data and configures PC, Steam, Epic, and PCSX2 installations.
+- Installs and removes Panacea, the Steam App ID helper, and Lua Backend.
+- Builds mods, patches or restores PC packages, and launches or stops supported games.
+- Provides creator workflows for metadata, target-file search, copy assets, preferences, and diff previews.
+- Checks the complete OpenKH package for updates.
+- Supports SDL gamepads with controller-specific PlayStation, Nintendo, and Xbox labels.
 - Opens the selected mod directory.
-- Provides a layout designed for desktop displays and the Steam Deck screen.
-
-Remote installation, update, extraction, patching, and game launch remain in the WPF application until their services have been separated from Windows UI dependencies.
+- Provides responsive layouts designed for Windows, Linux, and the Steam Deck screen.
 
 ## Run locally
 

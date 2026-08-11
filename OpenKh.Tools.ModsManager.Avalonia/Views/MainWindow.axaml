@@ -4,135 +4,263 @@
         x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="OpenKH Mod Manager"
-        Width="900"
-        Height="640"
-        MinWidth="680"
-        MinHeight="460">
-  <Grid ColumnDefinitions="150,*" RowDefinitions="*,Auto">
+        Width="1280"
+        Height="800"
+        MinWidth="960"
+        MinHeight="640"
+        XYFocus.NavigationModes="Enabled">
+  <Grid x:Name="RootLayoutGrid" ColumnDefinitions="220,*" RowDefinitions="*,Auto">
     <Border Grid.RowSpan="2" Background="#0F192A" BorderBrush="#22324C" BorderThickness="0,0,1,0">
-      <Grid Margin="16" RowDefinitions="Auto,28,Auto,*,Auto">
-        <StackPanel Spacing="2">
-          <TextBlock Text="OpenKH" FontSize="28" FontWeight="Bold" Foreground="White" />
-          <TextBlock Text="MOD MANAGER" FontSize="12" FontWeight="SemiBold" Foreground="#77A7FF" />
+      <Grid Margin="22" RowDefinitions="Auto,20,*,20,Auto">
+        <StackPanel Spacing="8">
+          <Image Source="avares://OpenKh.ModManager/Assets/OpenKH.png"
+                 Width="164"
+                 HorizontalAlignment="Left"
+                 Stretch="Uniform" />
+          <TextBlock Text="MOD MANAGER" FontSize="12" FontWeight="Bold" Foreground="#77A7FF" />
         </StackPanel>
 
-        <StackPanel Grid.Row="2" Spacing="8">
-          <Border Background="#1C2B44" CornerRadius="10" Padding="14,12">
+        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="9">
+          <Button Classes="subtle" Command="{Binding BrowseModsCommand}" HorizontalAlignment="Stretch">
             <StackPanel Orientation="Horizontal" Spacing="12">
-              <TextBlock Text="◆" Foreground="#77A7FF" VerticalAlignment="Center" />
-              <TextBlock Text="My mods" FontWeight="SemiBold" VerticalAlignment="Center" />
+              <TextBlock Text="Browse mods" VerticalAlignment="Center" />
             </StackPanel>
-          </Border>
+          </Button>
           <Button Classes="subtle" Command="{Binding InstallCommand}" HorizontalAlignment="Stretch">
             <StackPanel Orientation="Horizontal" Spacing="12">
-              <TextBlock Text="＋" Foreground="#8DB7FF" VerticalAlignment="Center" />
+              <TextBlock Text="+" Foreground="#8DB7FF" FontSize="18" VerticalAlignment="Center" />
               <TextBlock Text="Install" VerticalAlignment="Center" />
             </StackPanel>
           </Button>
-          <Border Padding="14,12">
+          <Button Classes="subtle" Command="{Binding PresetsCommand}" Content="Presets" HorizontalAlignment="Stretch" />
+          <Button Classes="subtle" Command="{Binding CreatorCommand}" Content="Creator" HorizontalAlignment="Stretch" />
+          <Button Classes="subtle" Command="{Binding SetupCommand}" HorizontalAlignment="Stretch">
             <StackPanel Orientation="Horizontal" Spacing="12">
-              <TextBlock Text="⚙" Foreground="#8191AA" VerticalAlignment="Center" />
-              <TextBlock Text="Setup" Foreground="#8191AA" VerticalAlignment="Center" />
+              <TextBlock Text="Setup" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Classes="subtle" Command="{Binding SettingsCommand}" Content="Settings" HorizontalAlignment="Stretch" />
+          <Button Classes="subtle" Command="{Binding InfoCommand}" Content="Info" HorizontalAlignment="Stretch" />
+          <Border Height="1" Margin="0,8" Background="#22324C" />
+          <Button Classes="primary" Command="{Binding BuildAndPlayCommand}" HorizontalAlignment="Stretch">
+            <TextBlock Text="Build and play" TextWrapping="Wrap" TextAlignment="Center" />
+          </Button>
+          <Button Classes="subtle" Command="{Binding BuildCommand}" HorizontalAlignment="Stretch">
+            <TextBlock Text="Build mods" TextWrapping="Wrap" TextAlignment="Center" />
+          </Button>
+          <Button Classes="subtle" Command="{Binding PlayCommand}" HorizontalAlignment="Stretch">
+            <TextBlock Text="Play without rebuilding" TextWrapping="Wrap" TextAlignment="Center" />
+          </Button>
+          <Button Classes="subtle" Command="{Binding StopGameCommand}" IsVisible="{Binding IsGameRunning}"
+                  Content="Stop running game" HorizontalAlignment="Stretch" />
+          <Button Classes="subtle" Command="{Binding ToggleAdvancedOptionsCommand}" HorizontalAlignment="Stretch">
+            <TextBlock Text="Advanced options" TextWrapping="Wrap" TextAlignment="Center" />
+          </Button>
+          <Border IsVisible="{Binding ShowAdvancedOptions}"
+                  Background="#111C2E" BorderBrush="#22324C" BorderThickness="1"
+                  CornerRadius="10" Padding="8">
+            <StackPanel Spacing="8">
+              <Button Classes="subtle" Content="Build and fast patch" Command="{Binding FastPatchCommand}"
+                      HorizontalAlignment="Stretch" />
+              <Button Classes="subtle" Content="Build and full patch" Command="{Binding ApplyToGameCommand}"
+                      HorizontalAlignment="Stretch" />
+              <Button Classes="subtle" Content="Fast restore" Command="{Binding FastRestoreCommand}"
+                      HorizontalAlignment="Stretch" />
+              <Button Classes="subtle" Content="Full restore" Command="{Binding RestoreGameCommand}"
+                      HorizontalAlignment="Stretch" />
             </StackPanel>
           </Border>
         </StackPanel>
+        </ScrollViewer>
 
         <Border Grid.Row="4" Background="#111E31" CornerRadius="12" Padding="14">
           <StackPanel Spacing="5">
-            <TextBlock Text="NATIVE PREVIEW" FontSize="10" FontWeight="Bold" Foreground="#62D6A7" />
-            <TextBlock Text="Windows · Linux · Steam Deck" FontSize="12" TextWrapping="Wrap" Foreground="#AAB9CF" />
+            <TextBlock Text="CONTROLLER SUPPORT" FontSize="10" FontWeight="Bold" Foreground="#62D6A7" />
+            <TextBlock Text="Windows &#x2022; Linux &#x2022; Steam Deck"
+                       FontSize="12" TextWrapping="Wrap" Foreground="#AAB9CF" />
           </StackPanel>
         </Border>
       </Grid>
     </Border>
 
-    <Grid Grid.Column="1" Margin="16,16,16,12" RowDefinitions="Auto,10,Auto,10,Auto,12,*">
-      <Grid>
+    <Grid Grid.Column="1" Margin="28,24,28,18" RowDefinitions="Auto,18,Auto,18,*">
+      <Grid ColumnDefinitions="*,280">
         <StackPanel Spacing="4">
-          <TextBlock Text="My mods" FontSize="30" FontWeight="Bold" Foreground="White" />
           <TextBlock Text="Choose what you want to play. Changes are saved automatically."
                      Foreground="#AAB9CF" />
         </StackPanel>
+        <ComboBox Grid.Column="1"
+                  ItemsSource="{Binding Games}"
+                  SelectedItem="{Binding SelectedGame}"
+                  HorizontalContentAlignment="Stretch">
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
       </Grid>
 
-      <ComboBox Grid.Row="2"
-                ItemsSource="{Binding Games}"
-                SelectedItem="{Binding SelectedGame}"
-                HorizontalContentAlignment="Stretch">
-        <ComboBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
-          </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
-
-      <Grid Grid.Row="4" ColumnDefinitions="*,8,82,8,82">
-        <TextBox PlaceholderText="Search mods"
+      <Grid Grid.Row="2" ColumnDefinitions="*,16,130,12,130">
+        <TextBox PlaceholderText="Search by mod, author, or repository"
                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-        <Border Grid.Column="2" Background="#111C2E" CornerRadius="10" Padding="10,7">
+        <Border Grid.Column="2" Background="#111C2E" CornerRadius="10" Padding="14,8">
           <StackPanel>
-            <TextBlock Text="{Binding TotalCount}" FontSize="18" FontWeight="Bold" Foreground="White" />
-            <TextBlock Text="Mods" FontSize="10" Foreground="#8191AA" />
+            <TextBlock Text="{Binding TotalCount}" FontSize="20" FontWeight="Bold" Foreground="White" />
+            <TextBlock Text="Installed" FontSize="11" Foreground="#8191AA" />
           </StackPanel>
         </Border>
-        <Border Grid.Column="4" Background="#11253A" CornerRadius="10" Padding="10,7">
+        <Border Grid.Column="4" Background="#11253A" CornerRadius="10" Padding="14,8">
           <StackPanel>
-            <TextBlock Text="{Binding EnabledCount}" FontSize="18" FontWeight="Bold" Foreground="#62D6A7" />
-            <TextBlock Text="Enabled" FontSize="10" Foreground="#8191AA" />
+            <TextBlock Text="{Binding EnabledCount}" FontSize="20" FontWeight="Bold" Foreground="#62D6A7" />
+            <TextBlock Text="Enabled" FontSize="11" Foreground="#8191AA" />
           </StackPanel>
         </Border>
       </Grid>
 
-      <Grid Grid.Row="6">
-        <Border Background="#0F192A" BorderBrush="#22324C" BorderThickness="1" CornerRadius="14" Padding="10">
+      <ScrollViewer x:Name="WorkspaceScroller" Grid.Row="4"
+                    HorizontalScrollBarVisibility="Disabled"
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalContentAlignment="Stretch"
+                    VerticalContentAlignment="Stretch">
+      <Grid x:Name="WorkspaceGrid" ColumnDefinitions="3*,18,2*" RowDefinitions="*">
+        <Border x:Name="ModLibraryPanel" Background="#0F192A" BorderBrush="#22324C" BorderThickness="1" CornerRadius="14" Padding="10">
           <Grid RowDefinitions="Auto,*">
             <Grid Margin="8,4,8,10" ColumnDefinitions="*,Auto">
               <TextBlock Text="Load order" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
               <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                <Button Classes="subtle" Content="Open folder" Command="{Binding OpenFolderCommand}" />
-                <Button Classes="subtle" Content="↑" Command="{Binding MoveUpCommand}" ToolTip.Tip="Increase priority" />
-                <Button Classes="subtle" Content="↓" Command="{Binding MoveDownCommand}" ToolTip.Tip="Decrease priority" />
+                <Button Classes="subtle" Content="Top" Command="{Binding MoveTopCommand}" ToolTip.Tip="Move to highest priority" />
+                <Button Classes="subtle" Content="&#x2191;" Command="{Binding MoveUpCommand}" ToolTip.Tip="Increase priority" />
+                <Button Classes="subtle" Content="&#x2193;" Command="{Binding MoveDownCommand}" ToolTip.Tip="Decrease priority" />
+                <Button Classes="subtle" Content="Check updates" Command="{Binding CheckUpdatesCommand}" />
                 <Button Classes="subtle" Content="Refresh" Command="{Binding RefreshCommand}" />
               </StackPanel>
             </Grid>
             <ListBox Grid.Row="1"
+                     x:Name="ModList"
+                     SelectionChanged="ModList_OnSelectionChanged"
                      ItemsSource="{Binding Mods}"
                      SelectedItem="{Binding SelectedMod}"
                      Background="Transparent"
-                     BorderThickness="0">
+                     BorderThickness="0"
+                     KeyboardNavigation.TabNavigation="Cycle">
               <ListBox.Styles>
                 <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
                   <Setter Property="Background" Value="#1C2B44" />
                 </Style>
+                <Style Selector="ListBoxItem:focus-visible /template/ ContentPresenter">
+                  <Setter Property="BorderBrush" Value="#77A7FF" />
+                  <Setter Property="BorderThickness" Value="2" />
+                </Style>
               </ListBox.Styles>
               <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="vm:ModListItemViewModel">
-                  <Grid Margin="4" ColumnDefinitions="52,*,Auto" MinHeight="68">
+                  <Grid Margin="4" ColumnDefinitions="52,*,Auto" MinHeight="72">
                     <Border Width="44" Height="44" CornerRadius="12" Background="#233B60" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Initial}" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                 FontSize="17" FontWeight="Bold" Foreground="#8DB7FF" />
+                      <Grid>
+                        <Image Source="{Binding IconImage}" IsVisible="{Binding HasIcon}" Stretch="UniformToFill" />
+                        <TextBlock Text="{Binding Initial}" IsVisible="{Binding ShowInitial}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   FontSize="17" FontWeight="Bold" Foreground="#8DB7FF" />
+                      </Grid>
                     </Border>
                     <StackPanel Grid.Column="1" Margin="12,0" VerticalAlignment="Center" Spacing="3">
                       <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14" TextTrimming="CharacterEllipsis" />
                       <StackPanel Orientation="Horizontal" Spacing="8">
                         <TextBlock Text="{Binding Author}" FontSize="12" Foreground="#91A2BA" />
                         <TextBlock Text="{Binding Kind}" FontSize="10" FontWeight="Bold" Foreground="#77A7FF" />
+                        <TextBlock Text="{Binding UpdateLabel}" IsVisible="{Binding HasUpdate}"
+                                   FontSize="10" FontWeight="Bold" Foreground="#62D6A7" />
                       </StackPanel>
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="2" IsChecked="{Binding IsEnabled}" VerticalAlignment="Center" />
+                    <ToggleSwitch Grid.Column="2"
+                                  IsChecked="{Binding IsEnabled}"
+                                  OnContent="On"
+                                  OffContent="Off"
+                                  VerticalAlignment="Center" />
                   </Grid>
                 </DataTemplate>
               </ListBox.ItemTemplate>
             </ListBox>
           </Grid>
         </Border>
+
+        <Border x:Name="ModDetailsPanel" Grid.Column="2" Background="#0F192A" BorderBrush="#22324C" BorderThickness="1" CornerRadius="14" Padding="24">
+          <Grid RowDefinitions="*,Auto">
+            <ScrollViewer IsVisible="{Binding HasSelection}">
+              <StackPanel Spacing="16">
+                <Border Width="72" Height="72" CornerRadius="18" Background="#233B60" HorizontalAlignment="Left">
+                  <Grid>
+                    <Image Source="{Binding SelectedMod.IconImage}" IsVisible="{Binding SelectedMod.HasIcon}" Stretch="UniformToFill" />
+                    <TextBlock Text="{Binding SelectedMod.Initial}" IsVisible="{Binding SelectedMod.ShowInitial}"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               FontSize="28" FontWeight="Bold" Foreground="#8DB7FF" />
+                  </Grid>
+                </Border>
+                <StackPanel Spacing="5">
+                  <TextBlock Text="{Binding SelectedMod.Name}" FontSize="24" FontWeight="Bold" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding SelectedMod.Author}" Foreground="#91A2BA" />
+                </StackPanel>
+                <TextBlock Text="{Binding SelectedMod.Description}"
+                           TextWrapping="Wrap"
+                           Foreground="#C4D0E1" />
+                <Border IsVisible="{Binding SelectedMod.HasPreview}" CornerRadius="10" ClipToBounds="True">
+                  <Image Source="{Binding SelectedMod.PreviewImage}" MaxHeight="180" Stretch="Uniform" />
+                </Border>
+                <Border Background="#111C2E" CornerRadius="10" Padding="12">
+                  <TextBlock Text="{Binding SelectedMod.Id}" FontSize="12" Foreground="#91A2BA" TextWrapping="Wrap" />
+                </Border>
+              </StackPanel>
+            </ScrollViewer>
+            <StackPanel Grid.Row="1" Spacing="10">
+              <Button Classes="primary"
+                      Content="Update mod"
+                      Command="{Binding UpdateSelectedCommand}"
+                      IsVisible="{Binding SelectedMod.HasUpdate}"
+                      HorizontalAlignment="Stretch" />
+              <Button Classes="primary"
+                      Content="Open mod folder"
+                      Command="{Binding OpenFolderCommand}"
+                      HorizontalAlignment="Stretch" />
+              <Button Content="Configure collection"
+                      Command="{Binding CollectionSettingsCommand}"
+                      IsVisible="{Binding SelectedMod.IsCollection}"
+                      HorizontalAlignment="Stretch" />
+              <Button Content="Remove mod"
+                      Command="{Binding RemoveSelectedCommand}"
+                      HorizontalAlignment="Stretch" />
+            </StackPanel>
+          </Grid>
+        </Border>
       </Grid>
+      </ScrollViewer>
     </Grid>
 
-    <Border Grid.Row="1" Grid.Column="1" BorderBrush="#22324C" BorderThickness="0,1,0,0" Padding="20,10">
-      <Grid ColumnDefinitions="*,Auto">
-        <TextBlock Text="{Binding StatusText}" Foreground="#91A2BA" />
-        <TextBlock Grid.Column="1" Text="{Binding InstallationDirectory}" Foreground="#596C88" TextTrimming="CharacterEllipsis" MaxWidth="350" />
+    <Border Grid.Row="1" Grid.Column="1" BorderBrush="#22324C" BorderThickness="0,1,0,0" Padding="28,11">
+      <Grid ColumnDefinitions="*,24,Auto" RowDefinitions="Auto,Auto,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Status" FontWeight="SemiBold" Foreground="#DCE7F8" />
+          <TextBlock Text="{Binding StatusText}" Foreground="#91A2BA" TextWrapping="Wrap" />
+        </StackPanel>
+        <TextBlock Grid.Column="2"
+                   Text="{Binding InstallationDirectory}"
+                   Foreground="#596C88"
+                   TextTrimming="CharacterEllipsis"
+                   MaxWidth="500" />
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Margin="0,7,0,0"
+                    Orientation="Horizontal" Spacing="8"
+                    IsVisible="{Binding IsControllerConnected}">
+          <TextBlock Text="Controller" FontWeight="SemiBold" Foreground="#DCE7F8" />
+          <TextBlock Text="{Binding ControllerStatusText}" Foreground="#62D6A7" />
+        </StackPanel>
+        <TextBlock Grid.Row="2" Grid.ColumnSpan="3"
+                   Margin="0,4,0,0"
+                   Text="{Binding ControllerHelpText}"
+                   IsVisible="{Binding IsControllerConnected}"
+                   Foreground="#71839E"
+                   FontSize="11"
+                   TextWrapping="Wrap" />
       </Grid>
     </Border>
   </Grid>

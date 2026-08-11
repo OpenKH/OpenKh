@@ -15,6 +15,15 @@ public sealed class InstallationLayoutTests
     }
 
     [Fact]
+    public void DetectUsesLegacyModManagerInstallationRoot()
+    {
+        var installationDirectory = Path.Combine(Path.GetTempPath(), "OpenKhLegacyLayoutTest");
+        var layout = InstallationLayout.Detect(Path.Combine(installationDirectory, "Apps", "ModManager"));
+
+        Assert.Equal(Path.GetFullPath(installationDirectory), layout.RootDirectory);
+    }
+
+    [Fact]
     public void DetectPrefersDataRootArgument()
     {
         var dataRoot = Path.Combine(Path.GetTempPath(), "OpenKhCustomData");

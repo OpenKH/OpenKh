@@ -1,0 +1,71 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.CreatorWindow"
+        Title="Mod creator" Width="820" Height="780" MinWidth="620" MinHeight="600"
+        WindowStartupLocation="CenterOwner" XYFocus.NavigationModes="Enabled">
+  <Grid Margin="28" RowDefinitions="Auto,18,*,18,Auto">
+    <StackPanel Spacing="5">
+      <TextBlock Text="Mod creator" FontSize="27" FontWeight="Bold" />
+      <TextBlock Text="Create the initial mod.yml file for a new OpenKH mod."
+                 Foreground="#AAB9CF" TextWrapping="Wrap" />
+    </StackPanel>
+    <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled">
+      <Border Classes="settings-card">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Preferences" FontSize="18" FontWeight="SemiBold" />
+          <TextBlock Text="Save and restore the mod folder, GameData folder, and diff tool."
+                     Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+          <Grid ColumnDefinitions="*,12,Auto,8,Auto">
+            <ComboBox x:Name="PreferenceComboBox" IsEditable="True" />
+            <Button x:Name="LoadPreferenceButton" Grid.Column="2" Content="Load" Click="LoadPreference_OnClick" />
+            <Button x:Name="SavePreferenceButton" Grid.Column="4" Content="Save" Click="SavePreference_OnClick" />
+          </Grid>
+          <Border Height="1" Background="#22324C" Margin="0,6" />
+          <TextBlock Text="mod.yml" FontSize="18" FontWeight="SemiBold" />
+          <TextBlock Text="Game" FontWeight="SemiBold" />
+          <ComboBox x:Name="GameComboBox" ItemsSource="{Binding}" SelectedIndex="0">
+            <ComboBox.ItemTemplate>
+              <DataTemplate><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <TextBlock Text="Title" FontWeight="SemiBold" />
+          <TextBox x:Name="TitleTextBox" PlaceholderText="My OpenKH mod" />
+          <TextBlock Text="Author" FontWeight="SemiBold" />
+          <TextBox x:Name="AuthorTextBox" PlaceholderText="Author name" />
+          <TextBlock Text="Description" FontWeight="SemiBold" />
+          <TextBox x:Name="DescriptionTextBox" Height="110" AcceptsReturn="True"
+                   TextWrapping="Wrap" VerticalContentAlignment="Top" Padding="12" />
+          <TextBlock Text="Mod folder containing mod.yml" FontWeight="SemiBold" />
+          <Grid ColumnDefinitions="*,12,130">
+            <TextBox x:Name="DirectoryTextBox" PlaceholderText="Choose an empty mod folder" />
+            <Button x:Name="BrowseButton" Grid.Column="2" Content="Browse" Click="Browse_OnClick" />
+          </Grid>
+          <TextBlock Text="Diff tool" FontSize="18" FontWeight="SemiBold" Margin="0,6,0,0" />
+          <TextBlock Text="Optional executable used to compare the current mod.yml with a generated preview."
+                     Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+          <Grid ColumnDefinitions="*,12,130">
+            <TextBox x:Name="DiffToolTextBox" PlaceholderText="Leave empty to open the generated preview normally" />
+            <Button x:Name="BrowseDiffToolButton" Grid.Column="2" Content="Browse" Click="BrowseDiffTool_OnClick" />
+          </Grid>
+          <TextBlock Text="Target files appender" FontSize="18" FontWeight="SemiBold" Margin="0,6,0,0" />
+          <TextBlock Text="Search extracted GameData, copy selected source files into the mod, and append copy assets to mod.yml."
+                     Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+          <Grid ColumnDefinitions="*,12,130">
+            <TextBox x:Name="GameDataTextBox" PlaceholderText="Extracted GameData folder" />
+            <Button x:Name="BrowseGameDataButton" Grid.Column="2" Content="Browse" Click="BrowseGameData_OnClick" />
+          </Grid>
+          <Grid ColumnDefinitions="*,12,180">
+            <TextBox x:Name="TargetSearchTextBox" PlaceholderText="Search target files by path" />
+            <Button x:Name="AppendFilesButton" Grid.Column="2" Content="Search and append" Click="AppendFiles_OnClick" />
+          </Grid>
+          <TextBlock x:Name="StatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+    </ScrollViewer>
+    <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
+      <Button x:Name="CloseButton" Content="Close" MinWidth="120" Click="Close_OnClick" />
+      <Button x:Name="PreviewButton" Content="Preview changes" MinWidth="150" Click="Preview_OnClick" />
+      <Button x:Name="CreateButton" Classes="primary" Content="Generate or update" MinWidth="170" Click="Create_OnClick" />
+    </StackPanel>
+  </Grid>
+</Window>

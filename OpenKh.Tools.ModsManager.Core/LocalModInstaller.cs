@@ -1,55 +1,91 @@
 using System.IO.Compression;
+using OpenKh.Patcher;
 
 namespace OpenKh.Tools.ModsManager.Core;
 
 public sealed class LocalModInstaller
 {
     private const string MetadataFileName = "mod.yml";
-    private readonly InstallationLayout _layout;
-    private readonly ModManagerConfiguration _configuration;
+    private readonly ModManagerConfigurationService _configuration;
 
     public LocalModInstaller(InstallationLayout layout)
+        : this(new ModManagerConfigurationService(layout))
     {
-        _layout = layout;
-        _configuration = ModManagerConfiguration.Load(layout.ConfigurationFile);
+    }
+
+    public LocalModInstaller(ModManagerConfigurationService configuration)
+    {
+        _configuration = configuration;
+        _configuration.EnsureDirectories();
     }
 
     public Task<ModInstallResult> InstallAsync(string packagePath, GameInfo game) =>
-        Task.Run(() => Install(packagePath, game));
+        InstallAsync(packagePath, game, false, CancellationToken.None);
 
-    private ModInstallResult Install(string packagePath, GameInfo game)
+    public Task<ModInstallResult> InstallAsync(
+        string packagePath,
+        GameInfo game,
+        bool overwrite,
+        CancellationToken cancellationToken = default) =>
+        Task.Run(() => Install(packagePath, game, overwrite, cancellationToken), cancellationToken);
+
+    private ModInstallResult Install(
+        string packagePath,
+        GameInfo game,
+        bool overwrite,
+        CancellationToken cancellationToken)
     {
         if (!File.Exists(packagePath))
             throw new FileNotFoundException("The selected mod package does not exist.", packagePath);
 
         using var archive = ZipFile.OpenRead(packagePath);
-        var packageLayout = GetPackageLayout(archive);
-        var metadataEntry = archive.Entries.First(entry =>
-            NormalizeEntryName(entry.FullName).Equals(
-                $"{packageLayout.Prefix}{MetadataFileName}",
-                StringComparison.OrdinalIgnoreCase));
-
-        ModMetadata metadata;
-        using (var metadataReader = new StreamReader(metadataEntry.Open()))
+        var patchArchive = PatchArchiveInfo.FromFileName(packagePath);
+        var packageLayout = patchArchive is null ? GetPackageLayout(archive) : new PackageLayout(string.Empty);
+        ModMetadata? metadata = null;
+        if (patchArchive is null)
+        {
+            var metadataEntry = archive.Entries.First(entry =>
+                NormalizeEntryName(entry.FullName).Equals(
+                    $"{packageLayout.Prefix}{MetadataFileName}",
+                    StringComparison.OrdinalIgnoreCase));
+            using var metadataReader = new StreamReader(metadataEntry.Open());
             metadata = ModMetadata.Read(metadataReader);
+        }
 
         var packageName = CreateSafeDirectoryName(Path.GetFileNameWithoutExtension(packagePath));
-        var destinationRoot = metadata.IsCollection
+        var destinationRoot = metadata?.IsCollection == true
             ? GetCollectionsDirectory()
             : GetGameModsDirectory(game);
         var destinationDirectory = Path.Combine(destinationRoot, packageName);
 
         if (Directory.Exists(destinationDirectory))
         {
-            throw new IOException(
-                $"A mod named '{packageName}' is already installed. Remove it before installing this package again.");
+            if (!overwrite)
+            {
+                throw new IOException(
+                    $"A mod named '{packageName}' is already installed. Enable replacement to install it again.");
+            }
+
+            foreach (var file in Directory.EnumerateFiles(destinationDirectory, "*", SearchOption.AllDirectories))
+                File.SetAttributes(file, FileAttributes.Normal);
+            Directory.Delete(destinationDirectory, true);
         }
 
         Directory.CreateDirectory(destinationDirectory);
         try
         {
-            foreach (var entry in archive.Entries)
-                ExtractEntry(entry, packageLayout.Prefix, destinationDirectory);
+            if (patchArchive is not null)
+            {
+                ExtractPatchArchive(archive, destinationDirectory, patchArchive, cancellationToken);
+            }
+            else
+            {
+                foreach (var entry in archive.Entries)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    ExtractEntry(entry, packageLayout.Prefix, destinationDirectory);
+                }
+            }
 
             if (!File.Exists(Path.Combine(destinationDirectory, MetadataFileName)))
                 throw new InvalidDataException("The package did not extract a mod.yml file.");
@@ -62,8 +98,53 @@ public sealed class LocalModInstaller
 
         return new ModInstallResult(
             packageName,
-            string.IsNullOrWhiteSpace(metadata.Title) ? packageName : metadata.Title,
+            string.IsNullOrWhiteSpace(metadata?.Title) ? patchArchive?.DisplayName ?? packageName : metadata.Title,
             destinationDirectory);
+    }
+
+    private static void ExtractPatchArchive(
+        ZipArchive archive,
+        string destinationDirectory,
+        PatchArchiveInfo patchArchive,
+        CancellationToken cancellationToken)
+    {
+        var assets = new List<AssetFile>();
+        foreach (var entry in archive.Entries.Where(entry => !string.IsNullOrEmpty(entry.Name)))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var normalizedName = NormalizeEntryName(entry.FullName);
+            var parts = normalizedName.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 2)
+                continue;
+
+            var package = parts[0];
+            var originalIndex = Array.FindIndex(parts, part => part.Equals("original", StringComparison.OrdinalIgnoreCase));
+            var relativeParts = originalIndex >= 0 ? parts.Skip(originalIndex + 1) : parts.Skip(1);
+            var relativeName = string.Join('/', relativeParts);
+            if (string.IsNullOrWhiteSpace(relativeName))
+                continue;
+
+            ExtractFile(entry, relativeName, destinationDirectory, true);
+            assets.Add(new AssetFile
+            {
+                Method = "copy",
+                Name = relativeName,
+                Package = package,
+                Platform = "pc",
+                Source = [new AssetFile { Name = relativeName }]
+            });
+        }
+
+        var metadata = new Metadata
+        {
+            Title = patchArchive.DisplayName,
+            OriginalAuthor = "Unknown",
+            Description = $"Metadata generated for an imported {patchArchive.ExtensionName} modification.",
+            Game = patchArchive.GameId,
+            Assets = assets
+        };
+        using var metadataStream = File.Create(Path.Combine(destinationDirectory, MetadataFileName));
+        metadata.Write(metadataStream);
     }
 
     private static PackageLayout GetPackageLayout(ZipArchive archive)
@@ -104,6 +185,15 @@ public sealed class LocalModInstaller
         if (string.IsNullOrWhiteSpace(relativeName) || string.IsNullOrEmpty(entry.Name))
             return;
 
+        ExtractFile(entry, relativeName, destinationDirectory, false);
+    }
+
+    private static void ExtractFile(
+        ZipArchiveEntry entry,
+        string relativeName,
+        string destinationDirectory,
+        bool overwrite)
+    {
         var destinationPath = Path.GetFullPath(Path.Combine(
             destinationDirectory,
             relativeName.Replace('/', Path.DirectorySeparatorChar)));
@@ -117,30 +207,15 @@ public sealed class LocalModInstaller
         var parentDirectory = Path.GetDirectoryName(destinationPath);
         if (!string.IsNullOrEmpty(parentDirectory))
             Directory.CreateDirectory(parentDirectory);
-        entry.ExtractToFile(destinationPath, false);
+        entry.ExtractToFile(destinationPath, overwrite);
     }
 
     private string GetGameModsDirectory(GameInfo game)
     {
-        var collectionRoot = ResolveConfiguredPath(
-            _configuration.ModCollectionPath,
-            _layout.RootDirectory);
-        return Path.Combine(collectionRoot, "mods", game.Id);
+        return _configuration.GetGameModsDirectory(game);
     }
 
-    private string GetCollectionsDirectory() => ResolveConfiguredPath(
-        _configuration.ModCollectionsPath,
-        Path.Combine(_layout.RootDirectory, "mods", "collections"));
-
-    private string ResolveConfiguredPath(string? configuredPath, string fallbackPath)
-    {
-        if (string.IsNullOrWhiteSpace(configuredPath))
-            return fallbackPath;
-
-        return Path.GetFullPath(Path.IsPathRooted(configuredPath)
-            ? configuredPath
-            : Path.Combine(_layout.RootDirectory, configuredPath));
-    }
+    private string GetCollectionsDirectory() => _configuration.CollectionsDirectory;
 
     private static string NormalizeEntryName(string name) => name.Replace('\\', '/').TrimStart('/');
 
@@ -153,6 +228,24 @@ public sealed class LocalModInstaller
     }
 
     private sealed record PackageLayout(string Prefix);
+
+    private sealed record PatchArchiveInfo(string GameId, string ExtensionName, string DisplayName)
+    {
+        public static PatchArchiveInfo? FromFileName(string fileName)
+        {
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+            var name = Path.GetFileNameWithoutExtension(fileName);
+            return extension switch
+            {
+                ".kh2pcpatch" => new("kh2", "KH2PCPATCH", $"{name} (KH2PCPATCH)"),
+                ".kh1pcpatch" => new("kh1", "KH1PCPATCH", $"{name} (KH1PCPATCH)"),
+                ".compcpatch" => new("Recom", "COMPCPATCH", $"{name} (COMPCPATCH)"),
+                ".bbspcpatch" => new("bbs", "BBSPCPATCH", $"{name} (BBSPCPATCH)"),
+                ".dddpcpatch" => new("kh3d", "DDDPCPATCH", $"{name} (DDDPCPATCH)"),
+                _ => null
+            };
+        }
+    }
 }
 
 public sealed record ModInstallResult(string Id, string DisplayName, string Directory);

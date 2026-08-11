@@ -7,6 +7,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Patcher\OpenKh.Patcher.csproj" />
+    <ProjectReference Include="..\OpenKh.Recom\OpenKh.Recom.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\OpenKh.Tools.ModsManager\Services\GameDataExtractionService.cs"
+             Link="Compatibility\GameDataExtractionService.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Interfaces\IDebugging.cs"
+             Link="Compatibility\IDebugging.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Interfaces\IOperationDispatcher.cs"
+             Link="Compatibility\IOperationDispatcher.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Services\Pcsx2Injector.cs"
+             Link="Compatibility\Pcsx2Injector.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Services\Pcsx2MemoryService.cs"
+             Link="Compatibility\Pcsx2MemoryService.cs" />
+    <Compile Include="..\OpenKh.Tools.Common\ProcessStream.cs"
+             Link="Compatibility\ProcessStream.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
 

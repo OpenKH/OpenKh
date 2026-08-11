@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.InfoWindow"
+        Title="OpenKH information" Width="620" Height="620" MinWidth="520" MinHeight="520"
+        WindowStartupLocation="CenterOwner" XYFocus.NavigationModes="Enabled">
+  <Grid Margin="28" RowDefinitions="Auto,18,*,18,Auto">
+    <StackPanel Spacing="8">
+      <Image Source="avares://OpenKh.ModManager/Assets/OpenKH.png" Width="220" HorizontalAlignment="Left" />
+      <TextBlock Text="OpenKH Mod Manager" FontSize="27" FontWeight="Bold" />
+      <TextBlock x:Name="VersionText" Foreground="#91A2BA" />
+    </StackPanel>
+    <Border Grid.Row="2" Classes="settings-card">
+      <StackPanel Spacing="10">
+        <Button Content="Frequently Asked Questions" Tag="https://openkh.dev/tool/GUI.ModsManager/FAQ" Click="OpenLink_OnClick" />
+        <Button Content="Download latest version" Tag="https://github.com/OpenKH/OpenKh/releases" Click="OpenLink_OnClick" />
+        <Button Content="OpenKH source code" Tag="https://github.com/OpenKH/OpenKh" Click="OpenLink_OnClick" />
+        <Button Content="OpenKH documentation" Tag="https://openkh.dev" Click="OpenLink_OnClick" />
+        <Button Content="Report bug or missing features" Tag="https://github.com/OpenKH/OpenKh/issues" Click="OpenLink_OnClick" />
+        <Button Content="Join Discord server" Tag="https://discord.openkh.dev" Click="OpenLink_OnClick" />
+      </StackPanel>
+    </Border>
+    <Button x:Name="CloseButton" Grid.Row="4" Content="Close" MinWidth="120"
+            HorizontalAlignment="Right" Click="Close_OnClick" />
+  </Grid>
+</Window>

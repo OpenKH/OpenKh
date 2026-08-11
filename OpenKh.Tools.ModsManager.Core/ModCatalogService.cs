@@ -3,17 +3,21 @@ namespace OpenKh.Tools.ModsManager.Core;
 public sealed class ModCatalogService
 {
     private const string MetadataFileName = "mod.yml";
-    private readonly InstallationLayout _layout;
-    private readonly ModManagerConfiguration _configuration;
+    private readonly ModManagerConfigurationService _configuration;
 
     public ModCatalogService(InstallationLayout layout)
+        : this(new ModManagerConfigurationService(layout))
     {
-        _layout = layout;
-        _configuration = ModManagerConfiguration.Load(layout.ConfigurationFile);
     }
 
-    public string InstallationDirectory => _layout.RootDirectory;
-    public GameInfo DefaultGame => GameInfo.FromId(_configuration.LaunchGame);
+    public ModCatalogService(ModManagerConfigurationService configuration)
+    {
+        _configuration = configuration;
+        _configuration.EnsureDirectories();
+    }
+
+    public string InstallationDirectory => _configuration.InstallationDirectory;
+    public GameInfo DefaultGame => GameInfo.FromId(_configuration.Current.LaunchGame);
 
     public Task<IReadOnlyList<ModEntry>> LoadAsync(GameInfo game) => Task.Run(() => Load(game));
 
@@ -91,6 +95,7 @@ public sealed class ModCatalogService
         var fallbackName = idParts.Length == 2 ? idParts[1] : idParts[0];
         var fallbackAuthor = idParts.Length == 2 ? idParts[0] : "Local mod";
         var iconPath = Path.Combine(location.Directory, "icon.png");
+        var previewPath = Path.Combine(location.Directory, "preview.png");
 
         return new ModEntry
         {
@@ -102,6 +107,7 @@ public sealed class ModCatalogService
                 : metadata.Description,
             Directory = location.Directory,
             IconPath = File.Exists(iconPath) ? iconPath : null,
+            PreviewPath = File.Exists(previewPath) ? previewPath : null,
             IsCollection = metadata?.IsCollection == true,
             IsEnabled = isEnabled
         };
@@ -115,30 +121,14 @@ public sealed class ModCatalogService
             : [];
     }
 
-    private string GetEnabledModsPath(GameInfo game) =>
-        Path.Combine(_layout.RootDirectory, game.EnabledModsFileName);
+    private string GetEnabledModsPath(GameInfo game) => _configuration.GetEnabledModsFile(game);
 
     private string GetGameModsDirectory(GameInfo game)
     {
-        var collectionRoot = ResolveConfiguredPath(
-            _configuration.ModCollectionPath,
-            _layout.RootDirectory);
-        return Path.Combine(collectionRoot, "mods", game.Id);
+        return _configuration.GetGameModsDirectory(game);
     }
 
-    private string GetCollectionsDirectory() => ResolveConfiguredPath(
-        _configuration.ModCollectionsPath,
-        Path.Combine(_layout.RootDirectory, "mods", "collections"));
-
-    private string ResolveConfiguredPath(string? configuredPath, string fallbackPath)
-    {
-        if (string.IsNullOrWhiteSpace(configuredPath))
-            return fallbackPath;
-
-        return Path.GetFullPath(Path.IsPathRooted(configuredPath)
-            ? configuredPath
-            : Path.Combine(_layout.RootDirectory, configuredPath));
-    }
+    private string GetCollectionsDirectory() => _configuration.CollectionsDirectory;
 
     private sealed record ModLocation(string Id, string Directory);
 }

@@ -13,6 +13,8 @@
       <Setter Property="Padding" Value="18,10" />
       <Setter Property="CornerRadius" Value="10" />
       <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     <Style Selector="Button.primary">
       <Setter Property="Background" Value="#377DFF" />
@@ -26,11 +28,21 @@
       <Setter Property="MinHeight" Value="44" />
       <Setter Property="CornerRadius" Value="10" />
       <Setter Property="Background" Value="#111C2E" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Padding" Value="12,0" />
     </Style>
     <Style Selector="ComboBox">
       <Setter Property="MinHeight" Value="44" />
       <Setter Property="CornerRadius" Value="10" />
       <Setter Property="Background" Value="#111C2E" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.settings-card">
+      <Setter Property="Background" Value="#0F192A" />
+      <Setter Property="BorderBrush" Value="#22324C" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="Padding" Value="20" />
     </Style>
   </Application.Styles>
 </Application>

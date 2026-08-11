@@ -1,0 +1,51 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.InstallModWindow"
+        Title="Install mod"
+        Width="620"
+        Height="500"
+        MinWidth="520"
+        MinHeight="460"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True"
+        XYFocus.NavigationModes="Enabled">
+  <Grid Margin="28" RowDefinitions="Auto,20,Auto,12,Auto,20,Auto,*,Auto">
+    <StackPanel Spacing="5">
+      <TextBlock Text="Install a mod" FontSize="27" FontWeight="Bold" />
+      <TextBlock Text="Paste a repository or package URL, or choose a local file."
+                 Foreground="#AAB9CF" TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="2" Spacing="7">
+      <TextBlock Text="Repository or package" FontWeight="SemiBold" />
+      <TextBox x:Name="SourceTextBox"
+               PlaceholderText="OpenKH/example-mod or https://github.com/OpenKH/example-mod"
+               TextWrapping="NoWrap" />
+      <TextBlock Text="GitHub repositories, custom Git hosts, ZIP links, OpenKH patch archives, and Lua files are supported."
+                 Foreground="#71839E" FontSize="11" TextWrapping="Wrap" />
+    </StackPanel>
+
+    <Grid Grid.Row="4" ColumnDefinitions="*,14,180">
+      <StackPanel Spacing="7">
+        <TextBlock Text="Branch (optional)" FontWeight="SemiBold" />
+        <TextBox x:Name="BranchTextBox" PlaceholderText="main" />
+      </StackPanel>
+      <Button x:Name="ChooseFileButton" Grid.Column="2" Content="Choose local file" Click="ChooseFile_OnClick"
+              VerticalAlignment="Bottom" />
+    </Grid>
+
+    <Border Grid.Row="6" Background="#111C2E" CornerRadius="10" Padding="14">
+      <CheckBox x:Name="OverwriteCheckBox"
+                Content="Replace an existing installation with the same name" />
+    </Border>
+
+    <TextBlock Grid.Row="7" Margin="0,16,0,0"
+               Text="Controller: use the D-pad to move, A to activate, and B to cancel."
+               Foreground="#71839E" FontSize="11" />
+
+    <StackPanel Grid.Row="8" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
+      <Button x:Name="CancelButton" Content="Cancel" MinWidth="120" Click="Cancel_OnClick" />
+      <Button x:Name="InstallButton" Classes="primary" Content="Install" MinWidth="140" Click="Install_OnClick" />
+    </StackPanel>
+  </Grid>
+</Window>

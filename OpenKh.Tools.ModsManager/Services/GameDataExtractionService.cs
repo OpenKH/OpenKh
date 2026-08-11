@@ -70,7 +70,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     }
                     var fileDestination = Path.Combine(gameDataLocation, "kh1", fileName);
                     var directoryDestination = Path.GetDirectoryName(fileDestination);
-                    if (!Directory.Exists(directoryDestination))
+                    if (!string.IsNullOrEmpty(directoryDestination) && !Directory.Exists(directoryDestination))
                     {
                         Directory.CreateDirectory(directoryDestination);
                     }
@@ -139,7 +139,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     using var stream = img.FileOpen(fileEntry);
                     var fileDestination = Path.Combine(gameDataLocation, "kh2", fileName);
                     var directoryDestination = Path.GetDirectoryName(fileDestination);
-                    if (!Directory.Exists(directoryDestination))
+                    if (!string.IsNullOrEmpty(directoryDestination) && !Directory.Exists(directoryDestination))
                     {
                         Directory.CreateDirectory(directoryDestination);
                     }

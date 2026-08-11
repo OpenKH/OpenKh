@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:OpenKh.Tools.ModsManager.Avalonia.ViewModels"
+        x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.CollectionSettingsWindow"
+        Title="Collection settings"
+        Width="620"
+        Height="600"
+        MinWidth="480"
+        MinHeight="480"
+        WindowStartupLocation="CenterOwner"
+        XYFocus.NavigationModes="Enabled">
+  <Grid Margin="28" RowDefinitions="Auto,18,*,18,Auto">
+    <StackPanel Spacing="5">
+      <TextBlock x:Name="CollectionTitleText" FontSize="27" FontWeight="Bold" TextWrapping="Wrap" />
+      <TextBlock Text="Choose the optional parts to include when this collection is built."
+                 Foreground="#AAB9CF" TextWrapping="Wrap" />
+    </StackPanel>
+    <Border Grid.Row="2" Classes="settings-card">
+      <ListBox x:Name="OptionsListBox" BorderThickness="0" Background="Transparent">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:CollectionOptionViewModel">
+            <Grid Margin="5" ColumnDefinitions="*,Auto" MinHeight="48">
+              <TextBlock Text="{Binding Name}" TextWrapping="Wrap" VerticalAlignment="Center" />
+              <ToggleSwitch Grid.Column="1" IsChecked="{Binding IsEnabled}" OnContent="On" OffContent="Off" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Border>
+    <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
+      <Button x:Name="CancelButton" Content="Cancel" MinWidth="120" Click="Cancel_OnClick" />
+      <Button x:Name="SaveButton" Classes="primary" Content="Save collection" MinWidth="160" Click="Save_OnClick" />
+    </StackPanel>
+  </Grid>
+</Window>

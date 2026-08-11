@@ -1,3 +1,4 @@
+#nullable disable
 using OpenKh.Common;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.ModsManager.Interfaces;

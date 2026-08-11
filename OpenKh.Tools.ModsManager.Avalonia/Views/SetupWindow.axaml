@@ -1,0 +1,265 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.SetupWindow"
+        Title="OpenKH Mod Manager setup"
+        Width="920"
+        Height="760"
+        MinWidth="760"
+        MinHeight="620"
+        WindowStartupLocation="CenterOwner"
+        XYFocus.NavigationModes="Enabled">
+  <Grid Margin="28" RowDefinitions="Auto,18,*,18,Auto">
+    <StackPanel Spacing="5">
+      <TextBlock Text="Setup" FontSize="30" FontWeight="Bold" />
+      <TextBlock Text="Configure your games once. These settings are shared with the existing OpenKH Mod Manager."
+                 Foreground="#AAB9CF" TextWrapping="Wrap" />
+    </StackPanel>
+
+    <ScrollViewer x:Name="SetupScrollViewer"
+                  Grid.Row="2"
+                  HorizontalScrollBarVisibility="Disabled"
+                  HorizontalContentAlignment="Stretch">
+      <StackPanel Spacing="18" Width="{Binding Bounds.Width, ElementName=SetupScrollViewer}">
+        <Border Classes="settings-card">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Game edition" FontSize="18" FontWeight="SemiBold" />
+            <ComboBox x:Name="GameEditionComboBox" SelectedIndex="{Binding GameEdition}" SelectionChanged="GameEdition_OnSelectionChanged">
+              <ComboBoxItem Content="PC release" />
+              <ComboBoxItem Content="PCSX2" />
+            </ComboBox>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="settings-card">
+          <StackPanel Spacing="12">
+            <TextBlock Text="OpenKH folders" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="Mod storage folder" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="*,12,130">
+              <TextBox x:Name="ModStorageTextBox" Text="{Binding ModCollectionPath}" PlaceholderText="Use the OpenKH installation folder" />
+              <Button Grid.Column="2" Content="Browse" Tag="ModStorageTextBox" Click="BrowseFolder_OnClick" />
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="settings-card" IsVisible="{Binding IsPcMode}">
+          <StackPanel Spacing="12">
+            <TextBlock Text="PC release" FontSize="18" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="*">
+              <StackPanel Spacing="6">
+                <TextBlock Text="PC platform" FontWeight="SemiBold" />
+                <ComboBox x:Name="PcVersionComboBox" SelectedIndex="{Binding PcVersionIndex}" SelectionChanged="PcVersion_OnSelectionChanged">
+                  <ComboBoxItem Content="Epic Games Store" />
+                  <ComboBoxItem Content="Steam" />
+                  <ComboBoxItem Content="Other" />
+                </ComboBox>
+              </StackPanel>
+            </Grid>
+            <Button x:Name="DetectInstallationsButton"
+                    Content="Detect installations"
+                    HorizontalAlignment="Left"
+                    Click="DetectInstallations_OnClick" />
+            <TextBlock x:Name="DetectionStatusText"
+                       Foreground="#91A2BA"
+                       FontSize="11"
+                       TextWrapping="Wrap" />
+            <Border Background="#111C2E" CornerRadius="10" Padding="14">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Game version" FontWeight="SemiBold" />
+                <TextBlock Text="Select which PC release files are installed. Steam Global installations use the dt folder automatically."
+                           Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+                <ComboBox x:Name="LanguageComboBox" SelectedIndex="{Binding LanguageIndex}">
+                  <ComboBoxItem Content="Global version" />
+                  <ComboBoxItem Content="Japanese version" />
+                </ComboBox>
+              </StackPanel>
+            </Border>
+            <TextBlock Text="KINGDOM HEARTS HD 1.5+2.5 ReMIX folder" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <Grid ColumnDefinitions="*,12,130">
+              <TextBox x:Name="PcReleaseTextBox" Text="{Binding PcReleaseLocation}" TextChanged="PcReleaseLocation_OnTextChanged" />
+              <Button Grid.Column="2" Content="Browse" Tag="PcReleaseTextBox" Click="BrowseFolder_OnClick" />
+            </Grid>
+            <TextBlock Text="KINGDOM HEARTS HD 2.8 Final Chapter Prologue folder" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <Grid ColumnDefinitions="*,12,130">
+              <TextBox x:Name="PcReleaseKh3DTextBox" Text="{Binding PcReleaseLocationKh3D}" TextChanged="PcReleaseLocation_OnTextChanged" />
+              <Button Grid.Column="2" Content="Browse" Tag="PcReleaseKh3DTextBox" Click="BrowseFolder_OnClick" />
+            </Grid>
+            <TextBlock Text="OpenKH Panacea" FontSize="16" FontWeight="SemiBold" Margin="0,8,0,0" />
+            <TextBlock Text="Panacea loads built mods without permanently patching the game packages. Install it separately for each collection you use."
+                       Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+            <Border Background="#111C2E" CornerRadius="10" Padding="14">
+              <Grid ColumnDefinitions="*,12,Auto">
+                <StackPanel Spacing="3">
+                  <TextBlock Text="HD 1.5+2.5 ReMIX" FontWeight="SemiBold" />
+                  <TextBlock x:Name="Panacea1525StatusText" Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button x:Name="Panacea1525ActionButton" Grid.Column="2" Tag="1525" Click="ManagePanacea_OnClick" />
+              </Grid>
+            </Border>
+            <Border Background="#111C2E" CornerRadius="10" Padding="14">
+              <Grid ColumnDefinitions="*,12,Auto">
+                <StackPanel Spacing="3">
+                  <TextBlock Text="HD 2.8 Final Chapter Prologue" FontWeight="SemiBold" />
+                  <TextBlock x:Name="Panacea28StatusText" Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button x:Name="Panacea28ActionButton" Grid.Column="2" Tag="28" Click="ManagePanacea_OnClick" />
+              </Grid>
+            </Border>
+            <TextBlock Text="Lua Backend" FontSize="16" FontWeight="SemiBold" Margin="0,8,0,0" />
+            <TextBlock Text="Lua Backend loads scripts installed by OpenKH mods. Select the games whose generated script folders should be added to its configuration."
+                       Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+            <Border Background="#111C2E" CornerRadius="10" Padding="14">
+              <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,12,Auto,8,Auto">
+                  <StackPanel Spacing="3">
+                    <TextBlock Text="HD 1.5+2.5 ReMIX" FontWeight="SemiBold" />
+                    <TextBlock x:Name="LuaBackend1525StatusText" Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+                  </StackPanel>
+                  <Button x:Name="LuaBackend1525ActionButton" Grid.Column="2" Tag="1525" Click="ManageLuaBackend_OnClick" />
+                  <Button x:Name="LuaBackend1525RemoveButton" Grid.Column="4" Tag="1525" Content="Remove"
+                          Click="RemoveLuaBackend_OnClick" />
+                </Grid>
+                <WrapPanel Orientation="Horizontal">
+                  <CheckBox x:Name="LuaKh1CheckBox" Content="KH1" Margin="0,0,16,4" />
+                  <CheckBox x:Name="LuaKh2CheckBox" Content="KH2" Margin="0,0,16,4" />
+                  <CheckBox x:Name="LuaBbsCheckBox" Content="BBS" Margin="0,0,16,4" />
+                  <CheckBox x:Name="LuaRecomCheckBox" Content="Re:CoM" Margin="0,0,16,4" />
+                </WrapPanel>
+              </StackPanel>
+            </Border>
+            <Border Background="#111C2E" CornerRadius="10" Padding="14">
+              <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,12,Auto,8,Auto">
+                  <StackPanel Spacing="3">
+                    <TextBlock Text="HD 2.8 Final Chapter Prologue" FontWeight="SemiBold" />
+                    <TextBlock x:Name="LuaBackend28StatusText" Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+                  </StackPanel>
+                  <Button x:Name="LuaBackend28ActionButton" Grid.Column="2" Tag="28" Click="ManageLuaBackend_OnClick" />
+                  <Button x:Name="LuaBackend28RemoveButton" Grid.Column="4" Tag="28" Content="Remove"
+                          Click="RemoveLuaBackend_OnClick" />
+                </Grid>
+                <CheckBox x:Name="LuaKh3DCheckBox" Content="Dream Drop Distance" />
+              </StackPanel>
+            </Border>
+            <Border Background="#111C2E" CornerRadius="10" Padding="14" IsVisible="{Binding IsSteamPlatform}">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Direct Steam launch" FontSize="16" FontWeight="SemiBold" />
+                <TextBlock Text="Creating steam_appid.txt lets the Mod Manager launch a game executable directly. Steam must already be running."
+                           Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+                <Grid ColumnDefinitions="*,12,Auto">
+                  <StackPanel Spacing="3">
+                    <TextBlock Text="HD 1.5+2.5 ReMIX" FontWeight="SemiBold" />
+                    <TextBlock x:Name="SteamAppId1525StatusText" Foreground="#91A2BA" FontSize="11" />
+                  </StackPanel>
+                  <Button x:Name="SteamAppId1525Button" Grid.Column="2" Tag="1525" Click="SteamAppId_OnClick" />
+                </Grid>
+                <Grid ColumnDefinitions="*,12,Auto">
+                  <StackPanel Spacing="3">
+                    <TextBlock Text="HD 2.8 Final Chapter Prologue" FontWeight="SemiBold" />
+                    <TextBlock x:Name="SteamAppId28StatusText" Foreground="#91A2BA" FontSize="11" />
+                  </StackPanel>
+                  <Button x:Name="SteamAppId28Button" Grid.Column="2" Tag="28" Click="SteamAppId_OnClick" />
+                </Grid>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="settings-card" IsVisible="{Binding IsPcsx2Mode}">
+          <StackPanel Spacing="12">
+            <TextBlock Text="PCSX2" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="PCSX2 executable" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="*,12,130">
+              <TextBox x:Name="Pcsx2TextBox" Text="{Binding Pcsx2Location}" />
+              <Button Grid.Column="2" Content="Browse" Tag="Pcsx2TextBox" Click="BrowseFile_OnClick" />
+            </Grid>
+            <TextBlock Text="PS2 region and language" FontWeight="SemiBold" />
+            <TextBlock Text="This controls the region and language values injected while the game is running."
+                       Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+            <ComboBox SelectedIndex="{Binding RegionId}">
+              <ComboBoxItem Content="Default" />
+              <ComboBoxItem Content="Japanese" />
+              <ComboBoxItem Content="English (US)" />
+              <ComboBoxItem Content="English (UK)" />
+              <ComboBoxItem Content="Italian" />
+              <ComboBoxItem Content="Spanish" />
+              <ComboBoxItem Content="German" />
+              <ComboBoxItem Content="French" />
+              <ComboBoxItem Content="Final Mix" />
+            </ComboBox>
+            <TextBlock Text="Kingdom Hearts II ISO" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="*,12,130">
+              <TextBox x:Name="Kh2IsoTextBox" Text="{Binding IsoLocationKh2}" TextChanged="ExtractionSource_OnTextChanged" />
+              <Button Grid.Column="2" Content="Browse" Tag="Kh2IsoTextBox" Click="BrowseFile_OnClick" />
+            </Grid>
+            <TextBlock Text="Kingdom Hearts ISO" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="*,12,130">
+              <TextBox x:Name="Kh1IsoTextBox" Text="{Binding IsoLocationKh1}" TextChanged="ExtractionSource_OnTextChanged" />
+              <Button Grid.Column="2" Content="Browse" Tag="Kh1IsoTextBox" Click="BrowseFile_OnClick" />
+            </Grid>
+            <TextBlock Text="Re:Chain of Memories ISO" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="*,12,130">
+              <TextBox x:Name="RecomIsoTextBox" Text="{Binding IsoLocationRecom}" TextChanged="ExtractionSource_OnTextChanged" />
+              <Button Grid.Column="2" Content="Browse" Tag="RecomIsoTextBox" Click="BrowseFile_OnClick" />
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="settings-card">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Game data" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock x:Name="PcExtractionHelpText"
+                       IsVisible="{Binding IsPcMode}"
+                       Text="OpenKH can extract every game in the 1.5+2.5 collection and Dream Drop Distance from the 2.8 collection. Select the games you want to extract. Size values are rounded up."
+                       Foreground="#AAB9CF" TextWrapping="Wrap" />
+            <TextBlock x:Name="Pcsx2ExtractionHelpText"
+                       IsVisible="{Binding IsPcsx2Mode}"
+                       Text="OpenKH can extract Kingdom Hearts, Kingdom Hearts II, and Re:Chain of Memories from their respective ISO files. Size values are estimates rounded up from known unmodified ISO files."
+                       Foreground="#AAB9CF" TextWrapping="Wrap" />
+            <WrapPanel Orientation="Horizontal">
+              <CheckBox x:Name="ExtractKh1CheckBox" IsChecked="{Binding ExtractKh1}" Margin="0,0,16,6" />
+              <CheckBox x:Name="ExtractKh2CheckBox" IsChecked="{Binding ExtractKh2}" Margin="0,0,16,6" />
+              <CheckBox x:Name="ExtractBbsCheckBox" IsChecked="{Binding ExtractBbs}" IsVisible="{Binding IsPcMode}" Margin="0,0,16,6" />
+              <CheckBox x:Name="ExtractRecomCheckBox" IsChecked="{Binding ExtractRecom}" Margin="0,0,16,6" />
+              <CheckBox x:Name="ExtractKh3DCheckBox" IsChecked="{Binding ExtractKh3D}" IsVisible="{Binding IsPcMode}" Margin="0,0,16,6" />
+            </WrapPanel>
+            <TextBlock Text="Extraction folder location" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="*,12,130">
+              <TextBox x:Name="GameDataTextBox" Text="{Binding GameDataPath}" PlaceholderText="Use OpenKH/data" />
+              <Button Grid.Column="2" Content="Browse" Tag="GameDataTextBox" Click="BrowseFolder_OnClick" />
+            </Grid>
+            <TextBlock x:Name="ExistingDataStatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
+            <TextBlock x:Name="ExtractionAvailabilityText" Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+            <TextBlock Text="Extraction can take between 5 and 15 minutes, or longer when several PC games are selected."
+                       Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+            <Button x:Name="ExtractGameDataButton"
+                    Content="Extract game data"
+                    HorizontalAlignment="Left"
+                    Click="ExtractGameData_OnClick" />
+            <ProgressBar x:Name="ExtractionProgressBar" Minimum="0" Maximum="1" Value="0" Height="10" IsVisible="False" />
+            <TextBlock x:Name="ExtractionStatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
+            <StackPanel IsVisible="{Binding IsPcMode}" Spacing="8">
+              <TextBlock Text="If remastered files are not extracted, some mods may have missing visuals or game data."
+                         Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" />
+              <CheckBox IsChecked="{Binding SkipRemastered}" Content="Skip Extracting Remastered Files" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="settings-card">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Preferences" FontSize="18" FontWeight="SemiBold" />
+            <CheckBox IsChecked="{Binding AutoUpdateMods}" Content="Check repository mods for updates automatically" />
+            <CheckBox IsChecked="{Binding EnableCache}" Content="Use the patcher cache" />
+            <CheckBox IsChecked="{Binding ShowConsole}" Content="Show the game console when supported" />
+            <CheckBox IsChecked="{Binding DebugLog}" Content="Enable debug logging" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+
+    <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
+      <Button x:Name="CancelButton" Content="Cancel" MinWidth="120" Click="Cancel_OnClick" />
+      <Button x:Name="SaveButton" Classes="primary" Content="Save setup" MinWidth="150" Click="Save_OnClick" />
+    </StackPanel>
+  </Grid>
+</Window>

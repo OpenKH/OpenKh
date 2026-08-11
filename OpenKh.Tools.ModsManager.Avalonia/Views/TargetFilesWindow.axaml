@@ -1,0 +1,27 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.TargetFilesWindow"
+        Title="Select target files" Width="860" Height="650" MinWidth="620" MinHeight="480"
+        WindowStartupLocation="CenterOwner" XYFocus.NavigationModes="Enabled">
+  <Grid Margin="28" RowDefinitions="Auto,16,Auto,16,*,16,Auto">
+    <StackPanel Spacing="5">
+      <TextBlock Text="Select target files" FontSize="27" FontWeight="Bold" />
+      <TextBlock Text="Selected files will be copied into the mod and appended to mod.yml."
+                 Foreground="#AAB9CF" TextWrapping="Wrap" />
+    </StackPanel>
+    <Grid Grid.Row="2" ColumnDefinitions="*,12,130">
+      <TextBox x:Name="SearchTextBox" PlaceholderText="Search by relative path" />
+      <Button x:Name="SearchButton" Grid.Column="2" Content="Search" Click="Search_OnClick" />
+    </Grid>
+    <Border Grid.Row="4" Classes="settings-card">
+      <Grid RowDefinitions="*,12,Auto">
+        <ListBox x:Name="FilesListBox" SelectionMode="Multiple" />
+        <TextBlock x:Name="StatusText" Grid.Row="2" Foreground="#91A2BA" TextWrapping="Wrap" />
+      </Grid>
+    </Border>
+    <StackPanel Grid.Row="6" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
+      <Button x:Name="CancelButton" Content="Cancel" MinWidth="120" Click="Cancel_OnClick" />
+      <Button x:Name="AppendButton" Classes="primary" Content="Append selected" MinWidth="160" Click="Append_OnClick" />
+    </StackPanel>
+  </Grid>
+</Window>
