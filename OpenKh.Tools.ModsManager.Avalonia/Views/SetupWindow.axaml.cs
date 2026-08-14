@@ -15,6 +15,7 @@ public sealed partial class SetupWindow : EmbeddedDialogControl
     private LuaBackendService? _luaBackend;
     private GameExtractionService? _extraction;
     private ModManagerConfigurationService? _configuration;
+    private IUserDialogService? _dialogs;
     private readonly GameInstallationDetectionService _installationDetector = new();
     private readonly SteamAppIdService _steamAppId = new();
     private ComboBox? _activeComboBox;
@@ -35,22 +36,25 @@ public sealed partial class SetupWindow : EmbeddedDialogControl
         ModManagerConfigurationService configuration,
         PanaceaService panacea,
         LuaBackendService luaBackend,
-        GameExtractionService extraction)
+        GameExtractionService extraction,
+        IUserDialogService? dialogs = null)
     {
         InitializeComponent();
-        Initialize(configuration, panacea, luaBackend, extraction);
+        Initialize(configuration, panacea, luaBackend, extraction, dialogs);
     }
 
     private void Initialize(
         ModManagerConfigurationService configuration,
         PanaceaService panacea,
         LuaBackendService luaBackend,
-        GameExtractionService extraction)
+        GameExtractionService extraction,
+        IUserDialogService? dialogs = null)
     {
         _configuration = configuration;
         _panacea = panacea;
         _luaBackend = luaBackend;
         _extraction = extraction;
+        _dialogs = dialogs;
         DataContext = new SetupWindowViewModel(configuration);
         Opened += (_, _) =>
         {
@@ -477,6 +481,13 @@ public sealed partial class SetupWindow : EmbeddedDialogControl
             ExtractionStatusText.Foreground = Brush.Parse("#F1B86B");
             return;
         }
+
+        var confirmed = _dialogs is null || await _dialogs.ConfirmAsync(
+            "Extract game data?",
+            "The selected games will be extracted completely, including remastered files. This may require substantial disk space and can take 5 to 15 minutes or longer.\n\nExisting extracted data for the selected games may be overwritten.",
+            "Start extraction");
+        if (!confirmed)
+            return;
 
         SetExtractionBusy(true);
         try

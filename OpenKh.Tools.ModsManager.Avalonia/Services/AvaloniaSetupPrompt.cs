@@ -14,7 +14,12 @@ public sealed class AvaloniaSetupPrompt(
 {
     public async Task<bool> ShowAsync()
     {
-        var window = new SetupWindow(configuration, panacea, luaBackend, extraction);
+        var window = new SetupWindow(
+            configuration,
+            panacea,
+            luaBackend,
+            extraction,
+            new AvaloniaUserDialogService(owner, controller));
         using var capture = controller.Capture(
             ControllerWindowNavigator.WithScrolling(window, window.HandleControllerAction));
         return await owner.ShowPageAsync<bool>(window);

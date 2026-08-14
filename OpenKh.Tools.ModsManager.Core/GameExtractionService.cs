@@ -14,7 +14,7 @@ public sealed class GameExtractionService(ModManagerConfigurationService configu
         if (games.Count == 0)
             throw new InvalidOperationException("Select at least one game to extract.");
 
-        ConfigurationService.SkipRemastered = configuration.Current.SkipRemastered;
+        ConfigurationService.SkipRemastered = false;
         var completedGames = 0;
         foreach (var game in games)
         {

@@ -232,11 +232,6 @@
                     Click="ExtractGameData_OnClick" />
             <ProgressBar x:Name="ExtractionProgressBar" Minimum="0" Maximum="1" Value="0" Height="10" IsVisible="False" />
             <TextBlock x:Name="ExtractionStatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
-            <StackPanel IsVisible="{Binding IsPcMode}" Spacing="8">
-              <TextBlock Text="If remastered files are not extracted, some mods may have missing visuals or game data."
-                         Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" />
-              <CheckBox IsChecked="{Binding SkipRemastered}" Content="Skip Extracting Remastered Files" />
-            </StackPanel>
           </StackPanel>
         </Border>
 

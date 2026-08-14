@@ -35,7 +35,6 @@ public sealed class SetupWindowViewModel : ObservableObject
         IsoLocationKh1 = configuration.IsoLocationKh1;
         IsoLocationRecom = configuration.IsoLocationRecom;
         AutoUpdateMods = configuration.AutoUpdateMods;
-        SkipRemastered = configuration.SkipRemastered;
         EnableCache = configuration.EnableCache;
         ShowConsole = configuration.ShowConsole;
         DebugLog = configuration.DebugLog;
@@ -94,7 +93,6 @@ public sealed class SetupWindowViewModel : ObservableObject
     public string? IsoLocationKh1 { get; set; }
     public string? IsoLocationRecom { get; set; }
     public bool AutoUpdateMods { get; set; }
-    public bool SkipRemastered { get; set; }
     public bool EnableCache { get; set; }
     public bool ShowConsole { get; set; }
     public bool DebugLog { get; set; }
@@ -127,7 +125,7 @@ public sealed class SetupWindowViewModel : ObservableObject
         configuration.IsoLocationKh1 = EmptyToNull(IsoLocationKh1);
         configuration.IsoLocationRecom = EmptyToNull(IsoLocationRecom);
         configuration.AutoUpdateMods = AutoUpdateMods;
-        configuration.SkipRemastered = SkipRemastered;
+        configuration.SkipRemastered = false;
         configuration.EnableCache = EnableCache;
         configuration.ShowConsole = ShowConsole;
         configuration.DebugLog = DebugLog;
