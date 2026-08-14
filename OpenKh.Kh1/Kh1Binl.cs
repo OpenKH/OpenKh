@@ -15,6 +15,7 @@ namespace OpenKh.Kh1
         public sealed class TextEntry
         {
             private readonly Kh1TextTable _table;
+            private readonly byte[] _originalBytes;
 
             internal TextEntry(int index, int offset, int length, byte[] bytes, Kh1TextTable table)
             {
@@ -22,16 +23,27 @@ namespace OpenKh.Kh1
                 Offset = offset;
                 OriginalLength = length;
                 _table = table;
+                _originalBytes = bytes;
                 Text = DecodeBody(bytes);
+                OriginalText = Text;
             }
 
             public int Index { get; }
             public int Offset { get; }
             public int OriginalLength { get; }
+            public string OriginalText { get; }
             public string Text { get; set; }
+            public bool IsModified => !string.Equals(OriginalText, Text, StringComparison.Ordinal);
+            internal bool ContainsStructuralCommands =>
+                Text.Contains("{cmd:05", StringComparison.OrdinalIgnoreCase) ||
+                Text.Contains("{cmd:06", StringComparison.OrdinalIgnoreCase) ||
+                Text.Contains("{cmd:0A", StringComparison.OrdinalIgnoreCase);
 
             internal byte[] EncodeBody()
             {
+                if (!IsModified)
+                    return _originalBytes;
+
                 var output = new List<byte>();
                 var plainText = new StringBuilder();
 
@@ -214,17 +226,16 @@ namespace OpenKh.Kh1
                     : contentLength;
                 if (TryFindBody(source, recordStart + 4, recordEnd, out var bodyStart, out var bodyEnd))
                 {
-                    entries.Add(new TextEntry(
+                    var entry = new TextEntry(
                         entries.Count,
                         bodyStart,
                         bodyEnd - bodyStart,
                         source.AsSpan(bodyStart, bodyEnd - bodyStart).ToArray(),
-                        table));
+                        table);
+                    if (!entry.ContainsStructuralCommands)
+                        entries.Add(entry);
                 }
             }
-
-            if (entries.Count == 0)
-                throw new InvalidDataException("No editable text entries were found in the BINL file.");
 
             return new Kh1Binl(source, contentLength, entries);
         }
@@ -310,12 +321,9 @@ namespace OpenKh.Kh1
                 offset += length;
             }
 
-            if (bodyStart >= 0)
-            {
-                bodyEnd = end;
-                return true;
-            }
-
+            // Records without a 05/06 terminator contain presentation data rather
+            // than an editable dialogue body. Keeping them out of the entry list
+            // avoids exposing command parameters as black-square characters.
             return false;
         }
 

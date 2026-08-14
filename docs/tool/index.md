@@ -58,4 +58,4 @@ If you have never used the command line before or have used it very little, fear
 | File | Tool name
 |------|-----------
 |[HD assets](../common/hdassets.md)| OpenKh.Command.HdAssets
-|KH1 `*.binl` event messages| [OpenKh.Tools.Kh1TextEditor](./GUI.Kh1TextEditor/index.md)
+|KH1 remastered `*.binl` and `*.kmb` text| [OpenKh.Tools.Kh1TextEditor](./GUI.Kh1TextEditor/index.md)
