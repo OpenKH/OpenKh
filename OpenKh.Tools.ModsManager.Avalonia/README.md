@@ -1,6 +1,6 @@
-# OpenKH Mod Manager for Avalonia
+# OpenKH Mod Manager
 
-This project is the cross-platform replacement for the WPF Mod Manager and is the version packaged in new OpenKH releases.
+This is the official cross-platform OpenKH Mod Manager for Windows, Linux, and Steam Deck. Its interface uses Avalonia so the same application can run natively on every supported platform.
 
 ## Current functionality
 
@@ -27,7 +27,7 @@ This project is the cross-platform replacement for the WPF Mod Manager and is th
 ## Run locally
 
 ```powershell
-dotnet run --project OpenKh.Tools.ModsManager.Avalonia.csproj -- --data-root E:\path\to\OpenKH
+dotnet run --project OpenKh.Tools.ModsManager.csproj -- --data-root E:\path\to\OpenKH
 ```
 
 The `--data-root` argument is optional in packaged builds. An executable placed in the `Apps` directory automatically uses the parent OpenKH installation directory.

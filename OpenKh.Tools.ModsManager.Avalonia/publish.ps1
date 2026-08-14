@@ -5,7 +5,7 @@ param(
     [string] $OutputDirectory = "artifacts"
 )
 
-$project = Join-Path $PSScriptRoot "OpenKh.Tools.ModsManager.Avalonia.csproj"
+$project = Join-Path $PSScriptRoot "OpenKh.Tools.ModsManager.csproj"
 $outputRoot = Join-Path $PSScriptRoot $OutputDirectory
 
 function Publish-Target([string] $runtime, [string] $folder) {

@@ -21,4 +21,9 @@
     <ProjectReference Include="..\OpenKh.Tools.ModsManager.Core\OpenKh.Tools.ModsManager.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\OpenKh.Tools.Launcher\Updates\LauncherInstallation.cs"
+             Link="Launcher\LauncherInstallation.cs" />
+  </ItemGroup>
+
 </Project>

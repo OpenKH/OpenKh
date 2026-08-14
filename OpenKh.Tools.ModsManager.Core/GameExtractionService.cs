@@ -1,4 +1,4 @@
-using OpenKh.Tools.ModsManager.Services;
+using OpenKh.Tools.ModsManager.Core.Services;
 
 namespace OpenKh.Tools.ModsManager.Core;
 

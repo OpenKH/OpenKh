@@ -5,8 +5,8 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using OpenKh.Tools.Launcher.Updates;
 using OpenKh.Tools.ModsManager.Avalonia.Services;
-using OpenKh.Tools.ModsManager.Services;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
@@ -40,13 +40,13 @@ public partial class MainWindow : Window
     private readonly IControllerInputService _controller;
     private readonly List<ToolEntry> _allTools = new();
     private readonly HashSet<string> _favoriteToolNames = new(StringComparer.OrdinalIgnoreCase);
-    private OpenkhUpdateCheckerService.CheckResult? _availableUpdate;
+    private OpenKhReleaseUpdateCheckerService.CheckResult? _availableUpdate;
     private bool _compactCards;
 
-    private string BaseDirectory => OpenkhInstallation.Directory;
+    private string BaseDirectory => LauncherInstallation.RootDirectory;
     private string ApplicationsPath => Path.Combine(BaseDirectory, ApplicationsDirectory);
     private string FavoritesPath => Path.Combine(BaseDirectory, FavoritesFileName);
-    private string ModManagerPath => FindModManagerPath();
+    private string ModManagerPath => LauncherInstallation.FindModManagerExecutable(BaseDirectory);
     private string CompatibilityModManagerPath => Path.Combine(BaseDirectory, "OpenKh.Tools.ModsManager.exe");
 
     public MainWindow() : this(new SdlControllerInputService())
@@ -109,20 +109,6 @@ public partial class MainWindow : Window
             Grid.SetColumn(ToolsCard, 2);
             Grid.SetRow(ToolsCard, 0);
         }
-    }
-
-    private string FindModManagerPath()
-    {
-        var candidates = new[]
-        {
-            Path.Combine(BaseDirectory, "Apps", "OpenKh.Tools.ModsManager.exe"),
-            Path.Combine(BaseDirectory, "Apps", "OpenKh.Tools.ModsManager"),
-            Path.Combine(BaseDirectory, "Apps", "ModManager", "OpenKh.Tools.ModsManager.exe"),
-            Path.Combine(BaseDirectory, "Apps", "ModManager", "OpenKh.Tools.ModsManager"),
-            Path.Combine(BaseDirectory, "OpenKh.Tools.ModsManager.exe"),
-            Path.Combine(BaseDirectory, "OpenKh.Tools.ModsManager"),
-        };
-        return candidates.FirstOrDefault(File.Exists) ?? candidates[0];
     }
 
     private void LoadTools()
@@ -229,7 +215,7 @@ public partial class MainWindow : Window
                 return;
 
             CheckForUpdatesButton.Content = "Downloading Update...";
-            await new OpenkhUpdateProceederService().UpdateAsync(
+            await new OpenKhUpdateInstallerService(BaseDirectory).UpdateAsync(
                 result.DownloadZipUrl,
                 rate => Dispatcher.UIThread.Post(() => CheckForUpdatesButton.Content = $"Downloading {rate:P0}"),
                 CancellationToken.None,
@@ -251,13 +237,13 @@ public partial class MainWindow : Window
         }
     }
 
-    private async Task<OpenkhUpdateCheckerService.CheckResult?> RefreshUpdateAvailabilityAsync(bool showErrors, bool showProgress)
+    private async Task<OpenKhReleaseUpdateCheckerService.CheckResult?> RefreshUpdateAvailabilityAsync(bool showErrors, bool showProgress)
     {
         if (showProgress)
             CheckForUpdatesButton.Content = "Checking for Updates...";
         try
         {
-            var result = await new OpenkhUpdateCheckerService().CheckAsync(CancellationToken.None);
+            var result = await new OpenKhReleaseUpdateCheckerService(BaseDirectory).CheckAsync(CancellationToken.None);
             _availableUpdate = result;
             SetUpdateAvailability(result.HasUpdate);
             return result;

@@ -2,7 +2,7 @@
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-PROJECT="$SCRIPT_DIR/OpenKh.Tools.ModsManager.Avalonia.csproj"
+PROJECT="$SCRIPT_DIR/OpenKh.Tools.ModsManager.csproj"
 OUTPUT_ROOT="${1:-$SCRIPT_DIR/artifacts}"
 
 publish_target() {

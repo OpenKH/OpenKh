@@ -32,9 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\OpenKh.Tools.ModsManager\Services\OpenkhInstallation.cs" Link="Updates\OpenkhInstallation.cs" />
-    <Compile Include="..\OpenKh.Tools.ModsManager\Services\OpenkhUpdateCheckerService.cs" Link="Updates\OpenkhUpdateCheckerService.cs" />
-    <Compile Include="..\OpenKh.Tools.ModsManager\Services\OpenkhUpdateProceederService.cs" Link="Updates\OpenkhUpdateProceederService.cs" />
     <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\ControllerAction.cs" Link="Input\ControllerAction.cs" />
     <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\ControllerWindowNavigator.cs" Link="Input\ControllerWindowNavigator.cs" />
     <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\IControllerInputService.cs" Link="Input\IControllerInputService.cs" />

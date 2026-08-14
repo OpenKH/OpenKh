@@ -1,4 +1,4 @@
-using OpenKh.Tools.ModsManager.Interfaces;
+using OpenKh.Tools.ModsManager.Core.Interfaces;
 
 namespace OpenKh.Tools.ModsManager.Core;
 

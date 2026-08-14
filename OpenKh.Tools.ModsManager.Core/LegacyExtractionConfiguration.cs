@@ -1,4 +1,4 @@
-namespace OpenKh.Tools.ModsManager.Services;
+namespace OpenKh.Tools.ModsManager.Core.Services;
 
 internal static class ConfigurationService
 {

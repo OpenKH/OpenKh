@@ -6,7 +6,7 @@ param (
 $ErrorActionPreference = "Stop"
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $launcherProject = Join-Path $repositoryRoot "OpenKh.Tools.Launcher\OpenKh.Tools.Launcher.csproj"
-$modManagerProject = Join-Path $repositoryRoot "OpenKh.Tools.ModsManager.Avalonia\OpenKh.Tools.ModsManager.Avalonia.csproj"
+$modManagerProject = Join-Path $repositoryRoot "OpenKh.Tools.ModsManager.Avalonia\OpenKh.Tools.ModsManager.csproj"
 
 if (Test-Path -LiteralPath $ReleaseDirectory) {
     throw "Release directory '$ReleaseDirectory' already exists."

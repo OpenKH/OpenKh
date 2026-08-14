@@ -13,16 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\OpenKh.Tools.ModsManager\Services\GameDataExtractionService.cs"
-             Link="Compatibility\GameDataExtractionService.cs" />
-    <Compile Include="..\OpenKh.Tools.ModsManager\Interfaces\IDebugging.cs"
-             Link="Compatibility\IDebugging.cs" />
-    <Compile Include="..\OpenKh.Tools.ModsManager\Interfaces\IOperationDispatcher.cs"
-             Link="Compatibility\IOperationDispatcher.cs" />
-    <Compile Include="..\OpenKh.Tools.ModsManager\Services\Pcsx2Injector.cs"
-             Link="Compatibility\Pcsx2Injector.cs" />
-    <Compile Include="..\OpenKh.Tools.ModsManager\Services\Pcsx2MemoryService.cs"
-             Link="Compatibility\Pcsx2MemoryService.cs" />
     <Compile Include="..\OpenKh.Tools.Common\ProcessStream.cs"
              Link="Compatibility\ProcessStream.cs" />
   </ItemGroup>
