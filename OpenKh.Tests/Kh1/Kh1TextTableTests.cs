@@ -198,6 +198,64 @@ namespace OpenKh.Tests.Kh1
             Assert.Equal("a\r\nA", reopened.Entries[1].Text);
         }
 
+        [Fact]
+        public void TextBinRoundTripsAndCanGrow()
+        {
+            var table = ReadTable();
+            var original = CreateTextBin();
+            using var input = new MemoryStream(original);
+            var textBin = Kh1TextBin.Read(input, table);
+
+            Assert.Equal(2, textBin.Entries.Count);
+            Assert.Equal("A B", textBin.Entries[0].Text);
+            Assert.Equal("a\r\nA", textBin.Entries[1].Text);
+
+            using var unchanged = new MemoryStream();
+            textBin.Write(unchanged);
+            Assert.Equal(original, unchanged.ToArray());
+
+            textBin.Entries[0].Text = "A B A B A B";
+            using var edited = new MemoryStream();
+            textBin.Write(edited);
+            Assert.Equal(0, edited.Length % 16);
+            edited.Position = 0;
+            var reopened = Kh1TextBin.Read(edited, table);
+            Assert.Equal("A B A B A B", reopened.Entries[0].Text);
+            Assert.Equal("a\r\nA", reopened.Entries[1].Text);
+        }
+
+        [Fact]
+        public void EventMessageRoundTripsGrowsAndRelocatesOffsets()
+        {
+            var table = ReadTable();
+            var original = CreateEventMessage();
+            using var input = new MemoryStream(original);
+            var message = Kh1EventMessage.Read(input, table);
+
+            Assert.Equal(2, message.Entries.Count);
+            Assert.Equal("A B", message.Entries[0].Text);
+            Assert.Equal("a A", message.Entries[1].Text);
+
+            using var unchanged = new MemoryStream();
+            message.Write(unchanged);
+            Assert.Equal(original, unchanged.ToArray());
+
+            var oldFirstBoundary = BitConverter.ToUInt32(original, 0x10);
+            var oldSecondBoundary = BitConverter.ToUInt32(original, 0x14);
+            message.Entries[0].Text = "A B A B A B A B A B A B A B A B";
+            using var edited = new MemoryStream();
+            message.Write(edited);
+            var editedBytes = edited.ToArray();
+            var delta = BitConverter.ToUInt32(editedBytes, 0x10) - oldFirstBoundary;
+            Assert.True(delta > 0);
+            Assert.Equal(oldSecondBoundary + delta, BitConverter.ToUInt32(editedBytes, 0x14));
+
+            edited.Position = 0;
+            var reopened = Kh1EventMessage.Read(edited, table);
+            Assert.Equal(message.Entries[0].Text, reopened.Entries[0].Text);
+            Assert.Equal("a A", reopened.Entries[1].Text);
+        }
+
         private static Kh1TextTable ReadTable()
         {
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(TableText));
@@ -256,6 +314,48 @@ namespace OpenKh.Tests.Kh1
             stream.Write(new byte[] { 0x2B, 0x00, 0x45, 0x02, 0x2B, 0x00, 0x00 });
             while ((stream.Length & 0x0F) != 0)
                 stream.WriteByte(0xCD);
+            return stream.ToArray();
+        }
+
+        private static byte[] CreateTextBin()
+        {
+            using var stream = new MemoryStream();
+            stream.Write(new byte[] { 0x2B, 0x01, 0x2C, 0x00 });
+            stream.Write(new byte[] { 0x45, 0x02, 0x2B, 0x00 });
+            while ((stream.Length & 0x0F) != 0)
+                stream.WriteByte(0x00);
+            return stream.ToArray();
+        }
+
+        private static byte[] CreateEventMessage()
+        {
+            using var section = new MemoryStream();
+            section.Write(BitConverter.GetBytes(2));
+            section.Write(new byte[]
+            {
+                0x0A, 0x00, 0x00, 0x00,
+                0x07, 0x0C, 0x00,
+                0x2B, 0x01, 0x2C,
+                0x05, 0x10, 0x00,
+                0x0A, 0x00, 0x00, 0x00,
+                0x07, 0x0C, 0x00,
+                0x45, 0x01, 0x2B,
+                0x06, 0x20, 0x00,
+            });
+            while ((section.Length & 0x0F) != 0)
+                section.WriteByte(0x00);
+
+            const int sectionStart = 0x18;
+            var sectionEnd = sectionStart + checked((int)section.Length);
+            var secondBoundary = sectionEnd + 0x10;
+            using var stream = new MemoryStream();
+            stream.Write(new byte[0x0C]);
+            stream.Write(BitConverter.GetBytes(sectionStart));
+            stream.Write(BitConverter.GetBytes(sectionEnd));
+            stream.Write(BitConverter.GetBytes(secondBoundary));
+            section.Position = 0;
+            section.CopyTo(stream);
+            stream.Write(new byte[0x20]);
             return stream.ToArray();
         }
     }

@@ -16,7 +16,7 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open BINL/KMB..." Command="ApplicationCommands.Open"/>
+                <MenuItem Header="_Open text file..." Command="ApplicationCommands.Open"/>
                 <MenuItem Header="Open _remastered folder..." Click="OpenFolder_Click"/>
                 <Separator/>
                 <MenuItem Header="_Save" Command="ApplicationCommands.Save"/>
@@ -38,74 +38,96 @@
             </StatusBarItem>
         </StatusBar>
 
-        <Grid Margin="8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="430" MinWidth="300"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="*" MinWidth="380"/>
-            </Grid.ColumnDefinitions>
+        <TabControl Margin="8" ItemsSource="{Binding Tabs}"
+                    SelectedItem="{Binding SelectedTab, Mode=TwoWay}">
+            <TabControl.Style>
+                <Style TargetType="TabControl">
+                    <Setter Property="IsEnabled" Value="True"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                            <Setter Property="IsEnabled" Value="False"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TabControl.Style>
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Header}"/>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="430" MinWidth="300"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="*" MinWidth="380"/>
+                        </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <TextBox x:Name="SearchBox" Margin="0,0,0,8" Padding="6,4"
-                         ToolTip="Search text, format or file path" TextChanged="SearchBox_TextChanged"/>
-                <ListBox x:Name="EntryList" Grid.Row="1" ItemsSource="{Binding EntriesView}"
-                         SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                         VirtualizingPanel.IsVirtualizing="True"
-                         VirtualizingPanel.VirtualizationMode="Recycling">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="2,4" ToolTip="{Binding Locations}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="58"/>
-                                    <ColumnDefinition Width="54"/>
-                                    <ColumnDefinition Width="76"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Number}" FontWeight="SemiBold"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Formats}" Foreground="Gray"/>
-                                <TextBlock Grid.Column="2" Text="{Binding OccurrenceCount, StringFormat={}×{0}}" Foreground="Gray"/>
-                                <TextBlock Grid.Column="3" Text="{Binding Preview}" TextTrimming="CharacterEllipsis"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </Grid>
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBox Margin="0,0,0,8" Padding="6,4"
+                                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Search text, format or file path"/>
+                            <ListBox Grid.Row="1" ItemsSource="{Binding EntriesView}"
+                                     SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     VirtualizingPanel.IsVirtualizing="True"
+                                     VirtualizingPanel.VirtualizationMode="Recycling">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="2,4" ToolTip="{Binding Locations}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="58"/>
+                                                <ColumnDefinition Width="54"/>
+                                                <ColumnDefinition Width="76"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Number}" FontWeight="SemiBold"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Formats}" Foreground="Gray"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding OccurrenceCount, StringFormat={}×{0}}" Foreground="Gray"/>
+                                            <TextBlock Grid.Column="3" Text="{Binding Preview}" TextTrimming="CharacterEllipsis"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
 
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
+                        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
 
-            <Grid Grid.Column="2" Margin="8,0,0,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <DockPanel Margin="0,0,0,8">
-                    <TextBlock Text="{Binding SelectedEntry.Number}" FontSize="16" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding SelectedEntry.Formats}" Margin="12,2,0,0" Foreground="Gray"/>
-                    <TextBlock Text="{Binding SelectedEntry.Occurrences}" Margin="12,2,0,0" Foreground="Gray"/>
-                </DockPanel>
-                <TextBox Grid.Row="1" Text="{Binding SelectedEntry.Text, UpdateSourceTrigger=PropertyChanged}"
-                         AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"
-                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
-                         IsEnabled="{Binding CanEdit}" Padding="8"
-                         FontFamily="Consolas" FontSize="15" SpellCheck.IsEnabled="False"/>
-                <GroupBox Grid.Row="2" Header="Locations updated by this entry" Margin="0,8,0,0" MaxHeight="130">
-                    <TextBox Text="{Binding SelectedEntry.Locations, Mode=OneWay}" IsReadOnly="True" BorderThickness="0"
-                             Padding="6" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto"
-                             HorizontalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="12"/>
-                </GroupBox>
-                <Border Grid.Row="3" Margin="0,8,0,0" Padding="8" Background="#10000000">
-                    <TextBlock TextWrapping="Wrap">
-                        Space = 01 · New line = 02 · {eol} = 00. In folder mode, an edit updates every identical occurrence shown above. Keep {cmd:...} and {0xNN} tokens intact.
-                    </TextBlock>
-                </Border>
-            </Grid>
-        </Grid>
+                        <Grid Grid.Column="2" Margin="8,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <DockPanel Margin="0,0,0,8">
+                                <TextBlock Text="{Binding SelectedEntry.Number}" FontSize="16" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding SelectedEntry.Formats}" Margin="12,2,0,0" Foreground="Gray"/>
+                                <TextBlock Text="{Binding SelectedEntry.Occurrences}" Margin="12,2,0,0" Foreground="Gray"/>
+                            </DockPanel>
+                            <TextBox Grid.Row="1" Text="{Binding SelectedEntry.Text, UpdateSourceTrigger=PropertyChanged}"
+                                     AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"
+                                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                                     Padding="8" FontFamily="Consolas" FontSize="15" SpellCheck.IsEnabled="False"/>
+                            <GroupBox Grid.Row="2" Header="Locations updated by this entry" Margin="0,8,0,0" MaxHeight="130">
+                                <TextBox Text="{Binding SelectedEntry.Locations, Mode=OneWay}" IsReadOnly="True" BorderThickness="0"
+                                         Padding="6" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto"
+                                         HorizontalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="12"/>
+                            </GroupBox>
+                            <Border Grid.Row="3" Margin="0,8,0,0" Padding="8" Background="#10000000">
+                                <TextBlock TextWrapping="Wrap">
+                                    Space = 01 · New line = 02 · {eol} = 00. In folder mode, an edit updates every identical occurrence in this file-type tab. Keep {cmd:...} and {0xNN} tokens intact.
+                                </TextBlock>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
     </DockPanel>
 </Window>

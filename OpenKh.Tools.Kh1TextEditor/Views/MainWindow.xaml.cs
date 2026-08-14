@@ -5,27 +5,34 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
 
 namespace OpenKh.Tools.Kh1TextEditor.Views
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private static readonly string[] FormatOrder = { "BINL", "KMB", "BIN", "EVDL", "EV" };
+
         private sealed class LoadResult
         {
             public List<LoadedDocument> Documents { get; } = new();
             public List<string> Errors { get; } = new();
         }
 
+        private sealed class BuiltDocument
+        {
+            public LoadedDocument Document { get; init; }
+            public byte[] Data { get; init; }
+        }
+
         private List<LoadedDocument> _documents = new();
-        private List<TextEntryViewModel> _entries = new();
-        private ICollectionView _entriesView;
-        private TextEntryViewModel _selectedEntry;
+        private List<TextFormatTabViewModel> _tabs = new();
+        private TextFormatTabViewModel _selectedTab;
         private string _sourcePath;
         private string _languageCode;
         private string _statusText;
@@ -37,45 +44,31 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
         {
             InitializeComponent();
             DataContext = this;
-            SetEntries(new List<TextEntryViewModel>());
             Loaded += MainWindow_Loaded;
         }
 
-        public List<TextEntryViewModel> Entries
+        public List<TextFormatTabViewModel> Tabs
         {
-            get => _entries;
+            get => _tabs;
             private set
             {
-                _entries = value;
+                _tabs = value;
                 OnPropertyChanged();
             }
         }
 
-        public ICollectionView EntriesView
+        public TextFormatTabViewModel SelectedTab
         {
-            get => _entriesView;
-            private set
-            {
-                _entriesView = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public TextEntryViewModel SelectedEntry
-        {
-            get => _selectedEntry;
+            get => _selectedTab;
             set
             {
-                _selectedEntry = value;
+                _selectedTab = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(HasSelection));
-                OnPropertyChanged(nameof(CanEdit));
+                UpdateStatus();
             }
         }
 
-        public bool HasSelection => SelectedEntry != null;
-        public bool CanEdit => HasSelection && !IsBusy;
-        public bool CanSaveAs => _documents.Count == 1 && !_isFolder && !IsBusy;
+        public bool CanSaveAs => _documents.Count > 0 && !IsBusy;
         public bool CanChangeLanguage => _isFolder && !IsBusy;
         public string LanguageButtonText => _isFolder
             ? $"File language: {_languageCode ?? "All"}"
@@ -89,7 +82,6 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 _isBusy = value;
                 Mouse.OverrideCursor = value ? Cursors.Wait : null;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(CanEdit));
                 OnPropertyChanged(nameof(CanSaveAs));
                 OnPropertyChanged(nameof(CanChangeLanguage));
             }
@@ -126,7 +118,9 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
         {
             var dialog = new OpenFileDialog
             {
-                Filter = "KH1 remastered text (*.binl;*.kmb)|*.binl;*.kmb|BINL files (*.binl)|*.binl|KMB files (*.kmb)|*.kmb|All files (*.*)|*.*",
+                Filter = "KH1 remastered text (*.binl;*.kmb;*.bin;*.evdl;*.ev)|*.binl;*.kmb;*.bin;*.evdl;*.ev|" +
+                    "BINL files (*.binl)|*.binl|KMB files (*.kmb)|*.kmb|BIN text tables (*.bin)|*.bin|" +
+                    "EVDL files (*.evdl)|*.evdl|EV files (*.ev)|*.ev|All files (*.*)|*.*",
                 Title = "Open KH1 text file",
             };
             if (dialog.ShowDialog(this) == true && ConfirmDiscardChanges())
@@ -151,45 +145,56 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
             {
                 IsBusy = true;
                 StatusText = Directory.Exists(path)
-                    ? "Scanning BINL and KMB files..."
+                    ? "Scanning KH1 text files..."
                     : $"Opening {Path.GetFileName(path)}...";
 
+                var previousFormat = SelectedTab?.Format;
                 var loaded = await Task.Run(() =>
                 {
-                    var documents = LoadDocuments(path, languageCode);
-                    var groups = documents.Documents
-                        .SelectMany(x => x.Entries)
-                        .GroupBy(x => x.Text, StringComparer.Ordinal)
-                        .Select((group, index) => new TextEntryViewModel(index, group))
+                    var result = LoadDocuments(path, languageCode);
+                    var tabs = result.Documents
+                        .GroupBy(x => x.Category, StringComparer.Ordinal)
+                        .OrderBy(x => Array.IndexOf(FormatOrder, x.Key))
+                        .Select(formatGroup =>
+                        {
+                            var groups = formatGroup
+                                .SelectMany(x => x.Entries)
+                                .GroupBy(x => x.Text, StringComparer.Ordinal)
+                                .Select((group, index) => new TextEntryViewModel(index, group))
+                                .ToList();
+                            return new TextFormatTabViewModel(formatGroup.Key, groups);
+                        })
                         .ToList();
-                    return (Documents: documents, Groups: groups);
+                    return (Result: result, Tabs: tabs);
                 });
-                var result = loaded.Documents;
-                if (result.Documents.Count == 0)
-                    throw new InvalidDataException("No readable BINL or KMB files were found.");
 
-                _documents = result.Documents;
+                if (loaded.Result.Documents.Count == 0)
+                    throw new InvalidDataException("No readable KH1 text files were found.");
+
+                _documents = loaded.Result.Documents;
                 _sourcePath = path;
                 _isFolder = Directory.Exists(path);
                 _languageCode = _isFolder ? languageCode : null;
-                SetEntries(loaded.Groups);
-                SelectedEntry = Entries.FirstOrDefault();
+                SetTabs(loaded.Tabs);
+                SelectedTab = Tabs.FirstOrDefault(x => x.Format == previousFormat) ?? Tabs.FirstOrDefault();
                 _isDirty = false;
+
                 var languageTitle = _languageCode == null ? string.Empty : $" [{_languageCode}]";
-                Title = $"{Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))}{languageTitle} | KH1 Text editor - OpenKH";
+                Title = $"{Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))}" +
+                    $"{languageTitle} | KH1 Text editor - OpenKH";
                 OnPropertyChanged(nameof(CanSaveAs));
                 OnPropertyChanged(nameof(CanChangeLanguage));
                 OnPropertyChanged(nameof(LanguageButtonText));
                 UpdateStatus();
 
-                if (result.Errors.Count > 0)
+                if (loaded.Result.Errors.Count > 0)
                 {
-                    var details = string.Join(Environment.NewLine, result.Errors.Take(10));
-                    if (result.Errors.Count > 10)
-                        details += $"{Environment.NewLine}... and {result.Errors.Count - 10} more files.";
+                    var details = string.Join(Environment.NewLine, loaded.Result.Errors.Take(10));
+                    if (loaded.Result.Errors.Count > 10)
+                        details += $"{Environment.NewLine}... and {loaded.Result.Errors.Count - 10} more files.";
                     MessageBox.Show(
                         this,
-                        $"{result.Errors.Count} file(s) could not be read:{Environment.NewLine}{Environment.NewLine}{details}",
+                        $"{loaded.Result.Errors.Count} file(s) could not be read:{Environment.NewLine}{Environment.NewLine}{details}",
                         "KH1 Text editor",
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
@@ -213,9 +218,7 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
             var files = isFolder
                 ? Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
                     .Where(IsSupportedFile)
-                    .Where(x => !Path.GetFileName(x).StartsWith("FM_", StringComparison.OrdinalIgnoreCase))
-                    .Where(x => languageCode == null ||
-                        Path.GetFileName(x).StartsWith($"{languageCode}_", StringComparison.OrdinalIgnoreCase))
+                    .Where(x => MatchesLanguage(x, languageCode))
                     .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
                 : new[] { path }.AsEnumerable();
 
@@ -224,7 +227,7 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 try
                 {
                     var document = LoadedDocument.Read(fileName, path);
-                    if (document != null)
+                    if (document != null && document.Entries.Count > 0)
                         result.Documents.Add(document);
                 }
                 catch (Exception ex)
@@ -253,15 +256,23 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
             if (!CanSaveAs)
                 return;
 
-            var document = _documents[0];
-            var dialog = new SaveFileDialog
+            var dialog = new SaveFileDialog();
+            if (_isFolder)
             {
-                Filter = string.Equals(document.Format, "KMB", StringComparison.Ordinal)
-                    ? "KMB files (*.kmb)|*.kmb|All files (*.*)|*.*"
-                    : "BINL files (*.binl)|*.binl|All files (*.*)|*.*",
-                FileName = Path.GetFileName(document.FileName),
-                Title = "Save KH1 text file as",
-            };
+                var language = _languageCode == null ? string.Empty : $"-{_languageCode}";
+                dialog.Filter = "ZIP archives (*.zip)|*.zip";
+                dialog.FileName = $"{Path.GetFileName(_sourcePath.TrimEnd(Path.DirectorySeparatorChar))}{language}-text.zip";
+                dialog.Title = "Export modified KH1 text files";
+            }
+            else
+            {
+                var document = _documents[0];
+                var extension = Path.GetExtension(document.FileName);
+                dialog.Filter = $"{document.Category} files (*{extension})|*{extension}|All files (*.*)|*.*";
+                dialog.FileName = Path.GetFileName(document.FileName);
+                dialog.Title = "Save KH1 text file as";
+            }
+
             if (dialog.ShowDialog(this) == true)
                 await SaveChangesAsync(dialog.FileName);
         }
@@ -271,9 +282,18 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
             if (_documents.Count == 0 || IsBusy)
                 return;
 
-            var modifiedGroups = Entries.Where(x => x.IsModified).ToList();
-            if (modifiedGroups.Count == 0 && saveAsFileName == null)
-                return;
+            var modifiedGroups = AllEntries().Where(x => x.IsModified).ToList();
+            var exportingZip = _isFolder && saveAsFileName != null;
+            if (modifiedGroups.Count == 0)
+            {
+                if (exportingZip)
+                {
+                    MessageBox.Show(this, "There are no modified files to export.", "KH1 Text editor",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                if (_isFolder || saveAsFileName == null)
+                    return;
+            }
 
             try
             {
@@ -282,12 +302,26 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 foreach (var group in modifiedGroups)
                     group.Apply();
 
-                var affectedDocuments = saveAsFileName != null
-                    ? _documents
-                    : modifiedGroups.SelectMany(x => x.Documents).Distinct().ToList();
+                var affectedDocuments = modifiedGroups
+                    .SelectMany(x => x.Documents)
+                    .Distinct()
+                    .ToList();
+                if (!_isFolder && saveAsFileName != null)
+                    affectedDocuments = _documents;
+
                 var output = await Task.Run(() => affectedDocuments
-                    .Select(x => new { Document = x, Data = x.BuildFile() })
+                    .Select(x => new BuiltDocument { Document = x, Data = x.BuildFile() })
                     .ToList());
+
+                if (exportingZip)
+                {
+                    StatusText = "Creating ZIP archive...";
+                    await Task.Run(() => WriteZipFile(saveAsFileName, output));
+                    UpdateStatus();
+                    MessageBox.Show(this, $"Created {saveAsFileName}", "KH1 Text editor",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
 
                 StatusText = "Writing files...";
                 await Task.Run(() =>
@@ -302,8 +336,6 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 foreach (var group in modifiedGroups)
                     group.AcceptChanges();
                 _isDirty = false;
-                UpdateStatus();
-
                 await LoadPathAsync(saveAsFileName ?? _sourcePath, saveAsFileName == null ? _languageCode : null);
             }
             catch (Exception ex)
@@ -317,39 +349,53 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
             }
         }
 
-        private void SetEntries(List<TextEntryViewModel> entries)
+        private static void WriteZipFile(string fileName, IReadOnlyList<BuiltDocument> documents)
         {
-            foreach (var oldEntry in Entries)
-                oldEntry.PropertyChanged -= Entry_PropertyChanged;
-            Entries = entries;
-            foreach (var entry in Entries)
-                entry.PropertyChanged += Entry_PropertyChanged;
-
-            EntriesView = CollectionViewSource.GetDefaultView(Entries);
-            EntriesView.Filter = FilterEntry;
+            var directory = Path.GetDirectoryName(Path.GetFullPath(fileName));
+            Directory.CreateDirectory(directory);
+            var temporaryFile = Path.Combine(directory, $".{Path.GetFileName(fileName)}.{Guid.NewGuid():N}.tmp");
+            try
+            {
+                using (var file = File.Create(temporaryFile))
+                using (var archive = new ZipArchive(file, ZipArchiveMode.Create))
+                {
+                    foreach (var item in documents.OrderBy(x => x.Document.RelativePath, StringComparer.OrdinalIgnoreCase))
+                    {
+                        var entryName = item.Document.RelativePath.Replace('\\', '/');
+                        if (Path.IsPathRooted(entryName) || entryName.Split('/').Any(x => x == ".."))
+                            throw new InvalidDataException($"Unsafe ZIP path: {entryName}");
+                        var entry = archive.CreateEntry(entryName, CompressionLevel.Optimal);
+                        using var output = entry.Open();
+                        output.Write(item.Data);
+                    }
+                }
+                File.Move(temporaryFile, fileName, true);
+            }
+            finally
+            {
+                if (File.Exists(temporaryFile))
+                    File.Delete(temporaryFile);
+            }
         }
+
+        private void SetTabs(List<TextFormatTabViewModel> tabs)
+        {
+            foreach (var oldEntry in AllEntries())
+                oldEntry.PropertyChanged -= Entry_PropertyChanged;
+            Tabs = tabs;
+            foreach (var entry in AllEntries())
+                entry.PropertyChanged += Entry_PropertyChanged;
+        }
+
+        private IEnumerable<TextEntryViewModel> AllEntries() => Tabs.SelectMany(x => x.Entries);
 
         private void Entry_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(TextEntryViewModel.Text))
             {
-                _isDirty = Entries.Any(x => x.IsModified);
+                _isDirty = AllEntries().Any(x => x.IsModified);
                 UpdateStatus();
             }
-        }
-
-        private void SearchBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) =>
-            EntriesView?.Refresh();
-
-        private bool FilterEntry(object item)
-        {
-            if (item is not TextEntryViewModel entry || string.IsNullOrWhiteSpace(SearchBox?.Text))
-                return true;
-            var search = SearchBox.Text;
-            return entry.Text.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
-                entry.Number.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                entry.Formats.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                entry.ContainsLocation(search);
         }
 
         private static bool IsSupportedFile(string path)
@@ -358,7 +404,25 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 return false;
             var extension = Path.GetExtension(path);
             return string.Equals(extension, ".binl", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(extension, ".kmb", StringComparison.OrdinalIgnoreCase);
+                string.Equals(extension, ".kmb", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(extension, ".evdl", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(extension, ".ev", StringComparison.OrdinalIgnoreCase) ||
+                (string.Equals(extension, ".bin", StringComparison.OrdinalIgnoreCase) &&
+                    LoadedDocument.IsTextBinFile(path));
+        }
+
+        private static bool MatchesLanguage(string path, string languageCode)
+        {
+            var name = Path.GetFileName(path);
+            var hasPrefix = name.Length > 3 && name[2] == '_' &&
+                char.IsLetter(name[0]) && char.IsLetter(name[1]);
+            if (!hasPrefix)
+                return true;
+
+            var prefix = name.Substring(0, 2);
+            if (prefix.Equals("FM", StringComparison.OrdinalIgnoreCase))
+                return false;
+            return languageCode == null || prefix.Equals(languageCode, StringComparison.OrdinalIgnoreCase);
         }
 
         private bool TrySelectLanguage(string folderName, out string languageCode)
@@ -389,7 +453,8 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
         {
             MessageBox.Show(
                 this,
-                "KH1 Text editor - OpenKH\n\nEdits remastered BINL and KMB text. Folder mode groups identical text and updates every occurrence.",
+                "KH1 Text editor - OpenKH\n\nEdits remastered BINL, KMB, BIN, EVDL and EV text. " +
+                    "Folder mode groups identical text within each file type.",
                 "About KH1 Text editor",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
@@ -421,14 +486,17 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 return;
             if (_documents.Count == 0)
             {
-                StatusText = "Open a BINL/KMB file or a remastered folder.";
+                StatusText = "Open a KH1 remastered text file or folder.";
                 return;
             }
 
             var occurrenceCount = _documents.Sum(x => x.Entries.Count);
+            var uniqueCount = Tabs.Sum(x => x.Entries.Count);
             var language = _languageCode == null ? string.Empty : $" · language {_languageCode}";
-            StatusText = $"{_documents.Count:N0} file(s){language} · {Entries.Count:N0} unique text(s) · {occurrenceCount:N0} occurrence(s)" +
-                (_isDirty ? $" · {Entries.Count(x => x.IsModified):N0} modified group(s)" : string.Empty);
+            var active = SelectedTab == null ? string.Empty : $" · {SelectedTab.Format} tab";
+            StatusText = $"{_documents.Count:N0} file(s){language} · {uniqueCount:N0} unique text(s)" +
+                $" · {occurrenceCount:N0} occurrence(s){active}" +
+                (_isDirty ? $" · {AllEntries().Count(x => x.IsModified):N0} modified group(s)" : string.Empty);
         }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
