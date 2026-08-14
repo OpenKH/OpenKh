@@ -227,8 +227,14 @@
             <TextBlock Text="WARNING: If you do not extract a game's data, only Lua script mods will function properly."
                        Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" />
             <StackPanel IsVisible="{Binding IsPcMode}" Spacing="6">
-              <TextBlock Text="WARNING: Remastered files account for about 80% of the listed extraction size. In KH1 they include important non-visual data. In KH2 they contain images, so some mods may have visual issues. Compatibility for other games depends on the mod."
+              <TextBlock Text="WARNING: Remastered files account for about 80% of the listed extraction size. You can skip them to save space, but the consequences depend on the game:"
                          Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" />
+              <TextBlock Text="KH1: Remastered files include important data required for modifications beyond visual changes."
+                         Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" Margin="12,0,0,0" />
+              <TextBlock Text="KH2: Remastered files contain images, so some mods may have missing or incorrect visuals."
+                         Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" Margin="12,0,0,0" />
+              <TextBlock Text="Other games: Compatibility depends on the mod because their remastered files may also contain required data."
+                         Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" Margin="12,0,0,0" />
               <CheckBox IsChecked="{Binding SkipRemastered}" Content="Skip Extracting Remastered Files" />
             </StackPanel>
             <TextBlock x:Name="ExtractionAvailabilityText" Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
