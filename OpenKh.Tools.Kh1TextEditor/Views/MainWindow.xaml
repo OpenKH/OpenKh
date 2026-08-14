@@ -24,21 +24,13 @@
                 <Separator/>
                 <MenuItem Header="E_xit" Click="Exit_Click"/>
             </MenuItem>
+            <MenuItem Header="{Binding LanguageButtonText}" Click="ChangeLanguage_Click"
+                      IsEnabled="{Binding CanChangeLanguage}"
+                      ToolTip="Change the language loaded from the remastered folder"/>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About" Click="About_Click"/>
             </MenuItem>
         </Menu>
-
-        <ToolBarTray DockPanel.Dock="Top">
-            <ToolBar>
-                <Button Content="Open file..." Command="ApplicationCommands.Open" Padding="8,2"/>
-                <Button Content="Open folder..." Click="OpenFolder_Click" Padding="8,2"/>
-                <Separator/>
-                <Button Content="{Binding LanguageButtonText}" Click="ChangeLanguage_Click"
-                        IsEnabled="{Binding CanChangeLanguage}" Padding="10,2"
-                        ToolTip="Change the language loaded from the remastered folder"/>
-            </ToolBar>
-        </ToolBarTray>
 
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem>

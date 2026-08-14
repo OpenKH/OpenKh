@@ -19,9 +19,8 @@ external `*.tbl` file is required.
 4. Use **Save** to update the affected files. **Save as** is available in
    single-file mode.
 
-The toolbar provides shortcuts for opening a file or folder. In folder mode,
-use the **File language** button to switch languages without selecting the
-folder again.
+In folder mode, use **File language** in the main menu to switch languages
+without selecting the folder again.
 
 The built-in KH1 table uses `01` for a space, `02` for a line break, and `00`
 for `{eol}`. A line break typed in the editor is saved as `02`.
