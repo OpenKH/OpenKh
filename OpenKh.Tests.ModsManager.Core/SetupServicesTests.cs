@@ -54,6 +54,21 @@ public sealed class SetupServicesTests : IDisposable
     }
 
     [Fact]
+    public void ExtractedGameDataIsDetectedUsingGameSpecificFiles()
+    {
+        var dataDirectory = Path.Combine(_rootDirectory, "data");
+        Directory.CreateDirectory(Path.Combine(dataDirectory, "kh1"));
+        Directory.CreateDirectory(Path.Combine(dataDirectory, "bbs", "message"));
+        Directory.CreateDirectory(Path.Combine(dataDirectory, "Recom", "SYS"));
+        File.WriteAllText(Path.Combine(dataDirectory, "kh1", "btltbl.bin"), "data");
+        File.WriteAllText(Path.Combine(dataDirectory, "unrelated.txt"), "not game data");
+
+        var games = GameDataDetectionService.FindExtractedGames(dataDirectory);
+
+        Assert.Equal(["kh1", "bbs", "Recom"], games.Select(game => game.Id));
+    }
+
+    [Fact]
     public async Task PanaceaUsesUnsavedSetupPathAndCanBeRemoved()
     {
         Directory.CreateDirectory(_rootDirectory);

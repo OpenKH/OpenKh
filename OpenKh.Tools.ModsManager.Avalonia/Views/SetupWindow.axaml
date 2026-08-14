@@ -219,12 +219,18 @@
             </WrapPanel>
             <TextBlock Text="Extraction folder location" FontWeight="SemiBold" />
             <Grid ColumnDefinitions="*,12,130">
-              <TextBox x:Name="GameDataTextBox" Text="{Binding GameDataPath}" PlaceholderText="Use OpenKH/data" />
+              <TextBox x:Name="GameDataTextBox" Text="{Binding GameDataPath}" PlaceholderText="Use OpenKH/data"
+                       TextChanged="ExtractionSource_OnTextChanged" />
               <Button Grid.Column="2" Content="Browse" Tag="GameDataTextBox" Click="BrowseFolder_OnClick" />
             </Grid>
             <TextBlock x:Name="ExistingDataStatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
             <TextBlock Text="WARNING: If you do not extract a game's data, only Lua script mods will function properly."
                        Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" />
+            <StackPanel IsVisible="{Binding IsPcMode}" Spacing="6">
+              <TextBlock Text="WARNING: Remastered files account for about 80% of the listed extraction size. In KH1 they include important non-visual data. In KH2 they contain images, so some mods may have visual issues. Compatibility for other games depends on the mod."
+                         Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" />
+              <CheckBox IsChecked="{Binding SkipRemastered}" Content="Skip Extracting Remastered Files" />
+            </StackPanel>
             <TextBlock x:Name="ExtractionAvailabilityText" Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
             <TextBlock Text="Extraction can take between 5 and 15 minutes, or longer when several PC games are selected."
                        Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />

@@ -454,14 +454,24 @@ public sealed partial class SetupWindow : EmbeddedDialogControl
             return;
 
         var configuredPath = GameDataTextBox?.Text;
-        var path = string.IsNullOrWhiteSpace(configuredPath)
-            ? _configuration.GameDataDirectory
-            : Path.GetFullPath(configuredPath);
-        var hasData = Directory.Exists(path) && Directory.EnumerateFileSystemEntries(path).Any();
-        ExistingDataStatusText.Text = hasData
-            ? "You already have extracted game data."
+        string path;
+        try
+        {
+            path = string.IsNullOrWhiteSpace(configuredPath)
+                ? _configuration.GameDataDirectory
+                : Path.GetFullPath(configuredPath);
+        }
+        catch (Exception exception) when (exception is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            ExistingDataStatusText.Text = "Enter a valid extraction folder location.";
+            ExistingDataStatusText.Foreground = Brush.Parse("#F1B86B");
+            return;
+        }
+        var extractedGames = GameDataDetectionService.FindExtractedGames(path);
+        ExistingDataStatusText.Text = extractedGames.Count > 0
+            ? $"Extracted game data found: {string.Join(", ", extractedGames.Select(game => game.DisplayName))}."
             : "You do not have extracted data from a supported game.";
-        ExistingDataStatusText.Foreground = Brush.Parse(hasData ? "#62D6A7" : "#91A2BA");
+        ExistingDataStatusText.Foreground = Brush.Parse(extractedGames.Count > 0 ? "#62D6A7" : "#91A2BA");
     }
 
     private async void ExtractGameData_OnClick(object? sender, RoutedEventArgs eventArgs)
@@ -482,9 +492,12 @@ public sealed partial class SetupWindow : EmbeddedDialogControl
             return;
         }
 
+        var extractionDescription = viewModel.SkipRemastered
+            ? "Remastered files will be skipped. Review the compatibility warning in Setup before continuing."
+            : "The selected games will be extracted completely, including remastered files.";
         var confirmed = _dialogs is null || await _dialogs.ConfirmAsync(
             "Extract game data?",
-            "The selected games will be extracted completely, including remastered files. This may require substantial disk space and can take 5 to 15 minutes or longer.\n\nExisting extracted data for the selected games may be overwritten.",
+            $"{extractionDescription} This may require substantial disk space and can take 5 to 15 minutes or longer.\n\nExisting extracted data for the selected games may be overwritten.",
             "Start extraction");
         if (!confirmed)
             return;
