@@ -5,6 +5,9 @@
 
 # Project specific files
 .tests/
+/openkh/
+/openkh-*/
+/OpenKh-*-release.zip
 
 # User-specific files
 *.suo

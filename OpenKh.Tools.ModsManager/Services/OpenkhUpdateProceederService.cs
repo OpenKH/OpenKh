@@ -11,7 +11,12 @@ namespace OpenKh.Tools.ModsManager.Services
 {
     public class OpenkhUpdateProceederService
     {
-        public async Task UpdateAsync(string downloadZipUrl, Action<float> progress, CancellationToken cancellation)
+        public async Task UpdateAsync(
+            string downloadZipUrl,
+            Action<float> progress,
+            CancellationToken cancellation,
+            string executableToRestart = ""
+        )
         {
             var tempId = Guid.NewGuid().ToString("N");
             var tempZipFile = Path.Combine(Path.GetTempPath(), $"openkh-{tempId}.zip");
@@ -40,13 +45,38 @@ namespace OpenKh.Tools.ModsManager.Services
             File.Delete(tempZipFile);
             var tempBatFile = Path.Combine(Path.GetTempPath(), $"openkh-{tempId}.bat");
 
-            var copyTo = AppDomain.CurrentDomain.BaseDirectory;
-
+            var copyFrom = Path.Combine(tempZipDir, "openkh");
+            var copyTo = OpenkhInstallation.Directory;
+            var packagedModManagerExecutable = Path.Combine(
+                copyFrom,
+                "Apps",
+                "OpenKh.Tools.ModsManager.exe"
+            );
+            var previousPackagedModManagerExecutable = Path.Combine(
+                copyFrom,
+                "Apps",
+                "ModManager",
+                "OpenKh.Tools.ModsManager.exe"
+            );
+            var modManagerExecutable = File.Exists(packagedModManagerExecutable)
+                ? Path.Combine(copyTo, "Apps", "OpenKh.Tools.ModsManager.exe")
+                : File.Exists(previousPackagedModManagerExecutable)
+                    ? Path.Combine(copyTo, "Apps", "ModManager", "OpenKh.Tools.ModsManager.exe")
+                    : OpenkhInstallation.GetModManagerExecutable(copyTo);
+            var restartExecutable = string.IsNullOrWhiteSpace(executableToRestart)
+                ? modManagerExecutable
+                : executableToRestart;
             await CreateBatchFileAsync(
                 tempBatFile: tempBatFile,
-                copyFrom: Path.Combine(tempZipDir, "openkh"),
+                copyFrom: copyFrom,
                 copyTo: copyTo,
-                execAfter: $"start \"\" \"{Path.Combine(copyTo, "OpenKh.Tools.ModsManager.exe")}\""
+                processesToStop: new[]
+                {
+                    Path.GetFileName(restartExecutable),
+                    "OpenKh.Launcher.exe",
+                    "OpenKh.Tools.ModsManager.exe",
+                },
+                execAfter: $"start \"\" \"{restartExecutable}\""
             );
 
             Process.Start(
@@ -79,11 +109,18 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        private async Task CreateBatchFileAsync(string tempBatFile, string copyFrom, string copyTo, string execAfter)
+        private async Task CreateBatchFileAsync(
+            string tempBatFile,
+            string copyFrom,
+            string copyTo,
+            string[] processesToStop,
+            string execAfter
+        )
         {
             var bat = new StringWriter();
             bat.WriteLine($"chcp 65001");
-            bat.WriteLine($"taskkill /im OpenKh.Tools.ModsManager.exe");
+            foreach (var processToStop in processesToStop)
+                bat.WriteLine($"taskkill /f /im {EscapeRobocopyArg(processToStop)} >nul 2>&1");
             bat.WriteLine($"robocopy  {EscapeRobocopyArg(copyFrom)} {EscapeRobocopyArg(copyTo)} /e");
             bat.WriteLine($"if errorlevel 8 pause");
             bat.WriteLine($"{execAfter}");

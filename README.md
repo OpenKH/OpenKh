@@ -18,6 +18,10 @@ New builds of OpenKH are automatically generated every time one of the contribut
 
 All the builds from `master` and from pull requestes are generated from [GitHub Actions](https://github.com/OpenKh/OpenKh/actions).
 
+After extracting a release, open `OpenKh.Launcher.exe`. The launcher presents the Mod Manager as the recommended option for installing and playing mods, while editors, converters, and command-line utilities remain in a separate section of the interface for mod creators. Modding tools can be marked as favorites so they stay at the top of the list between launcher sessions. All applications and their dependencies are stored together under `Apps`, leaving the release root with a single visible executable entry point. The launcher checks for update availability in the background and displays an indicator when a new version exists. Nothing is downloaded or installed until the user selects the update action and confirms it. Updates are applied without opening the Mod Manager. The launcher can also create a Mod Manager desktop shortcut.
+
+Existing installations are migrated to the organized layout when the updated launcher or an existing Mod Manager shortcut is opened. Mod Manager settings, presets, mod lists, and user content remain available while obsolete application files are removed from the release root. A hidden compatibility entry point remains in the release root so existing shortcuts continue to work after migration and future updates.
+
 OpenKH tools require the installation of the [.NET 8.0 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0). All the UI tools are designed to work on Windows, while command line tools will work on any operating system.
 
 

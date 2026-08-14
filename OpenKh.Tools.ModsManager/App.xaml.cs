@@ -32,7 +32,7 @@ namespace OpenKh.Tools.ModsManager
             // Save the error to a log file
             try
             {
-                string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "crash_log.txt");
+                string logPath = Path.Combine(Services.OpenkhInstallation.Directory, "crash_log.txt");
                 File.AppendAllText(logPath, $"[{DateTime.Now}] {errorMessage}\n\n");
             }
             catch

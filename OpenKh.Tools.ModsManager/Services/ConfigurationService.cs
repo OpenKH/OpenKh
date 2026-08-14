@@ -74,7 +74,7 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        private static string StoragePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        private static string StoragePath = OpenkhInstallation.Directory;
         private static string ConfigPath = Path.Combine(StoragePath, "mods-manager.yml");
         private static string EnabledModsPathKH1 = Path.Combine(StoragePath, "mods-KH1.txt");
         private static string EnabledModsPathKH2 = Path.Combine(StoragePath, "mods-KH2.txt");
