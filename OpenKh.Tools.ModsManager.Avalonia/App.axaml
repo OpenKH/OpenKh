@@ -62,5 +62,11 @@
       <Setter Property="CornerRadius" Value="14" />
       <Setter Property="Padding" Value="20" />
     </Style>
+    <Style Selector="Border.online-mod-panel">
+      <Setter Property="Background" Value="#0B1728" />
+      <Setter Property="BorderBrush" Value="#243A59" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="12" />
+    </Style>
   </Application.Styles>
 </Application>

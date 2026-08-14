@@ -74,11 +74,7 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
             {
                 if (_isClosed)
                     return;
-                if (_installedRepositories.Contains(mod.Repository) ||
-                    _allMods.Any(item => item.Repository.Equals(mod.Repository, StringComparison.OrdinalIgnoreCase)))
-                    return;
-                _allMods.Add(new OnlineModItem(mod));
-                ApplyFilter();
+                TryAddCatalogMod(mod);
                 ModsList.SelectedItem ??= _visibleMods.FirstOrDefault();
             });
             var mods = await _catalog.LoadAsync(
@@ -90,14 +86,8 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
             if (_isClosed)
                 return;
             foreach (var mod in mods)
-            {
-                if (_installedRepositories.Contains(mod.Repository) ||
-                    _allMods.Any(item => item.Repository.Equals(mod.Repository, StringComparison.OrdinalIgnoreCase)))
-                    continue;
-                _allMods.Add(new OnlineModItem(mod));
-            }
-            ApplyFilter();
-            ModsList.SelectedItem = _visibleMods.FirstOrDefault();
+                TryAddCatalogMod(mod);
+            ModsList.SelectedItem ??= _visibleMods.FirstOrDefault();
             StatusText.Text = _allMods.Count == 1 ? "1 mod is available" : $"{_allMods.Count} mods are available";
         }
         catch (OperationCanceledException) when (_isClosed)
@@ -118,13 +108,35 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
 
     private void ApplyFilter()
     {
-        var query = SearchTextBox.Text?.Trim();
-        var terms = string.IsNullOrWhiteSpace(query)
-            ? []
-            : query.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var selected = ModsList.SelectedItem as OnlineModItem;
         _visibleMods.Clear();
-        foreach (var mod in _allMods.Where(mod => terms.All(mod.Contains)))
+        foreach (var mod in _allMods.Where(MatchesCurrentFilter))
             _visibleMods.Add(mod);
+        ModsList.SelectedItem = selected is not null && _visibleMods.Contains(selected)
+            ? selected
+            : _visibleMods.FirstOrDefault();
+    }
+
+    private void TryAddCatalogMod(OnlineModInfo mod)
+    {
+        if (_installedRepositories.Contains(mod.Repository) ||
+            _allMods.Any(item => item.Repository.Equals(mod.Repository, StringComparison.OrdinalIgnoreCase)))
+            return;
+
+        var item = new OnlineModItem(mod);
+        _allMods.Add(item);
+        if (MatchesCurrentFilter(item))
+            _visibleMods.Add(item);
+    }
+
+    private bool MatchesCurrentFilter(OnlineModItem mod)
+    {
+        var query = SearchTextBox.Text?.Trim();
+        if (string.IsNullOrWhiteSpace(query))
+            return true;
+
+        var terms = query.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return terms.All(mod.Contains);
     }
 
     private void ModsList_OnSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs)
@@ -157,9 +169,12 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
             _installedRepositories.Add(selected.Repository);
             if (_onModInstalled is not null)
                 await _onModInstalled();
+            var selectedIndex = ModsList.SelectedIndex;
             _allMods.Remove(selected);
-            ApplyFilter();
-            ModsList.SelectedItem = _visibleMods.FirstOrDefault();
+            _visibleMods.Remove(selected);
+            ModsList.SelectedIndex = _visibleMods.Count == 0
+                ? -1
+                : Math.Min(selectedIndex, _visibleMods.Count - 1);
             StatusText.Text = $"{selected.Title} was installed";
             selected.Dispose();
         }

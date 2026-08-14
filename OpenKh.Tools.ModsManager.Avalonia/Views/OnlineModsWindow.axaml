@@ -3,9 +3,9 @@
         xmlns:views="using:OpenKh.Tools.ModsManager.Avalonia.Views"
         x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.OnlineModsWindow"
         XYFocus.NavigationModes="Enabled">
-  <Grid Margin="28" RowDefinitions="Auto,16,Auto,16,*,16,Auto">
+  <Grid Margin="24" RowDefinitions="Auto,14,Auto,14,*,14,Auto">
     <StackPanel Spacing="5">
-      <TextBlock Text="Browse online mods" FontSize="28" FontWeight="Bold" />
+      <TextBlock Text="Browse mods" FontSize="28" FontWeight="Bold" />
       <TextBlock x:Name="GameHelpText" Foreground="#AAB9CF" />
     </StackPanel>
 
@@ -13,30 +13,60 @@
              PlaceholderText="Search by name, author, description, or repository"
              TextChanged="Search_OnTextChanged" />
 
-    <Grid Grid.Row="4" ColumnDefinitions="3*,16,2*">
-      <Border Background="#0F192A" BorderBrush="#22324C" BorderThickness="1" CornerRadius="14" Padding="10">
+    <Grid Grid.Row="4" ColumnDefinitions="3*,14,2*">
+      <Border Classes="online-mod-panel" Padding="8">
         <ListBox x:Name="ModsList" SelectionChanged="ModsList_OnSelectionChanged" Background="Transparent">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.Styles>
+            <Style Selector="ListBoxItem">
+              <Setter Property="Width" Value="190" />
+              <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+              <Setter Property="Padding" Value="0" />
+              <Setter Property="Margin" Value="5" />
+            </Style>
+            <Style Selector="ListBoxItem /template/ ContentPresenter">
+              <Setter Property="Background" Value="#101E32" />
+              <Setter Property="BorderBrush" Value="#203550" />
+              <Setter Property="BorderThickness" Value="1" />
+              <Setter Property="CornerRadius" Value="10" />
+            </Style>
+            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+              <Setter Property="Background" Value="#132A49" />
+              <Setter Property="BorderBrush" Value="#397FFF" />
+              <Setter Property="BorderThickness" Value="2" />
+            </Style>
+          </ListBox.Styles>
           <ListBox.ItemTemplate>
             <DataTemplate>
-              <Grid Margin="6" ColumnDefinitions="52,*" MinHeight="70">
-                <Border Width="44" Height="44" CornerRadius="12" Background="#233B60" VerticalAlignment="Center">
-                  <Grid ClipToBounds="True">
-                    <TextBlock Text="{Binding Initial}" HorizontalAlignment="Center" VerticalAlignment="Center"
-                               FontWeight="Bold" Foreground="#8DB7FF" />
-                    <Image Source="{Binding IconImage}" Stretch="UniformToFill" />
-                  </Grid>
+              <StackPanel Margin="10" Spacing="8">
+                <Border Height="86" CornerRadius="8" Background="#0B1728" ClipToBounds="True">
+                  <Image Source="{Binding PreviewImage}" Stretch="UniformToFill" />
                 </Border>
-                <StackPanel Grid.Column="1" Margin="12,0" VerticalAlignment="Center" Spacing="3">
-                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                  <TextBlock Text="{Binding Author}" Foreground="#91A2BA" FontSize="12" />
-                </StackPanel>
-              </Grid>
+                <Grid ColumnDefinitions="38,*">
+                  <Border Width="32" Height="32" CornerRadius="8" Background="#203A62" ClipToBounds="True">
+                    <Grid>
+                      <TextBlock Text="{Binding Initial}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                 FontWeight="Bold" Foreground="#8DB7FF" />
+                      <Image Source="{Binding IconImage}" Stretch="UniformToFill" />
+                    </Grid>
+                  </Border>
+                  <StackPanel Grid.Column="1" Spacing="2">
+                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding Author}" Foreground="#91A2BA" FontSize="10" TextTrimming="CharacterEllipsis" />
+                  </StackPanel>
+                </Grid>
+                <TextBlock Text="Select to view details" Foreground="#6F83A0" FontSize="9" />
+              </StackPanel>
             </DataTemplate>
           </ListBox.ItemTemplate>
         </ListBox>
       </Border>
 
-      <Border Grid.Column="2" Background="#0F192A" BorderBrush="#22324C" BorderThickness="1" CornerRadius="14" Padding="22">
+      <Border Grid.Column="2" Classes="online-mod-panel" Padding="20">
         <Grid RowDefinitions="*,Auto">
           <ScrollViewer>
             <StackPanel Spacing="12">
