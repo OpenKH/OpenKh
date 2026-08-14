@@ -1,8 +1,21 @@
 # KH1 Text Editor
 
+> **Testing status:** This tool is still under testing. Keep backups of the
+> original files and verify edited assets in game before distributing them.
+
 `OpenKh.Tools.Kh1TextEditor` edits text from Kingdom Hearts 1.5 ReMIX `*.binl`,
 `*.kmb`, text-table `*.bin`, `*.evdl`, and `*.ev` files. The KH1 character
 table is compiled into the tool, so no external `*.tbl` file is required.
+
+## Screenshots
+
+### Remastered folder mode
+
+![KH1 Text Editor loading the US files from a remastered folder](images/folder-mode.png)
+
+### Single-file mode
+
+![KH1 Text Editor editing one BINL file](images/single-file.png)
 
 ## Usage
 
