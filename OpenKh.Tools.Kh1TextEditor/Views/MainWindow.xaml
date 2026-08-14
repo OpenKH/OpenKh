@@ -29,6 +29,17 @@
             </MenuItem>
         </Menu>
 
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar>
+                <Button Content="Open file..." Command="ApplicationCommands.Open" Padding="8,2"/>
+                <Button Content="Open folder..." Click="OpenFolder_Click" Padding="8,2"/>
+                <Separator/>
+                <Button Content="{Binding LanguageButtonText}" Click="ChangeLanguage_Click"
+                        IsEnabled="{Binding CanChangeLanguage}" Padding="10,2"
+                        ToolTip="Change the language loaded from the remastered folder"/>
+            </ToolBar>
+        </ToolBarTray>
+
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem>
                 <TextBlock Text="{Binding StatusText}"/>

@@ -38,6 +38,8 @@ namespace OpenKh.Tests.Kh1
 
             Assert.Equal(new byte[] { 0x01 }, table.Encode(" "));
             Assert.Equal(new byte[] { 0xCB, 0x3B, 0x59, 0xE9, 0x60 }, table.Encode("¿Qué?"));
+            Assert.Equal(new byte[] { 0x0F }, table.Encode("{ctrl:0F}"));
+            Assert.Equal("{ctrl:0F}", table.Decode(new byte[] { 0x0F }));
             Assert.Equal("ÁÉÍÓÚ áéíóú ñ", table.Decode(new byte[]
             {
                 0xCD, 0xD2, 0xD6, 0xDB, 0xDF, 0x01,

@@ -76,6 +76,10 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
         public bool HasSelection => SelectedEntry != null;
         public bool CanEdit => HasSelection && !IsBusy;
         public bool CanSaveAs => _documents.Count == 1 && !_isFolder && !IsBusy;
+        public bool CanChangeLanguage => _isFolder && !IsBusy;
+        public string LanguageButtonText => _isFolder
+            ? $"File language: {_languageCode ?? "All"}"
+            : "File language";
 
         public bool IsBusy
         {
@@ -87,6 +91,7 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(CanEdit));
                 OnPropertyChanged(nameof(CanSaveAs));
+                OnPropertyChanged(nameof(CanChangeLanguage));
             }
         }
 
@@ -173,6 +178,8 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 var languageTitle = _languageCode == null ? string.Empty : $" [{_languageCode}]";
                 Title = $"{Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))}{languageTitle} | KH1 Text editor - OpenKH";
                 OnPropertyChanged(nameof(CanSaveAs));
+                OnPropertyChanged(nameof(CanChangeLanguage));
+                OnPropertyChanged(nameof(LanguageButtonText));
                 UpdateStatus();
 
                 if (result.Errors.Count > 0)
@@ -206,6 +213,7 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
             var files = isFolder
                 ? Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
                     .Where(IsSupportedFile)
+                    .Where(x => !Path.GetFileName(x).StartsWith("FM_", StringComparison.OrdinalIgnoreCase))
                     .Where(x => languageCode == null ||
                         Path.GetFileName(x).StartsWith($"{languageCode}_", StringComparison.OrdinalIgnoreCase))
                     .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
@@ -231,6 +239,14 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
 
         private async void Save_Executed(object sender, ExecutedRoutedEventArgs e) =>
             await SaveChangesAsync(null);
+
+        private async void ChangeLanguage_Click(object sender, RoutedEventArgs e)
+        {
+            if (!CanChangeLanguage || !ConfirmDiscardChanges())
+                return;
+            if (TrySelectLanguage(_sourcePath, out var languageCode))
+                await LoadPathAsync(_sourcePath, languageCode);
+        }
 
         private async void SaveAs_Click(object sender, RoutedEventArgs e)
         {
@@ -352,9 +368,10 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 .Select(Path.GetFileName)
                 .Where(x => x.Length > 3 && x[2] == '_')
                 .Select(x => x.Substring(0, 2).ToUpperInvariant())
+                .Where(x => x != "FM")
                 .Distinct()
                 .ToList();
-            var dialog = new LanguageSelectionWindow(languages, _languageCode ?? "SP")
+            var dialog = new LanguageSelectionWindow(languages, _languageCode ?? "US")
             {
                 Owner = this,
             };

@@ -22,7 +22,6 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 ["GR"] = "Deutsch",
                 ["IT"] = "Italiano",
                 ["JP"] = "日本語",
-                ["FM"] = "Final Mix",
             };
 
         public LanguageSelectionWindow(IEnumerable<string> availableLanguages, string preferredLanguage)
@@ -30,7 +29,7 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
             InitializeComponent();
             var options = availableLanguages
                 .Distinct()
-                .OrderBy(x => x == "SP" ? 0 : 1)
+                .OrderBy(x => x == "US" ? 0 : x == "UK" ? 1 : x == "SP" ? 2 : 3)
                 .ThenBy(x => x)
                 .Select(x => new LanguageOption
                 {

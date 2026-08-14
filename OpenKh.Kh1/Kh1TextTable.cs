@@ -101,6 +101,7 @@ namespace OpenKh.Kh1
             Add(0x00, "{eol}");
             Add(0x01, " ");
             Add(0x02, "{lf}");
+            Add(0x0F, "{ctrl:0F}");
             Add(0x20, "—");
 
             for (var value = 0; value < 10; value++)
