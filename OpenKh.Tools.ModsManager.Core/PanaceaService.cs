@@ -1,10 +1,12 @@
 using System.Security.Cryptography;
+using System.Text;
 
 namespace OpenKh.Tools.ModsManager.Core;
 
 public sealed class PanaceaService(ModManagerConfigurationService configuration)
 {
     private const string PanaceaFileName = "OpenKH.Panacea.dll";
+    private static readonly byte[] PanaceaSignature = Encoding.ASCII.GetBytes("Welcome to OpenKH Panacea!");
     private static readonly string[] DependencyFileNames =
     [
         "avcodec-vgmstream-59.dll",
@@ -128,7 +130,8 @@ public sealed class PanaceaService(ModManagerConfigurationService configuration)
             releaseDirectory,
             OperatingSystem.IsWindows() ? "version.dll" : "DBGHELP.dll");
         File.Copy(Path.Combine(sourceDirectory, PanaceaFileName), destinationLoader, true);
-        DeleteIfOwned(alternateLoader, Path.Combine(sourceDirectory, PanaceaFileName));
+        if (IsPanaceaLoader(alternateLoader))
+            File.Delete(alternateLoader);
 
         var dependencyDirectory = Path.Combine(releaseDirectory, "dependencies");
         Directory.CreateDirectory(dependencyDirectory);
@@ -155,13 +158,10 @@ public sealed class PanaceaService(ModManagerConfigurationService configuration)
     {
         var releaseDirectory = GetReleaseDirectory(isKh3D, releaseDirectoryOverride, true)!;
         SaveReleaseDirectory(isKh3D, releaseDirectory);
-        var sourceDirectory = FindSourceDirectory() ?? throw new FileNotFoundException(
-            "The Panacea source files are required to identify files that are safe to remove.");
-        var sourceLoader = Path.Combine(sourceDirectory, PanaceaFileName);
         foreach (var loader in GetInstalledLoaderFiles(releaseDirectory))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            DeleteIfOwned(loader, sourceLoader);
+            File.Delete(loader);
         }
 
         var dependencyDirectory = Path.Combine(releaseDirectory, "dependencies");
@@ -169,8 +169,8 @@ public sealed class PanaceaService(ModManagerConfigurationService configuration)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var installedDependency = Path.Combine(dependencyDirectory, dependency);
-            var sourceDependency = Path.Combine(sourceDirectory, dependency);
-            DeleteIfOwned(installedDependency, sourceDependency);
+            if (File.Exists(installedDependency))
+                File.Delete(installedDependency);
         }
         if (Directory.Exists(dependencyDirectory) && !Directory.EnumerateFileSystemEntries(dependencyDirectory).Any())
             Directory.Delete(dependencyDirectory);
@@ -256,16 +256,29 @@ public sealed class PanaceaService(ModManagerConfigurationService configuration)
     {
         var dbgHelp = Path.Combine(releaseDirectory, "DBGHELP.dll");
         var version = Path.Combine(releaseDirectory, "version.dll");
-        if (File.Exists(dbgHelp))
+        if (IsPanaceaLoader(dbgHelp))
             yield return dbgHelp;
-        if (File.Exists(version))
+        if (IsPanaceaLoader(version))
             yield return version;
     }
 
-    private static void DeleteIfOwned(string installedFile, string sourceFile)
+    private static bool IsPanaceaLoader(string fileName)
     {
-        if (File.Exists(installedFile) && File.Exists(sourceFile) && FilesMatch(installedFile, sourceFile))
-            File.Delete(installedFile);
+        if (!File.Exists(fileName))
+            return false;
+
+        try
+        {
+            return File.ReadAllBytes(fileName).AsSpan().IndexOf(PanaceaSignature) >= 0;
+        }
+        catch (IOException)
+        {
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
     }
 
     private static bool FilesMatch(string left, string right)

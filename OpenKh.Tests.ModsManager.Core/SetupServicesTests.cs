@@ -59,7 +59,9 @@ public sealed class SetupServicesTests : IDisposable
         Directory.CreateDirectory(_rootDirectory);
         var gameDirectory = Path.Combine(_rootDirectory, "game");
         Directory.CreateDirectory(gameDirectory);
-        File.WriteAllText(Path.Combine(_rootDirectory, "OpenKH.Panacea.dll"), "loader");
+        File.WriteAllText(
+            Path.Combine(_rootDirectory, "OpenKH.Panacea.dll"),
+            "Welcome to OpenKH Panacea! current loader");
         File.WriteAllText(Path.Combine(_rootDirectory, "openkh-release"), "release2-test");
         foreach (var dependency in PanaceaDependencies)
             File.WriteAllText(Path.Combine(_rootDirectory, dependency), dependency);
@@ -76,6 +78,34 @@ public sealed class SetupServicesTests : IDisposable
 
         await panacea.RemoveAsync(false, gameDirectory);
 
+        Assert.False(panacea.GetStatus(false, gameDirectory).IsInstalled);
+    }
+
+    [Fact]
+    public async Task PanaceaCanRemoveAnOlderInstallationWithoutSourceFiles()
+    {
+        var gameDirectory = Path.Combine(_rootDirectory, "game");
+        var dependencyDirectory = Path.Combine(gameDirectory, "dependencies");
+        Directory.CreateDirectory(dependencyDirectory);
+        var loaderPath = Path.Combine(
+            gameDirectory,
+            OperatingSystem.IsWindows() ? "DBGHELP.dll" : "version.dll");
+        File.WriteAllText(loaderPath, "Welcome to OpenKH Panacea! older loader");
+        foreach (var dependency in PanaceaDependencies)
+            File.WriteAllText(Path.Combine(dependencyDirectory, dependency), "older dependency");
+        File.WriteAllText(Path.Combine(gameDirectory, "panacea_settings.txt"), "show_console=false");
+        var service = CreateConfigurationService();
+        var panacea = new PanaceaService(service);
+
+        var installedStatus = panacea.GetStatus(false, gameDirectory);
+        Assert.True(installedStatus.IsInstalled);
+        Assert.Contains("source files unavailable", installedStatus.Message);
+
+        await panacea.RemoveAsync(false, gameDirectory);
+
+        Assert.False(File.Exists(loaderPath));
+        Assert.False(Directory.Exists(dependencyDirectory));
+        Assert.False(File.Exists(Path.Combine(gameDirectory, "panacea_settings.txt")));
         Assert.False(panacea.GetStatus(false, gameDirectory).IsInstalled);
     }
 

@@ -26,6 +26,15 @@
 
   <ItemGroup>
     <AvaloniaResource Include="..\images\OpenKH.png" Link="Assets\OpenKH.png" />
+    <None Include="..\OpenKh.Research.Panacea\Release\OpenKH.Panacea.dll"
+          Link="OpenKH.Panacea.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest"
+          Condition="Exists('..\OpenKh.Research.Panacea\Release\OpenKH.Panacea.dll')" />
+    <None Include="..\OpenKh.Research.Panacea\Dependencies\*.dll"
+          Link="%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
     <Compile Remove="artifacts\**\*.cs" />
     <Compile Remove="preview-data\**\*.cs" />
   </ItemGroup>
