@@ -102,6 +102,7 @@ namespace OpenKh.Patcher
         /// "copy"
         /// "imgd"
         /// "imgz"
+        /// "kh1ardresource"
         /// "kh2msg"
         /// "listpatch"
         /// "spawnpoint"
@@ -190,6 +191,12 @@ namespace OpenKh.Patcher
         [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public int Index { get; set; }
         [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public string Game { get; set; }
         [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public bool CollectionOptional { get; set; }
+
+        /// <summary>
+        /// Entries to overwrite, keyed by index, declared inline rather than in a separate file.
+        /// Used by the "kh1ardresource" method.
+        /// </summary>
+        [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public Dictionary<int, string> Replacements { get; set; }
     }
 
     public class Multi

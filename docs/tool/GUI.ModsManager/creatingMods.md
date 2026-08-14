@@ -17,6 +17,7 @@ This document will focus on teaching you how to create mods using the OpenKH Mod
     * [areadataspawn](#areadataspawn-kh2---modifies-a-kh2-spawnpoint-subfile-located-within-ard-files-using-an-yaml-file-created-using-openkhcommandspawnscript)
     * [listpatch](#listpatch-kh2---can-modify-the-following-different-types-of-list-binaries-found-within-kh2)
   * [synthpatch](#synthpatch-kh2)     
+  * [kh1ardresource](#kh1ardresource-kh1---replaces-entries-in-the-resource-list-of-a-kh1-ard-file)
   * [bbsarc](#bbsarc-bbs)
   * [Example of a Fully Complete `mod.yml` File](#an-example-of-a-fully-complete-modyml-can-be-seen-below-and-the-full-source-of-the-mod-can-be-seen-here)
 * [Generating a Simple `mod.yml` for New Mod Authors](#generating-a-simple-modyml-for-new-mod-authors)
@@ -412,6 +413,36 @@ Asset Example
   Count: 1
   ShopUnlock: 201
 ```
+
+## `kh1ardresource` (KH1) - Replaces entries in the resource list of a KH1 `.ard` file.
+
+Every KH1 `.ard` contains a list of the models and animation sets its map loads. Each
+entry is a fixed-size slot holding one name, and the slots generally run as `(model, mset)` pairs.
+This method rewrites individual slots in place, so the rest of the binary is left byte for byte identical.
+
+Use it to swap a model or animation set without having to `copy` the whole multi-megabyte
+`.ard` into your mod, which would clobber any other mod's changes to that file.
+
+Unlike most methods, this one takes no `source`. The replacements are declared inline with
+`replacements`, keyed by slot index:
+
+```
+- name: tw01.ard
+  method: kh1ardresource
+  replacements:
+    0: xa_al_9999.mdls
+    1: xa_al_9999.mset
+    8: tw_6100.moa
+    9: tw_6100.moa.mset
+```
+
+Notes:
+ * Only existing slots can be overwritten. The list's length is fixed by the archive's
+   offset table, so entries cannot be added or removed — an out-of-range index is an error.
+ * A name can be at most 31 ASCII characters, and cannot be empty.
+ * The patch is applied on top of whatever is already staged for that `.ard`. If a mod
+   below yours replaced the file with `copy`, you edit *that* version; if none did, you
+   edit the original game file. Put your mod above any mod that replaces the same `.ard`.
 
 ### `bbsarc` (BBS)
 Allows you to add/patch files inside a bbs `.arc` container without having to `copy` the entire arc file into your mod. You can use any method to patch those files, although at time of writing the only one that works for BBS files (other than `bbsarc`) is `copy`.

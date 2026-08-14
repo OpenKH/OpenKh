@@ -390,6 +390,9 @@ namespace OpenKh.Patcher
                 case "areadatascript":
                     PatchAreaDataScript(context, assetFile.Source, stream);
                     break;
+                case "kh1ardresource":
+                    PatchKh1ArdResource(assetFile, stream);
+                    break;
                 case "bdscript":
                     PatchBdscript(context, assetFile, stream);
                     break;
@@ -625,6 +628,34 @@ namespace OpenKh.Patcher
             }
 
             Kh2.Ard.AreaDataScript.Write(stream.SetPosition(0), scripts.Values);
+        }
+
+        private static void PatchKh1ArdResource(AssetFile assetFile, Stream stream)
+        {
+            if (assetFile.Replacements == null || assetFile.Replacements.Count == 0)
+                throw new Exception($"File '{assetFile.Name}' does not define any replacements");
+
+            if (!Kh1.Ard.IsValid(stream))
+                throw new InvalidDataException($"'{assetFile.Name}' is not a valid KH1 .ard archive");
+
+            var resources = Kh1.Ard.ReadResourceList(stream);
+            foreach (var replacement in assetFile.Replacements)
+            {
+                if (replacement.Key < 0 || replacement.Key >= resources.Count)
+                    throw new IndexOutOfRangeException(
+                        $"'{assetFile.Name}' has {resources.Count} resource entries (0 to {resources.Count - 1}), but a replacement targets index {replacement.Key}");
+
+                if (string.IsNullOrEmpty(replacement.Value))
+                    throw new Exception($"'{assetFile.Name}' does not give a name for resource index {replacement.Key}");
+
+                resources[replacement.Key] = replacement.Value;
+            }
+
+            Kh1.Ard.WriteResourceList(stream, resources);
+
+            // The resource list is edited in place; keep the rest of the archive intact,
+            // as PatchFile truncates the stream to whatever position it is left at.
+            stream.Position = stream.Length;
         }
 
         private static void PatchBdscript(Context context, AssetFile assetFile, Stream stream)
