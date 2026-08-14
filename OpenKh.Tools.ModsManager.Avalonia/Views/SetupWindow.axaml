@@ -223,7 +223,7 @@
               <Button Grid.Column="2" Content="Browse" Tag="GameDataTextBox" Click="BrowseFolder_OnClick" />
             </Grid>
             <TextBlock x:Name="ExistingDataStatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
-            <TextBlock Text="Game data extraction is optional, but some mods require it. Without extracted data, those mods may fail to build or may have missing visuals, audio, or other content. You can extract it later from Setup."
+            <TextBlock Text="WARNING: If you do not extract a game's data, only Lua script mods will function properly."
                        Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" />
             <TextBlock x:Name="ExtractionAvailabilityText" Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
             <TextBlock Text="Extraction can take between 5 and 15 minutes, or longer when several PC games are selected."
