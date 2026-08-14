@@ -28,12 +28,10 @@
               <TextBlock Text="Browse mods" VerticalAlignment="Center" />
             </StackPanel>
           </Button>
-          <Button Classes="subtle" Command="{Binding InstallCommand}" HorizontalAlignment="Stretch">
-            <StackPanel Orientation="Horizontal" Spacing="12">
-              <TextBlock Text="+" Foreground="#8DB7FF" FontSize="18" VerticalAlignment="Center" />
-              <TextBlock Text="Install" VerticalAlignment="Center" />
-            </StackPanel>
-          </Button>
+          <Button Classes="subtle"
+                  Command="{Binding InstallCommand}"
+                  Content="Install mods"
+                  HorizontalAlignment="Stretch" />
           <Button Classes="subtle" Command="{Binding PresetsCommand}" Content="Presets" HorizontalAlignment="Stretch" />
           <Button Classes="subtle" Command="{Binding CreatorCommand}" Content="Creator" HorizontalAlignment="Stretch" />
           <Button Classes="subtle" Command="{Binding SetupCommand}" HorizontalAlignment="Stretch">

@@ -29,13 +29,13 @@ $archive = [System.IO.Compression.ZipFile]::Open(
     [System.IO.Compression.ZipArchiveMode]::Create)
 
 try {
-    Get-ChildItem -LiteralPath $sourcePath -Directory -Recurse | ForEach-Object {
+    Get-ChildItem -LiteralPath $sourcePath -Directory -Recurse -Force | ForEach-Object {
         $relativePath = $_.FullName.Substring($sourcePath.Length).TrimStart('\', '/')
         $entryName = "$sourceName/$($relativePath.Replace('\', '/'))/"
         $null = $archive.CreateEntry($entryName)
     }
 
-    Get-ChildItem -LiteralPath $sourcePath -File -Recurse | ForEach-Object {
+    Get-ChildItem -LiteralPath $sourcePath -File -Recurse -Force | ForEach-Object {
         $relativePath = $_.FullName.Substring($sourcePath.Length).TrimStart('\', '/')
         $entryName = "$sourceName/$($relativePath.Replace('\', '/'))"
         [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
