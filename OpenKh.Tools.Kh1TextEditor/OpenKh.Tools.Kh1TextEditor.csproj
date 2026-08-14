@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <UseWPF>true</UseWPF>
+    <AssemblyTitle>KH1 Text editor</AssemblyTitle>
+    <Product>KH1 Text editor - OpenKH</Product>
+    <Authors>OpenKH contributors</Authors>
+    <Company>OpenKH</Company>
+    <Copyright>Copyright (C) OpenKH</Copyright>
+    <Description>https://github.com/OpenKH/OpenKh</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Kh1\OpenKh.Kh1.csproj" />
+  </ItemGroup>
+
+</Project>
