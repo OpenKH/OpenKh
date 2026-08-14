@@ -60,6 +60,7 @@ public sealed class SetupServicesTests : IDisposable
         var gameDirectory = Path.Combine(_rootDirectory, "game");
         Directory.CreateDirectory(gameDirectory);
         File.WriteAllText(Path.Combine(_rootDirectory, "OpenKH.Panacea.dll"), "loader");
+        File.WriteAllText(Path.Combine(_rootDirectory, "openkh-release"), "release2-test");
         foreach (var dependency in PanaceaDependencies)
             File.WriteAllText(Path.Combine(_rootDirectory, dependency), dependency);
         var service = CreateConfigurationService();
@@ -67,13 +68,32 @@ public sealed class SetupServicesTests : IDisposable
 
         await panacea.InstallAsync(false, gameDirectory);
 
-        Assert.True(panacea.GetStatus(false, gameDirectory).IsInstalled);
+        var installedStatus = panacea.GetStatus(false, gameDirectory);
+        Assert.True(installedStatus.IsInstalled);
+        Assert.Contains("Panacea version OpenKH release2-test", installedStatus.Message);
         Assert.True(File.Exists(Path.Combine(gameDirectory, OperatingSystem.IsWindows() ? "DBGHELP.dll" : "version.dll")));
         Assert.Equal(gameDirectory, service.Current.PcReleaseLocation);
 
         await panacea.RemoveAsync(false, gameDirectory);
 
         Assert.False(panacea.GetStatus(false, gameDirectory).IsInstalled);
+    }
+
+    [Theory]
+    [InlineData("Steam", true, true, true)]
+    [InlineData("Steam", false, true, true)]
+    [InlineData("Steam", true, false, false)]
+    [InlineData("Steam", false, false, true)]
+    [InlineData("EGS", false, true, false)]
+    public void GameLaunchPolicyUsesSteamForEveryLinuxSteamLaunch(
+        string pcVersion,
+        bool directLaunchConfigured,
+        bool isLinux,
+        bool expected)
+    {
+        Assert.Equal(
+            expected,
+            GameLaunchPolicy.ShouldUseSteamClient(pcVersion, directLaunchConfigured, isLinux));
     }
 
     [Fact]

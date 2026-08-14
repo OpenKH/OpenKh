@@ -31,16 +31,41 @@ public sealed class PanaceaService(ModManagerConfigurationService configuration)
         var sourceDirectory = FindSourceDirectory();
         var installedFiles = GetInstalledLoaderFiles(releaseDirectory).ToArray();
         if (installedFiles.Length == 0)
-            return new PanaceaStatus(false, sourceDirectory is not null, "Not installed");
+        {
+            var availableVersion = sourceDirectory is null
+                ? string.Empty
+                : $", available Panacea version {GetSourceVersion(sourceDirectory)}";
+            return new PanaceaStatus(
+                false,
+                sourceDirectory is not null,
+                $"Not installed{availableVersion}");
+        }
+
+        var installedFile = sourceDirectory is null
+            ? installedFiles[0]
+            : installedFiles.FirstOrDefault(file =>
+                FilesMatch(Path.Combine(sourceDirectory, PanaceaFileName), file)) ?? installedFiles[0];
+        var installedVersion = GetInstalledVersion(installedFile, sourceDirectory);
         if (sourceDirectory is null)
-            return new PanaceaStatus(true, false, "Installed, source files unavailable for version check");
+        {
+            return new PanaceaStatus(
+                true,
+                false,
+                $"Installed, Panacea version {installedVersion}; source files unavailable");
+        }
 
         var sourceFile = Path.Combine(sourceDirectory, PanaceaFileName);
         var current = installedFiles.Any(file => FilesMatch(sourceFile, file)) &&
                       DependencyFileNames.All(file => File.Exists(Path.Combine(releaseDirectory, "dependencies", file)));
         return current
-            ? new PanaceaStatus(true, true, "Installed and up to date")
-            : new PanaceaStatus(true, true, "Installed, reinstall recommended");
+            ? new PanaceaStatus(
+                true,
+                true,
+                $"Installed, Panacea version {installedVersion}, up to date")
+            : new PanaceaStatus(
+                true,
+                true,
+                $"Installed, Panacea version {installedVersion}; available {GetSourceVersion(sourceDirectory)}. Reinstall recommended");
     }
 
     public Task InstallAsync(
@@ -170,6 +195,39 @@ public sealed class PanaceaService(ModManagerConfigurationService configuration)
         return candidates.FirstOrDefault(directory =>
             File.Exists(Path.Combine(directory, PanaceaFileName)) &&
             DependencyFileNames.All(file => File.Exists(Path.Combine(directory, file))));
+    }
+
+    private string GetInstalledVersion(string installedFile, string? sourceDirectory)
+    {
+        if (sourceDirectory is not null &&
+            FilesMatch(installedFile, Path.Combine(sourceDirectory, PanaceaFileName)))
+        {
+            return GetSourceVersion(sourceDirectory);
+        }
+
+        return GetBuildIdentifier(installedFile);
+    }
+
+    private string GetSourceVersion(string sourceDirectory)
+    {
+        var releaseFile = Path.Combine(configuration.InstallationDirectory, "openkh-release");
+        if (File.Exists(releaseFile))
+        {
+            var release = File.ReadLines(releaseFile)
+                .Select(line => line.Trim())
+                .FirstOrDefault(line => line.Length > 0);
+            if (!string.IsNullOrWhiteSpace(release))
+                return $"OpenKH {release}";
+        }
+
+        return GetBuildIdentifier(Path.Combine(sourceDirectory, PanaceaFileName));
+    }
+
+    private static string GetBuildIdentifier(string fileName)
+    {
+        using var stream = File.OpenRead(fileName);
+        var hash = Convert.ToHexString(SHA256.HashData(stream));
+        return $"build {hash[..8]}";
     }
 
     private string? GetReleaseDirectory(bool isKh3D, string? releaseDirectoryOverride, bool required)

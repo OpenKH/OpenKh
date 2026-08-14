@@ -101,6 +101,20 @@ jobs:
         $linuxRequiredEntries = @(
           "openkh-linux-x64/OpenKh.Launcher",
           "openkh-linux-x64/Apps/OpenKh.Tools.ModsManager",
+          "openkh-linux-x64/Apps/OpenKH.Panacea.dll",
+          "openkh-linux-x64/Apps/avcodec-vgmstream-59.dll",
+          "openkh-linux-x64/Apps/avformat-vgmstream-59.dll",
+          "openkh-linux-x64/Apps/avutil-vgmstream-57.dll",
+          "openkh-linux-x64/Apps/bass.dll",
+          "openkh-linux-x64/Apps/bass_vgmstream.dll",
+          "openkh-linux-x64/Apps/libatrac9.dll",
+          "openkh-linux-x64/Apps/libcelt-0061.dll",
+          "openkh-linux-x64/Apps/libcelt-0110.dll",
+          "openkh-linux-x64/Apps/libg719_decode.dll",
+          "openkh-linux-x64/Apps/libmpg123-0.dll",
+          "openkh-linux-x64/Apps/libspeex-1.dll",
+          "openkh-linux-x64/Apps/libvorbis.dll",
+          "openkh-linux-x64/Apps/swresample-vgmstream-4.dll",
           "openkh-linux-x64/install-openkh-linux.sh"
         )
         foreach ($entry in $linuxRequiredEntries) {
