@@ -93,7 +93,7 @@
                          IsEnabled="{Binding CanEdit}" Padding="8"
                          FontFamily="Consolas" FontSize="15" SpellCheck.IsEnabled="False"/>
                 <GroupBox Grid.Row="2" Header="Locations updated by this entry" Margin="0,8,0,0" MaxHeight="130">
-                    <TextBox Text="{Binding SelectedEntry.Locations}" IsReadOnly="True" BorderThickness="0"
+                    <TextBox Text="{Binding SelectedEntry.Locations, Mode=OneWay}" IsReadOnly="True" BorderThickness="0"
                              Padding="6" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto"
                              HorizontalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="12"/>
                 </GroupBox>

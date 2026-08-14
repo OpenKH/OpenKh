@@ -8,10 +8,13 @@ external `*.tbl` file is required.
 
 1. Open one extracted `*.binl` or `*.kmb` file with **File > Open BINL/KMB**,
    or open the extracted `remastered` folder with **Open remastered folder**.
-2. Search for an entry and edit its text. When folder mode finds the exact same
+2. When opening a folder, choose a language code such as `SP`, `UK`, or `US`.
+   Loading a single language is faster and uses substantially less memory; an
+   **All languages** option is also available.
+3. Search for an entry and edit its text. When folder mode finds the exact same
    text in several files, it groups the occurrences into one entry and saves the
    edit to every listed location.
-3. Use **Save** to update the affected files. **Save as** is available in
+4. Use **Save** to update the affected files. **Save as** is available in
    single-file mode.
 
 The built-in KH1 table uses `01` for a space, `02` for a line break, and `00`

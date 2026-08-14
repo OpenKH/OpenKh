@@ -27,6 +27,7 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
         private ICollectionView _entriesView;
         private TextEntryViewModel _selectedEntry;
         private string _sourcePath;
+        private string _languageCode;
         private string _statusText;
         private bool _isFolder;
         private bool _isDirty;
@@ -105,8 +106,13 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
         {
             var argument = Environment.GetCommandLineArgs().Skip(1).FirstOrDefault(x =>
                 Directory.Exists(x) || IsSupportedFile(x));
-            if (argument != null)
-                await LoadPathAsync(argument);
+            if (argument != null && Directory.Exists(argument))
+            {
+                if (TrySelectLanguage(argument, out var languageCode))
+                    await LoadPathAsync(argument, languageCode);
+            }
+            else if (argument != null)
+                await LoadPathAsync(argument, null);
             else
                 UpdateStatus();
         }
@@ -119,7 +125,7 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 Title = "Open KH1 text file",
             };
             if (dialog.ShowDialog(this) == true && ConfirmDiscardChanges())
-                await LoadPathAsync(dialog.FileName);
+                await LoadPathAsync(dialog.FileName, null);
         }
 
         private async void OpenFolder_Click(object sender, RoutedEventArgs e)
@@ -129,11 +135,12 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 Title = "Open KH1 remastered folder",
                 Multiselect = false,
             };
-            if (dialog.ShowDialog(this) == true && ConfirmDiscardChanges())
-                await LoadPathAsync(dialog.FolderName);
+            if (dialog.ShowDialog(this) == true && ConfirmDiscardChanges() &&
+                TrySelectLanguage(dialog.FolderName, out var languageCode))
+                await LoadPathAsync(dialog.FolderName, languageCode);
         }
 
-        private async Task LoadPathAsync(string path)
+        private async Task LoadPathAsync(string path, string languageCode)
         {
             try
             {
@@ -144,7 +151,7 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
 
                 var loaded = await Task.Run(() =>
                 {
-                    var documents = LoadDocuments(path);
+                    var documents = LoadDocuments(path, languageCode);
                     var groups = documents.Documents
                         .SelectMany(x => x.Entries)
                         .GroupBy(x => x.Text, StringComparer.Ordinal)
@@ -159,10 +166,12 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 _documents = result.Documents;
                 _sourcePath = path;
                 _isFolder = Directory.Exists(path);
+                _languageCode = _isFolder ? languageCode : null;
                 SetEntries(loaded.Groups);
                 SelectedEntry = Entries.FirstOrDefault();
                 _isDirty = false;
-                Title = $"{Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))} | KH1 Text editor - OpenKH";
+                var languageTitle = _languageCode == null ? string.Empty : $" [{_languageCode}]";
+                Title = $"{Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))}{languageTitle} | KH1 Text editor - OpenKH";
                 OnPropertyChanged(nameof(CanSaveAs));
                 UpdateStatus();
 
@@ -190,13 +199,15 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
             }
         }
 
-        private static LoadResult LoadDocuments(string path)
+        private static LoadResult LoadDocuments(string path, string languageCode)
         {
             var result = new LoadResult();
             var isFolder = Directory.Exists(path);
             var files = isFolder
                 ? Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
                     .Where(IsSupportedFile)
+                    .Where(x => languageCode == null ||
+                        Path.GetFileName(x).StartsWith($"{languageCode}_", StringComparison.OrdinalIgnoreCase))
                     .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
                 : new[] { path }.AsEnumerable();
 
@@ -277,7 +288,7 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 _isDirty = false;
                 UpdateStatus();
 
-                await LoadPathAsync(saveAsFileName ?? _sourcePath);
+                await LoadPathAsync(saveAsFileName ?? _sourcePath, saveAsFileName == null ? _languageCode : null);
             }
             catch (Exception ex)
             {
@@ -334,6 +345,29 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
                 string.Equals(extension, ".kmb", StringComparison.OrdinalIgnoreCase);
         }
 
+        private bool TrySelectLanguage(string folderName, out string languageCode)
+        {
+            var languages = Directory.EnumerateFiles(folderName, "*", SearchOption.AllDirectories)
+                .Where(IsSupportedFile)
+                .Select(Path.GetFileName)
+                .Where(x => x.Length > 3 && x[2] == '_')
+                .Select(x => x.Substring(0, 2).ToUpperInvariant())
+                .Distinct()
+                .ToList();
+            var dialog = new LanguageSelectionWindow(languages, _languageCode ?? "SP")
+            {
+                Owner = this,
+            };
+            if (dialog.ShowDialog() != true)
+            {
+                languageCode = null;
+                return false;
+            }
+
+            languageCode = dialog.SelectedLanguage;
+            return true;
+        }
+
         private void About_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(
@@ -375,7 +409,8 @@ namespace OpenKh.Tools.Kh1TextEditor.Views
             }
 
             var occurrenceCount = _documents.Sum(x => x.Entries.Count);
-            StatusText = $"{_documents.Count:N0} file(s) · {Entries.Count:N0} unique text(s) · {occurrenceCount:N0} occurrence(s)" +
+            var language = _languageCode == null ? string.Empty : $" · language {_languageCode}";
+            StatusText = $"{_documents.Count:N0} file(s){language} · {Entries.Count:N0} unique text(s) · {occurrenceCount:N0} occurrence(s)" +
                 (_isDirty ? $" · {Entries.Count(x => x.IsModified):N0} modified group(s)" : string.Empty);
         }
 

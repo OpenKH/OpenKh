@@ -1,0 +1,22 @@
+<Window x:Class="OpenKh.Tools.Kh1TextEditor.Views.LanguageSelectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Select language" SizeToContent="WidthAndHeight"
+        MinWidth="360" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="Choose which language to load from the remastered folder."
+                   TextWrapping="Wrap" Margin="0,0,0,12"/>
+        <ComboBox x:Name="LanguageComboBox" Grid.Row="1" MinWidth="310"
+                  DisplayMemberPath="DisplayName" Padding="6,3"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Cancel" Width="86" Margin="0,0,8,0" IsCancel="True"/>
+            <Button Content="Open" Width="86" IsDefault="True" Click="Open_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
