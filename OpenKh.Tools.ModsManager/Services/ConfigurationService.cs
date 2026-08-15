@@ -273,7 +273,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static string GameModPath
         {
-            get => Path.Combine(_config.ModCollectionPath ?? Path.GetFullPath(StoragePath), "mod", LaunchGame);
+            get => Path.Combine(_config.GameModPath ?? Path.GetFullPath(Path.Combine(StoragePath, "mod")), LaunchGame);
             set
             {
                 _config.GameModPath = value;
