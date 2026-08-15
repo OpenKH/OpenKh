@@ -11,6 +11,29 @@ namespace OpenKh.Tools.ModsManager.Services
 {
     public static class ConfigurationService
     {
+        private class LegacyConfigMigration
+        {
+            private static readonly IDeserializer _legacyvaluedeserializer =
+                new DeserializerBuilder()
+                .IgnoreFields()
+                .IgnoreUnmatchedProperties()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            public string ModCollectionPath { get; internal set; }
+            public string ModCollectionsPath { get; internal set; }
+            public string GameModPath { get; internal set; }
+            public string GameDataPath { get; internal set; }
+
+            public static LegacyConfigMigration Open(string fileName)
+            {
+                if (!File.Exists(fileName))
+                    return new LegacyConfigMigration();
+
+                using var reader = new StreamReader(fileName);
+                return _legacyvaluedeserializer.Deserialize<LegacyConfigMigration>(reader);
+            }
+        }
+
         private class Config
         {
             private static readonly IDeserializer _deserializer =
@@ -86,6 +109,7 @@ namespace OpenKh.Tools.ModsManager.Services
         private static string EnabledCollectionModsPathBBS = Path.Combine(StoragePath, "collection-mods-BBS.json");
         private static string EnabledCollectionModsPathRECOM = Path.Combine(StoragePath, "collection-mods-ReCoM.json");
         private static string EnabledCollectionModsPathKH3D = Path.Combine(StoragePath, "collection-mods-KH3D.json");
+        private static readonly LegacyConfigMigration _legacyconfig = LegacyConfigMigration.Open(ConfigPath);
         private static readonly Config _config = Config.Open(ConfigPath);
         public static string PresetPath = Path.Combine(StoragePath, "presets");
         private static readonly HashSet<string> _supportedGames = new HashSet<string>()
@@ -108,6 +132,16 @@ namespace OpenKh.Tools.ModsManager.Services
 
         static ConfigurationService()
         {
+            if (!string.IsNullOrEmpty(_legacyconfig.GameDataPath) && string.IsNullOrEmpty(_config.ExtractedGameDataPath))
+                _config.ExtractedGameDataPath = _legacyconfig.GameDataPath;
+            if (!string.IsNullOrEmpty(_legacyconfig.ModCollectionPath) && string.IsNullOrEmpty(_config.InstalledModsPath))
+                _config.InstalledModsPath = _legacyconfig.ModCollectionPath;
+            if (!string.IsNullOrEmpty(_legacyconfig.ModCollectionsPath) && string.IsNullOrEmpty(_config.InstalledCollectionsPath))
+                _config.InstalledCollectionsPath = _legacyconfig.ModCollectionsPath;
+            if (!string.IsNullOrEmpty(_legacyconfig.GameModPath) && string.IsNullOrEmpty(_config.CompiledModPath))
+                _config.CompiledModPath = _legacyconfig.GameModPath;
+
+
             string modsPath = Path.GetFullPath(Path.Combine(InstalledModsPath, ".."));
             if (!Directory.Exists(Path.Combine(InstalledCollectionsPath)))
                 Directory.CreateDirectory(InstalledCollectionsPath);
