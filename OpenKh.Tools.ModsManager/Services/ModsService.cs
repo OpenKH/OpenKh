@@ -62,7 +62,7 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             get
             {
-                var modsPath = ConfigurationService.ModsGamePath;
+                var modsPath = ConfigurationService.InstalledModsPath;
                 foreach (var dir in Directory.GetDirectories(modsPath))
                 {
                     var authorName = Path.GetFileName(dir);
@@ -76,7 +76,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     if (File.Exists(Path.Combine(dir, ModMetadata)))
                         yield return authorName;
                 }
-                var collectionsPath = ConfigurationService.ModCollectionsPath;
+                var collectionsPath = ConfigurationService.InstalledCollectionsPath;
                 foreach (var dir in Directory.GetDirectories(collectionsPath))
                 {
                     var authorName = Path.GetFileName(dir);
@@ -447,11 +447,11 @@ namespace OpenKh.Tools.ModsManager.Services
         }
 
         public static string GetModPath(string repositoryName) =>
-            Path.Combine(ConfigurationService.ModsGamePath, repositoryName);
+            Path.Combine(ConfigurationService.InstalledModsPath, repositoryName);
         public static string GetModsGamePath(string repositoryName, string game) =>
-            Path.Combine(ConfigurationService.ModsGamePath, "..", game, repositoryName);
+            Path.Combine(ConfigurationService.InstalledModsPath, "..", game, repositoryName);
         public static string GetCollectionPath(string repositoryName) =>
-            Path.Combine(ConfigurationService.ModCollectionsPath, repositoryName);
+            Path.Combine(ConfigurationService.InstalledCollectionsPath, repositoryName);
 
         public static IEnumerable<ModModel> GetMods(IEnumerable<string> modNames)
         {
@@ -528,11 +528,11 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static Task<bool> RunPatcherAsync(bool fastMode) => Task.Run(() => Handle(() =>
         {
-            if (Directory.Exists(ConfigurationService.GameModPath))
+            if (Directory.Exists(ConfigurationService.CompiledModPath))
             {
                 try
                 {
-                    Directory.Delete(ConfigurationService.GameModPath, true);
+                    Directory.Delete(ConfigurationService.CompiledModPath, true);
                 }
                 catch (Exception ex)
                 {
@@ -540,7 +540,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 }
             }
 
-            Directory.CreateDirectory(ConfigurationService.GameModPath);
+            Directory.CreateDirectory(ConfigurationService.CompiledModPath);
 
             var patcherProcessor = new PatcherProcessor();
             var modsList = GetMods(EnabledMods).ToList();
@@ -557,7 +557,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 patcherProcessor.Patch(
                     Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame),
-                    ConfigurationService.GameModPath,
+                    ConfigurationService.CompiledModPath,
                     mod.Metadata,
                     mod.Path,
                     ConfigurationService.GameEdition,
@@ -569,7 +569,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     enabledOptionalAssets);
             }
 
-            using var packageMapWriter = new StreamWriter(Path.Combine(ConfigurationService.GameModPath, "patch-package-map.txt"));
+            using var packageMapWriter = new StreamWriter(Path.Combine(ConfigurationService.CompiledModPath, "patch-package-map.txt"));
             foreach (var entry in packageMap)
                 packageMapWriter.WriteLine(entry.Key + " $$$$ " + entry.Value);
             packageMapWriter.Flush();
