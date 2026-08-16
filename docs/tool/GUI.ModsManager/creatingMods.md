@@ -437,8 +437,7 @@ Unlike most methods, this one takes no `source`. The replacements are declared i
 ```
 
 Notes:
- * Only existing slots can be overwritten. The list's length is fixed by the archive's
-   offset table, so entries cannot be added or removed — an out-of-range index is an error.
+ * Only existing slots can be overwritten.
  * A name can be at most 31 ASCII characters, and cannot be empty.
 
 ### `bbsarc` (BBS)
