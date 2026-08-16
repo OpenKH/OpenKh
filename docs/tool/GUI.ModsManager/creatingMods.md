@@ -440,9 +440,6 @@ Notes:
  * Only existing slots can be overwritten. The list's length is fixed by the archive's
    offset table, so entries cannot be added or removed — an out-of-range index is an error.
  * A name can be at most 31 ASCII characters, and cannot be empty.
- * The patch is applied on top of whatever is already staged for that `.ard`. If a mod
-   below yours replaced the file with `copy`, you edit *that* version; if none did, you
-   edit the original game file. Put your mod above any mod that replaces the same `.ard`.
 
 ### `bbsarc` (BBS)
 Allows you to add/patch files inside a bbs `.arc` container without having to `copy` the entire arc file into your mod. You can use any method to patch those files, although at time of writing the only one that works for BBS files (other than `bbsarc`) is `copy`.
