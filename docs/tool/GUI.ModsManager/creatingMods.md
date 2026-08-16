@@ -423,22 +423,33 @@ This method rewrites individual slots in place, so the rest of the binary is lef
 Use it to swap a model or animation set without having to `copy` the whole multi-megabyte
 `.ard` into your mod, which would clobber any other mod's changes to that file.
 
-Unlike most methods, this one takes no `source`. The replacements are declared inline with
-`replacements`, keyed by slot index:
+Asset Example
 
 ```
 - name: tw01.ard
   method: kh1ardresource
-  replacements:
-    0: xa_al_9999.mdls
-    1: xa_al_9999.mset
-    8: tw_6100.moa
-    9: tw_6100.moa.mset
+  source:
+  - name: files/tw01.yml
 ```
 
+YAML Source Example - the key is the slot index, the value is the new name:
+
+```
+0: xa_al_9999.mdls
+1: xa_al_9999.mset
+8: tw_6100.moa
+9: tw_6100.moa.mset
+```
+
+To find the indices, dump the resource list of the file you are targeting. The model half
+of a pair is not always a `.mdls`: enemies and objects use `.moa` and `.mfa`.
+
 Notes:
- * Only existing slots can be overwritten.
+ * Only existing slots can be overwritten. The list's length is fixed by the archive's
+   offset table, so entries cannot be added or removed - an out-of-range index is an error.
  * A name can be at most 31 ASCII characters, and cannot be empty.
+ * Listing more than one source applies them in order, so a later file can override an
+   earlier one.
 
 ### `bbsarc` (BBS)
 Allows you to add/patch files inside a bbs `.arc` container without having to `copy` the entire arc file into your mod. You can use any method to patch those files, although at time of writing the only one that works for BBS files (other than `bbsarc`) is `copy`.

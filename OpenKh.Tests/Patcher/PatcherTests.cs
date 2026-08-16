@@ -4240,18 +4240,20 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
-        public void Kh1ArdResourceReplaceIsDeclaredInlineInTheModYmlTest()
+        public void Kh1ArdResourceReadsTheReplacementsFromItsSourceFileTest()
         {
             var yml =
-                "title: inline test\n" +
+                "title: source file test\n" +
                 "assets:\n" +
                 "- name: tw01.ard\n" +
                 "  method: kh1ardresource\n" +
-                "  replacements:\n" +
-                "    1: xa_al_9999.mset\n";
+                "  source:\n" +
+                "  - name: files/tw01.yml\n";
 
             var patch = new MemoryStream(Encoding.UTF8.GetBytes(yml)).Using(Metadata.Read);
 
+            CreateFile(ModInputDir, "files/tw01.yml")
+                .Using(x => x.Write(Encoding.UTF8.GetBytes("1: xa_al_9999.mset\n")));
             CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
                 "a.mdls", "a.mset", "b.moa", "b.moa.mset")));
 
@@ -4345,18 +4347,25 @@ namespace OpenKh.Tests.Patcher
 
         private static int ArdResourceListEnd => ArdResourceListOffset + 4 * OpenKh.Kh1.Ard.NameSize;
 
-        private static Metadata Kh1ArdPatch(params (string Index, string Name)[] replacements) => new Metadata
+        private static Metadata Kh1ArdPatch(params (string Index, string Name)[] replacements)
         {
-            Assets = new List<AssetFile>
+            var lines = replacements.Select(x => $"{x.Index}: {x.Name}");
+            File.WriteAllText(Path.Combine(ModInputDir, "tw01.yml"),
+                string.Join(Environment.NewLine, lines) + Environment.NewLine);
+
+            return new Metadata
             {
-                new AssetFile
+                Assets = new List<AssetFile>
                 {
-                    Name = "tw01.ard",
-                    Method = "kh1ardresource",
-                    Replacements = replacements.ToDictionary(x => int.Parse(x.Index), x => x.Name)
+                    new AssetFile
+                    {
+                        Name = "tw01.ard",
+                        Method = "kh1ardresource",
+                        Source = new List<AssetFile> { new AssetFile { Name = "tw01.yml" } }
+                    }
                 }
-            }
-        };
+            };
+        }
 
         /// <summary>
         /// Builds a minimal but structurally valid .ard: 32 entries, with entry 5 holding

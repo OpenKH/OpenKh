@@ -391,7 +391,7 @@ namespace OpenKh.Patcher
                     PatchAreaDataScript(context, assetFile.Source, stream);
                     break;
                 case "kh1ardresource":
-                    PatchKh1ArdResource(assetFile, stream);
+                    PatchKh1ArdResource(context, assetFile, stream);
                     break;
                 case "bdscript":
                     PatchBdscript(context, assetFile, stream);
@@ -630,25 +630,35 @@ namespace OpenKh.Patcher
             Kh2.Ard.AreaDataScript.Write(stream.SetPosition(0), scripts.Values);
         }
 
-        private static void PatchKh1ArdResource(AssetFile assetFile, Stream stream)
+        private static void PatchKh1ArdResource(Context context, AssetFile assetFile, Stream stream)
         {
-            if (assetFile.Replacements == null || assetFile.Replacements.Count == 0)
-                throw new Exception($"File '{assetFile.Name}' does not define any replacements");
+            if (assetFile.Source == null || assetFile.Source.Count == 0)
+                throw new Exception($"File '{assetFile.Name}' does not contain any source");
 
             if (!Kh1.Ard.IsValid(stream))
                 throw new InvalidDataException($"'{assetFile.Name}' is not a valid KH1 .ard archive");
 
             var resources = Kh1.Ard.ReadResourceList(stream);
-            foreach (var replacement in assetFile.Replacements)
+            foreach (var source in assetFile.Source)
             {
-                if (replacement.Key < 0 || replacement.Key >= resources.Count)
-                    throw new IndexOutOfRangeException(
-                        $"'{assetFile.Name}' has {resources.Count} resource entries (0 to {resources.Count - 1}), but a replacement targets index {replacement.Key}");
+                var srcFile = context.GetSourceModAssetPath(source.Name);
+                if (!File.Exists(srcFile))
+                    throw new FileNotFoundException($"The mod does not contain the file {source.Name}", srcFile);
 
-                if (string.IsNullOrEmpty(replacement.Value))
-                    throw new Exception($"'{assetFile.Name}' does not give a name for resource index {replacement.Key}");
+                var replacements = deserializer.Deserialize<Dictionary<int, string>>(File.ReadAllText(srcFile))
+                    ?? new Dictionary<int, string>();
 
-                resources[replacement.Key] = replacement.Value;
+                foreach (var replacement in replacements)
+                {
+                    if (replacement.Key < 0 || replacement.Key >= resources.Count)
+                        throw new IndexOutOfRangeException(
+                            $"'{source.Name}' sets resource index {replacement.Key}, but '{assetFile.Name}' only has {resources.Count} entries (0 to {resources.Count - 1})");
+
+                    if (string.IsNullOrEmpty(replacement.Value))
+                        throw new Exception($"'{source.Name}' does not give a name for resource index {replacement.Key}");
+
+                    resources[replacement.Key] = replacement.Value;
+                }
             }
 
             Kh1.Ard.WriteResourceList(stream, resources);
