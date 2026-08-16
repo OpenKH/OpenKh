@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Xunit;
 using Xunit.Sdk;
 using YamlDotNet.Serialization;
@@ -4220,6 +4221,182 @@ namespace OpenKh.Tests.Patcher
             }, ModOutputDir, patch.Assets[0].Multi[0].Name);
         }
 
+
+        [Fact]
+        public void Kh1ArdResourceReplaceTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = Kh1ArdPatch(("1", "xa_al_9999.mset"), ("2", "tw_6100.moa"));
+
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "xa_ex_0010.mdls", "xa_ex_0010.mset", "ex_6540.moa", "ex_6540.moa.mset")));
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            AssertArdResources(new[]
+            {
+                "xa_ex_0010.mdls", "xa_al_9999.mset", "tw_6100.moa", "ex_6540.moa.mset"
+            }, ModOutputDir, "tw01.ard");
+        }
+
+        [Fact]
+        public void Kh1ArdResourceReadsTheReplacementsFromItsSourceFileTest()
+        {
+            var yml =
+                "title: source file test\n" +
+                "assets:\n" +
+                "- name: tw01.ard\n" +
+                "  method: kh1ardresource\n" +
+                "  source:\n" +
+                "  - name: files/tw01.yml\n";
+
+            var patch = new MemoryStream(Encoding.UTF8.GetBytes(yml)).Using(Metadata.Read);
+
+            CreateFile(ModInputDir, "files/tw01.yml")
+                .Using(x => x.Write(Encoding.UTF8.GetBytes("1: xa_al_9999.mset\n")));
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "a.mdls", "a.mset", "b.moa", "b.moa.mset")));
+
+            new PatcherProcessor().Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            AssertArdResources(new[] { "a.mdls", "xa_al_9999.mset", "b.moa", "b.moa.mset" },
+                ModOutputDir, "tw01.ard");
+        }
+
+        [Fact]
+        public void Kh1ArdResourceReplaceOfReplacedFileTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = Kh1ArdPatch(("1", "xa_al_9999.mset"));
+
+            // The vanilla file the patch must NOT be applied to.
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "vanilla_a.mdls", "vanilla_a.mset", "vanilla_b.moa", "vanilla_b.moa.mset")));
+
+            // A higher ranked mod already staged its own replacement of the same file.
+            CreateFile(ModOutputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "replaced_a.mdls", "replaced_a.mset", "replaced_b.moa", "replaced_b.moa.mset")));
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            AssertArdResources(new[]
+            {
+                "replaced_a.mdls", "xa_al_9999.mset", "replaced_b.moa", "replaced_b.moa.mset"
+            }, ModOutputDir, "tw01.ard");
+        }
+
+        [Fact]
+        public void Kh1ArdResourceReplacePreservesTheRestOfTheFileTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = Kh1ArdPatch(("0", "c.mdls"));
+
+            var original = CreateArd("a.mdls", "a.mset", "b.moa", "b.moa.mset");
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(original));
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            var patched = File.ReadAllBytes(Path.Combine(ModOutputDir, "tw01.ard"));
+            Assert.Equal(original.Length, patched.Length);
+            // The header and everything past the resource list must be byte identical.
+            Assert.Equal(original.Take(ArdResourceListOffset), patched.Take(ArdResourceListOffset));
+            Assert.Equal(original.Skip(ArdResourceListEnd), patched.Skip(ArdResourceListEnd));
+        }
+
+        [Fact]
+        public void Kh1ArdResourceReplaceOutOfRangeThrowsTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = Kh1ArdPatch(("9", "nope.mdls"));
+
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "a.mdls", "a.mset", "b.moa", "b.moa.mset")));
+
+            Assert.Throws<PatcherException>(() =>
+                patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true));
+        }
+
+        [Fact]
+        public void Kh1ArdResourceReplaceEmptyNameThrowsTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = Kh1ArdPatch(("0", ""));
+
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "a.mdls", "a.mset", "b.moa", "b.moa.mset")));
+
+            Assert.Throws<PatcherException>(() =>
+                patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true));
+        }
+
+        [Fact]
+        public void Kh1ArdResourceReplaceNameTooLongThrowsTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = Kh1ArdPatch(("0", new string('x', OpenKh.Kh1.Ard.MaxNameLength + 1)));
+
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "a.mdls", "a.mset", "b.moa", "b.moa.mset")));
+
+            Assert.Throws<PatcherException>(() =>
+                patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true));
+        }
+
+        private const int ArdHeaderSize = 4 + (32 + 1) * 4;
+        private const int ArdResourceListOffset = 0x100;
+
+        private static int ArdResourceListEnd => ArdResourceListOffset + 4 * OpenKh.Kh1.Ard.NameSize;
+
+        private static Metadata Kh1ArdPatch(params (string Index, string Name)[] replacements)
+        {
+            var lines = replacements.Select(x => $"{x.Index}: {x.Name}");
+            File.WriteAllText(Path.Combine(ModInputDir, "tw01.yml"),
+                string.Join(Environment.NewLine, lines) + Environment.NewLine);
+
+            return new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "tw01.ard",
+                        Method = "kh1ardresource",
+                        Source = new List<AssetFile> { new AssetFile { Name = "tw01.yml" } }
+                    }
+                }
+            };
+        }
+
+        /// <summary>
+        /// Builds a minimal but structurally valid .ard: 32 entries, with entry 5 holding
+        /// the given names and a marker block after it to catch collateral damage.
+        /// </summary>
+        private static byte[] CreateArd(params string[] names)
+        {
+            var listEnd = ArdResourceListOffset + names.Length * OpenKh.Kh1.Ard.NameSize;
+            var length = listEnd + 0x80;
+            var data = new byte[length];
+
+            BitConverter.GetBytes(32).CopyTo(data, 0);
+            for (var i = 0; i <= 32; i++)
+            {
+                var offset = i <= 5 ? ArdResourceListOffset : i == 6 ? listEnd : length;
+                BitConverter.GetBytes(offset).CopyTo(data, 4 + i * 4);
+            }
+
+            for (var i = 0; i < names.Length; i++)
+                Encoding.ASCII.GetBytes(names[i]).CopyTo(data, ArdResourceListOffset + i * OpenKh.Kh1.Ard.NameSize);
+
+            for (var i = listEnd; i < length; i++)
+                data[i] = 0xCD;
+
+            Assert.True(ArdHeaderSize <= ArdResourceListOffset);
+            return data;
+        }
+
+        private static void AssertArdResources(string[] expected, params string[] paths) =>
+            File.OpenRead(Path.Join(paths)).Using(x =>
+                Assert.Equal(expected, OpenKh.Kh1.Ard.ReadResourceList(x)));
 
         private static void AssertFileExists(params string[] paths)
         {

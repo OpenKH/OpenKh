@@ -102,6 +102,7 @@ namespace OpenKh.Patcher
         /// "copy"
         /// "imgd"
         /// "imgz"
+        /// "kh1ardresource"
         /// "kh2msg"
         /// "listpatch"
         /// "spawnpoint"

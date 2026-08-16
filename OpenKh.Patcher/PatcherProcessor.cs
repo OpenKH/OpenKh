@@ -390,6 +390,9 @@ namespace OpenKh.Patcher
                 case "areadatascript":
                     PatchAreaDataScript(context, assetFile.Source, stream);
                     break;
+                case "kh1ardresource":
+                    PatchKh1ArdResource(context, assetFile, stream);
+                    break;
                 case "bdscript":
                     PatchBdscript(context, assetFile, stream);
                     break;
@@ -625,6 +628,44 @@ namespace OpenKh.Patcher
             }
 
             Kh2.Ard.AreaDataScript.Write(stream.SetPosition(0), scripts.Values);
+        }
+
+        private static void PatchKh1ArdResource(Context context, AssetFile assetFile, Stream stream)
+        {
+            if (assetFile.Source == null || assetFile.Source.Count == 0)
+                throw new Exception($"File '{assetFile.Name}' does not contain any source");
+
+            if (!Kh1.Ard.IsValid(stream))
+                throw new InvalidDataException($"'{assetFile.Name}' is not a valid KH1 .ard archive");
+
+            var resources = Kh1.Ard.ReadResourceList(stream);
+            foreach (var source in assetFile.Source)
+            {
+                var srcFile = context.GetSourceModAssetPath(source.Name);
+                if (!File.Exists(srcFile))
+                    throw new FileNotFoundException($"The mod does not contain the file {source.Name}", srcFile);
+
+                var replacements = deserializer.Deserialize<Dictionary<int, string>>(File.ReadAllText(srcFile))
+                    ?? new Dictionary<int, string>();
+
+                foreach (var replacement in replacements)
+                {
+                    if (replacement.Key < 0 || replacement.Key >= resources.Count)
+                        throw new IndexOutOfRangeException(
+                            $"'{source.Name}' sets resource index {replacement.Key}, but '{assetFile.Name}' only has {resources.Count} entries (0 to {resources.Count - 1})");
+
+                    if (string.IsNullOrEmpty(replacement.Value))
+                        throw new Exception($"'{source.Name}' does not give a name for resource index {replacement.Key}");
+
+                    resources[replacement.Key] = replacement.Value;
+                }
+            }
+
+            Kh1.Ard.WriteResourceList(stream, resources);
+
+            // The resource list is edited in place; keep the rest of the archive intact,
+            // as PatchFile truncates the stream to whatever position it is left at.
+            stream.Position = stream.Length;
         }
 
         private static void PatchBdscript(Context context, AssetFile assetFile, Stream stream)
