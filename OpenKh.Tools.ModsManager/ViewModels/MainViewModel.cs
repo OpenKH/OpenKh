@@ -828,7 +828,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         FileName = ConfigurationService.OpenKhGameEngineLocation,
                         WorkingDirectory = Path.GetDirectoryName(ConfigurationService.OpenKhGameEngineLocation),
-                        Arguments = $"--data \"{ConfigurationService.GameDataLocation}\" --modpath \"{ConfigurationService.GameModPath}\"",
+                        Arguments = $"--data \"{ConfigurationService.GameDataLocation}\" --modpath \"{ConfigurationService.CompiledModPath}\"",
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,
@@ -887,7 +887,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 {
                                     File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
                                     [
-                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
                                     $"show_console={false}",
                                     ]);
                                 }
@@ -922,7 +922,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
                                         [
-                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
                                         $"show_console={false}",
                                         ]);
                                 }
@@ -957,7 +957,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 {
                                     File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
                                     [
-                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
                                     $"show_console={false}",
                                     ]);
                                 }
@@ -992,7 +992,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 {
                                     File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
                                     [
-                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
                                     $"show_console={false}",
                                     ]);
                                 }
@@ -1031,7 +1031,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
                                         [
-                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
                                         $"show_console={false}",
                                         ]);
                                     }
@@ -1055,7 +1055,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
                                         [
-                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}",
+                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
                                         $"show_console={false}",
                                         ]);
                                     }
@@ -1202,19 +1202,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (ConfigurationService.GameEdition == SetupWizardViewModel.PC)
                 {
                     // Use the package map file to rearrange the files in the structure needed by the patcher
-                    var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, "patch-package-map.txt");
+                    var packageMapLocation = Path.Combine(ConfigurationService.CompiledModPath, "patch-package-map.txt");
                     var packageMap = File
                         .ReadLines(packageMapLocation)
                         .Select(line => line.Split(" $$$$ "))
                         .ToDictionary(array => array[0], array => array[1]);
 
-                    var patchStagingDir = Path.Combine(ConfigurationService.GameModPath, "patch-staging");
+                    var patchStagingDir = Path.Combine(ConfigurationService.CompiledModPath, "patch-staging");
                     if (Directory.Exists(patchStagingDir))
                         Directory.Delete(patchStagingDir, true);
                     Directory.CreateDirectory(patchStagingDir);
                     foreach (var entry in packageMap)
                     {
-                        var sourceFile = Path.Combine(ConfigurationService.GameModPath, entry.Key);
+                        var sourceFile = Path.Combine(ConfigurationService.CompiledModPath, entry.Key);
                         var destFile = Path.Combine(patchStagingDir, entry.Value);
                         if (File.Exists(sourceFile))
                         {
@@ -1223,7 +1223,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }
                     }
 
-                    foreach (var directory in Directory.GetDirectories(Path.Combine(ConfigurationService.GameModPath)))
+                    foreach (var directory in Directory.GetDirectories(Path.Combine(ConfigurationService.CompiledModPath)))
                         if (!"patch-staging".Equals(Path.GetFileName(directory)))
                             Directory.Delete(directory, true);
 
@@ -1235,18 +1235,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         specialDirs = Directory.GetDirectories(specialStagingDir).Select(directory => Path.GetFileName(directory)).ToArray();
 
                     foreach (var packageName in stagingDirs)
-                        Directory.Move(Path.Combine(patchStagingDir, packageName), Path.Combine(ConfigurationService.GameModPath, packageName));
+                        Directory.Move(Path.Combine(patchStagingDir, packageName), Path.Combine(ConfigurationService.CompiledModPath, packageName));
                     foreach (var specialDir in specialDirs)
-                        Directory.Move(Path.Combine(ConfigurationService.GameModPath, "special", specialDir), Path.Combine(ConfigurationService.GameModPath, specialDir));
+                        Directory.Move(Path.Combine(ConfigurationService.CompiledModPath, "special", specialDir), Path.Combine(ConfigurationService.CompiledModPath, specialDir));
 
                     stagingDirs.Remove("special"); // Since it's not actually a real game package
                     Directory.Delete(patchStagingDir, true);
 
-                    var specialModDir = Path.Combine(ConfigurationService.GameModPath, "special");
+                    var specialModDir = Path.Combine(ConfigurationService.CompiledModPath, "special");
                     if (Directory.Exists(specialModDir))
                         Directory.Delete(specialModDir, true);
 
-                    foreach (var directory in stagingDirs.Select(packageDir => Path.Combine(ConfigurationService.GameModPath, packageDir)))
+                    foreach (var directory in stagingDirs.Select(packageDir => Path.Combine(ConfigurationService.CompiledModPath, packageDir)))
                     {
                         if (specialDirs.Contains(Path.GetDirectoryName(directory)))
                             continue;
@@ -1441,11 +1441,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }
 
                     }
-                    if (Directory.Exists(ConfigurationService.GameModPath))
+                    if (Directory.Exists(ConfigurationService.CompiledModPath))
                     {
                         try
                         {
-                            Directory.Delete(ConfigurationService.GameModPath, true);
+                            Directory.Delete(ConfigurationService.CompiledModPath, true);
                         }
                         catch (Exception ex)
                         {
@@ -1550,7 +1550,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                 string panaceaSettings = Path.Combine(configTargetPath, "panacea_settings.txt");
                 string[] lines = File.Exists(panaceaSettings) ? File.ReadAllLines(panaceaSettings) : Array.Empty<string>();
-                string textToWrite = $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.GameModPath,".."))}\r\n";
+                string textToWrite = $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}\r\n";
                 foreach (string entry in lines)
                 {
                     if (entry.Contains("dev_path"))
