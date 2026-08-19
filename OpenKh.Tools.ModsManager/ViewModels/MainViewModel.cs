@@ -370,6 +370,21 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public MainViewModel()
         {
+            if (Directory.Exists($"gitfetch"))
+            {
+                var _fetchAllFiles = Directory.GetFiles($"gitfetch", "*", SearchOption.AllDirectories);
+                var _fetchAllDirectories = Directory.GetDirectories($"gitfetch", "*", SearchOption.AllDirectories);
+
+                foreach (var _fetchFile in _fetchAllFiles)
+                    File.SetAttributes(_fetchFile, FileAttributes.Normal);
+
+                foreach (string _fetchDirectory in _fetchAllDirectories)
+                    File.SetAttributes(_fetchDirectory, FileAttributes.Normal);
+
+                Directory.Delete($"gitfetch", true);
+            }
+
+
             if (ConfigurationService.GameEdition == SetupWizardViewModel.PC)
             {
                 PC = true;
@@ -771,6 +786,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     searchWindow.Show();
                 }
             );
+
+            if (Directory.Exists(ConfigurationService.InstalledModsPath))
+            {
+                var _fetchAllFiles = Directory.GetFiles(ConfigurationService.InstalledModsPath, "*", SearchOption.AllDirectories);
+                var _fetchAllDirectories = Directory.GetDirectories(ConfigurationService.InstalledModsPath, "*", SearchOption.AllDirectories);
+
+                foreach (var _fetchFile in _fetchAllFiles)
+                    File.SetAttributes(_fetchFile, FileAttributes.Normal);
+
+                foreach (string _fetchDirectory in _fetchAllDirectories)
+                    File.SetAttributes(_fetchDirectory, FileAttributes.Normal);
+            }
 
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
             _ = FetchUpdates();
