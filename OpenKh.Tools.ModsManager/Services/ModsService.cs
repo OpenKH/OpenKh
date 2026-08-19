@@ -124,15 +124,6 @@ namespace OpenKh.Tools.ModsManager.Services
             string platformUrl = null,
             string branchName = null)
         {
-
-            if (name.Contains("@"))
-            {
-                var _fetchNameWithPlatform = name.Split("@");
-
-                name = _fetchNameWithPlatform[0];
-                platformUrl = _fetchNameWithPlatform[1];
-            }
-
             if (!isZipFile && !isLuaFile)
             {
                 return Task.Run(() => InstallModFromGit(name, progressOutput, progressNumber, platformUrl, branchName));

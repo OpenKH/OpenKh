@@ -522,6 +522,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             progressWindow.Show();
                             return progressWindow;
                         });
+
+                        if (name.Contains("@"))
+                        {
+                            var _fetchNameWithPlatform = name.Split("@");
+
+                            name = _fetchNameWithPlatform[0];
+                            platformUrl = _fetchNameWithPlatform[1];
+                        }
+
                         await ModsService.InstallMod(name, isZipFile, isLuaFile, progress =>
                         {
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
