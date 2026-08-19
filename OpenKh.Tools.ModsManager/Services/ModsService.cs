@@ -296,7 +296,7 @@ namespace OpenKh.Tools.ModsManager.Services
             if (!string.IsNullOrWhiteSpace(branchName))
             {
                 progressOutput?.Invoke($"Fetching file {ModMetadata} from branch {branchName}");
-                var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata, platformName);
+                var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata, progressOutput, progressNumber, platformName);
                 if (!isValidMod)
                     throw new BranchNotValidException(repositoryName, branchName);
             }
@@ -304,7 +304,7 @@ namespace OpenKh.Tools.ModsManager.Services
             {
                 branchName = DefaultGitBranch;
                 progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
-                var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata, platformName);
+                var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata, progressOutput, progressNumber, platformName);
                 if (!isValidMod)
                 {
                     progressOutput?.Invoke($"{ModMetadata} not found, fetching default branch name");
@@ -313,7 +313,7 @@ namespace OpenKh.Tools.ModsManager.Services
                         throw new RepositoryNotFoundException(repositoryName);
 
                     progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
-                    isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata, platformName);
+                    isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata, progressOutput, progressNumber, platformName);
                 }
 
                 if (!isValidMod)

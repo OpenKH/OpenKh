@@ -1,4 +1,5 @@
 using LibGit2Sharp;
+using LibGit2Sharp.Handlers;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -40,23 +41,33 @@ namespace OpenKh.Tools.ModsManager.Services
             return JsonConvert.DeserializeObject<ReposResponse>(await response.Content.ReadAsStringAsync())?.DefaultBranch;
         }
 
-        public static Task<bool> IsFileExists(string repoName, string branch, string filePath, string platformUrl = null)
-        {
+        public static Task<bool> IsFileExists(string repoName, string branch, string filePath, Action<string> progressOutput = null, Action<float> progressNumber = null, string platformUrl = null)
+        {                                                                                      
             if (!string.IsNullOrEmpty(platformUrl))
             {
                 var _fetchBaseUri = new Uri(platformUrl.Contains("http") ? platformUrl : "https://" + platformUrl);
                 var _fetchRelativeUri = new Uri(_fetchBaseUri, $"{repoName}");
 
+                var _fetchRepoParent = $"gitfetch";
                 var _fetchRepoDirectory = $"gitfetch/{repoName}/{branch}";
 
                 var _cloneOptions = new CloneOptions
                 {
                     Checkout = false,
                     IsBare = true,
-                    BranchName = branch
+                    BranchName = branch,
                 };
 
+                _cloneOptions.FetchOptions.Depth = 1;
                 _cloneOptions.FetchOptions.Prune = true;
+
+                _cloneOptions.FetchOptions.OnTransferProgress = new TransferProgressHandler((progress) =>
+                {
+                    progressOutput.Invoke($"Checking if Git is a Mod: {progress.ReceivedObjects} / {progress.TotalObjects}");
+                    progressNumber.Invoke((float)progress.ReceivedObjects / (float)progress.TotalObjects);
+
+                    return true;
+                });
 
                 Repository.Clone(_fetchRelativeUri.ToString(), _fetchRepoDirectory, _cloneOptions);
                 var _fetchRepository = new Repository(_fetchRepoDirectory);
@@ -66,10 +77,10 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 _fetchRepository.Dispose();
 
-                if (Directory.Exists(_fetchRepoDirectory))
+                if (Directory.Exists(_fetchRepoParent))
                 {
-                    var _fetchAllFiles = Directory.GetFiles(_fetchRepoDirectory, "*", SearchOption.AllDirectories);
-                    var _fetchAllDirectories = Directory.GetDirectories(_fetchRepoDirectory, "*", SearchOption.AllDirectories);
+                    var _fetchAllFiles = Directory.GetFiles(_fetchRepoParent, "*", SearchOption.AllDirectories);
+                    var _fetchAllDirectories = Directory.GetDirectories(_fetchRepoParent, "*", SearchOption.AllDirectories);
 
                     foreach (var _fetchFile in _fetchAllFiles)
                         File.SetAttributes(_fetchFile, FileAttributes.Normal);
@@ -77,7 +88,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     foreach (string _fetchDirectory in _fetchAllDirectories)
                         File.SetAttributes(_fetchDirectory, FileAttributes.Normal);
 
-                    Directory.Delete(_fetchRepoDirectory, true);
+                    Directory.Delete(_fetchRepoParent, true);
                 }
 
                 return Task.FromResult(_doesModFileExist);
