@@ -52,6 +52,33 @@ public sealed class ModCatalogServiceTests : IDisposable
             File.ReadAllLines(Path.Combine(_rootDirectory, "mods-KH2.txt")));
     }
 
+    [Fact]
+    public async Task LoadIncludesFilesModifiedByTheMod()
+    {
+        var modDirectory = Path.Combine(_rootDirectory, "mods", "kh2", "Author", "FilesMod");
+        Directory.CreateDirectory(modDirectory);
+        File.WriteAllText(Path.Combine(modDirectory, "mod.yml"), """
+            title: Files mod
+            originalAuthor: Author
+            description: Modifies multiple files
+            assets:
+            - name: msg/en/sys.bar
+              method: copy
+              multi:
+              - name: msg/fr/sys.bar
+            - name: scripts/kh2/example.lua
+              method: copy
+            """);
+        var service = new ModCatalogService(InstallationLayout.Detect("ignored", ["--data-root", _rootDirectory]));
+
+        var mods = await service.LoadAsync(GameInfo.FromId("kh2"));
+
+        var mod = Assert.Single(mods);
+        Assert.Equal(
+            ["msg/en/sys.bar", "msg/fr/sys.bar", "scripts/kh2/example.lua"],
+            mod.FilesToPatch);
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_rootDirectory))

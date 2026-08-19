@@ -241,12 +241,32 @@ public sealed class SetupServicesTests : IDisposable
         var expectedScripts = Path.Combine(configuration.GetGameModOutputDirectory(GameInfo.FromId("kh2")), "scripts")
             .Replace("\\", "/");
         Assert.Contains(expectedScripts, text);
+        Assert.Contains("[kh2]\nscripts =", text.Replace("\r\n", "\n"));
+        Assert.DoesNotContain("[kh2]scripts =", text);
         Assert.Contains("game_docs = \"My Games/", text);
         Assert.True(service.IsInstalled(gameDirectory));
 
         service.Remove(gameDirectory);
 
         Assert.False(service.IsInstalled(gameDirectory));
+    }
+
+    [Fact]
+    public void LuaBackendConfigurationPreservesScriptsIndentation()
+    {
+        var gameDirectory = Path.Combine(_rootDirectory, "lua-indentation");
+        Directory.CreateDirectory(gameDirectory);
+        File.WriteAllText(
+            Path.Combine(gameDirectory, "LuaBackend.toml"),
+            "[kh1]\r\n  scripts = [{ path = \"scripts/kh1/\", relative = true }]\r\n" +
+            "exe = \"KINGDOM HEARTS FINAL MIX.exe\"\r\n");
+        var service = new LuaBackendService(CreateConfigurationService());
+
+        service.Configure(gameDirectory, [GameInfo.FromId("kh1")], false);
+
+        var text = File.ReadAllText(Path.Combine(gameDirectory, "LuaBackend.toml"));
+        Assert.Contains("[kh1]\r\n  scripts =", text);
+        Assert.DoesNotContain("[kh1]scripts =", text);
     }
 
     [Fact]

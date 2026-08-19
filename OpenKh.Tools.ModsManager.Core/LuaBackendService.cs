@@ -117,8 +117,12 @@ public sealed class LuaBackendService
         {
             var body = match.Groups["body"].Value;
             var scriptsLine = $"scripts = [{{ path = \"scripts/{sectionName}/\", relative = true }}, {{ path = \"{scriptPath}\", relative = false }}]";
-            body = Regex.IsMatch(body, @"(?m)^\s*scripts\s*=.*$")
-                ? new Regex(@"(?m)^\s*scripts\s*=.*$").Replace(body, scriptsLine, 1)
+            const string scriptsPattern = @"(?m)^(?<indent>[^\S\r\n]*)scripts[^\S\r\n]*=.*$";
+            body = Regex.IsMatch(body, scriptsPattern)
+                ? new Regex(scriptsPattern).Replace(
+                    body,
+                    line => line.Groups["indent"].Value + scriptsLine,
+                    1)
                 : $"{Environment.NewLine}{scriptsLine}{body}";
             return match.Groups[1].Value + body;
         });

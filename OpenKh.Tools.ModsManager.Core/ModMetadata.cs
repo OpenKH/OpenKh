@@ -1,3 +1,4 @@
+using OpenKh.Patcher;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -15,6 +16,7 @@ internal sealed class ModMetadata
     public string? OriginalAuthor { get; set; }
     public string? Description { get; set; }
     public bool IsCollection { get; set; }
+    public List<AssetFile>? Assets { get; set; }
 
     public static ModMetadata Read(string fileName)
     {

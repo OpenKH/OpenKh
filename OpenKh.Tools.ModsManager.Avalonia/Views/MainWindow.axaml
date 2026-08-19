@@ -210,6 +210,16 @@
                 <Border Background="#111C2E" CornerRadius="10" Padding="12">
                   <TextBlock Text="{Binding SelectedMod.Id}" FontSize="12" Foreground="#91A2BA" TextWrapping="Wrap" />
                 </Border>
+                <Expander Header="{Binding SelectedMod.FilesToPatchHeader}"
+                          IsVisible="{Binding SelectedMod.HasFilesToPatch}">
+                  <Border Background="#111C2E" CornerRadius="10" Padding="12" Margin="0,8,0,0">
+                    <TextBlock Text="{Binding SelectedMod.FilesToPatchText}"
+                               FontFamily="Cascadia Mono,Consolas"
+                               FontSize="11"
+                               Foreground="#AAB9CF"
+                               TextWrapping="Wrap" />
+                  </Border>
+                </Expander>
               </StackPanel>
             </ScrollViewer>
             <StackPanel Grid.Row="1" Spacing="10">

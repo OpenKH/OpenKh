@@ -28,6 +28,12 @@ public sealed class ModListItemViewModel : ObservableObject
     public string Initial => string.IsNullOrWhiteSpace(Name) ? "?" : Name[..1].ToUpperInvariant();
     public Bitmap? IconImage { get; }
     public Bitmap? PreviewImage { get; }
+    public IReadOnlyList<string> FilesToPatch => Model.FilesToPatch;
+    public bool HasFilesToPatch => FilesToPatch.Count > 0;
+    public string FilesToPatchHeader => FilesToPatch.Count == 1
+        ? "1 file modified"
+        : $"{FilesToPatch.Count} files modified";
+    public string FilesToPatchText => string.Join(Environment.NewLine, FilesToPatch);
     public bool HasIcon => IconImage is not null;
     public bool HasPreview => PreviewImage is not null;
     public bool ShowInitial => !HasIcon;

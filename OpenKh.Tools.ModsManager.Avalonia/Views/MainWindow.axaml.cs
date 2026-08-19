@@ -42,6 +42,7 @@ public sealed partial class MainWindow : Window
         WorkspaceGrid.RowDefinitions.Clear();
         if (compact)
         {
+            WorkspaceScroller.VerticalScrollBarVisibility = global::Avalonia.Controls.Primitives.ScrollBarVisibility.Auto;
             WorkspaceGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
             WorkspaceGrid.RowDefinitions.Add(new RowDefinition(new GridLength(3, GridUnitType.Star)));
             WorkspaceGrid.RowDefinitions.Add(new RowDefinition(new GridLength(18)));
@@ -52,6 +53,7 @@ public sealed partial class MainWindow : Window
         }
         else
         {
+            WorkspaceScroller.VerticalScrollBarVisibility = global::Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled;
             WorkspaceGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(3, GridUnitType.Star)));
             WorkspaceGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(18)));
             WorkspaceGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(2, GridUnitType.Star)));

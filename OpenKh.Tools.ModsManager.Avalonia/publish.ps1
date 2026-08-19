@@ -7,8 +7,8 @@ param(
 
 $project = Join-Path $PSScriptRoot "OpenKh.Tools.ModsManager.csproj"
 $outputRoot = Join-Path $PSScriptRoot $OutputDirectory
-$panaceaLoader = Join-Path $PSScriptRoot "..\OpenKh.Research.Panacea\Release\OpenKH.Panacea.dll"
-$panaceaDependencies = Join-Path $PSScriptRoot "..\OpenKh.Research.Panacea\Dependencies"
+$repositoryBuild = Join-Path $PSScriptRoot "..\bin"
+$panaceaProject = Join-Path $PSScriptRoot "..\OpenKh.Research.Panacea"
 $panaceaFileNames = @(
     "avcodec-vgmstream-59.dll",
     "avformat-vgmstream-59.dll",
@@ -26,17 +26,31 @@ $panaceaFileNames = @(
 )
 
 function Copy-PanaceaFiles([string] $output) {
-    if (-not (Test-Path -LiteralPath $panaceaLoader -PathType Leaf)) {
+    $sources = @(
+        [pscustomobject]@{
+            Loader = Join-Path $repositoryBuild "OpenKH.Panacea.dll"
+            Dependencies = $repositoryBuild
+        },
+        [pscustomobject]@{
+            Loader = Join-Path $panaceaProject "Release\OpenKH.Panacea.dll"
+            Dependencies = Join-Path $panaceaProject "Dependencies"
+        }
+    ) | Where-Object {
+        $candidate = $_
+        (Test-Path -LiteralPath $candidate.Loader -PathType Leaf) -and
+        -not ($panaceaFileNames | Where-Object {
+            -not (Test-Path -LiteralPath (Join-Path $candidate.Dependencies $_) -PathType Leaf)
+        })
+    } | Sort-Object { (Get-Item -LiteralPath $_.Loader).LastWriteTimeUtc } -Descending
+    $source = $sources | Select-Object -First 1
+    if ($null -eq $source) {
         Write-Warning "Panacea was not built, so it will not be included in '$output'."
         return
     }
 
-    Copy-Item -LiteralPath $panaceaLoader -Destination $output -Force
+    Copy-Item -LiteralPath $source.Loader -Destination $output -Force
     foreach ($fileName in $panaceaFileNames) {
-        $sourcePath = Join-Path $panaceaDependencies $fileName
-        if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) {
-            throw "Required Panacea dependency '$sourcePath' does not exist."
-        }
+        $sourcePath = Join-Path $source.Dependencies $fileName
         Copy-Item -LiteralPath $sourcePath -Destination $output -Force
     }
 }

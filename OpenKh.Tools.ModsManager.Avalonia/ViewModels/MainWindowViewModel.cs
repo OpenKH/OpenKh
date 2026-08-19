@@ -524,7 +524,13 @@ public sealed class MainWindowViewModel : ObservableObject
         if (SelectedMod is null || !SelectedMod.IsCollection)
             return;
         if (await _collectionSettingsPrompt.ShowAsync(SelectedMod.Model, SelectedGame))
-            StatusText = $"{SelectedMod.Name} collection settings were saved";
+        {
+            var selectedId = SelectedMod.Id;
+            var selectedName = SelectedMod.Name;
+            await RefreshAsync();
+            SelectedMod = Mods.FirstOrDefault(mod => mod.Id.Equals(selectedId, StringComparison.OrdinalIgnoreCase));
+            StatusText = $"{selectedName} collection settings were saved";
+        }
     }
 
     private Task ApplyToGameAsync() => PatchGameAsync(false);

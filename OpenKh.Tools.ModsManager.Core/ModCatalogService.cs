@@ -1,5 +1,8 @@
 namespace OpenKh.Tools.ModsManager.Core;
 
+using OpenKh.Patcher;
+using System.Text.Json;
+
 public sealed class ModCatalogService
 {
     private const string MetadataFileName = "mod.yml";
@@ -31,6 +34,7 @@ public sealed class ModCatalogService
     {
         var enabledIds = ReadEnabledIds(game);
         var enabledLookup = enabledIds.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var collectionSettings = ReadCollectionSettings(game);
         var locations = EnumerateModLocations(game)
             .GroupBy(location => location.Id, StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First())
@@ -43,7 +47,11 @@ public sealed class ModCatalogService
                 .OrderBy(id => id, StringComparer.OrdinalIgnoreCase));
 
         return orderedIds
-            .Select(id => CreateEntry(locations[id], enabledLookup.Contains(id)))
+            .Select(id => CreateEntry(
+                locations[id],
+                enabledLookup.Contains(id),
+                game,
+                collectionSettings))
             .ToArray();
     }
 
@@ -79,7 +87,11 @@ public sealed class ModCatalogService
         }
     }
 
-    private static ModEntry CreateEntry(ModLocation location, bool isEnabled)
+    private static ModEntry CreateEntry(
+        ModLocation location,
+        bool isEnabled,
+        GameInfo game,
+        IReadOnlyDictionary<string, Dictionary<string, bool>> collectionSettings)
     {
         ModMetadata? metadata = null;
         try
@@ -108,9 +120,45 @@ public sealed class ModCatalogService
             Directory = location.Directory,
             IconPath = File.Exists(iconPath) ? iconPath : null,
             PreviewPath = File.Exists(previewPath) ? previewPath : null,
+            FilesToPatch = GetFilesToPatch(metadata, location.Id, game, collectionSettings),
             IsCollection = metadata?.IsCollection == true,
             IsEnabled = isEnabled
         };
+    }
+
+    private static IReadOnlyList<string> GetFilesToPatch(
+        ModMetadata? metadata,
+        string modId,
+        GameInfo game,
+        IReadOnlyDictionary<string, Dictionary<string, bool>> collectionSettings)
+    {
+        collectionSettings.TryGetValue(modId, out var enabledOptionalAssets);
+        var files = new List<string>();
+        foreach (var asset in metadata?.Assets ?? [])
+        {
+            if (metadata?.IsCollection == true &&
+                !string.IsNullOrWhiteSpace(asset.Game) &&
+                !asset.Game.Equals(game.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (asset.CollectionOptional)
+            {
+                var enabled = !string.IsNullOrWhiteSpace(asset.Name) &&
+                    enabledOptionalAssets?.TryGetValue(asset.Name, out var isEnabled) == true &&
+                    isEnabled;
+                if (!enabled)
+                    continue;
+            }
+
+            if (!string.IsNullOrWhiteSpace(asset.Name))
+                files.Add(asset.CollectionOptional ? $"{asset.Name} (optional, enabled)" : asset.Name);
+            if (asset.Multi is not null)
+                files.AddRange(asset.Multi.Select(entry => entry.Name).Where(name => !string.IsNullOrWhiteSpace(name)));
+        }
+
+        return files.Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
     }
 
     private IReadOnlyList<string> ReadEnabledIds(GameInfo game)
@@ -119,6 +167,22 @@ public sealed class ModCatalogService
         return File.Exists(path)
             ? File.ReadAllLines(path).Where(line => !string.IsNullOrWhiteSpace(line)).ToArray()
             : [];
+    }
+
+    private Dictionary<string, Dictionary<string, bool>> ReadCollectionSettings(GameInfo game)
+    {
+        var fileName = _configuration.GetCollectionSettingsFile(game);
+        if (!File.Exists(fileName) || string.IsNullOrWhiteSpace(File.ReadAllText(fileName)))
+            return new Dictionary<string, Dictionary<string, bool>>(StringComparer.OrdinalIgnoreCase);
+        try
+        {
+            return JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, bool>>>(File.ReadAllText(fileName))
+                ?? new Dictionary<string, Dictionary<string, bool>>(StringComparer.OrdinalIgnoreCase);
+        }
+        catch (JsonException)
+        {
+            return new Dictionary<string, Dictionary<string, bool>>(StringComparer.OrdinalIgnoreCase);
+        }
     }
 
     private string GetEnabledModsPath(GameInfo game) => _configuration.GetEnabledModsFile(game);
