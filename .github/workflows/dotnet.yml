@@ -2,9 +2,13 @@ name: .NET
 
 on:
   push:
-    branches: [ "master", "fix-*" ]
+    branches: [ "master", "fix-*", "avalonia" ]
   pull_request:
     branches: [ "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write # required to create tags and releases
 
 jobs:
   build:
@@ -12,11 +16,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
     - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
@@ -80,7 +84,6 @@ jobs:
     - name: "GitHub release latest"
       if: ${{ github.ref_name == 'master' }}
       uses: "marvinpinto/action-automatic-releases@latest"
-      continue-on-error: true # at non master branch this will always fail
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
@@ -91,7 +94,6 @@ jobs:
 
     - name: "GitHub release numbered"
       uses: "marvinpinto/action-automatic-releases@latest"
-      continue-on-error: true # at non master branch this will always fail
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "release2-${{github.run_number}}"

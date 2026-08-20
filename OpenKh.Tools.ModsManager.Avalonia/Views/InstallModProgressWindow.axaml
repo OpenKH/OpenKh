@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.ModsManager.Views.InstallModProgressWindow"
+        Title="{Binding DialogTitle}" Height="120" Width="300"
+        SizeToContent="WidthAndHeight" CanResize="False"
+        WindowStartupLocation="CenterScreen">
+    <StackPanel Margin="10">
+        <TextBlock Margin="0 0 0 10">
+            <Run Text="{Binding OperationName}"/>
+            <Run> the mod </Run>
+            <Run FontWeight="Bold" Text="{Binding ModName}"/>
+            <Run>...</Run>
+        </TextBlock>
+        <ProgressBar Margin="0 0 0 10" Height="20" IsIndeterminate="{Binding ProgressUnknown}" Value="{Binding ProgressValue}" Maximum="1" />
+        <TextBlock Text="{Binding ProgressText}"/>
+    </StackPanel>
+</Window>

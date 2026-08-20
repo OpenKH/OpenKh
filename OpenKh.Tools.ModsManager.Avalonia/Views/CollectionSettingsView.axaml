@@ -1,0 +1,49 @@
+<common:DialogWindowBase
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:common="using:OpenKh.Tools.Common.Avalonia"
+        xmlns:local="using:OpenKh.Tools.ModsManager.Views"
+        x:Class="OpenKh.Tools.ModsManager.Views.CollectionSettingsView"
+        WindowStartupLocation="CenterScreen"
+        Title="Collection Settings"
+        Width="400" Height="300"
+        Background="{Binding ColorTheme.BackgroundColor}">
+    <Grid Margin="10" ColumnDefinitions="2*,*">
+        <ListBox
+            Grid.Column="0"
+            VerticalAlignment="Stretch"
+            ItemsSource="{Binding CollectionModsList}"
+            SelectedValue="{Binding CollectionSelectedValue}"
+            Background="{Binding ColorTheme.BackgroundColor}"
+            HorizontalAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Height="64" Margin="3" ColumnDefinitions="Auto,*">
+                        <CheckBox Grid.Column="0" VerticalAlignment="Center" IsChecked="{Binding Enabled}" Foreground="{Binding ColorTheme.TextColor}">
+                            <CheckBox.Content>
+                                <Grid Margin="3 1 10 0">
+                                    <Image Width="64" Height="64" Source="{Binding IconImage}"/>
+                                </Grid>
+                            </CheckBox.Content>
+                        </CheckBox>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="{Binding ColorTheme.TextColor}"/>
+                            <TextBlock Text="{Binding Author}" Foreground="{Binding ColorTheme.TextColor}"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Grid Grid.Column="1">
+            <StackPanel IsVisible="{Binding IsModUnselectedMessageVisible, Converter={StaticResource VisibilityToBool}}">
+                <TextBlock Margin="3 0 0 3" Text="The selected mod info will be displayed here." TextWrapping="Wrap" Foreground="{Binding ColorTheme.TextColor}"/>
+                <TextBlock Margin="3 0 0 3" TextWrapping="Wrap" Foreground="{Binding ColorTheme.TextColor}" Text="&#x0a;To have a mod included in patching tick the box next to it.&#x0a;"/>
+                <TextBlock Margin="3 0 0 3" TextWrapping="Wrap" Foreground="{Binding ColorTheme.TextColor}"
+                           Text="After selecting the mods you wish to run with close this window and follow your normal 'Build' process with either the 'Build' or 'Build and Run' commands."/>
+            </StackPanel>
+            <ScrollViewer IsVisible="{Binding IsModInfoVisible, Converter={StaticResource VisibilityToBool}}">
+                <local:CollectionOptionalModDetailsView DataContext="{Binding CollectionSelectedValue}"/>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</common:DialogWindowBase>

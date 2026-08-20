@@ -1,0 +1,9 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="OpenKh.Tools.ModsManager.UserControls.FolderSelectorControl"
+             x:Name="_self">
+    <Grid ColumnDefinitions="*,24">
+        <TextBox Grid.Column="0" Text="{Binding FolderPath, ElementName=_self}"/>
+        <Button Grid.Column="1" Click="Button_Click" Padding="2" HorizontalContentAlignment="Center" VerticalAlignment="Stretch">📂</Button>
+    </Grid>
+</UserControl>

@@ -1,27 +1,29 @@
 using System.Collections.Generic;
-using System.Windows;
-using Xceed.Wpf.Toolkit;
+using Xe.Tools;
 
 namespace OpenKh.Tools.ModsManager.Services
 {
-    public class WizardPageStackService : DependencyObject
+    // Tracks the visited wizard pages so "previous" follows the path the user
+    // actually took through the branching wizard. Pages are opaque tokens
+    // (WPF passes Xceed WizardPage instances, Avalonia its own page controls),
+    // which keeps this service and the SetupWizardViewModel UI-framework
+    // agnostic.
+    public class WizardPageStackService : BaseNotifyPropertyChanged
     {
-        public static readonly DependencyProperty BackProperty = DependencyProperty.Register(
-            "Back",
-            typeof(WizardPage),
-            typeof(WizardPageStackService),
-            new PropertyMetadata(null)
-        );
+        private readonly List<object> _pages = new List<object>();
+        private object _back;
 
-        private readonly List<WizardPage> _pages = new List<WizardPage>();
-
-        public WizardPage Back
+        public object Back
         {
-            get => (WizardPage)GetValue(BackProperty);
-            set => SetValue(BackProperty, value);
+            get => _back;
+            set
+            {
+                _back = value;
+                OnPropertyChanged();
+            }
         }
 
-        internal void OnPageChanged(WizardPage page)
+        public void OnPageChanged(object page)
         {
             int found = _pages.IndexOf(page);
             if (found != -1)

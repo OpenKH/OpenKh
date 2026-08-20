@@ -340,3 +340,6 @@ OpenKh.WinShell.Output/
 
 # VS History
 .vshistory
+
+# Linux AppImage build output
+openkh-modsmanager-x86_64.AppImage

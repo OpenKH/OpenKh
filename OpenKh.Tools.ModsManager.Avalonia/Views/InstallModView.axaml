@@ -1,0 +1,48 @@
+<UserControl
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.ModsManager.Views.InstallModView"
+        MinWidth="320"
+        MaxWidth="440"
+        Focusable="True"
+        KeyDown="InstallModView_KeyDown"
+        Foreground="{Binding ColorTheme.TextColor}">
+    <Grid>
+      <Grid Name="InstallForm" RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
+        <StackPanel Grid.Row="0">
+            <TextBlock FontSize="20" FontWeight="SemiBold" Margin="0 0 0 12">Install a mod</TextBlock>
+            <TextBlock Margin="0 0 0 4">GitHub repository</TextBlock>
+            <TextBox Name="txtSourceModUrl" Margin="0 0 0 5"
+                     Watermark="eg. openkh/my-kingdomhearts-mod"
+                     Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Margin="0 8 0 4">Branch (optional)</TextBlock>
+            <TextBox Name="txtBranchName" Margin="0 0 0 5"
+                     Watermark="eg. main"
+                     Text="{Binding BranchName, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Margin="0 12 0 4">Local archive or Lua script</TextBlock>
+            <Button Click="InstallLocalFile_Click" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center">
+                Select a file to install
+            </Button>
+        </StackPanel>
+
+        <Separator Grid.Row="1"/>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Click="Cancel_Click" MinWidth="80" HorizontalContentAlignment="Center">Cancel</Button>
+            <Button Click="Install_Click" MinWidth="80" HorizontalContentAlignment="Center">Install</Button>
+        </StackPanel>
+      </Grid>
+
+      <StackPanel Name="BlockedModWarning" IsVisible="False" Spacing="14">
+        <TextBlock FontSize="20" FontWeight="SemiBold">Installation warning</TextBlock>
+        <TextBlock Name="BlockedModWarningText" TextWrapping="Wrap" MaxWidth="400"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+          <Button Click="BlockedModCancel_Click" MinWidth="80" HorizontalContentAlignment="Center">Go back</Button>
+          <Button Click="BlockedModConfirm_Click" MinWidth="110" HorizontalContentAlignment="Center">Install anyway</Button>
+        </StackPanel>
+      </StackPanel>
+    </Grid>
+</UserControl>

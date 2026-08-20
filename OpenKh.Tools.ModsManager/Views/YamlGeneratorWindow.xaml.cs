@@ -175,7 +175,7 @@ namespace OpenKh.Tools.ModsManager.Views
             SimpleAsyncActionCommand<object> appenderCommand;
 
             VM.AppenderCommand = appenderCommand = new SimpleAsyncActionCommand<object>(
-                async _ =>
+                _ =>
                 {
                     SimpleAsyncActionCommand<object> searchCommand;
 
@@ -634,6 +634,7 @@ namespace OpenKh.Tools.ModsManager.Views
                         targetDisposables.Dispose();
                     };
                     targetWindow.Show();
+                    return Task.CompletedTask;
                 },
                 task => VM.AppenderTask = task
             );

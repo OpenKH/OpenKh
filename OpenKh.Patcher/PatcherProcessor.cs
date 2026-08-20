@@ -48,9 +48,15 @@ namespace OpenKh.Patcher
                 DestinationPath = destinationPath;
             }
 
-            public string GetOriginalAssetPath(string path) => Path.Combine(OriginalAssetPath, path);
-            public string GetSourceModAssetPath(string path) => Path.Combine(SourceModAssetPath, path);
-            public string GetDestinationPath(string path) => Path.Combine(DestinationPath, path);
+            // Mod asset names conventionally use Windows-style backslashes (e.g.
+            // "bgm\music050.win32.scd"). On platforms where '/' is the separator,
+            // backslashes would otherwise become literal filename characters.
+            public static string NormalizeSeparators(string path) =>
+                Path.DirectorySeparatorChar == '/' && path != null ? path.Replace('\\', '/') : path;
+
+            public string GetOriginalAssetPath(string path) => Path.Combine(OriginalAssetPath, NormalizeSeparators(path));
+            public string GetSourceModAssetPath(string path) => Path.Combine(SourceModAssetPath, NormalizeSeparators(path));
+            public string GetDestinationPath(string path) => Path.Combine(DestinationPath, NormalizeSeparators(path));
             public void EnsureDirectoryExists(string fileName) => Directory.CreateDirectory(Path.GetDirectoryName(fileName));
             public void CopyOriginalFile(string fileName, string dstFile)
             {
@@ -191,10 +197,10 @@ namespace OpenKh.Patcher
                                         continue;
 
                                     if (assetFile.Platform.ToLower() != "ps2")
-                                        packageMapLocation = _packageFile + "/" + _extraPath + name;
+                                        packageMapLocation = _packageFile + "/" + _extraPath + Context.NormalizeSeparators(name);
 
                                     else if (_pcFile)
-                                        packageMapLocation = _packageFile + "/" + name;
+                                        packageMapLocation = _packageFile + "/" + Context.NormalizeSeparators(name);
                                 }
                                 break;
                             }

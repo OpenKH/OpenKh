@@ -1,0 +1,9 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="OpenKh.Tools.ModsManager.Views.DebuggingWindow"
+        Title="Debug window" Height="450" Width="800"
+        FontFamily="Courier New" Background="#FF282C34">
+    <ScrollViewer>
+        <StackPanel x:Name="LogPanel"/>
+    </ScrollViewer>
+</Window>

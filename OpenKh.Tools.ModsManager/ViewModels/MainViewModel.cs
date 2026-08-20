@@ -30,7 +30,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private static Version _version = Assembly.GetEntryAssembly()?.GetName()?.Version;
         private static string ApplicationName = Utilities.GetApplicationName();
         private static string ApplicationVersion = Utilities.GetApplicationVersion();
-        private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private GetActiveWindowService _getActiveWindowService = new GetActiveWindowService();
 
         private DebuggingWindow _debuggingWindow = new DebuggingWindow();
@@ -494,7 +493,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             SelectedValue = ModsList.FirstOrDefault();
             ReloadPresetList();
 
-            ExitCommand = new RelayCommand(_ => Window.Close());
+            ExitCommand = new RelayCommand(_ => _getActiveWindowService.GetActiveWindow()?.Close());
             AddModCommand = new RelayCommand(_ =>
             {
                 var view = new InstallModView();
@@ -674,7 +673,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         PC = false;
                         PCSX2 = true;
-                        string? launchIso;
+                        string launchIso;
                         switch (_launchGame)
                         {
                             case "kh2":
@@ -690,7 +689,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 launchIso = null;
                                 break;
                         }
-                        GameInfoModel? game;
+                        GameInfoModel game;
                         if (!String.IsNullOrEmpty(launchIso))
                         {
                             game = GameService.DetectGameId(launchIso);
@@ -871,6 +870,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     };
                     break;
                 case SetupWizardViewModel.PCSX2:
+                    if (!PlatformCapabilities.SupportsPcsx2Injection)
+                    {
+                        MessageBox.Show(
+                            "Launching PCSX2 with live mod patching is only supported on Windows for now.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        CloseAllWindows();
+                        return Task.CompletedTask;
+                    }
                     Log.Info("Starting PCSX2");
                     _pcsx2Injector.RegionId = ConfigurationService.RegionId;
                     _pcsx2Injector.Region = Kh2.Constants.Regions[_pcsx2Injector.RegionId];
@@ -912,6 +919,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     break;
                 case SetupWizardViewModel.PC:
+                    if (ConfigurationService.PCVersion == "EGS" && !PlatformCapabilities.SupportsEpicGamesStore)
+                    {
+                        MessageBox.Show(
+                            "There is no Epic Games Store client on this platform, so the game cannot be launched through it. " +
+                            "Use the Steam version instead, or launch the game manually.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        CloseAllWindows();
+                        return Task.CompletedTask;
+                    }
                     if (ConfigurationService.PCVersion == "EGS" && !(_launchGame == "kh3d"))
                     {
                         if (Directory.Exists(ConfigurationService.PcReleaseLocation))
@@ -923,7 +939,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 {
                                     File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
                                     [
-                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
+
+                                    $"mod_path={WinePathUtil.ToGamePath(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")))}",
+
                                     $"show_console={false}",
                                     ]);
                                 }
@@ -958,7 +976,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
                                         [
-                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
+
+                                        $"mod_path={WinePathUtil.ToGamePath(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")))}",
+
                                         $"show_console={false}",
                                         ]);
                                 }
@@ -982,7 +1002,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             return Task.CompletedTask;
                         }
                     }
-                    if (ConfigurationService.PCVersion == "Steam" && !(_launchGame == "kh3d") && ConfigurationService.SteamAPITrick1525 == false)
+                    // On Linux the games only run through Proton, so the Steam
+                    // version always boots via the Steam client regardless of
+                    // the steam_appid.txt direct-launch trick.
+                    if (ConfigurationService.PCVersion == "Steam" && !(_launchGame == "kh3d") && (ConfigurationService.SteamAPITrick1525 == false || !OperatingSystem.IsWindows()))
                     {
                         if (Directory.Exists(ConfigurationService.PcReleaseLocation))
                         {
@@ -993,7 +1016,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 {
                                     File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
                                     [
-                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
+
+                                    $"mod_path={WinePathUtil.ToGamePath(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")))}",
+
                                     $"show_console={false}",
                                     ]);
                                 }
@@ -1017,7 +1042,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             return Task.CompletedTask;
                         }
                     }
-                    else if (ConfigurationService.PCVersion == "Steam" && _launchGame == "kh3d" && ConfigurationService.SteamAPITrick28 == false)
+                    else if (ConfigurationService.PCVersion == "Steam" && _launchGame == "kh3d" && (ConfigurationService.SteamAPITrick28 == false || !OperatingSystem.IsWindows()))
                     {
                         if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
                         {
@@ -1028,7 +1053,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 {
                                     File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
                                     [
-                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
+
+                                    $"mod_path={WinePathUtil.ToGamePath(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")))}",
+
                                     $"show_console={false}",
                                     ]);
                                 }
@@ -1054,6 +1081,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                     else
                     {
+                        // Direct executable launch: only possible on Windows;
+                        // on Linux the Windows executables need Proton, which
+                        // only Steam provides.
+                        if (!OperatingSystem.IsWindows())
+                        {
+                            MessageBox.Show(
+                            "Launching the game executable directly is not supported on Linux. " +
+                            "Select the Steam launcher in the setup wizard so the game can be started through the Steam client.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            CloseAllWindows();
+                            return Task.CompletedTask;
+                        }
+
                         string filename = "";
 
                         try
@@ -1067,7 +1107,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
                                         [
-                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
+
+                                        $"mod_path={WinePathUtil.ToGamePath(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")))}",
+
                                         $"show_console={false}",
                                         ]);
                                     }
@@ -1091,7 +1133,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                     {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
                                         [
-                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
+
+                                        $"mod_path={WinePathUtil.ToGamePath(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")))}",
+
                                         $"show_console={false}",
                                         ]);
                                     }
@@ -1536,6 +1580,24 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             );
             if (checkResult.HasUpdate)
             {
+                if (!PlatformCapabilities.SupportsSelfUpdate)
+                {
+                    // The Linux build ships as an immutable AppImage, so
+                    // in-place self-update is not possible; point the user at
+                    // the releases page instead.
+                    var linuxMessage = "A new version of OpenKh has been detected!\n" +
+                        $"[Current: {checkResult.CurrentVersion}, Latest: {checkResult.NewVersion}]\n\n" +
+                        "Do you want to open the releases page to download it?";
+                    if (MessageBox.Show(linuxMessage, "OpenKh", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        Process.Start(new ProcessStartInfo("https://github.com/OpenKH/OpenKh/releases")
+                        {
+                            UseShellExecute = true
+                        });
+                    }
+                    return;
+                }
+
                 var message = "A new version of OpenKh has been detected!\n" +
                     $"[Current: {checkResult.CurrentVersion}, Latest: {checkResult.NewVersion}]\n\n" +
                     "Do you wish to update the game?";
@@ -1556,7 +1618,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     );
                     ConfigurationService.Updated = true;
                     // quit app
-                    Window?.Close();
+                    _getActiveWindowService.GetActiveWindow()?.Close();
                 }
             }
             else
@@ -1586,7 +1648,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                 string panaceaSettings = Path.Combine(configTargetPath, "panacea_settings.txt");
                 string[] lines = File.Exists(panaceaSettings) ? File.ReadAllLines(panaceaSettings) : Array.Empty<string>();
-                string textToWrite = $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}\r\n";
+
+                string textToWrite = $"mod_path={WinePathUtil.ToGamePath(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")))}\r\n";
+
                 foreach (string entry in lines)
                 {
                     if (entry.Contains("dev_path"))

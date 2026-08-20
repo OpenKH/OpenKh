@@ -1,0 +1,51 @@
+<common:DialogWindowBase
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:common="using:OpenKh.Tools.Common.Avalonia"
+        xmlns:userControls="using:OpenKh.Tools.ModsManager.UserControls"
+        x:Class="OpenKh.Tools.ModsManager.Views.CopySourceFilesWindow"
+        Background="{Binding ColorTheme.BackgroundColor}"
+        WindowStartupLocation="CenterOwner"
+        Title="CopySourceFilesWindow" Height="543" Width="422">
+    <DockPanel LastChildFill="True">
+        <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Orientation="Horizontal">
+            <Button Content="Proceed" HorizontalAlignment="Left" Padding="7" Margin="7" Command="{Binding ProceedCommand}" />
+            <userControls:TaskStatusObserverControl VerticalAlignment="Center" Task="{Binding ProceedTask}" />
+        </StackPanel>
+        <TextBlock Text="Select primary one if applicable:" Padding="7" DockPanel.Dock="Top" Foreground="{Binding ColorTheme.TextColor}"/>
+        <ComboBox DockPanel.Dock="Top" Margin="7" ItemsSource="{Binding PrimarySourceList}" SelectedItem="{Binding SelectedPrimarySource}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Display}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Text="Tools:" Padding="7" DockPanel.Dock="Top" Foreground="{Binding ColorTheme.TextColor}"/>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Button Margin="7,7,0,7" Padding="3" Command="{Binding CheckAllCommand}" MinWidth="60">
+                <TextBlock TextAlignment="Center" Text="Check&#x0a;all"/>
+            </Button>
+            <Button Margin="7,7,0,7" Padding="3" Command="{Binding UncheckAllCommand}" MinWidth="60">
+                <TextBlock TextAlignment="Center" Text="Uncheck&#x0a;all"/>
+            </Button>
+        </StackPanel>
+        <TextBlock Text="Select actions for source:" Padding="7" DockPanel.Dock="Top" Foreground="{Binding ColorTheme.TextColor}"/>
+        <Border Margin="7" BorderBrush="Gray" BorderThickness="1">
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding CopySourceList}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel LastChildFill="True" VerticalAlignment="Top" Margin="3">
+                                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                                    <CheckBox Content="Exists" IsChecked="{Binding DestinationFileExists}" IsEnabled="False" VerticalAlignment="Center" Margin="3"/>
+                                    <CheckBox Content="{Binding ActionName}" IsChecked="{Binding DoAction}" VerticalAlignment="Center" Margin="3"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding Display}" Padding="3" TextTrimming="CharacterEllipsis"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+    </DockPanel>
+</common:DialogWindowBase>

@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 
 namespace OpenKh.Tools.ModsManager.Services
 {
-    public class DownloadableModsService
+    public partial class DownloadableModsService
     {
         /// <summary>
         /// Delegate and event for status updates notification
@@ -534,58 +534,6 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        private BitmapImage GetTextBasedAvatarImageOf(string name)
-        {
-            // Create a simple colored rectangle as placeholder
-            var drawingVisual = new System.Windows.Media.DrawingVisual();
-            using (var drawingContext = drawingVisual.RenderOpen())
-            {
-                drawingContext.DrawRectangle(
-                    new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(100, 149, 237)), // Cornflower blue
-                    null,
-                    new System.Windows.Rect(0, 0, 64, 64));
-
-                // Add text with repo name
-                var formattedText = new System.Windows.Media.FormattedText(
-                    (name + "  ").Substring(0, 2).Trim(),
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    System.Windows.FlowDirection.LeftToRight,
-                    new System.Windows.Media.Typeface("Arial"),
-                    24,
-                    System.Windows.Media.Brushes.White,
-                    1.0);
-
-                drawingContext.DrawText(formattedText,
-                    new System.Windows.Point((64 - formattedText.Width) / 2, (64 - formattedText.Height) / 2));
-            }
-
-            var renderTarget = new System.Windows.Media.Imaging.RenderTargetBitmap(
-                64, 64, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
-            renderTarget.Render(drawingVisual);
-            renderTarget.Freeze();
-
-            // Convert RenderTargetBitmap to BitmapImage
-            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
-            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(renderTarget));
-
-            // Don't dispose the stream until after the BitmapImage has loaded from it
-            var memoryStream = new System.IO.MemoryStream();
-            encoder.Save(memoryStream);
-            memoryStream.Position = 0;
-
-            var bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.StreamSource = memoryStream;
-            bitmapImage.EndInit();
-            bitmapImage.Freeze();
-
-            // Safe to dispose now that image is frozen
-            memoryStream.Dispose();
-
-            return bitmapImage;
-        }
-
         private async Task LoadImageWithCache(DownloadableModModel mod, string cachePath, string url, Action<BitmapImage> setImage, CancellationToken cancellationToken = default)
         {
             try
@@ -702,69 +650,30 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             try
             {
-                // Create colored rectangle with text
-                var drawingVisual = new System.Windows.Media.DrawingVisual();
-                using (var drawingContext = drawingVisual.RenderOpen())
+                // Pick a color based on repository name
+                byte[] nameBytes = System.Text.Encoding.UTF8.GetBytes(mod.Repo ?? "unknown");
+                var r = (byte)((nameBytes.Length > 0 ? nameBytes[0] : 100) % 200 + 55);
+                var g = (byte)((nameBytes.Length > 1 ? nameBytes[1] : 149) % 200 + 55);
+                var b = (byte)((nameBytes.Length > 2 ? nameBytes[2] : 237) % 200 + 55);
+
+                // Get first two letters of repo name as text
+                string initials = "?";
+                if (!string.IsNullOrEmpty(mod.RepoName))
                 {
-                    // Pick a color based on repository name
-                    byte[] nameBytes = System.Text.Encoding.UTF8.GetBytes(mod.Repo ?? "unknown");
-                    var r = (byte)((nameBytes.Length > 0 ? nameBytes[0] : 100) % 200 + 55);
-                    var g = (byte)((nameBytes.Length > 1 ? nameBytes[1] : 149) % 200 + 55);
-                    var b = (byte)((nameBytes.Length > 2 ? nameBytes[2] : 237) % 200 + 55);
-
-                    var brush = new System.Windows.Media.SolidColorBrush(
-                        System.Windows.Media.Color.FromRgb(r, g, b));
-
-                    drawingContext.DrawRectangle(brush, null, new System.Windows.Rect(0, 0, 64, 64));
-
-                    // Get first two letters of repo name as text
-                    string initials = "?";
-                    if (!string.IsNullOrEmpty(mod.RepoName))
-                    {
-                        initials = mod.RepoName.Substring(0, Math.Min(2, mod.RepoName.Length)).ToUpper();
-                    }
-
-                    var formattedText = new System.Windows.Media.FormattedText(
-                        initials,
-                        System.Globalization.CultureInfo.InvariantCulture,
-                        System.Windows.FlowDirection.LeftToRight,
-                        new System.Windows.Media.Typeface("Arial"),
-                        24,
-                        System.Windows.Media.Brushes.White,
-                        System.Windows.Media.VisualTreeHelper.GetDpi(drawingVisual).PixelsPerDip);
-
-                    // Center the text
-                    drawingContext.DrawText(formattedText,
-                        new System.Windows.Point((64 - formattedText.Width) / 2, (64 - formattedText.Height) / 2));
+                    initials = mod.RepoName.Substring(0, Math.Min(2, mod.RepoName.Length)).ToUpper();
                 }
 
-                // Render to bitmap
-                var renderTarget = new System.Windows.Media.Imaging.RenderTargetBitmap(
-                    64, 64, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
-                renderTarget.Render(drawingVisual);
-
-                // Convert to BitmapImage
-                var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
-                encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(renderTarget));
-
-                using var memoryStream = new System.IO.MemoryStream();
-                encoder.Save(memoryStream);
-                memoryStream.Position = 0;
-
-                var bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.StreamSource = memoryStream;
-                bitmapImage.EndInit();
-                bitmapImage.Freeze();
-
                 // Set the placeholder image
-                setImage(bitmapImage);
+                setImage(RenderTextAvatar(initials, r, g, b));
             }
             catch (Exception ex)
             {
                 OnDiagLog?.Invoke($"Error creating placeholder: {ex.Message}");
             }
         }
+
+        private BitmapImage GetTextBasedAvatarImageOf(string name) =>
+            // Cornflower blue
+            RenderTextAvatar((name + "  ").Substring(0, 2).Trim(), 100, 149, 237);
     }
 }

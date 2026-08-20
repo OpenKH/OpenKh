@@ -1,0 +1,48 @@
+<common:DialogWindowBase
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:common="using:OpenKh.Tools.Common.Avalonia"
+        x:Class="OpenKh.Tools.ModsManager.Views.PresetsWindow"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        Title="Presets" Height="300" Width="300" SizeToContent="Height"
+        Background="{Binding ColorTheme.BackgroundColor}">
+
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}"/>
+    </Window.KeyBindings>
+
+    <DockPanel Margin="10">
+
+        <!-- Add new preset -->
+        <StackPanel DockPanel.Dock="Bottom">
+            <TextBlock Margin="0 0 0 3" Foreground="{Binding ColorTheme.TextColor}">Name Preset</TextBlock>
+            <TextBox Name="txtSourceModUrl" Margin="0 0 0 5"
+                     Watermark="Enter New Preset Name"
+                     Text="{Binding PresetName}" KeyUp="txtSourceModUrl_KeyUp" />
+            <Button Click="Save_Click" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">Save</Button>
+        </StackPanel>
+
+        <Grid ColumnDefinitions="*,100">
+            <ScrollViewer Grid.Column="0" MinHeight="200">
+                <ListBox Name="List_Presets" ItemsSource="{Binding MainVm.PresetList}"
+                         Background="{Binding ColorTheme.BackgroundColor}"
+                         Foreground="{Binding ColorTheme.TextColor}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center" Text="{Binding}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+
+            <StackPanel Grid.Column="1" Margin="10">
+                <Button Click="Button_ApplyPreset" Margin="0 10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">Apply</Button>
+                <Button Click="Button_RemovePreset" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">Remove</Button>
+            </StackPanel>
+        </Grid>
+
+    </DockPanel>
+</common:DialogWindowBase>

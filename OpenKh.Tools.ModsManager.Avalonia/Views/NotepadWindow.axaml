@@ -1,0 +1,19 @@
+<common:DialogWindowBase
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:common="using:OpenKh.Tools.Common.Avalonia"
+        x:Class="OpenKh.Tools.ModsManager.Views.NotepadWindow"
+        WindowStartupLocation="CenterOwner"
+        Title="NotepadWindow" Height="450" Width="800">
+    <DockPanel LastChildFill="True">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="4" Margin="4">
+            <Button Command="{Binding CopyAllCommand}" Content="_Copy all"/>
+            <Button Command="{Binding SaveAsCommand}" Content="Save _as"/>
+        </StackPanel>
+        <TextBox Text="{Binding Text}" AcceptsReturn="True" AcceptsTab="True"
+                 Foreground="{Binding ColorTheme.TextColor}"
+                 Background="{Binding ColorTheme.BackgroundColor}"
+                 FontFamily="monospace"
+                 />
+    </DockPanel>
+</common:DialogWindowBase>

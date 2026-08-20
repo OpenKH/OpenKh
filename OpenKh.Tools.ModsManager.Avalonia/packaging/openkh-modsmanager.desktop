@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=OpenKH Mods Manager
+Comment=Install and manage Kingdom Hearts mods
+Exec=OpenKh.Tools.ModsManager.Avalonia
+Icon=openkh-modsmanager
+Terminal=false
+Categories=Game;Utility;

@@ -1,0 +1,39 @@
+name: .NET (Linux Mods Manager)
+
+on:
+  push:
+    branches: [ "master", "fix-*", "avalonia" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Build Mods Manager (Avalonia)
+      run: dotnet build OpenKh.Tools.ModsManager.Avalonia/OpenKh.Tools.ModsManager.Avalonia.csproj -c Release
+    - name: Test Mods Manager (Avalonia Headless)
+      run: dotnet test OpenKh.Tests.ModsManager.Avalonia/OpenKh.Tests.ModsManager.Avalonia.csproj -c Release
+    - name: Build AppImage
+      run: ./build-linux-modsmanager.sh
+
+    - name: Upload AppImage artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: openkh-modsmanager-linux
+        path: openkh-modsmanager-x86_64.AppImage
+
+    # Once the Linux port is considered stable, the AppImage can additionally
+    # be attached to the same rolling releases the Windows build publishes to
+    # (see dotnet.yml), by mirroring its marvinpinto/action-automatic-releases
+    # steps here with files: openkh-modsmanager-x86_64.AppImage.

@@ -11,7 +11,7 @@ namespace OpenKh.Tools.ModsManager.Services
         /// <returns>Return final yml blob if it is good to save. Otherwise return `null` if it is not fit to save.</returns>
         public delegate Task<byte[]> GetDiffAsyncDelegate(byte[] rawInput, byte[] rawOutput);
 
-        public async Task RefillAssetFilesAsync(
+        public Task RefillAssetFilesAsync(
             List<AssetFile> assetFiles,
             string sourceDir
         )
@@ -79,6 +79,8 @@ namespace OpenKh.Tools.ModsManager.Services
                     assetFiles.Add(asset);
                 }
             }
+
+            return Task.CompletedTask;
         }
     }
 }

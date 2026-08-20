@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:OpenKh.Tools.ModsManager.Views"
+             x:Class="OpenKh.Tools.ModsManager.Views.ModManagerView"
+             Background="{Binding ColorTheme.BackgroundColor}">
+    <Grid Margin="10" ColumnDefinitions="*,24,10,282">
+
+        <!-- Priority-ordered mod list with the header/footer labels the WPF
+             version drew via a ListBox control template. -->
+        <Border Grid.Column="0" BorderThickness="1" BorderBrush="#FFABADB3">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <StackPanel Grid.Row="0" Margin="3" Background="{Binding ColorTheme.BackgroundColor}">
+                    <TextBlock HorizontalAlignment="Center" Text="Highest priority" Foreground="{Binding ColorTheme.TextColor}"/>
+                    <Border Margin="3" Height="1" Background="#FFABADB3"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Margin="3" Background="{Binding ColorTheme.BackgroundColor}">
+                    <Border Margin="3" Height="1" Background="#FFABADB3"/>
+                    <TextBlock HorizontalAlignment="Center" Text="Lowest priority" Foreground="{Binding ColorTheme.TextColor}"/>
+                </StackPanel>
+                <ListBox Grid.Row="1"
+                    VerticalAlignment="Stretch"
+                    Background="{Binding ColorTheme.BackgroundColor}"
+                    ItemsSource="{Binding ModsList}"
+                    SelectedValue="{Binding SelectedValue}" KeyUp="ListBox_KeyUp"
+                    HorizontalAlignment="Stretch">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Height="64" Margin="3" ColumnDefinitions="Auto,*">
+                                <CheckBox Grid.Column="0" VerticalAlignment="Center" IsChecked="{Binding Enabled}" Foreground="{Binding ColorTheme.TextColor}">
+                                    <CheckBox.Content>
+                                        <Grid Margin="3 1 10 0">
+                                            <Image Width="64" Height="64" Source="{Binding IconImage}"/>
+                                        </Grid>
+                                    </CheckBox.Content>
+                                </CheckBox>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="{Binding ColorTheme.TextColor}"/>
+                                    <TextBlock Text="{Binding Author}" Foreground="{Binding ColorTheme.TextColor}"/>
+                                    <TextBlock IsVisible="{Binding UpdateVisibility, Converter={StaticResource VisibilityToBool}}" Text="Update available" Foreground="{Binding ColorTheme.TextColor}"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="1">
+            <StackPanel VerticalAlignment="Center">
+                <Button Margin="0 3 0 3" Command="{Binding MoveTop}" ToolTip.Tip="Moves Selected mod to the top." Padding="4">⤒</Button>
+                <Button Margin="0 3 0 3" Command="{Binding MoveUp}" ToolTip.Tip="Moves selected mod up increasing its priority." Padding="4">↑</Button>
+                <Button Margin="0 3 0 3" Command="{Binding MoveDown}" ToolTip.Tip="Moves selected mod down decreasing its priority." Padding="4">↓</Button>
+                <Button Margin="0 3 0 3" Command="{Binding AddModCommand}" ToolTip.Tip="Install a new mod." Padding="4">+</Button>
+                <Button Margin="0 3 0 3" Command="{Binding RemoveModCommand}" ToolTip.Tip="Delete selected mod." Padding="4">−</Button>
+                <Button Margin="0 3 0 3" Command="{Binding OpenModSearchCommand}" ToolTip.Tip="Search and download mods online." Padding="4">🔍</Button>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Column="3">
+            <StackPanel IsVisible="{Binding IsModUnselectedMessageVisible, Converter={StaticResource VisibilityToBool}}">
+                <TextBlock Margin="0 0 0 3" Text="The selected mod info will be displayed here." TextWrapping="Wrap" Foreground="{Binding ColorTheme.TextColor}"/>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Foreground="{Binding ColorTheme.TextColor}"
+                           Text="To add a new mod click the '+' button or go to the Mods menu. A simple mod to add for testing can be 'OpenKH/mod-template'."/>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Foreground="{Binding ColorTheme.TextColor}"
+                           Text="Once you have selected the mods you want to, go to the menu 'Run' and then select 'Build and Run'! The 'Build' is only required when the content of a mod or the selected mod changes. If you are unsure, you can just always use 'Build and Run'."/>
+            </StackPanel>
+            <ScrollViewer IsVisible="{Binding IsModInfoVisible, Converter={StaticResource VisibilityToBool}}">
+                <local:ModDetailsView DataContext="{Binding SelectedValue}"/>
+            </ScrollViewer>
+        </Grid>
+
+    </Grid>
+</UserControl>

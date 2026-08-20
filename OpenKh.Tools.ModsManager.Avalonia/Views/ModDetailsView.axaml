@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="OpenKh.Tools.ModsManager.Views.ModDetailsView">
+    <StackPanel>
+        <TextBlock Margin="0 0 0 3" FontWeight="Bold" Text="{Binding Title}" Foreground="{Binding ColorTheme.TextColor}"/>
+        <StackPanel IsVisible="{Binding SourceVisibility, Converter={StaticResource VisibilityToBool}}">
+            <TextBlock Margin="0 0 0 3" Text="{Binding Author}" Foreground="#569CD6"
+                       Cursor="Hand" Tag="{Binding AuthorUrl}" PointerReleased="Link_PointerReleased"/>
+            <StackPanel IsVisible="{Binding UpdateVisibility, Converter={StaticResource VisibilityToBool}}">
+                <TextBlock Margin="0 0 0 3" Foreground="{Binding ColorTheme.TextColor}">
+                    <Run>The mod is </Run>
+                    <Run Text="{Binding UpdateCount}"/>
+                    <Run> updates behind.</Run>
+                </TextBlock>
+                <Button Margin="0 0 0 3" Content="Download updates" Command="{Binding UpdateCommand}"/>
+            </StackPanel>
+        </StackPanel>
+        <Image MaxWidth="256" MaxHeight="144" Margin="0 3 0 3" Source="{Binding PreviewImage}"
+               IsVisible="{Binding PreviewImageVisibility, Converter={StaticResource VisibilityToBool}}"/>
+        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Text="{Binding Description}" Foreground="{Binding ColorTheme.TextColor}"/>
+        <StackPanel IsVisible="{Binding SourceVisibility, Converter={StaticResource VisibilityToBool}}">
+            <TextBlock Margin="0 0 0 3" Text="Mod source code" Foreground="#569CD6"
+                       Cursor="Hand" Tag="{Binding SourceUrl}" PointerReleased="Link_PointerReleased"/>
+            <TextBlock Margin="0 0 0 3" Text="Report bug" Foreground="#569CD6"
+                       Cursor="Hand" Tag="{Binding ReportBugUrl}" PointerReleased="Link_PointerReleased"/>
+        </StackPanel>
+        <StackPanel IsVisible="{Binding LocalVisibility, Converter={StaticResource VisibilityToBool}}">
+            <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" FontStyle="Italic" Foreground="{Binding ColorTheme.TextColor}"
+                       Text="This mod is available only locally and it is not linked to any GitHub repository."/>
+        </StackPanel>
+        <Grid ColumnDefinitions="*,*">
+            <StackPanel IsVisible="{Binding CollectionSettingsVisibility, Converter={StaticResource VisibilityToBool}}">
+                <Button Margin="0 0 0 3"
+                        Command="{Binding CollectionSettingsCommand}"
+                        ToolTip.Tip="Control which optional mod files are patched for this collection.">
+                    <TextBlock Text="Collection Settings"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Expander Header="Files to patch">
+            <TextBlock Text="{Binding FilesToPatch}" TextWrapping="Wrap" Foreground="{Binding ColorTheme.TextColor}"/>
+        </Expander>
+    </StackPanel>
+</UserControl>

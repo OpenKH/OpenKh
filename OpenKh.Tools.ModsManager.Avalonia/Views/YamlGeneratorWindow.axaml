@@ -1,0 +1,124 @@
+<common:DialogWindowBase
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:common="using:OpenKh.Tools.Common.Avalonia"
+        xmlns:userControls="using:OpenKh.Tools.ModsManager.UserControls"
+        x:Class="OpenKh.Tools.ModsManager.Views.YamlGeneratorWindow"
+        Background="{Binding ColorTheme.BackgroundColor}"
+        WindowStartupLocation="CenterOwner"
+        Title="YamlGeneratorWindow" Height="694" Width="426">
+    <Window.Styles>
+        <!-- Scope to page panels: a blanket TextBlock style would also hit
+             the TextBlocks generated inside ComboBox selection boxes, where
+             the DataContext is the item and the binding fails. -->
+        <Style Selector="StackPanel > TextBlock">
+            <Setter Property="Padding" Value="3"/>
+            <Setter Property="Foreground" Value="{Binding $parent[Window].DataContext.ColorTheme.TextColor}"/>
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="Foreground" Value="{Binding $parent[Window].DataContext.ColorTheme.TextColor}"/>
+        </Style>
+        <Style Selector="Border.group">
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Padding" Value="7"/>
+            <Setter Property="Margin" Value="0,3"/>
+        </Style>
+        <Style Selector="TextBlock.groupHeader">
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </Window.Styles>
+    <ScrollViewer>
+        <StackPanel Margin="7" Orientation="Vertical">
+            <Border Classes="group">
+                <StackPanel>
+                    <TextBlock Classes="groupHeader" Text="About"/>
+                    <TextBlock TextWrapping="Wrap">YamlGenerator is an embedded tool. Provide a rapid crafting tools to satisfy mod.yml. This is a specialized utility for mod authors.</TextBlock>
+                </StackPanel>
+            </Border>
+            <Border Classes="group">
+                <StackPanel>
+                    <TextBlock Classes="groupHeader" Text="Preferences"/>
+                    <TextBlock TextWrapping="Wrap">
+                        <Run>Load and save the fields of: </Run>
+                        <Run FontStyle="Italic">mod.yml</Run>
+                        <Run> and </Run>
+                        <Run FontStyle="Italic">GameDataPath</Run>
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <ComboBox ItemsSource="{Binding Prefs}" VerticalAlignment="Center" Width="200"
+                          SelectedItem="{Binding SelectedPref}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Label}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBlock />
+                        <Button Content="Load from it" Command="{Binding LoadPrefCommand}" HorizontalAlignment="Left" Padding="7" />
+                        <TextBlock />
+                        <Button Content="Save to it" Command="{Binding SavePrefCommand}" HorizontalAlignment="Left" Padding="7" />
+                    </StackPanel>
+                    <TextBox Watermark="Preference label" Text="{Binding PrefLabel}" Margin="0,3,0,0"/>
+                </StackPanel>
+            </Border>
+            <Border Classes="group">
+                <StackPanel>
+                    <TextBlock Classes="groupHeader" Text="mod.yml"/>
+                    <TextBlock>
+                        <Run>Enter the file path to </Run>
+                        <Run FontStyle="Italic">mod.yml</Run>
+                    </TextBlock>
+                    <userControls:SaveFileSelectorControl FilePath="{Binding ModYmlFilePath, Mode=TwoWay}"
+                                                      Filter="mod.yml|mod.yml|*|*" />
+                </StackPanel>
+            </Border>
+            <Border Classes="group">
+                <StackPanel>
+                    <TextBlock Classes="groupHeader" Text="Diff tool selection"/>
+                    <TextBlock TextWrapping="Wrap">
+                        <Run>You can select a diff tool to see changes for </Run>
+                        <Run FontStyle="Italic">mod.yml</Run>
+                    </TextBlock>
+                    <ComboBox ItemsSource="{Binding Tools}" SelectedItem="{Binding SelectedTool}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+            <Border Classes="group">
+                <StackPanel>
+                    <TextBlock Classes="groupHeader" Text="Generator"/>
+                    <TextBlock TextWrapping="Wrap">
+                        <Run>This generator will construct an initial </Run>
+                        <Run FontStyle="Italic">mod.yml</Run>
+                        <Run> for you.</Run>
+                    </TextBlock>
+                    <Button Content="Generate or update mod.yml" Command="{Binding GenerateCommand}" HorizontalAlignment="Left" Padding="7" />
+                    <userControls:TaskStatusObserverControl Padding="3" Task="{Binding GeneratingTask}" />
+                </StackPanel>
+            </Border>
+            <Border Classes="group">
+                <StackPanel>
+                    <TextBlock Classes="groupHeader" Text="Target files appender"/>
+                    <TextBlock TextWrapping="Wrap">
+                        <Run>This appender will copy the source files from </Run>
+                        <Run FontStyle="Italic">GameDataPath</Run>
+                        <Run> into </Run>
+                        <Run FontStyle="Italic">mod.yml</Run>
+                        <Run>. After copy process, you can edit the copied files for modding purpose.</Run>
+                    </TextBlock>
+                    <TextBlock>GameDataPath</TextBlock>
+                    <userControls:FolderSelectorControl FolderPath="{Binding GameDataPath, Mode=TwoWay}" />
+                    <TextBlock />
+                    <Button Content="Begin" Command="{Binding AppenderCommand}" HorizontalAlignment="Left" Padding="7" />
+                    <userControls:TaskStatusObserverControl Padding="3" Task="{Binding AppenderTask}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</common:DialogWindowBase>

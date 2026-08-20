@@ -1,0 +1,54 @@
+<common:DialogWindowBase
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:common="using:OpenKh.Tools.Common.Avalonia"
+        xmlns:userControls="using:OpenKh.Tools.ModsManager.UserControls"
+        x:Class="OpenKh.Tools.ModsManager.Views.SelectModTargetFilesWindow"
+        Background="{Binding ColorTheme.BackgroundColor}"
+        WindowStartupLocation="CenterOwner"
+        Title="SelectModTargetFilesWindow" Height="558" Width="800">
+    <DockPanel LastChildFill="True">
+        <DockPanel LastChildFill="True" DockPanel.Dock="Top" VerticalAlignment="Top">
+            <TextBlock Margin="3" Padding="3" DockPanel.Dock="Left" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="{Binding ColorTheme.TextColor}">Search keywords:</TextBlock>
+            <userControls:TaskStatusByIconControl Width="32" Height="32" DockPanel.Dock="Right" Margin="3,0,3,0"
+                                                  Task="{Binding SearchingTask}" />
+            <Button Margin="3" DockPanel.Dock="Right" Content="_Search" Padding="7" Command="{Binding SearchCommand}" IsDefault="True" />
+            <TextBox Margin="3" VerticalAlignment="Center" Padding="3" Text="{Binding SearchKeywords}" />
+        </DockPanel>
+        <TextBlock Text="Search result (one item represents one file)" Margin="3" Padding="3" DockPanel.Dock="Top" Foreground="{Binding ColorTheme.TextColor}"/>
+        <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+            <TextBlock Text="Actions:" Margin="3" Padding="3" Foreground="{Binding ColorTheme.TextColor}"/>
+            <ItemsControl ItemsSource="{Binding Actions}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding Display}" Padding="7" Margin="5" Command="{Binding Command}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+        <Border DockPanel.Dock="Bottom" BorderBrush="Gray" BorderThickness="1" Margin="3" Padding="4">
+            <StackPanel>
+                <TextBlock Text="Help" FontWeight="Bold" Foreground="{Binding ColorTheme.TextColor}"/>
+                <ItemsControl ItemsSource="{Binding Actions}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Display}" TextDecorations="Underline" Foreground="{Binding ColorTheme.TextColor}"/>
+                                <TextBlock Margin="7,0,0,0" Text="{Binding ToolTip}" TextWrapping="Wrap" Foreground="{Binding ColorTheme.TextColor}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <ListBox Margin="3" ItemsSource="{Binding SearchHits}" SelectionChanged="ListBox_SelectionChanged"
+                 SelectionMode="Multiple">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Display}" HorizontalAlignment="Stretch" Foreground="{Binding ColorTheme.TextColor}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</common:DialogWindowBase>

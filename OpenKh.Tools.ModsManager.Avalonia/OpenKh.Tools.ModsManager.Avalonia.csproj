@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyTitle>Mods Manager</AssemblyTitle>
+    <Product>Mods Manager - OpenKH</Product>
+    <RootNamespace>OpenKh.Tools.ModsManager</RootNamespace>
+    <!-- Reflection bindings keep the ported WPF binding expressions working
+         while views are migrated; compiled bindings can be adopted per-view
+         later with x:DataType. -->
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <!-- Business logic is shared with the WPF project (single source of truth
+       during the transition): everything except the WPF UI layer (Views,
+       UserControls, Styles, Converters, App), the WPF-era settings designer
+       and the services that create WPF windows directly, which have Avalonia
+       counterparts in this project. -->
+  <ItemGroup>
+    <Compile Include="..\OpenKh.Tools.ModsManager\ViewModels\**\*.cs" LinkBase="Shared\ViewModels" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Services\**\*.cs" LinkBase="Shared\Services"
+             Exclude="..\OpenKh.Tools.ModsManager\Services\SettingBinding.cs;..\OpenKh.Tools.ModsManager\Services\GetActiveWindowService.cs;..\OpenKh.Tools.ModsManager\Services\**\*.Wpf.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Models\**\*.cs" LinkBase="Shared\Models" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Exceptions\**\*.cs" LinkBase="Shared\Exceptions" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\ExtensionMethods\**\*.cs" LinkBase="Shared\ExtensionMethods" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Interfaces\**\*.cs" LinkBase="Shared\Interfaces" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Helpers.cs" LinkBase="Shared" />
+    <!-- Plain view-model classes that live in the WPF project's Views folder
+         (the .xaml/.xaml.cs views themselves are NOT shared). -->
+    <Compile Include="..\OpenKh.Tools.ModsManager\Views\*VM.cs" LinkBase="Shared\ViewVMs"
+             Exclude="..\OpenKh.Tools.ModsManager\Views\ModSearchVM.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.2" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Runtime.Caching" Version="8.0.1" />
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="Octokit" Version="14.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
+    <ProjectReference Include="..\OpenKh.Egs\OpenKh.Egs.csproj" />
+    <ProjectReference Include="..\OpenKh.Kh1\OpenKh.Kh1.csproj" />
+    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+    <ProjectReference Include="..\OpenKh.Patcher\OpenKh.Patcher.csproj" />
+    <ProjectReference Include="..\OpenKh.Recom\OpenKh.Recom.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.Common.Avalonia\OpenKh.Tools.Common.Avalonia.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
+  </ItemGroup>
+
+</Project>

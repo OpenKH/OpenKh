@@ -13,8 +13,6 @@ namespace OpenKh.Tools.Common.Wpf
         public bool _isEnabled = true;
 
         public event EventHandler CanExecuteChanged;
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public SimpleAsyncActionCommand(
             Func<T, Task> asyncAction,
             Action<Task> newTask = null

@@ -49,10 +49,17 @@ namespace OpenKh.Tools.ModsManager.Services
                 .Build();
 
             public int WizardVersionNumber { get; set; }
+
+            public double WindowWidth { get; internal set; }
+            public double WindowHeight { get; internal set; }
+            public int WindowX { get; internal set; }
+            public int WindowY { get; internal set; }
+            public bool WindowMaximized { get; internal set; }
             public string ExtractedGameDataPath { get; internal set; }
             public string InstalledModsPath { get; internal set; }
             public string InstalledCollectionsPath { get; internal set; }
             public string CompiledModPath { get; internal set; }
+
             public int GameEdition { get; internal set; } = 1;
             public string IsoLocationKH2 { get; internal set; }
             public string IsoLocationKH1 { get; internal set; }
@@ -97,7 +104,37 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        private static string StoragePath = OpenkhInstallation.Directory;
+
+        private static string StoragePath = GetWritableStoragePath();
+
+        private static string GetWritableStoragePath()
+        {
+            var installationDirectory = OpenkhInstallation.Directory;
+            if (IsDirectoryWritable(installationDirectory))
+                return installationDirectory;
+
+            var dataDirectory = Path.Combine(
+                System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
+                "OpenKh",
+                "ModsManager");
+            Directory.CreateDirectory(dataDirectory);
+            return dataDirectory;
+        }
+
+        private static bool IsDirectoryWritable(string directory)
+        {
+            try
+            {
+                var probe = Path.Combine(directory, $".openkh-write-probe-{System.Guid.NewGuid():N}");
+                using (File.Create(probe, 1, FileOptions.DeleteOnClose)) { }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private static string ConfigPath = Path.Combine(StoragePath, "mods-manager.yml");
         private static string EnabledModsPathKH1 = Path.Combine(StoragePath, "mods-KH1.txt");
         private static string EnabledModsPathKH2 = Path.Combine(StoragePath, "mods-KH2.txt");
@@ -644,6 +681,56 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.DarkMode = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static double WindowWidth
+        {
+            get => _config.WindowWidth;
+            set
+            {
+                _config.WindowWidth = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static double WindowHeight
+        {
+            get => _config.WindowHeight;
+            set
+            {
+                _config.WindowHeight = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static int WindowX
+        {
+            get => _config.WindowX;
+            set
+            {
+                _config.WindowX = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static int WindowY
+        {
+            get => _config.WindowY;
+            set
+            {
+                _config.WindowY = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static bool WindowMaximized
+        {
+            get => _config.WindowMaximized;
+            set
+            {
+                _config.WindowMaximized = value;
                 _config.Save(ConfigPath);
             }
         }

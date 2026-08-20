@@ -5,6 +5,7 @@
 #include <intrin.h>
 #include <Shlwapi.h>
 #include <Psapi.h>
+#include <tlhelp32.h>
 #include <list>
 
 #include "OpenKH.h"
@@ -104,9 +105,54 @@ int QuickLaunch = 0;
 __int64 (*LaunchGame)(int game);
 __int64 (*LaunchGameEpic)(int game);
 __int64 (*LaunchGameSteam)(int game);
+
+static bool IsRunningUnderWine()
+{
+    HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+    return ntdll && GetProcAddress(ntdll, "wine_get_version");
+}
+
+static bool IsGameProcessRunning()
+{
+    bool found = false;
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == INVALID_HANDLE_VALUE)
+        return false;
+    PROCESSENTRY32W entry{ sizeof(entry) };
+    if (Process32FirstW(snapshot, &entry))
+    {
+        do
+        {
+            if (entry.th32ProcessID != GetCurrentProcessId()
+                && !_wcsnicmp(entry.szExeFile, L"KINGDOM HEARTS", 14)
+                && !StrStrIW(entry.szExeFile, L"Launcher"))
+            {
+                found = true;
+                break;
+            }
+        } while (Process32NextW(snapshot, &entry));
+    }
+    CloseHandle(snapshot);
+    return found;
+}
+
 void QuickBootHook()
 {
     LaunchGame(QuickLaunch);
+    // Under Proton, exiting the launcher in the same instant the game
+    // launch is requested races Steam's session tracking: the new game
+    // process can try to start while the launcher's wineserver session
+    // is still tearing down, leaving Steam stuck on "Launching". Linger
+    // until the game process is visible, bounded so a failed launch
+    // (or a launch Steam defers until this process exits) can't keep
+    // the launcher alive forever, then give Steam a moment to register
+    // the new process before this one goes away.
+    if (IsRunningUnderWine())
+    {
+        for (int waited = 0; waited < 10000 && !IsGameProcessRunning(); waited += 200)
+            Sleep(200);
+        Sleep(1000);
+    }
     ExitProcess(QuickLaunch);
 }
 
