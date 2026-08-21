@@ -69,7 +69,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool SoundDebug { get; internal set; } = false;
             public bool EnableCache { get; internal set; } = true;
             public bool QuickMenu { get; internal set; } = false;
-            public bool DevView { get; internal set; } = false;
+            public bool EnablePatching { get; internal set; } = false;
             public bool AutoUpdateMods { get; internal set; }
             public string pcVersion { get; internal set; } = "EGS";
             public bool steamAPITrick1525 {  get; internal set; } = false;
@@ -495,12 +495,12 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
-        public static bool DevView
+        public static bool EnablePatching
         {
-            get => _config.DevView;
+            get => _config.EnablePatching;
             set
             {
-                _config.DevView = value;
+                _config.EnablePatching = value;
                 _config.Save(ConfigPath);
             }
         }
