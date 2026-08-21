@@ -1,6 +1,21 @@
 OPENKH QUICK START FOR LINUX AND STEAM DECK
 ============================================
 
+APPIMAGE
+--------
+
+Download openkh-x86_64.AppImage, make it executable, and run it:
+
+    chmod +x openkh-x86_64.AppImage
+    ./openkh-x86_64.AppImage
+
+The AppImage contains both the Launcher and Mod Manager. Settings, installed
+mods, and extracted game data are stored in $XDG_DATA_HOME/OpenKH or, when that
+variable is not set, $HOME/.local/share/OpenKH.
+
+PORTABLE ZIP
+------------
+
 Open a terminal in this folder and run:
 
     sh install-openkh-linux.sh

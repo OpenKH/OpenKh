@@ -12,7 +12,7 @@ The launcher is the cross-platform entry point for OpenKH releases. It keeps the
 - Supports SDL gamepads throughout the interface.
 - Uses Steam launcher mode when Steam Input owns the controller.
 - Opens the Steam Deck floating keyboard when a text field receives focus.
-- Uses Steam App ID 480 for development and non-Steam testing.
+- Runs from a single AppImage while keeping user data in the standard Linux data directory.
 
 ## Publish
 
@@ -21,3 +21,7 @@ The launcher is the cross-platform entry point for OpenKH releases. It keeps the
 ```
 
 The script creates self-contained, single-file builds for Windows, Linux, and Steam Deck.
+
+The release workflow also packages the Linux Launcher and Mod Manager as
+`openkh-x86_64.AppImage`. The AppImage build uses the prepared Linux release
+layout, so it contains the same Panacea files as the portable ZIP.

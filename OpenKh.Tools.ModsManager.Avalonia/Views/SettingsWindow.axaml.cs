@@ -93,13 +93,15 @@ public sealed partial class SettingsWindow : EmbeddedDialogControl
 
         try
         {
-            var launcherPath = Path.Combine(_configuration.InstallationDirectory, "OpenKh.Launcher.exe");
-            if (File.Exists(launcherPath))
+            var launcherPath = OpenKhUpdateEnvironment.FindLauncher(
+                _configuration.InstallationDirectory,
+                AppContext.BaseDirectory);
+            if (launcherPath is not null)
             {
                 Process.Start(new ProcessStartInfo(launcherPath)
                 {
-                    UseShellExecute = true,
-                    WorkingDirectory = _configuration.InstallationDirectory
+                    UseShellExecute = false,
+                    WorkingDirectory = Path.GetDirectoryName(launcherPath)
                 });
                 UpdateStatusText.Text = "The OpenKH Launcher was opened. Use its update button to install the complete package.";
                 return;
@@ -121,6 +123,8 @@ public sealed partial class SettingsWindow : EmbeddedDialogControl
 
     public void HandleControllerAction(ControllerAction action)
     {
+        if (ControllerWindowNavigator.TryMoveFocus(this, action))
+            return;
         if (action is ControllerAction.PreviousControl or ControllerAction.PreviousItem)
             ControllerWindowNavigator.MoveFocus(this, -1);
         else if (action is ControllerAction.NextControl or ControllerAction.NextItem)

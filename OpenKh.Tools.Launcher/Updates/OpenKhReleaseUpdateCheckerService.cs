@@ -72,6 +72,10 @@ namespace OpenKh.Tools.Launcher.Updates
         }
 
         private static string GetReleaseAssetName() =>
-            OperatingSystem.IsWindows() ? "openkh.zip" : "openkh-linux-x64.zip";
+            OperatingSystem.IsWindows()
+                ? "openkh.zip"
+                : LauncherInstallation.IsAppImage
+                    ? "openkh-x86_64.AppImage"
+                    : "openkh-linux-x64.zip";
     }
 }

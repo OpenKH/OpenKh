@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=OpenKH
+Comment=Manage and play Kingdom Hearts mods
+Exec=openkh
+Icon=openkh
+Terminal=false
+Categories=Game;Utility;
+StartupWMClass=OpenKh.Launcher

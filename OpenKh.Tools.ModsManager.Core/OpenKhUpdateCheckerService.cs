@@ -51,7 +51,10 @@ public sealed class OpenKhUpdateCheckerService
 
     private string ReadCurrentVersion()
     {
-        var versionFile = Path.Combine(_configuration.InstallationDirectory, "openkh-release");
+        var versionDirectory = OpenKhUpdateEnvironment.FindVersionDirectory(
+            _configuration.InstallationDirectory,
+            AppContext.BaseDirectory);
+        var versionFile = Path.Combine(versionDirectory, "openkh-release");
         if (!File.Exists(versionFile))
             return "Unknown version";
 
@@ -63,7 +66,7 @@ public sealed class OpenKhUpdateCheckerService
     private static ReleaseAsset? FindLatestRelease(JsonElement releases)
     {
         ReleaseAsset? latest = null;
-        var assetName = OperatingSystem.IsWindows() ? "openkh.zip" : "openkh-linux-x64.zip";
+        var assetName = OpenKhUpdateEnvironment.ReleaseAssetName;
         foreach (var release in releases.EnumerateArray())
         {
             var tag = release.GetProperty("tag_name").GetString() ?? string.Empty;

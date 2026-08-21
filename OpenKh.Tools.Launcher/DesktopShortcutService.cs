@@ -6,10 +6,18 @@ namespace OpenKh.Tools.Launcher;
 
 internal static class DesktopShortcutService
 {
-    public static string CreateModManagerShortcut(string targetPath, string? shortcutDirectory = null)
+    public static string CreateModManagerShortcut(
+        string targetPath,
+        string? shortcutDirectory = null) =>
+        CreateModManagerShortcut(targetPath, null, shortcutDirectory);
+
+    public static string CreateModManagerShortcut(
+        string targetPath,
+        IEnumerable<string>? arguments,
+        string? shortcutDirectory = null)
     {
         if (!OperatingSystem.IsWindows())
-            return CreateLinuxShortcut(targetPath, shortcutDirectory);
+            return CreateLinuxShortcut(targetPath, arguments, shortcutDirectory);
 
         shortcutDirectory ??= Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
         var shortcutPath = Path.Combine(shortcutDirectory, "OpenKH Mod Manager.lnk");
@@ -32,6 +40,9 @@ internal static class DesktopShortcutService
 
             var shortcutType = shortcut.GetType();
             shortcutType.InvokeMember("TargetPath", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { targetPath });
+            var argumentText = string.Join(" ", arguments ?? []);
+            if (argumentText.Length > 0)
+                shortcutType.InvokeMember("Arguments", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { argumentText });
             shortcutType.InvokeMember("WorkingDirectory", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { Path.GetDirectoryName(targetPath)! });
             shortcutType.InvokeMember("Description", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { "Open OpenKH Mod Manager" });
             shortcutType.InvokeMember("IconLocation", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { $"{targetPath},0" });
@@ -48,7 +59,10 @@ internal static class DesktopShortcutService
         return shortcutPath;
     }
 
-    private static string CreateLinuxShortcut(string targetPath, string? shortcutDirectory)
+    private static string CreateLinuxShortcut(
+        string targetPath,
+        IEnumerable<string>? arguments,
+        string? shortcutDirectory)
     {
         if (string.IsNullOrWhiteSpace(shortcutDirectory))
         {
@@ -66,12 +80,16 @@ internal static class DesktopShortcutService
         Directory.CreateDirectory(shortcutDirectory);
         var shortcutPath = Path.Combine(shortcutDirectory, "openkh-mod-manager.desktop");
         var escapedTarget = EscapeDesktopEntryValue(targetPath);
+        var escapedArguments = string.Join(" ", (arguments ?? []).Select(EscapeDesktopEntryArgument));
+        var exec = escapedArguments.Length == 0
+            ? $"\"{escapedTarget}\""
+            : $"\"{escapedTarget}\" {escapedArguments}";
         var content = new StringBuilder()
             .AppendLine("[Desktop Entry]")
             .AppendLine("Type=Application")
             .AppendLine("Name=OpenKH Mod Manager")
             .AppendLine("Comment=Open OpenKH Mod Manager")
-            .AppendLine($"Exec=\"{escapedTarget}\"")
+            .AppendLine($"Exec={exec}")
             .AppendLine($"Path=\"{EscapeDesktopEntryValue(Path.GetDirectoryName(targetPath) ?? string.Empty)}\"")
             .AppendLine("Terminal=false")
             .AppendLine("Categories=Game;Utility;")
@@ -91,4 +109,7 @@ internal static class DesktopShortcutService
 
     private static string EscapeDesktopEntryValue(string value) =>
         value.Replace("\\", "\\\\").Replace("\"", "\\\"");
+
+    private static string EscapeDesktopEntryArgument(string value) =>
+        $"\"{EscapeDesktopEntryValue(value)}\"";
 }

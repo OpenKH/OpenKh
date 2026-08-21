@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+APP_DIRECTORY="${APPDIR:-$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)}"
+APP_ROOT="$APP_DIRECTORY/usr/lib/openkh"
+DATA_ROOT="${OPENKH_DATA_ROOT:-${XDG_DATA_HOME:-$HOME/.local/share}/OpenKH}"
+
+mkdir -p "$DATA_ROOT"
+export OPENKH_DATA_ROOT="$DATA_ROOT"
+export LD_LIBRARY_PATH="$APP_DIRECTORY/usr/lib:${APP_ROOT}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
+cd "$DATA_ROOT"
+
+if [ "${1:-}" = "--mod-manager" ]; then
+    shift
+    exec "$APP_ROOT/Apps/OpenKh.Tools.ModsManager" --data-root "$DATA_ROOT" "$@"
+fi
+
+exec "$APP_ROOT/OpenKh.Launcher" "$@"

@@ -16,9 +16,9 @@ jobs:
       with:
         submodules: recursive
     - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 10.0.x
     - name: Restore dependencies
       run: dotnet restore
     - name: pre-build.ps1
@@ -127,6 +127,13 @@ jobs:
           throw "Linux archive entry '$invalidLinuxEntry' contains a Windows path separator."
         }
 
+    - name: Upload Linux release layout
+      uses: actions/upload-artifact@v4
+      with:
+        name: openkh-linux-layout
+        path: openkh-linux-x64
+        if-no-files-found: error
+
     - name: "GitHub release latest"
       if: ${{ github.ref_name == 'master' }}
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -151,3 +158,84 @@ jobs:
         files: |
           openkh.zip
           openkh-linux-x64.zip
+
+  appimage:
+    needs: build
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download Linux release layout
+      uses: actions/download-artifact@v4
+      with:
+        name: openkh-linux-layout
+        path: openkh-linux-x64
+
+    - name: Install AppImage build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --yes \
+          imagemagick \
+          libfontconfig1 \
+          libfreetype6 \
+          libice6 \
+          libsm6 \
+          libx11-6 \
+          libx11-xcb1 \
+          libxcb1 \
+          xvfb
+
+    - name: Build AppImage
+      shell: bash
+      env:
+        RELEASE_TAG: release2-${{ github.run_number }}
+      run: |
+        sh ./.github/scripts/prepare-appimage.sh \
+          openkh-linux-x64 \
+          openkh-x86_64.AppImage \
+          "$RELEASE_TAG"
+
+    - name: Validate AppImage
+      shell: bash
+      run: |
+        ./openkh-x86_64.AppImage --appimage-version
+        ./openkh-x86_64.AppImage --appimage-extract >/dev/null
+        test -x squashfs-root/AppRun
+        test -x squashfs-root/usr/lib/openkh/OpenKh.Launcher
+        test -x squashfs-root/usr/lib/openkh/Apps/OpenKh.Tools.ModsManager
+        test -f squashfs-root/usr/lib/openkh/Apps/OpenKH.Panacea.dll
+        APPIMAGE_EXTRACT_AND_RUN=1 \
+          OPENKH_DATA_ROOT="$RUNNER_TEMP/openkh-appimage-test" \
+          xvfb-run -a sh -c '
+            "$1" &
+            app_pid=$!
+            sleep 5
+            if ! kill -0 "$app_pid" 2>/dev/null; then
+              wait "$app_pid" || true
+              echo "The AppImage launcher exited before the smoke test completed." >&2
+              exit 1
+            fi
+            kill "$app_pid"
+            wait "$app_pid" || true
+          ' sh ./openkh-x86_64.AppImage
+
+    - name: Upload AppImage artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: openkh-appimage
+        path: openkh-x86_64.AppImage
+        if-no-files-found: error
+
+    - name: Add AppImage to latest release
+      if: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: gh release upload latest openkh-x86_64.AppImage --clobber
+
+    - name: Add AppImage to numbered release
+      if: ${{ github.event_name == 'push' }}
+      env:
+        GH_TOKEN: ${{ github.token }}
+        RELEASE_TAG: release2-${{ github.run_number }}
+      run: gh release upload "$RELEASE_TAG" openkh-x86_64.AppImage --clobber

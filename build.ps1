@@ -34,6 +34,13 @@ function Get-CSProjects([string]$filter) {
         if ( Test-Path -Path $csprojPath -PathType Leaf ) {
             Write-Output $csprojPath
         }
+        else {
+            # Some projects retain their public assembly name after moving to a platform-specific directory.
+            $projectFiles = @(Get-ChildItem -LiteralPath $_.FullName -Filter "*.csproj" -File)
+            if ($projectFiles.Count -eq 1) {
+                Write-Output $projectFiles[0].FullName
+            }
+        }
     }
 }
 

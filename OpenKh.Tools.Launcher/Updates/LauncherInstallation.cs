@@ -2,7 +2,15 @@ namespace OpenKh.Tools.Launcher.Updates;
 
 public static class LauncherInstallation
 {
+    public const string DataRootEnvironmentVariable = "OPENKH_DATA_ROOT";
+
     public static string RootDirectory => DetectRoot(AppContext.BaseDirectory);
+    // AppImage mounts application files read-only, so AppRun redirects mutable data here.
+    public static string DataDirectory => DetectDataDirectory(
+        RootDirectory,
+        Environment.GetEnvironmentVariable(DataRootEnvironmentVariable));
+    public static string? AppImagePath => GetAbsoluteEnvironmentPath("APPIMAGE");
+    public static bool IsAppImage => OperatingSystem.IsLinux() && AppImagePath is not null;
 
     public static string DetectRoot(string applicationBaseDirectory)
     {
@@ -40,5 +48,16 @@ public static class LauncherInstallation
         };
 
         return candidates.FirstOrDefault(File.Exists) ?? candidates[0];
+    }
+
+    public static string DetectDataDirectory(string installationDirectory, string? configuredDataRoot) =>
+        string.IsNullOrWhiteSpace(configuredDataRoot)
+            ? Path.GetFullPath(installationDirectory)
+            : Path.GetFullPath(configuredDataRoot);
+
+    private static string? GetAbsoluteEnvironmentPath(string variableName)
+    {
+        var value = Environment.GetEnvironmentVariable(variableName);
+        return string.IsNullOrWhiteSpace(value) ? null : Path.GetFullPath(value);
     }
 }

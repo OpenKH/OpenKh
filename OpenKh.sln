@@ -238,6 +238,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0AB3BF05
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tests.ModsManager.Core", "OpenKh.Tests.ModsManager.Core\OpenKh.Tests.ModsManager.Core.csproj", "{8EB2DE33-35DB-49FC-B38C-39D3597917AC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tests.ModsManager.Avalonia", "OpenKh.Tests.ModsManager.Avalonia\OpenKh.Tests.ModsManager.Avalonia.csproj", "{2675DCA2-0E95-485C-85EA-ED56F2206899}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tests.Launcher.Avalonia", "OpenKh.Tests.Launcher.Avalonia\OpenKh.Tests.Launcher.Avalonia.csproj", "{FC8505CD-CFBE-471D-8E19-0A1341017B44}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		.NET Debug|Any CPU = .NET Debug|Any CPU
@@ -964,6 +968,22 @@ Global
 		{8EB2DE33-35DB-49FC-B38C-39D3597917AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EB2DE33-35DB-49FC-B38C-39D3597917AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8EB2DE33-35DB-49FC-B38C-39D3597917AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2675DCA2-0E95-485C-85EA-ED56F2206899}..NET Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2675DCA2-0E95-485C-85EA-ED56F2206899}..NET Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2675DCA2-0E95-485C-85EA-ED56F2206899}..NET Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2675DCA2-0E95-485C-85EA-ED56F2206899}..NET Release|Any CPU.Build.0 = Release|Any CPU
+		{2675DCA2-0E95-485C-85EA-ED56F2206899}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2675DCA2-0E95-485C-85EA-ED56F2206899}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2675DCA2-0E95-485C-85EA-ED56F2206899}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2675DCA2-0E95-485C-85EA-ED56F2206899}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC8505CD-CFBE-471D-8E19-0A1341017B44}..NET Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC8505CD-CFBE-471D-8E19-0A1341017B44}..NET Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC8505CD-CFBE-471D-8E19-0A1341017B44}..NET Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC8505CD-CFBE-471D-8E19-0A1341017B44}..NET Release|Any CPU.Build.0 = Release|Any CPU
+		{FC8505CD-CFBE-471D-8E19-0A1341017B44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC8505CD-CFBE-471D-8E19-0A1341017B44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC8505CD-CFBE-471D-8E19-0A1341017B44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC8505CD-CFBE-471D-8E19-0A1341017B44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1063,6 +1083,8 @@ Global
 		{E57E5A3D-CDEA-4A40-BC51-43ECAB0F1E02} = {0FB7CD6A-EE31-467D-A590-267DCD028618}
 		{0596515A-353E-4762-95E9-851B6CE93E9E} = {402B2669-D594-4DFA-965B-02A92626ADC6}
 		{8EB2DE33-35DB-49FC-B38C-39D3597917AC} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{2675DCA2-0E95-485C-85EA-ED56F2206899} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{FC8505CD-CFBE-471D-8E19-0A1341017B44} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DF3960B-4FE5-4E56-92D4-2FC0A912E823}

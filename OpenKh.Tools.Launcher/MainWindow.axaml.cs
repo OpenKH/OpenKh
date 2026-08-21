@@ -38,14 +38,16 @@ public partial class MainWindow : Window
         };
 
     private readonly IControllerInputService _controller;
+    private readonly bool _checkUpdatesOnOpen;
     private readonly List<ToolEntry> _allTools = new();
     private readonly HashSet<string> _favoriteToolNames = new(StringComparer.OrdinalIgnoreCase);
     private OpenKhReleaseUpdateCheckerService.CheckResult? _availableUpdate;
     private bool _compactCards;
 
     private string BaseDirectory => LauncherInstallation.RootDirectory;
+    private string DataDirectory => LauncherInstallation.DataDirectory;
     private string ApplicationsPath => Path.Combine(BaseDirectory, ApplicationsDirectory);
-    private string FavoritesPath => Path.Combine(BaseDirectory, FavoritesFileName);
+    private string FavoritesPath => Path.Combine(DataDirectory, FavoritesFileName);
     private string ModManagerPath => LauncherInstallation.FindModManagerExecutable(BaseDirectory);
     private string CompatibilityModManagerPath => Path.Combine(BaseDirectory, "OpenKh.Tools.ModsManager.exe");
 
@@ -53,9 +55,10 @@ public partial class MainWindow : Window
     {
     }
 
-    public MainWindow(IControllerInputService controller)
+    public MainWindow(IControllerInputService controller, bool checkUpdatesOnOpen = true)
     {
         _controller = controller;
+        _checkUpdatesOnOpen = checkUpdatesOnOpen;
         InitializeComponent();
         Opened += HandleOpened;
         SizeChanged += HandleSizeChanged;
@@ -78,7 +81,8 @@ public partial class MainWindow : Window
         LoadFavorites();
         LoadTools();
         UpdateCardLayout(Bounds.Width < 900);
-        _ = RefreshUpdateAvailabilityAsync(showErrors: false, showProgress: false);
+        if (_checkUpdatesOnOpen)
+            _ = RefreshUpdateAvailabilityAsync(showErrors: false, showProgress: false);
         LaunchModManagerButton.Focus();
     }
 
@@ -184,7 +188,7 @@ public partial class MainWindow : Window
 
     private async void LaunchModManager_Click(object? sender, RoutedEventArgs eventArgs)
     {
-        if (await TryLaunchAsync(ModManagerPath))
+        if (await TryLaunchAsync(ModManagerPath, ["--data-root", DataDirectory]))
             Close();
     }
 
@@ -268,8 +272,10 @@ public partial class MainWindow : Window
     {
         try
         {
-            var target = File.Exists(CompatibilityModManagerPath) ? CompatibilityModManagerPath : ModManagerPath;
-            var path = DesktopShortcutService.CreateModManagerShortcut(target);
+            var target = LauncherInstallation.AppImagePath ??
+                (File.Exists(CompatibilityModManagerPath) ? CompatibilityModManagerPath : ModManagerPath);
+            var arguments = LauncherInstallation.IsAppImage ? new[] { "--mod-manager" } : null;
+            var path = DesktopShortcutService.CreateModManagerShortcut(target, arguments);
             await MessageDialog.ShowAsync(this, "Shortcut created",
                 $"The OpenKH Mod Manager shortcut was created.\n\n{path}");
         }
@@ -286,6 +292,15 @@ public partial class MainWindow : Window
         HomePanel.IsVisible = false;
         ToolsPanel.IsVisible = true;
         SearchBox.Focus();
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (ToolsList.ItemCount == 0)
+                return;
+
+            ToolsList.SelectedIndex = 0;
+            if (ToolsList.SelectedItem is { } selectedTool)
+                ToolsList.ScrollIntoView(selectedTool);
+        }, DispatcherPriority.Loaded);
     }
 
     private void ShowHome_Click(object? sender, RoutedEventArgs eventArgs) => ShowHome();
@@ -375,16 +390,22 @@ public partial class MainWindow : Window
 
     private async void Launch(string target) => await TryLaunchAsync(target);
 
-    private async Task<bool> TryLaunchAsync(string target)
+    private async Task<bool> TryLaunchAsync(string target, IEnumerable<string>? arguments = null)
     {
         try
         {
-            Process.Start(new ProcessStartInfo
+            var startInfo = new ProcessStartInfo
             {
                 FileName = target,
                 WorkingDirectory = File.Exists(target) ? Path.GetDirectoryName(target) : AppContext.BaseDirectory,
                 UseShellExecute = true,
-            });
+            };
+            if (arguments is not null)
+            {
+                foreach (var argument in arguments)
+                    startInfo.ArgumentList.Add(argument);
+            }
+            Process.Start(startInfo);
             return true;
         }
         catch (Exception exception)
@@ -398,6 +419,12 @@ public partial class MainWindow : Window
     {
         Dispatcher.UIThread.Post(() =>
         {
+            if (ControllerWindowNavigator.TryHideVirtualKeyboard(action) ||
+                ControllerWindowNavigator.TryShowVirtualKeyboard(this, action) ||
+                ControllerWindowNavigator.TryScroll(this, action) ||
+                ControllerWindowNavigator.TryMoveFocus(this, action))
+                return;
+
             switch (action)
             {
                 case ControllerAction.PreviousControl:

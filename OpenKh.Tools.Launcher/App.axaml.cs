@@ -63,10 +63,10 @@ public partial class App : Application
 
         var action = eventArgs.Key switch
         {
-            Key.Up => ControllerAction.PreviousControl,
-            Key.Down => ControllerAction.NextControl,
-            Key.Left => ControllerAction.PreviousGame,
-            Key.Right => ControllerAction.NextGame,
+            Key.Up => ControllerAction.NavigateUp,
+            Key.Down => ControllerAction.NavigateDown,
+            Key.Left => ControllerAction.NavigateLeft,
+            Key.Right => ControllerAction.NavigateRight,
             Key.Enter or Key.Space => ControllerAction.Confirm,
             Key.Escape => ControllerAction.Cancel,
             Key.F5 => ControllerAction.Refresh,

@@ -25,6 +25,12 @@ namespace OpenKh.Tools.Launcher.Updates
             string executableToRestart = ""
         )
         {
+            if (LauncherInstallation.IsAppImage && LauncherInstallation.AppImagePath is { } appImagePath)
+            {
+                await UpdateAppImageAsync(downloadZipUrl, appImagePath, progress, cancellation);
+                return;
+            }
+
             var tempId = Guid.NewGuid().ToString("N");
             var tempZipFile = Path.Combine(Path.GetTempPath(), $"openkh-{tempId}.zip");
 
@@ -143,7 +149,73 @@ namespace OpenKh.Tools.Launcher.Updates
             });
         }
 
-        private async Task CopyToAsyncWithProgress(Stream input, Stream output, long? maxLen, Action<float> progress, CancellationToken cancellation)
+        private static async Task UpdateAppImageAsync(
+            string downloadUrl,
+            string currentAppImage,
+            Action<float> progress,
+            CancellationToken cancellation)
+        {
+            if (!OperatingSystem.IsLinux())
+                throw new PlatformNotSupportedException("AppImage updates are only supported on Linux.");
+
+            var appImageDirectory = Path.GetDirectoryName(currentAppImage)
+                ?? throw new InvalidOperationException("The AppImage directory could not be determined.");
+            var writeProbe = Path.Combine(appImageDirectory, $".openkh-write-test-{Guid.NewGuid():N}");
+            await File.WriteAllTextAsync(writeProbe, string.Empty, cancellation);
+            File.Delete(writeProbe);
+
+            var tempId = Guid.NewGuid().ToString("N");
+            var downloadedAppImage = Path.Combine(Path.GetTempPath(), $"openkh-{tempId}.AppImage");
+            using (var client = new HttpClient())
+            using (var output = File.Create(downloadedAppImage))
+            using (var response = await client.GetAsync(
+                downloadUrl,
+                HttpCompletionOption.ResponseHeadersRead,
+                cancellation))
+            {
+                response.EnsureSuccessStatusCode();
+                var input = await response.Content.ReadAsStreamAsync(cancellation);
+                await CopyToAsyncWithProgress(
+                    input,
+                    output,
+                    response.Content.Headers.ContentLength,
+                    progress,
+                    cancellation);
+            }
+
+            File.SetUnixFileMode(
+                downloadedAppImage,
+                UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute |
+                UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
+                UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+
+            var scriptPath = Path.Combine(Path.GetTempPath(), $"openkh-{tempId}.sh");
+            // The mounted AppImage cannot replace its backing file until this process exits.
+            var script = new StringBuilder()
+                .AppendLine("#!/bin/sh")
+                .AppendLine($"while kill -0 {Environment.ProcessId} 2>/dev/null; do sleep 0.2; done")
+                .AppendLine($"if mv -f {EscapeShellArg(downloadedAppImage)} {EscapeShellArg(currentAppImage)}; then")
+                .AppendLine($"  chmod +x {EscapeShellArg(currentAppImage)}")
+                .AppendLine("else")
+                .AppendLine($"  rm -f {EscapeShellArg(downloadedAppImage)}")
+                .AppendLine("fi")
+                .AppendLine($"{EscapeShellArg(currentAppImage)} >/dev/null 2>&1 &")
+                .AppendLine($"rm -f {EscapeShellArg(scriptPath)}")
+                .ToString();
+            await File.WriteAllTextAsync(scriptPath, script, new UTF8Encoding(false), cancellation);
+            File.SetUnixFileMode(
+                scriptPath,
+                UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "/bin/sh",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                ArgumentList = { scriptPath },
+            });
+        }
+
+        private static async Task CopyToAsyncWithProgress(Stream input, Stream output, long? maxLen, Action<float> progress, CancellationToken cancellation)
         {
             byte[] buffer = new byte[8192];
             var totalTransferred = 0L;

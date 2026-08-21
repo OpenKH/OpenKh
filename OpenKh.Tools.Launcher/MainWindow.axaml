@@ -98,6 +98,10 @@
                 <Setter Property="Padding" Value="0" />
                 <Setter Property="Margin" Value="0,0,0,6" />
               </Style>
+              <Style Selector="ListBoxItem:focus-visible /template/ ContentPresenter">
+                <Setter Property="BorderBrush" Value="#8DB5FF" />
+                <Setter Property="BorderThickness" Value="3" />
+              </Style>
             </ListBox.Styles>
             <ListBox.ItemTemplate>
               <DataTemplate>

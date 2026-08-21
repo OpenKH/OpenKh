@@ -83,6 +83,9 @@ internal sealed class MessageDialog : Window
     {
         Dispatcher.UIThread.Post(() =>
         {
+            if (ControllerWindowNavigator.TryMoveFocus(this, action))
+                return;
+
             if (action is ControllerAction.PreviousControl or ControllerAction.PreviousItem or ControllerAction.PreviousGame)
             {
                 ControllerWindowNavigator.MoveFocus(this, -1);
