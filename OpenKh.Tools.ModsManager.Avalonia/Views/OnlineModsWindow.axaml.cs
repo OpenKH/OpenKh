@@ -2,6 +2,8 @@ using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
+using Avalonia.Input;
+using Avalonia.VisualTree;
 using OpenKh.Tools.ModsManager.Avalonia.Services;
 using OpenKh.Tools.ModsManager.Core;
 
@@ -68,7 +70,10 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
                     return;
                 StatusText.Text = value.Message;
                 if (value.Percentage is { } percentage)
+                {
+                    LoadingProgressBar.IsIndeterminate = false;
                     LoadingProgressBar.Value = percentage;
+                }
             });
             var itemProgress = new Progress<OnlineModInfo>(mod =>
             {
@@ -152,29 +157,48 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
 
     private async void InstallSelected_OnClick(object? sender, RoutedEventArgs eventArgs)
     {
-        if (_installer is null || _game is null || ModsList.SelectedItem is not OnlineModItem selected)
+        if (_isInstalling || _installer is null || _game is null ||
+            ModsList.SelectedItem is not OnlineModItem selected)
             return;
 
         SetInstalling(true);
+        InstallSelectedButton.Content = $"Installing {selected.Title}...";
+        StatusText.Text = $"Preparing to install {selected.Title}";
+        LoadingProgressBar.Value = 0;
+        LoadingProgressBar.IsIndeterminate = true;
         try
         {
             var progress = new Progress<ModOperationProgress>(value =>
             {
+                if (_isClosed)
+                    return;
                 StatusText.Text = value.Message;
                 if (value.Percentage is { } percentage)
+                {
+                    LoadingProgressBar.IsIndeterminate = false;
                     LoadingProgressBar.Value = percentage;
+                }
+                else
+                {
+                    LoadingProgressBar.IsIndeterminate = true;
+                }
             });
             await _installer.InstallAsync(selected.Repository, _game, progress: progress);
             _installedAny = true;
             _installedRepositories.Add(selected.Repository);
             if (_onModInstalled is not null)
                 await _onModInstalled();
-            var selectedIndex = ModsList.SelectedIndex;
+            var currentSelection = ModsList.SelectedItem as OnlineModItem;
+            var installedIndex = _visibleMods.IndexOf(selected);
             _allMods.Remove(selected);
             _visibleMods.Remove(selected);
-            ModsList.SelectedIndex = _visibleMods.Count == 0
-                ? -1
-                : Math.Min(selectedIndex, _visibleMods.Count - 1);
+            ModsList.SelectedItem = currentSelection is not null &&
+                !ReferenceEquals(currentSelection, selected) &&
+                _visibleMods.Contains(currentSelection)
+                    ? currentSelection
+                    : _visibleMods.Count == 0
+                        ? null
+                        : _visibleMods[Math.Clamp(installedIndex, 0, _visibleMods.Count - 1)];
             StatusText.Text = $"{selected.Title} was installed";
             selected.Dispose();
         }
@@ -184,6 +208,7 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
         }
         finally
         {
+            InstallSelectedButton.Content = "Install selected mod";
             SetInstalling(false);
         }
     }
@@ -193,7 +218,10 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
         _isCatalogLoading = loading;
         LoadingProgressBar.IsVisible = loading || _isInstalling;
         if (loading)
+        {
             LoadingProgressBar.Value = 0;
+            LoadingProgressBar.IsIndeterminate = true;
+        }
         UpdateControlState();
     }
 
@@ -201,13 +229,15 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
     {
         _isInstalling = installing;
         LoadingProgressBar.IsVisible = installing || _isCatalogLoading;
+        if (!installing && !_isCatalogLoading)
+            LoadingProgressBar.IsIndeterminate = false;
         UpdateControlState();
     }
 
     private void UpdateControlState()
     {
-        SearchTextBox.IsEnabled = !_isInstalling;
-        ModsList.IsEnabled = !_isInstalling;
+        SearchTextBox.IsEnabled = true;
+        ModsList.IsEnabled = true;
         InstallSelectedButton.IsEnabled = !_isInstalling && ModsList.SelectedItem is not null;
         CloseButton.IsEnabled = !_isInstalling;
     }
@@ -216,28 +246,32 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
 
     public void HandleControllerAction(ControllerAction action)
     {
-        if (action is ControllerAction.PreviousControl)
-            ControllerWindowNavigator.MoveFocus(this, -1);
-        else if (action is ControllerAction.NextControl)
-            ControllerWindowNavigator.MoveFocus(this, 1);
-        else if (action is ControllerAction.PreviousItem)
-            MoveSelection(-1);
-        else if (action is ControllerAction.NextItem)
-            MoveSelection(1);
+        if (ControllerWindowNavigator.TryMoveFocus(this, action))
+            return;
         else if (action == ControllerAction.Cancel && CloseButton.IsEnabled)
             Close(_installedAny);
         else if (action is ControllerAction.Confirm or ControllerAction.Install)
-            InstallSelected_OnClick(InstallSelectedButton, new RoutedEventArgs());
+            ActivateFocusedControl();
     }
 
-    private void MoveSelection(int offset)
+    private void ModsList_OnGotFocus(object? sender, FocusChangedEventArgs eventArgs)
     {
-        if (_visibleMods.Count == 0)
-            return;
-        var index = ModsList.SelectedIndex < 0 ? 0 : ModsList.SelectedIndex;
-        ModsList.SelectedIndex = Math.Clamp(index + offset, 0, _visibleMods.Count - 1);
-        if (ModsList.SelectedItem is { } selected)
-            ModsList.ScrollIntoView(selected);
+        var focused = eventArgs.Source as Control;
+        var item = focused as ListBoxItem ??
+            focused?.GetVisualAncestors().OfType<ListBoxItem>().FirstOrDefault();
+        if (item?.DataContext is { } mod)
+            ModsList.SelectedItem = mod;
+    }
+
+    private void ActivateFocusedControl()
+    {
+        var focused = FocusManager?.GetFocusedElement() as Control;
+        if (focused == CloseButton)
+            Close(_installedAny);
+        else if (focused == InstallSelectedButton || focused == ModsList ||
+                 focused is ListBoxItem ||
+                 focused?.GetVisualAncestors().OfType<ListBoxItem>().Any() == true)
+            InstallSelected_OnClick(InstallSelectedButton, new RoutedEventArgs());
     }
 
     private void DisposeImages()

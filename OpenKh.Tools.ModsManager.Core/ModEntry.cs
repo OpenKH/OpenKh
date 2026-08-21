@@ -9,6 +9,8 @@ public sealed class ModEntry
     public required string Directory { get; init; }
     public string? IconPath { get; init; }
     public string? PreviewPath { get; init; }
+    public string? SourceUrl { get; init; }
+    public string? ReportBugUrl { get; init; }
     public IReadOnlyList<string> FilesToPatch { get; init; } = [];
     public bool IsCollection { get; init; }
     public bool IsEnabled { get; set; }

@@ -50,6 +50,31 @@ public sealed class ModCatalogServiceTests : IDisposable
         Assert.Equal(
             new[] { mods[1].Id },
             File.ReadAllLines(Path.Combine(_rootDirectory, "mods-KH2.txt")));
+        Assert.Equal(
+            mods.Select(mod => mod.Id),
+            File.ReadAllLines(Path.Combine(_rootDirectory, "mod-order-KH2.txt")));
+    }
+
+    [Fact]
+    public async Task RefreshKeepsTheCompleteSavedOrderIncludingDisabledMods()
+    {
+        CreateMod("Author/First", "First", "Author", "Description");
+        CreateMod("Author/Second", "Second", "Author", "Description");
+        CreateMod("Author/Third", "Third", "Author", "Description");
+        var layout = InstallationLayout.Detect("ignored", ["--data-root", _rootDirectory]);
+        var service = new ModCatalogService(layout);
+        var game = GameInfo.FromId("kh2");
+        var mods = (await service.LoadAsync(game)).ToList();
+        var customOrder = new[] { mods[2], mods[0], mods[1] };
+        customOrder[1].IsEnabled = true;
+
+        service.SaveEnabledOrder(game, customOrder);
+        var refreshed = await service.LoadAsync(game);
+
+        Assert.Equal(customOrder.Select(mod => mod.Id), refreshed.Select(mod => mod.Id));
+        Assert.False(refreshed[0].IsEnabled);
+        Assert.True(refreshed[1].IsEnabled);
+        Assert.False(refreshed[2].IsEnabled);
     }
 
     [Fact]
@@ -77,6 +102,26 @@ public sealed class ModCatalogServiceTests : IDisposable
         Assert.Equal(
             ["msg/en/sys.bar", "msg/fr/sys.bar", "scripts/kh2/example.lua"],
             mod.FilesToPatch);
+    }
+
+    [Fact]
+    public async Task LoadIncludesSourceAndIssueLinksForRepositoryMods()
+    {
+        CreateMod("Author/Hosted", "Hosted", "Author", "Description");
+        var modDirectory = Path.Combine(_rootDirectory, "mods", "kh2", "Author", "Hosted");
+        var gitDirectory = Path.Combine(modDirectory, ".git");
+        Directory.CreateDirectory(gitDirectory);
+        File.WriteAllText(Path.Combine(gitDirectory, "config"), """
+            [remote "origin"]
+                url = git@github.com:Author/Hosted.git
+                fetch = +refs/heads/*:refs/remotes/origin/*
+            """);
+        var service = new ModCatalogService(InstallationLayout.Detect("ignored", ["--data-root", _rootDirectory]));
+
+        var mod = Assert.Single(await service.LoadAsync(GameInfo.FromId("kh2")));
+
+        Assert.Equal("https://github.com/Author/Hosted", mod.SourceUrl);
+        Assert.Equal("https://github.com/Author/Hosted/issues", mod.ReportBugUrl);
     }
 
     public void Dispose()

@@ -24,6 +24,8 @@ public sealed partial class InfoWindow : EmbeddedDialogControl
 
     public void HandleControllerAction(ControllerAction action)
     {
+        if (ControllerWindowNavigator.TryMoveFocus(this, action))
+            return;
         if (action is ControllerAction.PreviousControl or ControllerAction.PreviousItem)
             ControllerWindowNavigator.MoveFocus(this, -1);
         else if (action is ControllerAction.NextControl or ControllerAction.NextItem)

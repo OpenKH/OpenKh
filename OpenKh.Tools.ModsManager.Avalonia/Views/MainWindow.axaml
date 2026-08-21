@@ -34,7 +34,7 @@
                   HorizontalAlignment="Stretch" />
           <Button Classes="subtle" Command="{Binding PresetsCommand}" Content="Presets" HorizontalAlignment="Stretch" />
           <Button Classes="subtle" Command="{Binding CreatorCommand}" Content="Creator" HorizontalAlignment="Stretch" />
-          <Button Classes="subtle" Command="{Binding SetupCommand}" HorizontalAlignment="Stretch">
+          <Button x:Name="SetupNavigationButton" Classes="subtle" Command="{Binding SetupCommand}" HorizontalAlignment="Stretch">
             <StackPanel Orientation="Horizontal" Spacing="12">
               <TextBlock Text="Setup" VerticalAlignment="Center" />
             </StackPanel>
@@ -139,6 +139,7 @@
             <ListBox Grid.Row="1"
                      x:Name="ModList"
                      SelectionChanged="ModList_OnSelectionChanged"
+                     GotFocus="ModList_OnGotFocus"
                      ItemsSource="{Binding Mods}"
                      SelectedItem="{Binding SelectedMod}"
                      Background="Transparent"
@@ -210,8 +211,17 @@
                 <Border Background="#111C2E" CornerRadius="10" Padding="12">
                   <TextBlock Text="{Binding SelectedMod.Id}" FontSize="12" Foreground="#91A2BA" TextWrapping="Wrap" />
                 </Border>
+                <StackPanel Orientation="Horizontal" Spacing="10"
+                            IsVisible="{Binding SelectedMod.HasSource}">
+                  <Button Classes="subtle" Content="Mod source"
+                          Command="{Binding OpenSourceCommand}" />
+                  <Button Classes="subtle" Content="Report bug"
+                          Command="{Binding ReportBugCommand}"
+                          IsVisible="{Binding SelectedMod.CanReportBug}" />
+                </StackPanel>
                 <Expander Header="{Binding SelectedMod.FilesToPatchHeader}"
-                          IsVisible="{Binding SelectedMod.HasFilesToPatch}">
+                          IsVisible="{Binding SelectedMod.HasFilesToPatch}"
+                          Focusable="True">
                   <Border Background="#111C2E" CornerRadius="10" Padding="12" Margin="0,8,0,0">
                     <TextBlock Text="{Binding SelectedMod.FilesToPatchText}"
                                FontFamily="Cascadia Mono,Consolas"

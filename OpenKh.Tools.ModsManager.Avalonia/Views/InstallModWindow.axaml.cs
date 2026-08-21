@@ -51,6 +51,8 @@ public sealed partial class InstallModWindow : EmbeddedDialogControl
 
     public void HandleControllerAction(ControllerAction action)
     {
+        if (ControllerWindowNavigator.TryMoveFocus(this, action))
+            return;
         if (action is ControllerAction.PreviousControl or ControllerAction.PreviousItem or ControllerAction.PreviousGame)
             ControllerWindowNavigator.MoveFocus(this, -1);
         else if (action is ControllerAction.NextControl or ControllerAction.NextItem or ControllerAction.NextGame)

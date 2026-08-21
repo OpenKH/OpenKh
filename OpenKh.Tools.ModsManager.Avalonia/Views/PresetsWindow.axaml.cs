@@ -13,6 +13,7 @@ public sealed partial class PresetsWindow : EmbeddedDialogControl
     public PresetsWindow()
     {
         InitializeComponent();
+        RefreshButtons();
     }
 
     public PresetsWindow(PresetService presets, IReadOnlyCollection<string> enabledModIds) : this()
@@ -75,6 +76,11 @@ public sealed partial class PresetsWindow : EmbeddedDialogControl
 
     public void HandleControllerAction(ControllerAction action)
     {
+        if (ControllerWindowNavigator.TryMoveFocus(this, action))
+        {
+            RefreshButtons();
+            return;
+        }
         if (action is ControllerAction.PreviousControl)
             ControllerWindowNavigator.MoveFocus(this, -1);
         else if (action is ControllerAction.NextControl)

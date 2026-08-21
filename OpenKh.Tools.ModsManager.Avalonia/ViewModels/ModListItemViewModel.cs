@@ -23,6 +23,10 @@ public sealed class ModListItemViewModel : ObservableObject
     public string Author => Model.Author;
     public string Description => Model.Description;
     public string Directory => Model.Directory;
+    public string? SourceUrl => Model.SourceUrl;
+    public string? ReportBugUrl => Model.ReportBugUrl;
+    public bool HasSource => !string.IsNullOrWhiteSpace(SourceUrl);
+    public bool CanReportBug => !string.IsNullOrWhiteSpace(ReportBugUrl);
     public string Kind => Model.IsCollection ? "COLLECTION" : "MOD";
     public bool IsCollection => Model.IsCollection;
     public string Initial => string.IsNullOrWhiteSpace(Name) ? "?" : Name[..1].ToUpperInvariant();

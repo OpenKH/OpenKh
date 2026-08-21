@@ -9,8 +9,9 @@
       <TextBlock Text="Create the initial mod.yml file for a new OpenKH mod."
                  Foreground="#AAB9CF" TextWrapping="Wrap" />
     </StackPanel>
-    <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled">
-      <Border Classes="settings-card">
+    <ScrollViewer x:Name="CreatorScrollViewer" Grid.Row="2" HorizontalScrollBarVisibility="Disabled"
+                  HorizontalContentAlignment="Stretch">
+      <Border Classes="settings-card" Width="{Binding Bounds.Width, ElementName=CreatorScrollViewer}">
         <StackPanel Spacing="12">
           <TextBlock Text="Preferences" FontSize="18" FontWeight="SemiBold" />
           <TextBlock Text="Save and restore the mod folder, GameData folder, and diff tool."

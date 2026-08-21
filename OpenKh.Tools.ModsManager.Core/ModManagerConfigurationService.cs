@@ -35,6 +35,9 @@ public sealed class ModManagerConfigurationService
     public string GetEnabledModsFile(GameInfo game) =>
         Path.Combine(_layout.RootDirectory, game.EnabledModsFileName);
 
+    public string GetModOrderFile(GameInfo game) =>
+        Path.Combine(_layout.RootDirectory, $"mod-order-{game.ConfigFileSuffix}.txt");
+
     public string GetCollectionSettingsFile(GameInfo game) =>
         Path.Combine(_layout.RootDirectory, $"collection-mods-{game.ConfigFileSuffix}.json");
 

@@ -564,6 +564,9 @@ public sealed partial class SetupWindow : EmbeddedDialogControl
         if (HandleActiveComboBox(action))
             return;
 
+        if (ControllerWindowNavigator.TryMoveFocus(this, action))
+            return;
+
         if (action is ControllerAction.PreviousControl or ControllerAction.PreviousItem)
             ControllerWindowNavigator.MoveFocus(this, -1);
         else if (action is ControllerAction.NextControl or ControllerAction.NextItem)
@@ -584,9 +587,11 @@ public sealed partial class SetupWindow : EmbeddedDialogControl
             return false;
         }
 
-        if (action is ControllerAction.PreviousControl or ControllerAction.PreviousItem or ControllerAction.PreviousGame)
+        if (action is ControllerAction.NavigateUp or ControllerAction.NavigateLeft or
+            ControllerAction.PreviousControl or ControllerAction.PreviousItem or ControllerAction.PreviousGame)
             ChangeSelection(comboBox, -1);
-        else if (action is ControllerAction.NextControl or ControllerAction.NextItem or ControllerAction.NextGame)
+        else if (action is ControllerAction.NavigateDown or ControllerAction.NavigateRight or
+                 ControllerAction.NextControl or ControllerAction.NextItem or ControllerAction.NextGame)
             ChangeSelection(comboBox, 1);
         else if (action is ControllerAction.Confirm or ControllerAction.Cancel)
         {

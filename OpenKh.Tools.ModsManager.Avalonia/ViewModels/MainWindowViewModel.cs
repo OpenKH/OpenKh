@@ -79,6 +79,12 @@ public sealed class MainWindowViewModel : ObservableObject
         MoveDownCommand = new RelayCommand(() => MoveSelected(1), () => CanMoveSelected(1));
         MoveTopCommand = new RelayCommand(MoveSelectedToTop, () => CanMoveSelectedToTop());
         OpenFolderCommand = new RelayCommand(OpenSelectedFolder, () => SelectedMod is not null);
+        OpenSourceCommand = new RelayCommand(
+            () => OpenUrl(SelectedMod?.SourceUrl),
+            () => SelectedMod?.HasSource == true);
+        ReportBugCommand = new RelayCommand(
+            () => OpenUrl(SelectedMod?.ReportBugUrl),
+            () => SelectedMod?.CanReportBug == true);
         InstallCommand = new AsyncRelayCommand(InstallPackageAsync, () => !IsBusy);
         BrowseModsCommand = new AsyncRelayCommand(BrowseOnlineModsAsync, () => !IsBusy);
         PresetsCommand = new AsyncRelayCommand(OpenPresetsAsync, () => !IsBusy);
@@ -112,6 +118,8 @@ public sealed class MainWindowViewModel : ObservableObject
     public RelayCommand MoveDownCommand { get; }
     public RelayCommand MoveTopCommand { get; }
     public RelayCommand OpenFolderCommand { get; }
+    public RelayCommand OpenSourceCommand { get; }
+    public RelayCommand ReportBugCommand { get; }
     public AsyncRelayCommand InstallCommand { get; }
     public AsyncRelayCommand BrowseModsCommand { get; }
     public AsyncRelayCommand PresetsCommand { get; }
@@ -166,6 +174,8 @@ public sealed class MainWindowViewModel : ObservableObject
             MoveDownCommand.NotifyCanExecuteChanged();
             MoveTopCommand.NotifyCanExecuteChanged();
             OpenFolderCommand.NotifyCanExecuteChanged();
+            OpenSourceCommand.NotifyCanExecuteChanged();
+            ReportBugCommand.NotifyCanExecuteChanged();
             UpdateSelectedCommand.NotifyCanExecuteChanged();
             RemoveSelectedCommand.NotifyCanExecuteChanged();
             CollectionSettingsCommand.NotifyCanExecuteChanged();
@@ -250,7 +260,6 @@ public sealed class MainWindowViewModel : ObservableObject
             _allMods.AddRange(entries.Select(entry =>
                 new ModListItemViewModel(entry, SaveEnabledOrder)));
             ApplyFilter();
-            SelectedMod = Mods.FirstOrDefault();
             StatusText = TotalCount == 0
                 ? "No mods were found for this game"
                 : $"{LibrarySummary}, {EnabledSummary}";
@@ -315,7 +324,7 @@ public sealed class MainWindowViewModel : ObservableObject
         var selectedId = SelectedMod.Id;
         _allMods.RemoveAt(oldIndex);
         _allMods.Insert(newIndex, SelectedMod);
-        ApplyFilter();
+        Mods.Move(oldIndex, newIndex);
         SelectedMod = Mods.First(mod => mod.Id == selectedId);
         SaveEnabledOrder();
         MoveUpCommand.NotifyCanExecuteChanged();
@@ -331,9 +340,10 @@ public sealed class MainWindowViewModel : ObservableObject
         if (!CanMoveSelectedToTop() || SelectedMod is null)
             return;
         var selectedId = SelectedMod.Id;
+        var oldIndex = _allMods.IndexOf(SelectedMod);
         _allMods.Remove(SelectedMod);
         _allMods.Insert(0, SelectedMod);
-        ApplyFilter();
+        Mods.Move(oldIndex, 0);
         SelectedMod = Mods.First(mod => mod.Id == selectedId);
         SaveEnabledOrder();
         MoveUpCommand.NotifyCanExecuteChanged();
@@ -351,6 +361,14 @@ public sealed class MainWindowViewModel : ObservableObject
             FileName = SelectedMod.Directory,
             UseShellExecute = true
         });
+    }
+
+    private static void OpenUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return;
+
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
     }
 
     private async Task InstallPackageAsync()
@@ -787,6 +805,18 @@ public sealed class MainWindowViewModel : ObservableObject
             case ControllerAction.Refresh:
                 if (CheckUpdatesCommand.CanExecute(null))
                     CheckUpdatesCommand.Execute(null);
+                break;
+            case ControllerAction.MoveUp:
+                if (MoveUpCommand.CanExecute(null))
+                    MoveUpCommand.Execute(null);
+                break;
+            case ControllerAction.MoveDown:
+                if (MoveDownCommand.CanExecute(null))
+                    MoveDownCommand.Execute(null);
+                break;
+            case ControllerAction.MoveTop:
+                if (MoveTopCommand.CanExecute(null))
+                    MoveTopCommand.Execute(null);
                 break;
         }
     }

@@ -15,7 +15,8 @@
 
     <Grid Grid.Row="4" ColumnDefinitions="3*,14,2*">
       <Border Classes="online-mod-panel" Padding="8">
-        <ListBox x:Name="ModsList" SelectionChanged="ModsList_OnSelectionChanged" Background="Transparent">
+        <ListBox x:Name="ModsList" SelectionChanged="ModsList_OnSelectionChanged"
+                 GotFocus="ModsList_OnGotFocus" Background="Transparent">
           <ListBox.ItemsPanel>
             <ItemsPanelTemplate>
               <WrapPanel Orientation="Horizontal" />
@@ -38,6 +39,11 @@
               <Setter Property="Background" Value="#132A49" />
               <Setter Property="BorderBrush" Value="#397FFF" />
               <Setter Property="BorderThickness" Value="2" />
+            </Style>
+            <Style Selector="ListBoxItem:focus-visible /template/ ContentPresenter">
+              <Setter Property="Background" Value="#132A49" />
+              <Setter Property="BorderBrush" Value="#8DB5FF" />
+              <Setter Property="BorderThickness" Value="3" />
             </Style>
           </ListBox.Styles>
           <ListBox.ItemTemplate>
@@ -88,10 +94,14 @@
     </Grid>
 
     <Grid Grid.Row="6" ColumnDefinitions="*,16,Auto">
-      <StackPanel Spacing="6">
-        <ProgressBar x:Name="LoadingProgressBar" Minimum="0" Maximum="1" IsVisible="False" />
-        <TextBlock x:Name="StatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
-      </StackPanel>
+      <Border Background="#111C2E" CornerRadius="10" Padding="12,9">
+        <StackPanel Spacing="7">
+          <ProgressBar x:Name="LoadingProgressBar" Minimum="0" Maximum="1"
+                       Height="10" IsVisible="False" />
+          <TextBlock x:Name="StatusText" Foreground="#C4D0E1"
+                     FontWeight="SemiBold" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
       <Button x:Name="CloseButton" Grid.Column="2" Content="Close" Click="Close_OnClick" />
     </Grid>
   </Grid>

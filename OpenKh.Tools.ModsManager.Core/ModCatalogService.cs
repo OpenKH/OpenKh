@@ -26,24 +26,32 @@ public sealed class ModCatalogService
 
     public void SaveEnabledOrder(GameInfo game, IEnumerable<ModEntry> mods)
     {
-        var enabledMods = mods.Where(mod => mod.IsEnabled).Select(mod => mod.Id);
-        File.WriteAllLines(GetEnabledModsPath(game), enabledMods);
+        var orderedMods = mods.ToArray();
+        File.WriteAllLines(
+            GetEnabledModsPath(game),
+            orderedMods.Where(mod => mod.IsEnabled).Select(mod => mod.Id));
+        File.WriteAllLines(
+            _configuration.GetModOrderFile(game),
+            orderedMods.Select(mod => mod.Id));
     }
 
     private IReadOnlyList<ModEntry> Load(GameInfo game)
     {
         var enabledIds = ReadEnabledIds(game);
         var enabledLookup = enabledIds.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var savedOrder = ReadOrderIds(game);
         var collectionSettings = ReadCollectionSettings(game);
         var locations = EnumerateModLocations(game)
             .GroupBy(location => location.Id, StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First())
             .ToDictionary(location => location.Id, StringComparer.OrdinalIgnoreCase);
 
-        var orderedIds = enabledIds
+        var savedOrderLookup = savedOrder.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var orderedIds = (savedOrder.Count > 0 ? savedOrder : enabledIds)
             .Where(locations.ContainsKey)
             .Concat(locations.Keys
-                .Where(id => !enabledLookup.Contains(id))
+                .Where(id => !savedOrderLookup.Contains(id) &&
+                    (savedOrder.Count > 0 || !enabledLookup.Contains(id)))
                 .OrderBy(id => id, StringComparer.OrdinalIgnoreCase));
 
         return orderedIds
@@ -108,6 +116,7 @@ public sealed class ModCatalogService
         var fallbackAuthor = idParts.Length == 2 ? idParts[0] : "Local mod";
         var iconPath = Path.Combine(location.Directory, "icon.png");
         var previewPath = Path.Combine(location.Directory, "preview.png");
+        var (sourceUrl, reportBugUrl) = GetRepositoryLinks(location.Directory);
 
         return new ModEntry
         {
@@ -120,6 +129,8 @@ public sealed class ModCatalogService
             Directory = location.Directory,
             IconPath = File.Exists(iconPath) ? iconPath : null,
             PreviewPath = File.Exists(previewPath) ? previewPath : null,
+            SourceUrl = sourceUrl,
+            ReportBugUrl = reportBugUrl,
             FilesToPatch = GetFilesToPatch(metadata, location.Id, game, collectionSettings),
             IsCollection = metadata?.IsCollection == true,
             IsEnabled = isEnabled
@@ -161,9 +172,91 @@ public sealed class ModCatalogService
         return files.Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
     }
 
+    private static (string? SourceUrl, string? ReportBugUrl) GetRepositoryLinks(string directory)
+    {
+        try
+        {
+            var configFile = Path.Combine(directory, ".git", "config");
+            if (!File.Exists(configFile))
+                return (null, null);
+
+            var sourceUrl = NormalizeRepositoryUrl(ReadOriginRemoteUrl(configFile));
+            return sourceUrl is null ? (null, null) : (sourceUrl, $"{sourceUrl}/issues");
+        }
+        catch (IOException)
+        {
+            return (null, null);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return (null, null);
+        }
+    }
+
+    private static string? ReadOriginRemoteUrl(string configFile)
+    {
+        var isOrigin = false;
+        foreach (var line in File.ReadLines(configFile))
+        {
+            var value = line.Trim();
+            if (value.StartsWith('['))
+            {
+                isOrigin = value.Equals("[remote \"origin\"]", StringComparison.OrdinalIgnoreCase);
+                continue;
+            }
+
+            if (!isOrigin || !value.StartsWith("url", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var separator = value.IndexOf('=');
+            if (separator >= 0)
+                return value[(separator + 1)..].Trim();
+        }
+
+        return null;
+    }
+
+    private static string? NormalizeRepositoryUrl(string? remoteUrl)
+    {
+        if (string.IsNullOrWhiteSpace(remoteUrl))
+            return null;
+
+        var value = remoteUrl.Trim();
+        if (value.StartsWith("git@", StringComparison.OrdinalIgnoreCase))
+        {
+            var separator = value.IndexOf(':');
+            if (separator <= 4 || separator == value.Length - 1)
+                return null;
+            value = $"https://{value[4..separator]}/{value[(separator + 1)..]}";
+        }
+        else if (Uri.TryCreate(value, UriKind.Absolute, out var uri))
+        {
+            if (uri.Scheme is not ("http" or "https" or "ssh"))
+                return null;
+            value = $"https://{uri.Host}{uri.AbsolutePath}";
+        }
+        else
+        {
+            return null;
+        }
+
+        value = value.TrimEnd('/');
+        return value.EndsWith(".git", StringComparison.OrdinalIgnoreCase)
+            ? value[..^4]
+            : value;
+    }
+
     private IReadOnlyList<string> ReadEnabledIds(GameInfo game)
     {
         var path = GetEnabledModsPath(game);
+        return File.Exists(path)
+            ? File.ReadAllLines(path).Where(line => !string.IsNullOrWhiteSpace(line)).ToArray()
+            : [];
+    }
+
+    private IReadOnlyList<string> ReadOrderIds(GameInfo game)
+    {
+        var path = _configuration.GetModOrderFile(game);
         return File.Exists(path)
             ? File.ReadAllLines(path).Where(line => !string.IsNullOrWhiteSpace(line)).ToArray()
             : [];

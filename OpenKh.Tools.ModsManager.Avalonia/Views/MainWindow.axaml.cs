@@ -1,7 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using OpenKh.Tools.ModsManager.Avalonia.Services;
 using OpenKh.Tools.ModsManager.Avalonia.ViewModels;
+using Avalonia.VisualTree;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Views;
 
@@ -70,6 +72,9 @@ public sealed partial class MainWindow : Window
             listBox.ScrollIntoView(listBox.SelectedItem);
     }
 
+    private void ModList_OnGotFocus(object? sender, FocusChangedEventArgs eventArgs) =>
+        SelectFocusedMod(eventArgs.Source as Control);
+
     public void HandleControllerAction(ControllerAction action)
     {
         if (ControllerWindowNavigator.TryHideVirtualKeyboard(action) ||
@@ -77,20 +82,21 @@ public sealed partial class MainWindow : Window
             ControllerWindowNavigator.TryScroll(this, action))
             return;
 
-        if (action == ControllerAction.PreviousControl)
+        if (ControllerWindowNavigator.TryMoveFocus(this, action))
         {
-            ControllerWindowNavigator.MoveFocus(this, -1);
+            SelectFocusedMod(FocusManager?.GetFocusedElement() as Control);
             return;
         }
 
-        if (action == ControllerAction.NextControl)
+        if (action == ControllerAction.Confirm)
         {
-            ControllerWindowNavigator.MoveFocus(this, 1);
-            return;
+            SelectFocusedMod(FocusManager?.GetFocusedElement() as Control);
+            if (ActivateFocusedControl())
+                return;
         }
 
-        if (action == ControllerAction.Confirm && ActivateFocusedControl())
-            return;
+        if (action is ControllerAction.MoveUp or ControllerAction.MoveDown or ControllerAction.MoveTop)
+            SelectFocusedMod(FocusManager?.GetFocusedElement() as Control);
 
         if (DataContext is MainWindowViewModel viewModel)
             viewModel.HandleControllerAction(action);
@@ -99,6 +105,17 @@ public sealed partial class MainWindow : Window
     private bool ActivateFocusedControl()
     {
         var focused = FocusManager?.GetFocusedElement();
+        if (focused is Control focusedControl)
+        {
+            var expander = focusedControl as Expander ??
+                focusedControl.GetVisualAncestors().OfType<Expander>().FirstOrDefault();
+            if (expander is not null)
+            {
+                expander.IsExpanded = !expander.IsExpanded;
+                return true;
+            }
+        }
+
         if (focused is Button button && button.Command is { } command)
         {
             if (command.CanExecute(button.CommandParameter))
@@ -125,5 +142,13 @@ public sealed partial class MainWindow : Window
         }
 
         return false;
+    }
+
+    private void SelectFocusedMod(Control? focusedControl)
+    {
+        var item = focusedControl as ListBoxItem ??
+            focusedControl?.GetVisualAncestors().OfType<ListBoxItem>().FirstOrDefault();
+        if (item?.DataContext is ModListItemViewModel mod)
+            ModList.SelectedItem = mod;
     }
 }
