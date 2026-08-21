@@ -28,6 +28,7 @@ public sealed partial class SettingsWindow : EmbeddedDialogControl
         _updateChecker = updateChecker;
         var settings = configuration.Current;
         AutoUpdateModsCheckBox.IsChecked = settings.AutoUpdateMods;
+        EnablePatchingCheckBox.IsChecked = settings.EnablePatching;
         ShowConsoleCheckBox.IsChecked = settings.ShowConsole;
         DebugLogCheckBox.IsChecked = settings.DebugLog;
         SoundDebugCheckBox.IsChecked = settings.SoundDebug;
@@ -41,6 +42,7 @@ public sealed partial class SettingsWindow : EmbeddedDialogControl
             return;
         var settings = _configuration.Current;
         settings.AutoUpdateMods = AutoUpdateModsCheckBox.IsChecked == true;
+        settings.EnablePatching = EnablePatchingCheckBox.IsChecked == true;
         settings.ShowConsole = ShowConsoleCheckBox.IsChecked == true;
         settings.DebugLog = DebugLogCheckBox.IsChecked == true;
         settings.SoundDebug = SoundDebugCheckBox.IsChecked == true;

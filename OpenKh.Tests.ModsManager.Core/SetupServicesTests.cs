@@ -128,6 +128,21 @@ public sealed class SetupServicesTests : IDisposable
     }
 
     [Fact]
+    public void PreviewDevViewSettingEnablesPatchingTools()
+    {
+        Directory.CreateDirectory(_rootDirectory);
+        var configurationPath = Path.Combine(_rootDirectory, "mods-manager.yml");
+        File.WriteAllText(configurationPath, "devView: true\n");
+
+        var configuration = ModManagerConfiguration.Load(configurationPath);
+
+        Assert.True(configuration.EnablePatching);
+        var migrated = File.ReadAllText(configurationPath);
+        Assert.Contains("enablePatching: true", migrated);
+        Assert.DoesNotContain("devView:", migrated);
+    }
+
+    [Fact]
     public void LegacyCleanupOnlyTargetsApplicationFiles()
     {
         var appsDirectory = Path.Combine(_rootDirectory, "Apps");

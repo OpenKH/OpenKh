@@ -52,7 +52,7 @@ public sealed class ModManagerConfiguration
     public bool SoundDebug { get; set; }
     public bool EnableCache { get; set; } = true;
     public bool QuickMenu { get; set; }
-    public bool DevView { get; set; }
+    public bool EnablePatching { get; set; }
     public bool AutoUpdateMods { get; set; }
 
     [YamlMember(Alias = "pcVersion")]
@@ -138,6 +138,11 @@ public sealed class ModManagerConfiguration
             CreatorPreferences = interim.CreatorPreferences;
             migrated = true;
         }
+        if (!EnablePatching && interim.DevView == true)
+        {
+            EnablePatching = true;
+            migrated = true;
+        }
 
         return migrated;
     }
@@ -151,6 +156,7 @@ public sealed class ModManagerConfiguration
         public string? ModCollectionsPath { get; set; }
         public string? GameModPath { get; set; }
         public string? GameDataPath { get; set; }
+        public bool? DevView { get; set; }
         public List<CreatorPreference>? CreatorPreferences { get; set; }
     }
 }

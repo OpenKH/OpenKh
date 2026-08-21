@@ -199,6 +199,8 @@ public sealed class MainWindowViewModel : ObservableObject
         set => SetProperty(ref _showAdvancedOptions, value);
     }
 
+    public bool EnablePatching => _configuration.Current.EnablePatching;
+
     public string SearchText
     {
         get => _searchText;
@@ -490,7 +492,12 @@ public sealed class MainWindowViewModel : ObservableObject
     private async Task OpenSettingsAsync()
     {
         if (await _settingsPrompt.ShowAsync())
+        {
+            if (!EnablePatching)
+                ShowAdvancedOptions = false;
+            OnPropertyChanged(nameof(EnablePatching));
             StatusText = "Settings were saved";
+        }
     }
 
     private Task OpenInfoAsync() => _infoPrompt.ShowAsync();

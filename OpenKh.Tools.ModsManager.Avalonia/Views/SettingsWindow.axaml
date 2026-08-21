@@ -14,6 +14,7 @@
           <StackPanel Spacing="12">
             <TextBlock Text="Mod Manager" FontSize="18" FontWeight="SemiBold" />
             <CheckBox x:Name="AutoUpdateModsCheckBox" Content="Check repository mods for updates automatically" />
+            <CheckBox x:Name="EnablePatchingCheckBox" Content="Enable package patching tools" />
             <Button x:Name="CheckOpenKhUpdatesButton" Content="Check for OpenKH updates" HorizontalAlignment="Left" Click="CheckOpenKhUpdates_OnClick" />
             <TextBlock x:Name="UpdateStatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
             <Button x:Name="InstallOpenKhUpdateButton" Content="Open Launcher to install update"

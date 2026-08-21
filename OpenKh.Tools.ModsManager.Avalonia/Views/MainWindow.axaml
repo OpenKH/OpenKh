@@ -53,7 +53,8 @@
           </Button>
           <Button Classes="subtle" Command="{Binding StopGameCommand}" IsVisible="{Binding IsGameRunning}"
                   Content="Stop running game" HorizontalAlignment="Stretch" />
-          <Button Classes="subtle" Command="{Binding ToggleAdvancedOptionsCommand}" HorizontalAlignment="Stretch">
+          <Button Classes="subtle" Command="{Binding ToggleAdvancedOptionsCommand}"
+                  IsVisible="{Binding EnablePatching}" HorizontalAlignment="Stretch">
             <TextBlock Text="Advanced options" TextWrapping="Wrap" TextAlignment="Center" />
           </Button>
           <Border IsVisible="{Binding ShowAdvancedOptions}"
