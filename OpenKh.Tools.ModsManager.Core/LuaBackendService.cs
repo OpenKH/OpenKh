@@ -112,20 +112,101 @@ public sealed class LuaBackendService
 
     private static string SetScriptsPath(string text, string sectionName, string scriptPath)
     {
-        var sectionPattern = $@"(?ms)(^\[{Regex.Escape(sectionName)}\]\s*$)(?<body>.*?)(?=^\[|\z)";
-        return Regex.Replace(text, sectionPattern, match =>
+        var newLine = DetectNewLine(text);
+        var escapedSectionName = Regex.Escape(sectionName);
+        var joinedHeaderPattern = $@"(?m)^(?<header>[^\S\r\n]*\[{escapedSectionName}\][^\S\r\n]*)(?=scripts[^\S\r\n]*=)";
+        text = new Regex(joinedHeaderPattern).Replace(
+            text,
+            match => match.Groups["header"].Value.TrimEnd(' ', '\t') + newLine,
+            1);
+
+        var sectionPattern = $@"(?ms)(?<header>^[^\S\r\n]*\[{escapedSectionName}\][^\S\r\n]*(?:\r\n|\n|\r))(?<body>.*?)(?=^[^\S\r\n]*\[|\z)";
+        return new Regex(sectionPattern).Replace(text, match =>
         {
             var body = match.Groups["body"].Value;
             var scriptsLine = $"scripts = [{{ path = \"scripts/{sectionName}/\", relative = true }}, {{ path = \"{scriptPath}\", relative = false }}]";
-            const string scriptsPattern = @"(?m)^(?<indent>[^\S\r\n]*)scripts[^\S\r\n]*=.*$";
-            body = Regex.IsMatch(body, scriptsPattern)
-                ? new Regex(scriptsPattern).Replace(
-                    body,
-                    line => line.Groups["indent"].Value + scriptsLine,
-                    1)
-                : $"{Environment.NewLine}{scriptsLine}{body}";
-            return match.Groups[1].Value + body;
-        });
+            body = ReplaceScriptsAssignment(body, scriptsLine, newLine);
+            return match.Groups["header"].Value + body;
+        }, 1);
+    }
+
+    private static string ReplaceScriptsAssignment(string body, string scriptsLine, string newLine)
+    {
+        const string scriptsPattern = @"(?m)^(?<indent>[^\S\r\n]*)scripts[^\S\r\n]*=";
+        var match = Regex.Match(body, scriptsPattern);
+        if (!match.Success)
+            return scriptsLine + newLine + body;
+
+        var assignmentEnd = FindAssignmentEnd(body, match.Index + match.Length);
+        return body[..match.Index] +
+            match.Groups["indent"].Value +
+            scriptsLine +
+            body[assignmentEnd..];
+    }
+
+    private static int FindAssignmentEnd(string text, int valueStart)
+    {
+        var arrayStart = text.IndexOf('[', valueStart);
+        var lineEnd = IndexOfLineEnd(text, valueStart);
+        if (arrayStart < 0 || arrayStart > lineEnd)
+            return lineEnd;
+
+        var depth = 0;
+        var inString = false;
+        var quote = '\0';
+        var escaped = false;
+        for (var index = arrayStart; index < text.Length; index++)
+        {
+            var character = text[index];
+            if (inString)
+            {
+                if (quote == '"' && character == '\\' && !escaped)
+                {
+                    escaped = true;
+                    continue;
+                }
+
+                if (character == quote && !escaped)
+                    inString = false;
+                escaped = false;
+                continue;
+            }
+
+            if (character is '"' or '\'')
+            {
+                inString = true;
+                quote = character;
+            }
+            else if (character == '[')
+            {
+                depth++;
+            }
+            else if (character == ']' && --depth == 0)
+            {
+                return index + 1;
+            }
+        }
+
+        return lineEnd;
+    }
+
+    private static int IndexOfLineEnd(string text, int startIndex)
+    {
+        for (var index = startIndex; index < text.Length; index++)
+        {
+            if (text[index] is '\r' or '\n')
+                return index;
+        }
+
+        return text.Length;
+    }
+
+    private static string DetectNewLine(string text)
+    {
+        var lineFeed = text.IndexOf('\n');
+        if (lineFeed >= 0)
+            return lineFeed > 0 && text[lineFeed - 1] == '\r' ? "\r\n" : "\n";
+        return text.Contains('\r') ? "\r" : Environment.NewLine;
     }
 
     private static string SelectSteamDocumentsPaths(string text)

@@ -23,6 +23,7 @@ public sealed partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var layout = InstallationLayout.Detect(AppContext.BaseDirectory, desktop.Args);
+            LegacyInstallationCleanup.Schedule(layout.RootDirectory);
             var mainWindow = new MainWindow();
             var configuration = new ModManagerConfigurationService(layout);
             var localInstaller = new LocalModInstaller(configuration);
@@ -94,10 +95,10 @@ public sealed partial class App : Application
 
         var action = eventArgs.Key switch
         {
-            Key.Up => ControllerAction.PreviousControl,
-            Key.Down => ControllerAction.NextControl,
-            Key.Left => ControllerAction.NextControl,
-            Key.Right => ControllerAction.PreviousControl,
+            Key.Up => ControllerAction.NavigateUp,
+            Key.Down => ControllerAction.NavigateDown,
+            Key.Left => ControllerAction.NavigateLeft,
+            Key.Right => ControllerAction.NavigateRight,
             Key.Enter or Key.Space => ControllerAction.Confirm,
             Key.Escape => ControllerAction.Cancel,
             Key.F5 => ControllerAction.Refresh,

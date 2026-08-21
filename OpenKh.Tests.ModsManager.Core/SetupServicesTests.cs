@@ -54,6 +54,131 @@ public sealed class SetupServicesTests : IDisposable
     }
 
     [Fact]
+    public void OfficialConfigurationNamesAreLoadedAndPreserved()
+    {
+        Directory.CreateDirectory(_rootDirectory);
+        var configurationPath = Path.Combine(_rootDirectory, "mods-manager.yml");
+        var modDirectory = Path.Combine(_rootDirectory, "creator-mod");
+        File.WriteAllText(configurationPath, $$"""
+            extractedGameDataPath: '{{Path.Combine(_rootDirectory, "extracted")}}'
+            installedModsPath: '{{Path.Combine(_rootDirectory, "installed")}}'
+            installedCollectionsPath: '{{Path.Combine(_rootDirectory, "collections")}}'
+            compiledModPath: '{{Path.Combine(_rootDirectory, "compiled")}}'
+            yamlGenPrefs:
+            - label: Existing creator setup
+              gameDataPath: '{{Path.Combine(_rootDirectory, "creator-data")}}'
+              modYmlFilePath: '{{Path.Combine(modDirectory, "mod.yml")}}'
+            """);
+
+        var configuration = ModManagerConfiguration.Load(configurationPath);
+
+        Assert.Equal(Path.Combine(_rootDirectory, "extracted"), configuration.GameDataPath);
+        Assert.Equal(Path.Combine(_rootDirectory, "installed"), configuration.ModCollectionPath);
+        Assert.Equal(Path.Combine(_rootDirectory, "collections"), configuration.ModCollectionsPath);
+        Assert.Equal(Path.Combine(_rootDirectory, "compiled"), configuration.GameModPath);
+        Assert.Equal(modDirectory, Assert.Single(configuration.CreatorPreferences).ModDirectory);
+
+        configuration.Save(configurationPath);
+        var saved = File.ReadAllText(configurationPath);
+        Assert.Contains("extractedGameDataPath:", saved);
+        Assert.Contains("installedModsPath:", saved);
+        Assert.Contains("installedCollectionsPath:", saved);
+        Assert.Contains("compiledModPath:", saved);
+        Assert.Contains("yamlGenPrefs:", saved);
+        Assert.Contains("modYmlFilePath:", saved);
+        Assert.DoesNotContain("gameDataPath:", saved.Split("yamlGenPrefs:")[0]);
+        Assert.DoesNotContain("modCollectionPath:", saved);
+        Assert.DoesNotContain("creatorPreferences:", saved);
+    }
+
+    [Fact]
+    public void InterimAvaloniaConfigurationIsMigratedToOfficialNames()
+    {
+        Directory.CreateDirectory(_rootDirectory);
+        var configurationPath = Path.Combine(_rootDirectory, "mods-manager.yml");
+        var modDirectory = Path.Combine(_rootDirectory, "creator-mod");
+        File.WriteAllText(configurationPath, $$"""
+            gameDataPath: '{{Path.Combine(_rootDirectory, "extracted")}}'
+            modCollectionPath: '{{Path.Combine(_rootDirectory, "installed")}}'
+            modCollectionsPath: '{{Path.Combine(_rootDirectory, "collections")}}'
+            gameModPath: '{{Path.Combine(_rootDirectory, "compiled")}}'
+            creatorPreferences:
+            - label: Avalonia creator setup
+              modDirectory: '{{modDirectory}}'
+              gameDataPath: '{{Path.Combine(_rootDirectory, "creator-data")}}'
+              diffToolPath: diff-tool
+            """);
+
+        var configuration = ModManagerConfiguration.Load(configurationPath);
+
+        Assert.Equal(Path.Combine(_rootDirectory, "extracted"), configuration.GameDataPath);
+        Assert.Equal(Path.Combine(_rootDirectory, "installed"), configuration.ModCollectionPath);
+        Assert.Equal(Path.Combine(_rootDirectory, "collections"), configuration.ModCollectionsPath);
+        Assert.Equal(Path.Combine(_rootDirectory, "compiled"), configuration.GameModPath);
+        var preference = Assert.Single(configuration.CreatorPreferences);
+        Assert.Equal(modDirectory, preference.ModDirectory);
+        Assert.Equal("diff-tool", preference.DiffToolPath);
+
+        var migrated = File.ReadAllText(configurationPath);
+        Assert.Contains("extractedGameDataPath:", migrated);
+        Assert.Contains("installedModsPath:", migrated);
+        Assert.Contains("yamlGenPrefs:", migrated);
+        Assert.DoesNotContain("modCollectionPath:", migrated);
+        Assert.DoesNotContain("creatorPreferences:", migrated);
+    }
+
+    [Fact]
+    public void LegacyCleanupOnlyTargetsApplicationFiles()
+    {
+        var appsDirectory = Path.Combine(_rootDirectory, "Apps");
+        Directory.CreateDirectory(appsDirectory);
+        Directory.CreateDirectory(Path.Combine(_rootDirectory, "mods"));
+        Directory.CreateDirectory(Path.Combine(_rootDirectory, "data"));
+        Directory.CreateDirectory(Path.Combine(_rootDirectory, "presets"));
+        Directory.CreateDirectory(Path.Combine(_rootDirectory, "AdvancedTools"));
+        File.WriteAllText(Path.Combine(_rootDirectory, "OpenKh.Launcher.exe"), "launcher");
+        File.WriteAllText(Path.Combine(_rootDirectory, "OpenKh.Tools.ModsManager.exe"), "compatibility launcher");
+        File.WriteAllText(Path.Combine(appsDirectory, "OpenKh.Tools.ModsManager.exe"), "mod manager");
+        File.WriteAllText(Path.Combine(_rootDirectory, "old-library.dll"), "old application file");
+        File.WriteAllText(Path.Combine(_rootDirectory, "mods-manager.yml"), "launchGame: kh2");
+        File.WriteAllText(Path.Combine(_rootDirectory, "mods-KH2.txt"), "OpenKH/example");
+        File.WriteAllText(Path.Combine(appsDirectory, "legacy-release-files.txt"), "old-library.dll\n");
+        File.WriteAllText(Path.Combine(appsDirectory, "legacy-release-directories.txt"), "AdvancedTools\n");
+
+        var paths = LegacyInstallationCleanup.GetLegacyPaths(_rootDirectory);
+
+        Assert.Contains(Path.Combine(_rootDirectory, "old-library.dll"), paths);
+        Assert.Contains(Path.Combine(_rootDirectory, "AdvancedTools"), paths);
+        Assert.DoesNotContain(Path.Combine(_rootDirectory, "OpenKh.Launcher.exe"), paths);
+        Assert.DoesNotContain(Path.Combine(_rootDirectory, "OpenKh.Tools.ModsManager.exe"), paths);
+        Assert.DoesNotContain(Path.Combine(_rootDirectory, "mods-manager.yml"), paths);
+        Assert.DoesNotContain(Path.Combine(_rootDirectory, "mods-KH2.txt"), paths);
+        Assert.DoesNotContain(Path.Combine(_rootDirectory, "mods"), paths);
+        Assert.DoesNotContain(Path.Combine(_rootDirectory, "data"), paths);
+        Assert.DoesNotContain(Path.Combine(_rootDirectory, "presets"), paths);
+    }
+
+    [Fact]
+    public void UpdateEnvironmentFindsLauncherAndPackagedVersion()
+    {
+        var applicationRoot = Path.Combine(_rootDirectory, "release");
+        var appsDirectory = Path.Combine(applicationRoot, "Apps");
+        var dataDirectory = Path.Combine(_rootDirectory, "data-root");
+        Directory.CreateDirectory(appsDirectory);
+        Directory.CreateDirectory(dataDirectory);
+        var launcherName = OperatingSystem.IsWindows() ? "OpenKh.Launcher.exe" : "OpenKh.Launcher";
+        var launcherPath = Path.Combine(applicationRoot, launcherName);
+        File.WriteAllText(launcherPath, "launcher");
+        File.WriteAllText(Path.Combine(applicationRoot, "openkh-release"), "release2-test");
+
+        Assert.Equal(applicationRoot, OpenKhUpdateEnvironment.FindApplicationRoot(appsDirectory));
+        Assert.Equal(
+            applicationRoot,
+            OpenKhUpdateEnvironment.FindVersionDirectory(dataDirectory, appsDirectory));
+        Assert.Equal(launcherPath, OpenKhUpdateEnvironment.FindLauncher(dataDirectory, appsDirectory));
+    }
+
+    [Fact]
     public void ExtractedGameDataIsDetectedUsingGameSpecificFiles()
     {
         var dataDirectory = Path.Combine(_rootDirectory, "data");
@@ -267,6 +392,53 @@ public sealed class SetupServicesTests : IDisposable
         var text = File.ReadAllText(Path.Combine(gameDirectory, "LuaBackend.toml"));
         Assert.Contains("[kh1]\r\n  scripts =", text);
         Assert.DoesNotContain("[kh1]scripts =", text);
+    }
+
+    [Fact]
+    public void LuaBackendConfigurationRepairsJoinedSectionHeader()
+    {
+        var gameDirectory = Path.Combine(_rootDirectory, "lua-joined-header");
+        Directory.CreateDirectory(gameDirectory);
+        File.WriteAllText(
+            Path.Combine(gameDirectory, "LuaBackend.toml"),
+            "[kh2]scripts = [{ path = \"scripts/kh2/\", relative = true }]\n" +
+            "exe = \"KINGDOM HEARTS II FINAL MIX.exe\"\n");
+        var service = new LuaBackendService(CreateConfigurationService());
+
+        service.Configure(gameDirectory, [GameInfo.FromId("kh2")], false);
+
+        var text = File.ReadAllText(Path.Combine(gameDirectory, "LuaBackend.toml"));
+        Assert.Contains("[kh2]\nscripts =", text.Replace("\r\n", "\n"));
+        Assert.DoesNotContain("[kh2]scripts =", text);
+    }
+
+    [Fact]
+    public void LuaBackendConfigurationReplacesMultilineScriptsArrayAndRemainsValid()
+    {
+        var gameDirectory = Path.Combine(_rootDirectory, "lua-multiline");
+        Directory.CreateDirectory(gameDirectory);
+        File.WriteAllText(
+            Path.Combine(gameDirectory, "LuaBackend.toml"),
+            "[kh2]\r\n" +
+            "scripts = [\r\n" +
+            "  { path = \"scripts/kh2/\", relative = true },\r\n" +
+            "  { path = \"C:/old/scripts\", relative = false },\r\n" +
+            "]\r\n" +
+            "exe = \"KINGDOM HEARTS II FINAL MIX.exe\"\r\n" +
+            "\r\n[bbs]\r\n" +
+            "scripts = [{ path = \"scripts/bbs/\", relative = true }]\r\n");
+        var service = new LuaBackendService(CreateConfigurationService());
+
+        service.Configure(gameDirectory, [GameInfo.FromId("kh2")], false);
+        service.Configure(gameDirectory, [GameInfo.FromId("kh2")], false);
+
+        var text = File.ReadAllText(Path.Combine(gameDirectory, "LuaBackend.toml"));
+        var normalized = text.Replace("\r\n", "\n");
+        Assert.Contains("[kh2]\nscripts =", normalized);
+        Assert.DoesNotContain("[kh2]scripts =", normalized);
+        Assert.DoesNotContain("C:/old/scripts", normalized);
+        Assert.Contains("\nexe = \"KINGDOM HEARTS II FINAL MIX.exe\"", normalized);
+        Assert.Contains("[bbs]\nscripts =", normalized);
     }
 
     [Fact]
