@@ -46,7 +46,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private bool _panaceaSoundDebugEnabled;
         private bool _panaceaCacheEnabled;
         private bool _panaceaQuickMenuEnabled;
-        private bool _devView;
+        private bool _enablePatching;
         private bool _autoUpdateMods = false;
         private string _launchGame = "kh2";
         private List<string> _supportedGames = new List<string>()
@@ -126,8 +126,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public Visibility IsModInfoVisible => IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PatchVisible => PC &&  EnablePatching ? Visibility.Visible : Visibility.Collapsed;
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
         public bool GameSelectInteractable => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && MultiEmuGames);
@@ -229,13 +228,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 UpdatePanaceaSettings();
             }
         }
-        public bool DevView
+        public bool EnablePatching
         {
-            get => _devView;
+            get => _enablePatching;
             set
             {
-                _devView = value;
-                ConfigurationService.DevView = DevView;
+                _enablePatching = value;
+                ConfigurationService.EnablePatching = EnablePatching;
                 OnPropertyChanged(nameof(PatchVisible));
             }
         }
@@ -255,7 +254,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 _panaceaInstalled = value;
                 OnPropertyChanged(nameof(PatchVisible));
-                OnPropertyChanged(nameof(ModLoader));
                 OnPropertyChanged(nameof(PanaceaSettings));
             }
         }
@@ -267,7 +265,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 _pc = value;
                 OnPropertyChanged(nameof(PC));
-                OnPropertyChanged(nameof(ModLoader));
                 OnPropertyChanged(nameof(PatchVisible));
                 OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
@@ -284,7 +281,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 _pcsx2 = value;
                 OnPropertyChanged(nameof(PCSX2));
-                OnPropertyChanged(nameof(ModLoader));
                 OnPropertyChanged(nameof(PatchVisible));
                 OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
@@ -390,7 +386,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 PC = true;
                 PCSX2 = false;
                 PanaceaInstalled = ConfigurationService.PanaceaInstalled;
-                DevView = ConfigurationService.DevView;
+                EnablePatching = ConfigurationService.EnablePatching;
                 _panaceaConsoleEnabled = ConfigurationService.ShowConsole;
                 _panaceaDebugLogEnabled = ConfigurationService.DebugLog;
                 _panaceaSoundDebugEnabled = ConfigurationService.SoundDebug;
