@@ -17,6 +17,8 @@ public sealed class SdlControllerInputService : IControllerInputService
     private int _horizontalAxisDirection;
     private int _verticalAxisDirection;
     private int _rightVerticalAxisDirection;
+    private bool _leftTriggerPressed;
+    private bool _rightTriggerPressed;
     private long _horizontalAxisNextRepeat;
     private long _verticalAxisNextRepeat;
     private long _rightVerticalAxisNextRepeat;
@@ -196,6 +198,14 @@ public sealed class SdlControllerInputService : IControllerInputService
                 HandleAxis(SDL.GamepadAxis.LeftY, (short)-currentState.Gamepad.ThumbLY);
                 HandleAxis(SDL.GamepadAxis.LeftX, currentState.Gamepad.ThumbLX);
                 HandleAxis(SDL.GamepadAxis.RightY, (short)-currentState.Gamepad.ThumbRY);
+                HandleTrigger(
+                    currentState.Gamepad.LeftTrigger * 128,
+                    ref _leftTriggerPressed,
+                    ControllerAction.MoveUp);
+                HandleTrigger(
+                    currentState.Gamepad.RightTrigger * 128,
+                    ref _rightTriggerPressed,
+                    ControllerAction.MoveDown);
                 _xInputStates[index] = currentState;
             }
         }
@@ -224,15 +234,15 @@ public sealed class SdlControllerInputService : IControllerInputService
 
     private void PollXInputButtons(ushort pressedButtons)
     {
-        DispatchXInputButton(pressedButtons, 0x0001, ControllerAction.PreviousControl);
-        DispatchXInputButton(pressedButtons, 0x0002, ControllerAction.NextControl);
-        DispatchXInputButton(pressedButtons, 0x0004, ControllerAction.NextControl);
-        DispatchXInputButton(pressedButtons, 0x0008, ControllerAction.PreviousControl);
+        DispatchXInputButton(pressedButtons, 0x0001, ControllerAction.NavigateUp);
+        DispatchXInputButton(pressedButtons, 0x0002, ControllerAction.NavigateDown);
+        DispatchXInputButton(pressedButtons, 0x0004, ControllerAction.NavigateLeft);
+        DispatchXInputButton(pressedButtons, 0x0008, ControllerAction.NavigateRight);
         DispatchXInputButton(pressedButtons, 0x0010, ControllerAction.Refresh);
         DispatchXInputButton(pressedButtons, 0x1000, ControllerAction.Confirm);
         DispatchXInputButton(pressedButtons, 0x2000, ControllerAction.Cancel);
         DispatchXInputButton(pressedButtons, 0x4000, ControllerAction.Secondary);
-        DispatchXInputButton(pressedButtons, 0x8000, ControllerAction.Install);
+        DispatchXInputButton(pressedButtons, 0x8000, ControllerAction.MoveTop);
         DispatchXInputButton(pressedButtons, 0x0100, ControllerAction.PreviousGame);
         DispatchXInputButton(pressedButtons, 0x0200, ControllerAction.NextGame);
     }
@@ -264,6 +274,14 @@ public sealed class SdlControllerInputService : IControllerInputService
         HandleAxis(SDL.GamepadAxis.LeftY, SDL.GetGamepadAxis(gamepad, SDL.GamepadAxis.LeftY));
         HandleAxis(SDL.GamepadAxis.LeftX, SDL.GetGamepadAxis(gamepad, SDL.GamepadAxis.LeftX));
         HandleAxis(SDL.GamepadAxis.RightY, SDL.GetGamepadAxis(gamepad, SDL.GamepadAxis.RightY));
+        HandleTrigger(
+            SDL.GetGamepadAxis(gamepad, SDL.GamepadAxis.LeftTrigger),
+            ref _leftTriggerPressed,
+            ControllerAction.MoveUp);
+        HandleTrigger(
+            SDL.GetGamepadAxis(gamepad, SDL.GamepadAxis.RightTrigger),
+            ref _rightTriggerPressed,
+            ControllerAction.MoveDown);
     }
 
     private void PollButton(IntPtr gamepad, SDL.GamepadButton button)
@@ -312,6 +330,8 @@ public sealed class SdlControllerInputService : IControllerInputService
             _horizontalAxisNextRepeat = 0;
             _verticalAxisNextRepeat = 0;
             _rightVerticalAxisNextRepeat = 0;
+            _leftTriggerPressed = false;
+            _rightTriggerPressed = false;
         }
         ConnectionChanged?.Invoke();
         StatusChanged?.Invoke();
@@ -321,14 +341,14 @@ public sealed class SdlControllerInputService : IControllerInputService
     {
         var action = button switch
         {
-            SDL.GamepadButton.DPadUp => ControllerAction.PreviousControl,
-            SDL.GamepadButton.DPadDown => ControllerAction.NextControl,
-            SDL.GamepadButton.DPadLeft => ControllerAction.NextControl,
-            SDL.GamepadButton.DPadRight => ControllerAction.PreviousControl,
+            SDL.GamepadButton.DPadUp => ControllerAction.NavigateUp,
+            SDL.GamepadButton.DPadDown => ControllerAction.NavigateDown,
+            SDL.GamepadButton.DPadLeft => ControllerAction.NavigateLeft,
+            SDL.GamepadButton.DPadRight => ControllerAction.NavigateRight,
             SDL.GamepadButton.South => ControllerAction.Confirm,
             SDL.GamepadButton.East => ControllerAction.Cancel,
             SDL.GamepadButton.West => ControllerAction.Secondary,
-            SDL.GamepadButton.North => ControllerAction.Install,
+            SDL.GamepadButton.North => ControllerAction.MoveTop,
             SDL.GamepadButton.LeftShoulder => ControllerAction.PreviousGame,
             SDL.GamepadButton.RightShoulder => ControllerAction.NextGame,
             SDL.GamepadButton.Start => ControllerAction.Refresh,
@@ -347,8 +367,8 @@ public sealed class SdlControllerInputService : IControllerInputService
                 value,
                 ref _verticalAxisDirection,
                 ref _verticalAxisNextRepeat,
-                ControllerAction.PreviousItem,
-                ControllerAction.NextItem);
+                ControllerAction.NavigateUp,
+                ControllerAction.NavigateDown);
         }
         else if (axis == SDL.GamepadAxis.LeftX)
         {
@@ -356,8 +376,8 @@ public sealed class SdlControllerInputService : IControllerInputService
                 value,
                 ref _horizontalAxisDirection,
                 ref _horizontalAxisNextRepeat,
-                ControllerAction.NextControl,
-                ControllerAction.PreviousControl);
+                ControllerAction.NavigateLeft,
+                ControllerAction.NavigateRight);
         }
         else if (axis == SDL.GamepadAxis.RightY)
         {
@@ -405,6 +425,21 @@ public sealed class SdlControllerInputService : IControllerInputService
         Dispatch(direction < 0 ? negativeAction : positiveAction);
     }
 
+    private void HandleTrigger(int value, ref bool isPressed, ControllerAction action)
+    {
+        if (value < AxisReleaseThreshold)
+        {
+            isPressed = false;
+            return;
+        }
+
+        if (value < AxisPressThreshold || isPressed)
+            return;
+
+        isPressed = true;
+        Dispatch(action);
+    }
+
     public void Dispatch(ControllerAction action)
     {
         if (_capturedHandler is { } handler)
@@ -422,7 +457,7 @@ public sealed class SdlControllerInputService : IControllerInputService
             gamepadName.Contains("PS4", StringComparison.OrdinalIgnoreCase) ||
             gamepadName.Contains("PS5", StringComparison.OrdinalIgnoreCase))
         {
-            return "D-pad / left stick: navigate   Right stick: scroll   Cross: select   Circle: back   Square: open folder   Triangle: install   L1/R1: game   Options: updates";
+            return "D-pad / left stick: navigate   Right stick: scroll   Cross: select   Circle: back   Square: open folder   Triangle: move to top   L2/R2: move mod   L1/R1: game   Options: updates";
         }
 
         if (vendor == 0x057e ||
@@ -430,17 +465,17 @@ public sealed class SdlControllerInputService : IControllerInputService
             gamepadName.Contains("Switch", StringComparison.OrdinalIgnoreCase) ||
             gamepadName.Contains("Joy-Con", StringComparison.OrdinalIgnoreCase))
         {
-            return "D-pad / left stick: navigate   Right stick: scroll   B: select   A: back   Y: open folder   X: install   L/R: game   Plus: updates";
+            return "D-pad / left stick: navigate   Right stick: scroll   B: select   A: back   Y: open folder   X: move to top   ZL/ZR: move mod   L/R: game   Plus: updates";
         }
 
         if (vendor == 0x28de ||
             gamepadName.Contains("Steam Deck", StringComparison.OrdinalIgnoreCase) ||
             gamepadName.Contains("Steam Virtual", StringComparison.OrdinalIgnoreCase))
         {
-            return "D-pad / left stick: navigate   Right stick: scroll   A: select   B: back   X: open folder   Y: install   L1/R1: game   Menu: updates   Steam + X: keyboard";
+            return "D-pad / left stick: navigate   Right stick: scroll   A: select   B: back   X: open folder   Y: move to top   L2/R2: move mod   L1/R1: game   Menu: updates   Steam + X: keyboard";
         }
 
-        return "D-pad / left stick: navigate   Right stick: scroll   A: select   B: back   X: open folder   Y: install   LB/RB: game   Menu: updates";
+        return "D-pad / left stick: navigate   Right stick: scroll   A: select   B: back   X: open folder   Y: move to top   LT/RT: move mod   LB/RB: game   Menu: updates";
     }
 
     private void SetDisconnectedStatus()

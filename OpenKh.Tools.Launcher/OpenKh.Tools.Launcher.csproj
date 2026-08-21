@@ -36,6 +36,7 @@
     <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\ControllerWindowNavigator.cs" Link="Input\ControllerWindowNavigator.cs" />
     <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\IControllerInputService.cs" Link="Input\IControllerInputService.cs" />
     <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\SdlControllerInputService.cs" Link="Input\SdlControllerInputService.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\SpatialNavigation.cs" Link="Input\SpatialNavigation.cs" />
     <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\VirtualKeyboardService.cs" Link="Input\VirtualKeyboardService.cs" />
   </ItemGroup>
 

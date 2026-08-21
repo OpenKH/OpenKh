@@ -2,6 +2,10 @@ namespace OpenKh.Tools.ModsManager.Avalonia.Services;
 
 public enum ControllerAction
 {
+    NavigateUp,
+    NavigateDown,
+    NavigateLeft,
+    NavigateRight,
     PreviousControl,
     NextControl,
     PreviousItem,
@@ -14,5 +18,8 @@ public enum ControllerAction
     NextGame,
     ScrollUp,
     ScrollDown,
-    Refresh
+    Refresh,
+    MoveUp,
+    MoveDown,
+    MoveTop
 }

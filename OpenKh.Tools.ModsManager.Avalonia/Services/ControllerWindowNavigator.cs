@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia;
 using Avalonia.VisualTree;
@@ -61,6 +62,65 @@ public static class ControllerWindowNavigator
         return true;
     }
 
+    public static bool TryMoveFocus(Control root, ControllerAction action)
+    {
+        var direction = action switch
+        {
+            ControllerAction.NavigateUp => NavigationDirection.Up,
+            ControllerAction.NavigateDown => NavigationDirection.Down,
+            ControllerAction.NavigateLeft => NavigationDirection.Left,
+            ControllerAction.NavigateRight => NavigationDirection.Right,
+            _ => (NavigationDirection?)null
+        };
+        if (direction is null)
+            return false;
+
+        MoveFocus(root, direction.Value);
+        return true;
+    }
+
+    public static void MoveFocus(Control root, NavigationDirection direction)
+    {
+        var focused = TopLevel.GetTopLevel(root)?.FocusManager?.GetFocusedElement() as Control;
+        if (focused is null || !IsWithinRoot(focused, root))
+        {
+            focused = FindStartingTarget(root);
+            if (focused is null || !TryFocusTarget(focused))
+                return;
+
+            SyncSelectionWithFocus(root);
+        }
+
+        var source = GetNavigationTarget(focused) ?? focused;
+        var sourceBounds = GetBoundsRelativeTo(source, root);
+        if (sourceBounds is null)
+            return;
+
+        var controls = root.GetVisualDescendants()
+            .OfType<Control>()
+            .Where(IsNavigationTarget)
+            .Where(control => control != source)
+            .Where(control => !IsNestedNavigationTarget(source, control))
+            .Select(control => new
+            {
+                Control = control,
+                Bounds = GetBoundsRelativeTo(control, root)
+            })
+            .Where(candidate => candidate.Bounds is not null)
+            .ToArray();
+        var bounds = controls.Select(candidate => candidate.Bounds!.Value).ToArray();
+        var nextIndex = SpatialNavigation.FindNearest(sourceBounds.Value, bounds, direction);
+        if (nextIndex < 0)
+            return;
+
+        var next = controls[nextIndex].Control;
+        if (!TryFocusTarget(next))
+            return;
+
+        next.BringIntoView();
+        SyncSelectionWithFocus(root);
+    }
+
     public static void MoveFocus(Control root, int offset)
     {
         var controls = root.GetVisualDescendants()
@@ -78,18 +138,100 @@ public static class ControllerWindowNavigator
         for (var step = 1; step <= controls.Length; step++)
         {
             var nextIndex = (currentIndex + (offset * step) + controls.Length) % controls.Length;
-            if (controls[nextIndex].Focus(NavigationMethod.Directional))
+            if (TryFocusTarget(controls[nextIndex]))
+            {
+                SyncSelectionWithFocus(root);
                 return;
+            }
         }
     }
 
+    public static void SyncSelectionWithFocus(Control root)
+    {
+        var focused = TopLevel.GetTopLevel(root)?.FocusManager?.GetFocusedElement() as Control;
+        var item = focused as ListBoxItem ??
+            focused?.GetVisualAncestors().OfType<ListBoxItem>().FirstOrDefault();
+        var listBox = item?.GetVisualAncestors().OfType<ListBox>().FirstOrDefault();
+        if (item?.DataContext is not { } model || listBox is null)
+            return;
+
+        listBox.SelectedItem = model;
+        listBox.ScrollIntoView(model);
+    }
+
     private static bool IsAvailable(Control control) =>
-        control.Focusable &&
+        control.Focusable && IsVisibleAndEnabled(control);
+
+    private static bool IsVisibleAndEnabled(Control control) =>
         control.IsEffectivelyEnabled &&
         control.IsVisible &&
         control.GetVisualAncestors()
             .OfType<Control>()
             .All(ancestor => ancestor.IsVisible && ancestor.IsEffectivelyEnabled);
+
+    private static bool IsNavigationTarget(Control control) =>
+        IsAvailable(control) &&
+        IsNavigationTargetKind(control) &&
+        !control.GetVisualAncestors()
+            .OfType<Control>()
+            .Any(ancestor => IsAvailable(ancestor) && IsNavigationTargetKind(ancestor));
+
+    private static bool IsNavigationTargetKind(Control control) =>
+        control is Button or TextBox or ComboBox or CheckBox or ToggleSwitch or Expander or ListBoxItem;
+
+    private static Control? GetNavigationTarget(Control focused)
+    {
+        return focused.GetVisualAncestors()
+            .Prepend(focused)
+            .OfType<Control>()
+            .Where(IsAvailable)
+            .Where(IsNavigationTargetKind)
+            .LastOrDefault();
+    }
+
+    private static Control? FindStartingTarget(Control root)
+    {
+        foreach (var listBox in root.GetVisualDescendants().OfType<ListBox>().Where(IsVisibleAndEnabled))
+        {
+            if (listBox.SelectedItem is not { } selected)
+                continue;
+
+            var selectedContainer = listBox.GetVisualDescendants()
+                .OfType<ListBoxItem>()
+                .FirstOrDefault(item => ReferenceEquals(item.DataContext, selected));
+            if (selectedContainer is not null && IsNavigationTarget(selectedContainer))
+                return selectedContainer;
+        }
+
+        return root.GetVisualDescendants()
+            .OfType<Control>()
+            .FirstOrDefault(IsNavigationTarget);
+    }
+
+    private static bool TryFocusTarget(Control target)
+    {
+        if (target.Focus(NavigationMethod.Directional))
+            return true;
+
+        return target.GetVisualDescendants()
+            .OfType<Control>()
+            .Where(IsAvailable)
+            .Any(control => control.Focus(NavigationMethod.Directional));
+    }
+
+    private static bool IsWithinRoot(Control control, Control root) =>
+        ReferenceEquals(control, root) || control.GetVisualAncestors().Contains(root);
+
+    private static bool IsNestedNavigationTarget(Control source, Control candidate) =>
+        candidate.GetVisualAncestors().Contains(source) ||
+        source.GetVisualAncestors().Contains(candidate);
+
+    private static Rect? GetBoundsRelativeTo(Control control, Control root)
+    {
+        var transform = control.TransformToVisual(root);
+        var localBounds = new Rect(control.Bounds.Size);
+        return transform is null ? null : localBounds.TransformToAABB(transform.Value);
+    }
 
     private static bool CanScroll(ScrollViewer viewer) =>
         viewer.IsVisible &&

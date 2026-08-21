@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="Avalonia" Version="12.1.0" />
     <PackageReference Include="xunit" Version="2.9.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1">
       <PrivateAssets>all</PrivateAssets>
@@ -24,6 +25,8 @@
   <ItemGroup>
     <Compile Include="..\OpenKh.Tools.Launcher\Updates\LauncherInstallation.cs"
              Link="Launcher\LauncherInstallation.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager.Avalonia\Services\SpatialNavigation.cs"
+             Link="ModsManager\SpatialNavigation.cs" />
   </ItemGroup>
 
 </Project>
