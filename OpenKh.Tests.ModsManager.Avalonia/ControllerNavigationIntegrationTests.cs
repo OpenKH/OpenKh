@@ -10,12 +10,44 @@ using Avalonia.VisualTree;
 using OpenKh.Tools.ModsManager.Avalonia.Services;
 using OpenKh.Tools.ModsManager.Avalonia.ViewModels;
 using OpenKh.Tools.ModsManager.Avalonia.Views;
+using System.Reflection;
 using Xunit;
 
 namespace OpenKh.Tests.ModsManager.Avalonia;
 
 public class ControllerNavigationIntegrationTests
 {
+    [AvaloniaFact]
+    public void SetupMapsEveryAdvancedStorageBrowseButtonToItsField()
+    {
+        var setup = new SetupWindow();
+        var resolver = typeof(SetupWindow).GetMethod(
+            "GetPathTextBox",
+            BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        Assert.Same(
+            setup.FindControl<TextBox>("ModStorageTextBox"),
+            resolver.Invoke(setup, ["ModStorageTextBox"]));
+        Assert.Same(
+            setup.FindControl<TextBox>("CollectionStorageTextBox"),
+            resolver.Invoke(setup, ["CollectionStorageTextBox"]));
+        Assert.Same(
+            setup.FindControl<TextBox>("BuiltModsTextBox"),
+            resolver.Invoke(setup, ["BuiltModsTextBox"]));
+    }
+
+    [AvaloniaFact]
+    public void InstallDialogUsesSeparateRepositoryAndLocalFileActions()
+    {
+        var install = new InstallModWindow();
+
+        Assert.NotNull(install.FindControl<TextBox>("SourceTextBox"));
+        Assert.NotNull(install.FindControl<TextBox>("BranchTextBox"));
+        Assert.NotNull(install.FindControl<Button>("InstallButton"));
+        Assert.NotNull(install.FindControl<Button>("ChooseFileButton"));
+        Assert.Null(install.FindControl<CheckBox>("OverwriteCheckBox"));
+    }
+
     [AvaloniaFact]
     public void BrowseGridMovesDownToTheRenderedCardBelow()
     {

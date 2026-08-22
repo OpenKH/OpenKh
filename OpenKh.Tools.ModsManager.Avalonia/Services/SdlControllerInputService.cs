@@ -1,3 +1,5 @@
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using SDL3;
 using System.Runtime.InteropServices;
@@ -54,7 +56,7 @@ public sealed class SdlControllerInputService : IControllerInputService
             SDL.SetHint("SDL_JOYSTICK_HIDAPI", "1");
             SDL.SetHint("SDL_JOYSTICK_HIDAPI_STEAM", "1");
             SDL.SetHint("SDL_JOYSTICK_HIDAPI_STEAMDECK", "1");
-            SDL.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
+            SDL.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "0");
             _initialized = SDL.Init(SDL.InitFlags.Gamepad);
             if (!_initialized)
             {
@@ -442,10 +444,24 @@ public sealed class SdlControllerInputService : IControllerInputService
 
     public void Dispatch(ControllerAction action)
     {
+        if (!IsApplicationActive())
+            return;
+
         if (_capturedHandler is { } handler)
             handler(action);
         else
             ActionTriggered?.Invoke(action);
+    }
+
+    private static bool IsApplicationActive()
+    {
+        if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop ||
+            desktop.Windows.Count == 0)
+        {
+            return true;
+        }
+
+        return desktop.Windows.Any(window => window.IsActive);
     }
 
     private static string GetNavigationHelpText(string gamepadName, ushort vendor)

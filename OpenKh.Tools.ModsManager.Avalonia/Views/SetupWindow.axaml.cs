@@ -549,6 +549,8 @@ public sealed partial class SetupWindow : EmbeddedDialogControl
     private TextBox? GetPathTextBox(string name) => name switch
     {
         "ModStorageTextBox" => ModStorageTextBox,
+        "CollectionStorageTextBox" => CollectionStorageTextBox,
+        "BuiltModsTextBox" => BuiltModsTextBox,
         "GameDataTextBox" => GameDataTextBox,
         "PcReleaseTextBox" => PcReleaseTextBox,
         "PcReleaseKh3DTextBox" => PcReleaseKh3DTextBox,

@@ -25,53 +25,53 @@
         <StackPanel Spacing="9">
           <Button Classes="subtle" Command="{Binding BrowseModsCommand}" HorizontalAlignment="Stretch">
             <StackPanel Orientation="Horizontal" Spacing="12">
-              <TextBlock Text="Browse mods" VerticalAlignment="Center" />
+              <TextBlock Text="Browse Mods" VerticalAlignment="Center" />
             </StackPanel>
           </Button>
           <Button Classes="subtle"
                   Command="{Binding InstallCommand}"
-                  Content="Install mods"
+                  Content="Install Mods"
                   HorizontalAlignment="Stretch" />
           <Button Classes="subtle" Command="{Binding PresetsCommand}" Content="Presets" HorizontalAlignment="Stretch" />
           <Button x:Name="SetupNavigationButton" Classes="subtle" Command="{Binding SetupCommand}" HorizontalAlignment="Stretch">
             <StackPanel Orientation="Horizontal" Spacing="12">
-              <TextBlock Text="Game setup" VerticalAlignment="Center" />
+              <TextBlock Text="Game Setup" VerticalAlignment="Center" />
             </StackPanel>
           </Button>
-          <Button Classes="subtle" Command="{Binding SettingsCommand}" Content="App settings" HorizontalAlignment="Stretch" />
+          <Button Classes="subtle" Command="{Binding SettingsCommand}" Content="App Settings" HorizontalAlignment="Stretch" />
           <Expander Header="More" HorizontalAlignment="Stretch">
             <StackPanel Spacing="8" Margin="0,8,0,0">
-              <Button Classes="subtle" Command="{Binding CreatorCommand}" Content="Creator tools" HorizontalAlignment="Stretch" />
+              <Button Classes="subtle" Command="{Binding CreatorCommand}" Content="Creator Tools" HorizontalAlignment="Stretch" />
               <Button Classes="subtle" Command="{Binding InfoCommand}" Content="About OpenKH" HorizontalAlignment="Stretch" />
             </StackPanel>
           </Expander>
           <Border Height="1" Margin="0,8" Background="#22324C" />
           <Button Classes="primary" Command="{Binding BuildAndPlayCommand}" HorizontalAlignment="Stretch">
-            <TextBlock Text="Build and launch" TextWrapping="Wrap" TextAlignment="Center" />
+            <TextBlock Text="Build and Launch" TextWrapping="Wrap" TextAlignment="Center" />
           </Button>
           <Button Classes="subtle" Command="{Binding BuildCommand}" HorizontalAlignment="Stretch">
-            <TextBlock Text="Build mods" TextWrapping="Wrap" TextAlignment="Center" />
+            <TextBlock Text="Build Mods" TextWrapping="Wrap" TextAlignment="Center" />
           </Button>
           <Button Classes="subtle" Command="{Binding PlayCommand}" HorizontalAlignment="Stretch">
-            <TextBlock Text="Launch without rebuilding" TextWrapping="Wrap" TextAlignment="Center" />
+            <TextBlock Text="Launch Without Rebuilding" TextWrapping="Wrap" TextAlignment="Center" />
           </Button>
-          <Button Classes="subtle" Content="Clear built mods" Command="{Binding ClearBuiltModsCommand}"
+          <Button Classes="subtle" Content="Clear Built Mods" Command="{Binding ClearBuiltModsCommand}"
                   HorizontalAlignment="Stretch" />
           <Button Classes="subtle" Command="{Binding StopGameCommand}" IsVisible="{Binding IsGameRunning}"
-                  Content="Stop running game" HorizontalAlignment="Stretch" />
+                  Content="Stop Running Game" HorizontalAlignment="Stretch" />
           <Button Classes="subtle" Command="{Binding ToggleAdvancedOptionsCommand}"
                   IsVisible="{Binding EnablePatching}" HorizontalAlignment="Stretch">
-            <TextBlock Text="Advanced options" TextWrapping="Wrap" TextAlignment="Center" />
+            <TextBlock Text="Advanced Options" TextWrapping="Wrap" TextAlignment="Center" />
           </Button>
           <Border IsVisible="{Binding ShowAdvancedOptions}"
                   Background="#111C2E" BorderBrush="#22324C" BorderThickness="1"
                   CornerRadius="10" Padding="8">
             <StackPanel Spacing="8">
-              <Button Classes="subtle" Content="Build and fast patch" Command="{Binding FastPatchCommand}"
+              <Button Classes="subtle" Content="Build and Fast Patch" Command="{Binding FastPatchCommand}"
                       HorizontalAlignment="Stretch" />
-              <Button Classes="subtle" Content="Build and full patch" Command="{Binding ApplyToGameCommand}"
+              <Button Classes="subtle" Content="Build and Full Patch" Command="{Binding ApplyToGameCommand}"
                       HorizontalAlignment="Stretch" />
-              <Button Classes="subtle" Content="Full restore" Command="{Binding RestoreGameCommand}"
+              <Button Classes="subtle" Content="Full Restore" Command="{Binding RestoreGameCommand}"
                       HorizontalAlignment="Stretch" />
             </StackPanel>
           </Border>
@@ -80,7 +80,7 @@
 
         <Border Grid.Row="4" Background="#111E31" CornerRadius="12" Padding="14">
           <StackPanel Spacing="5">
-            <TextBlock Text="CONTROLLER SUPPORT" FontSize="10" FontWeight="Bold" Foreground="#62D6A7" />
+            <TextBlock Text="CONTROLLER SUPPORT" FontSize="10" FontWeight="Bold" Foreground="#AAB9CF" />
             <TextBlock Text="Windows &#x2022; Linux &#x2022; Steam Deck"
                        FontSize="12" TextWrapping="Wrap" Foreground="#AAB9CF" />
           </StackPanel>
@@ -132,12 +132,12 @@
         <Border x:Name="ModLibraryPanel" Background="#0F192A" BorderBrush="#22324C" BorderThickness="1" CornerRadius="14" Padding="10">
           <Grid RowDefinitions="Auto,*">
             <Grid Margin="8,4,8,10" ColumnDefinitions="*,Auto">
-              <TextBlock Text="Load order" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
+              <TextBlock Text="Load Order" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
               <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                 <Button Classes="subtle" Content="Top" Command="{Binding MoveTopCommand}" ToolTip.Tip="Move to highest priority" />
                 <Button Classes="subtle" Content="&#x2191;" Command="{Binding MoveUpCommand}" ToolTip.Tip="Increase priority" />
                 <Button Classes="subtle" Content="&#x2193;" Command="{Binding MoveDownCommand}" ToolTip.Tip="Decrease priority" />
-                <Button Classes="subtle" Content="Check updates" Command="{Binding CheckUpdatesCommand}" />
+                <Button Classes="subtle" Content="Check Updates" Command="{Binding CheckUpdatesCommand}" />
                 <Button Classes="subtle" Content="Refresh" Command="{Binding RefreshCommand}" />
               </StackPanel>
             </Grid>
@@ -218,9 +218,9 @@
                 </Border>
                 <StackPanel Orientation="Horizontal" Spacing="10"
                             IsVisible="{Binding SelectedMod.HasSource}">
-                  <Button Classes="subtle" Content="Mod source"
+                  <Button Classes="subtle" Content="Mod Source"
                           Command="{Binding OpenSourceCommand}" />
-                  <Button Classes="subtle" Content="Report bug"
+                  <Button Classes="subtle" Content="Report Bug"
                           Command="{Binding ReportBugCommand}"
                           IsVisible="{Binding SelectedMod.CanReportBug}" />
                 </StackPanel>
@@ -239,18 +239,18 @@
             </ScrollViewer>
             <StackPanel Grid.Row="1" Spacing="10">
               <Button Classes="primary"
-                      Content="Update mod"
+                      Content="Update Mod"
                       Command="{Binding UpdateSelectedCommand}"
                       IsVisible="{Binding SelectedMod.HasUpdate}"
                       HorizontalAlignment="Stretch" />
-              <Button Content="Open mod folder"
+              <Button Content="Open Mod Folder"
                       Command="{Binding OpenFolderCommand}"
                       HorizontalAlignment="Stretch" />
-              <Button Content="Configure collection"
+              <Button Content="Configure Collection"
                       Command="{Binding CollectionSettingsCommand}"
                       IsVisible="{Binding SelectedMod.IsCollection}"
                       HorizontalAlignment="Stretch" />
-              <Button Content="Remove mod"
+              <Button Content="Remove Mod"
                       Command="{Binding RemoveSelectedCommand}"
                       HorizontalAlignment="Stretch" />
             </StackPanel>
@@ -261,23 +261,23 @@
     </Grid>
 
     <Border Grid.Row="1" Grid.Column="1" BorderBrush="#22324C" BorderThickness="0,1,0,0" Padding="28,11">
-      <Grid ColumnDefinitions="*,24,Auto" RowDefinitions="Auto,Auto,Auto">
-        <StackPanel Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Status" FontWeight="SemiBold" Foreground="#DCE7F8" />
-          <TextBlock Text="{Binding StatusText}" Foreground="#91A2BA" TextWrapping="Wrap" />
-        </StackPanel>
-        <TextBlock Grid.Column="2"
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+        <TextBlock Text="Status" FontWeight="SemiBold" Foreground="#DCE7F8" />
+        <TextBlock Grid.Column="1" Margin="8,0,0,0"
+                   Text="{Binding StatusText}" Foreground="{Binding StatusForeground}" TextWrapping="Wrap" />
+        <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="0,5,0,0"
                    Text="{Binding InstallationDirectory}"
                    Foreground="#596C88"
                    TextTrimming="CharacterEllipsis"
-                   MaxWidth="500" />
-        <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Margin="0,7,0,0"
+                   HorizontalAlignment="Right"
+                   MaxWidth="720" />
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Margin="0,7,0,0"
                     Orientation="Horizontal" Spacing="8"
                     IsVisible="{Binding ShowControllerHelp}">
           <TextBlock Text="Controller" FontWeight="SemiBold" Foreground="#DCE7F8" />
-          <TextBlock Text="{Binding ControllerStatusText}" Foreground="#62D6A7" />
+          <TextBlock Text="{Binding ControllerStatusText}" Foreground="#91A2BA" />
         </StackPanel>
-        <TextBlock Grid.Row="2" Grid.ColumnSpan="3"
+        <TextBlock Grid.Row="3" Grid.ColumnSpan="2"
                    Margin="0,4,0,0"
                    Text="{Binding ControllerHelpText}"
                    IsVisible="{Binding ShowControllerHelp}"

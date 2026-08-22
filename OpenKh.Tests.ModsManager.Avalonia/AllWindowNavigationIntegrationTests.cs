@@ -40,15 +40,24 @@ public sealed class AllWindowNavigationIntegrationTests
             ("Target files", () => new ModViews.TargetFilesWindow(), (view, action) => ((ModViews.TargetFilesWindow)view).HandleControllerAction(action))
         };
 
-        foreach (var screen in screens)
+        var windowSizes = new[]
         {
-            var view = screen.Create();
-            var window = ShowContent(view, 1500, 1000);
-            AssertConnected(
-                screen.Name,
-                view,
-                action => screen.Handle(view, action));
-            window.Close();
+            new Size(1500, 1000),
+            new Size(960, 640)
+        };
+
+        foreach (var windowSize in windowSizes)
+        {
+            foreach (var screen in screens)
+            {
+                var view = screen.Create();
+                var window = ShowContent(view, windowSize.Width, windowSize.Height);
+                AssertConnected(
+                    $"{screen.Name} at {windowSize.Width}x{windowSize.Height}",
+                    view,
+                    action => screen.Handle(view, action));
+                window.Close();
+            }
         }
     }
 
