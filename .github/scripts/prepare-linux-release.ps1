@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $launcherProject = Join-Path $repositoryRoot "OpenKh.Tools.Launcher\OpenKh.Tools.Launcher.csproj"
 $modManagerProject = Join-Path $repositoryRoot "OpenKh.Tools.ModsManager.Avalonia\OpenKh.Tools.ModsManager.csproj"
-$panaceaSourceDirectory = Join-Path $repositoryRoot "bin"
+$panaceaSourceDirectory = Join-Path $repositoryRoot "OpenKh.Research.Panacea\Release"
 $panaceaFileNames = @(
     "OpenKH.Panacea.dll",
     "avcodec-vgmstream-59.dll",
