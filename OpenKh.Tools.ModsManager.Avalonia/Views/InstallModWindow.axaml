@@ -11,20 +11,19 @@
     </StackPanel>
 
     <Border Grid.Row="2" Classes="settings-card">
-      <Grid ColumnDefinitions="*,16,Auto">
-        <StackPanel Spacing="7">
-          <TextBlock Text="Repository or Package URL" FontSize="16" FontWeight="SemiBold" />
-          <TextBox x:Name="SourceTextBox"
-                   PlaceholderText="OpenKH/example-mod or https://github.com/OpenKH/example-mod"
-                   TextWrapping="NoWrap" />
-          <TextBlock Text="Branch (Optional)" FontWeight="SemiBold" />
-          <TextBox x:Name="BranchTextBox" PlaceholderText="main" />
-          <TextBlock Text="GitHub repositories, custom Git hosts, ZIP links, OpenKH patch archives, and Lua files are supported."
-                     Foreground="#71839E" FontSize="11" TextWrapping="Wrap" />
-        </StackPanel>
-        <Button x:Name="InstallButton" Grid.Column="2" Classes="primary"
+      <Grid ColumnDefinitions="*,16,Auto" RowDefinitions="Auto,7,Auto,7,Auto,7,Auto,7,Auto">
+        <TextBlock Text="Repository or Package URL" FontSize="16" FontWeight="SemiBold" />
+        <TextBox x:Name="SourceTextBox" Grid.Row="2"
+                 PlaceholderText="OpenKH/example-mod or https://github.com/OpenKH/example-mod"
+                 TextWrapping="NoWrap" />
+        <TextBlock Grid.Row="4" Text="Branch (Optional)" FontWeight="SemiBold" />
+        <TextBox x:Name="BranchTextBox" Grid.Row="6" PlaceholderText="main" />
+        <TextBlock Grid.Row="8"
+                   Text="GitHub repositories, custom Git hosts, ZIP links, OpenKH patch archives, and Lua files are supported."
+                   Foreground="#71839E" FontSize="11" TextWrapping="Wrap" />
+        <Button x:Name="InstallButton" Grid.Row="6" Grid.Column="2" Classes="primary"
                 Content="Install From Repository" MinWidth="190"
-                VerticalAlignment="Bottom" Click="Install_OnClick" />
+                Click="Install_OnClick" />
       </Grid>
     </Border>
 
