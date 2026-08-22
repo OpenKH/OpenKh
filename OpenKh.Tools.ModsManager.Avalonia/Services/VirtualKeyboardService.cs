@@ -5,6 +5,14 @@ using System.Runtime.InteropServices;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Services;
 
+public interface IVirtualKeyboardHost
+{
+    bool IsOpen { get; }
+    void Show(TextBox textBox);
+    bool HandleControllerAction(ControllerAction action);
+    bool Hide();
+}
+
 public static class VirtualKeyboardService
 {
     private const string SteamKeyboardUri =
@@ -12,13 +20,25 @@ public static class VirtualKeyboardService
     private const string SteamCloseKeyboardUri = "steam://close/keyboard";
     private const uint WindowSystemCommand = 0x0112;
     private const uint SystemCommandClose = 0xF060;
+    private static IVirtualKeyboardHost? _host;
     private static KeyboardBackend _backend;
     private static WeakReference<TextBox>? _target;
 
-    public static bool IsOpen => _backend != KeyboardBackend.None;
+    public static bool IsOpen => _host?.IsOpen ?? _backend != KeyboardBackend.None;
+
+    public static void Configure(IVirtualKeyboardHost host)
+    {
+        _host = host;
+    }
 
     public static void Show(TextBox textBox)
     {
+        if (_host is not null)
+        {
+            _host.Show(textBox);
+            return;
+        }
+
         textBox.Focus(NavigationMethod.Directional);
         _target = new WeakReference<TextBox>(textBox);
 
@@ -26,7 +46,7 @@ public static class VirtualKeyboardService
         {
             if (ShouldUseSteamKeyboard())
             {
-                ShowSteamKeyboard();
+                OpenSteamUri(SteamKeyboardUri);
                 _backend = KeyboardBackend.Steam;
                 return;
             }
@@ -40,7 +60,7 @@ public static class VirtualKeyboardService
 
             if (OperatingSystem.IsLinux())
             {
-                ShowSteamKeyboard();
+                OpenSteamUri(SteamKeyboardUri);
                 _backend = KeyboardBackend.Steam;
             }
         }
@@ -50,8 +70,23 @@ public static class VirtualKeyboardService
         }
     }
 
+    public static bool HandleControllerAction(ControllerAction action)
+    {
+        if (_host is not null)
+            return _host.HandleControllerAction(action);
+        if (_backend == KeyboardBackend.None)
+            return false;
+
+        if (action == ControllerAction.Cancel)
+            Hide();
+
+        return true;
+    }
+
     public static bool Hide()
     {
+        if (_host is not null)
+            return _host.Hide();
         if (_backend == KeyboardBackend.None)
             return false;
 
@@ -75,48 +110,6 @@ public static class VirtualKeyboardService
         }
 
         return true;
-    }
-
-    private static void ShowWindowsKeyboard()
-    {
-        var commonProgramFiles = Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles);
-        var touchKeyboard = Path.Combine(
-            commonProgramFiles,
-            "microsoft shared",
-            "ink",
-            "TabTip.exe");
-        var executable = File.Exists(touchKeyboard) ? touchKeyboard : "osk.exe";
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = executable,
-            UseShellExecute = true
-        });
-    }
-
-    private static void ShowSteamKeyboard()
-    {
-        OpenSteamUri(SteamKeyboardUri);
-    }
-
-    private static void OpenSteamUri(string uri)
-    {
-        if (OperatingSystem.IsWindows())
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = uri,
-                UseShellExecute = true
-            });
-            return;
-        }
-
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = "steam",
-            UseShellExecute = false
-        };
-        startInfo.ArgumentList.Add(uri);
-        Process.Start(startInfo);
     }
 
     private static bool ShouldUseSteamKeyboard()
@@ -152,6 +145,43 @@ public static class VirtualKeyboardService
         {
             return false;
         }
+    }
+
+    private static void ShowWindowsKeyboard()
+    {
+        var commonProgramFiles = Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles);
+        var touchKeyboard = Path.Combine(
+            commonProgramFiles,
+            "microsoft shared",
+            "ink",
+            "TabTip.exe");
+        var executable = File.Exists(touchKeyboard) ? touchKeyboard : "osk.exe";
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = executable,
+            UseShellExecute = true
+        });
+    }
+
+    private static void OpenSteamUri(string uri)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = uri,
+                UseShellExecute = true
+            });
+            return;
+        }
+
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "steam",
+            UseShellExecute = false
+        };
+        startInfo.ArgumentList.Add(uri);
+        Process.Start(startInfo);
     }
 
     private static void HideWindowsKeyboard()

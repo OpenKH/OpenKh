@@ -13,6 +13,7 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        VirtualKeyboardService.Configure(new EmbeddedVirtualKeyboardHost(this));
         SizeChanged += (_, _) => UpdateResponsiveLayout();
         Opened += (_, _) => UpdateResponsiveLayout();
     }

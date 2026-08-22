@@ -30,6 +30,7 @@ public sealed class AllWindowNavigationIntegrationTests
         {
             ("Collection settings", () => new ModViews.CollectionSettingsWindow(), (view, action) => ((ModViews.CollectionSettingsWindow)view).HandleControllerAction(action)),
             ("Confirmation", () => new ModViews.ConfirmationWindow(), (view, action) => ((ModViews.ConfirmationWindow)view).HandleControllerAction(action)),
+            ("Controller keyboard", () => new ModViews.ControllerKeyboardWindow(), (view, action) => ((ModViews.ControllerKeyboardWindow)view).HandleControllerAction(action)),
             ("Creator", () => new ModViews.CreatorWindow(), (view, action) => ((ModViews.CreatorWindow)view).HandleControllerAction(action)),
             ("Info", () => new ModViews.InfoWindow(), (view, action) => ((ModViews.InfoWindow)view).HandleControllerAction(action)),
             ("Install mods", () => new ModViews.InstallModWindow(), (view, action) => ((ModViews.InstallModWindow)view).HandleControllerAction(action)),

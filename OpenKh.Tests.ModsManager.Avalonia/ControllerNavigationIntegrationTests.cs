@@ -64,6 +64,71 @@ public class ControllerNavigationIntegrationTests
     }
 
     [AvaloniaFact]
+    public async Task ControllerKeyboardTypesErasesClosesAndRestoresTheDialog()
+    {
+        var main = new MainWindow();
+        var window = ShowContent(main, 1280, 800);
+        var install = new InstallModWindow();
+        var installTask = main.ShowPageAsync<ModInstallRequest>(install);
+        Dispatcher.UIThread.RunJobs();
+        var target = install.FindControl<TextBox>("SourceTextBox")!;
+        target.Text = "ab";
+        target.CaretIndex = 2;
+        target.SelectionStart = 2;
+        target.SelectionEnd = 2;
+
+        VirtualKeyboardService.Show(target);
+        Dispatcher.UIThread.RunJobs();
+        var keyboard = main.GetVisualDescendants().OfType<ControllerKeyboardWindow>().Single();
+
+        FocusKeyboardButton(keyboard, "Character:c");
+        Assert.True(ControllerWindowNavigator.TryHandleVirtualKeyboard(ControllerAction.Confirm));
+        Assert.Equal("abc", target.Text);
+
+        FocusKeyboardButton(keyboard, "Backspace");
+        Assert.True(ControllerWindowNavigator.TryHandleVirtualKeyboard(ControllerAction.Confirm));
+        Assert.Equal("ab", target.Text);
+
+        FocusKeyboardButton(keyboard, "Done");
+        Assert.True(ControllerWindowNavigator.TryHandleVirtualKeyboard(ControllerAction.Confirm));
+        await WaitForKeyboardToCloseAsync();
+
+        Assert.False(VirtualKeyboardService.IsOpen);
+        Assert.True(install.IsAttachedToVisualTree());
+        Dispatcher.UIThread.RunJobs();
+        Assert.Same(target, main.FocusManager?.GetFocusedElement());
+
+        install.Close();
+        await installTask;
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public async Task ControllerCancelClosesOnlyTheKeyboardAndReturnsControlToTheDialog()
+    {
+        var main = new MainWindow();
+        var window = ShowContent(main, 1280, 800);
+        var install = new InstallModWindow();
+        var installTask = main.ShowPageAsync<ModInstallRequest>(install);
+        Dispatcher.UIThread.RunJobs();
+        var target = install.FindControl<TextBox>("SourceTextBox")!;
+
+        VirtualKeyboardService.Show(target);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(ControllerWindowNavigator.TryHandleVirtualKeyboard(ControllerAction.Cancel));
+        await WaitForKeyboardToCloseAsync();
+
+        Assert.False(VirtualKeyboardService.IsOpen);
+        Assert.False(installTask.IsCompleted);
+        Assert.True(install.IsAttachedToVisualTree());
+        Assert.Same(target, main.FocusManager?.GetFocusedElement());
+
+        install.Close();
+        await installTask;
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void BrowseGridMovesDownToTheRenderedCardBelow()
     {
         var cards = Enumerable.Range(0, 6)
@@ -376,6 +441,24 @@ public class ControllerNavigationIntegrationTests
 
         path.Add(TopLevel.GetTopLevel(root)?.FocusManager?.GetFocusedElement() as Control);
         return path;
+    }
+
+    private static void FocusKeyboardButton(ControllerKeyboardWindow keyboard, string action)
+    {
+        var button = keyboard.GetVisualDescendants()
+            .OfType<Button>()
+            .Single(candidate => Equals(candidate.Tag, action));
+        Assert.True(button.Focus(NavigationMethod.Directional));
+    }
+
+    private static async Task WaitForKeyboardToCloseAsync()
+    {
+        for (var attempt = 0; attempt < 20 && VirtualKeyboardService.IsOpen; attempt++)
+        {
+            Dispatcher.UIThread.RunJobs();
+            await Task.Delay(10);
+        }
+        Dispatcher.UIThread.RunJobs();
     }
 
     private static string Describe(Control? control) => control switch
