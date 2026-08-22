@@ -70,7 +70,7 @@
       <DelayLoadDLLs>bass_vgmstream.dll;bass.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
     <PostBuildEvent>
-      <Command>copy Dependencies\*.dll ..\Debug\</Command>
+      <Command>copy /Y "Dependencies\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -98,7 +98,7 @@
       <DelayLoadDLLs>bass_vgmstream.dll;bass.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
     <PostBuildEvent>
-      <Command>copy Dependencies\*.dll ..\Release\</Command>
+      <Command>copy /Y "Dependencies\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

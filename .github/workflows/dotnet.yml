@@ -33,8 +33,8 @@ jobs:
     - name: msbuild panacea
       run: |
         msbuild OpenKh.Research.Panacea\OpenKh.Research.Panacea.vcxproj /p:Configuration=Release /p:Platform=x64
-        xcopy "OpenKh.Research.Panacea\Release\*.dll" bin\
-        xcopy "OpenKh.Research.Panacea\Dependencies\*.dll" bin\
+        xcopy /Y "OpenKh.Research.Panacea\Release\*.dll" bin\
+        xcopy /Y "OpenKh.Research.Panacea\Dependencies\*.dll" bin\
 
     - name: Organize release for mod users
       run: powershell -ExecutionPolicy Unrestricted ./.github/scripts/prepare-release.ps1
