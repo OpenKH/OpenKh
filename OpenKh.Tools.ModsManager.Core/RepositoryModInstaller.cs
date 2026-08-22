@@ -256,9 +256,9 @@ public sealed class RepositoryModInstaller
         return client;
     }
 
-    private sealed record RepositoryAddress(string Id, string CloneUrl, string? Branch)
+    internal sealed record RepositoryAddress(string Id, string CloneUrl, string? Branch)
     {
-        public static RepositoryAddress Parse(string source, string? branch)
+        internal static RepositoryAddress Parse(string source, string? branch)
         {
             if (Uri.TryCreate(source, UriKind.Absolute, out var uri))
             {
@@ -276,12 +276,31 @@ public sealed class RepositoryModInstaller
                 return new RepositoryAddress($"{parts[0]}/{repositoryName}", baseUrl, detectedBranch);
             }
 
-            var sourceParts = source.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+            var repositorySource = source.Trim().Trim('/');
+            var repositoryHost = "github.com";
+            var hostSeparator = repositorySource.LastIndexOf('@');
+            if (hostSeparator > 0)
+            {
+                repositoryHost = repositorySource[(hostSeparator + 1)..].Trim();
+                repositorySource = repositorySource[..hostSeparator].TrimEnd('/');
+                if (!Uri.TryCreate($"https://{repositoryHost}", UriKind.Absolute, out var hostUri) ||
+                    !hostUri.AbsolutePath.Equals("/", StringComparison.Ordinal))
+                {
+                    throw new ArgumentException("The repository host is not valid.");
+                }
+
+                repositoryHost = hostUri.Authority;
+            }
+
+            var sourceParts = repositorySource.Split('/', StringSplitOptions.RemoveEmptyEntries);
             if (sourceParts.Length < 2)
                 throw new ArgumentException("Use owner/repository or paste a full repository URL.");
-            var id = $"{sourceParts[0]}/{sourceParts[1]}";
+            var shorthandRepositoryName = sourceParts[1].EndsWith(".git", StringComparison.OrdinalIgnoreCase)
+                ? sourceParts[1][..^4]
+                : sourceParts[1];
+            var id = $"{sourceParts[0]}/{shorthandRepositoryName}";
             var detectedSourceBranch = branch ?? (sourceParts.Length > 2 ? string.Join('/', sourceParts.Skip(2)) : null);
-            return new RepositoryAddress(id, $"https://github.com/{id}.git", detectedSourceBranch);
+            return new RepositoryAddress(id, $"https://{repositoryHost}/{id}.git", detectedSourceBranch);
         }
     }
 }

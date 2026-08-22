@@ -92,6 +92,40 @@ public sealed class SetupServicesTests : IDisposable
     }
 
     [Fact]
+    public void CustomStorageLocationsAreUsedWithoutExtraFolderNames()
+    {
+        var service = CreateConfigurationService();
+        var installed = Path.Combine(_rootDirectory, "installed");
+        var collections = Path.Combine(_rootDirectory, "collections");
+        var compiled = Path.Combine(_rootDirectory, "compiled");
+        service.Current.ModCollectionPath = installed;
+        service.Current.ModCollectionsPath = collections;
+        service.Current.GameModPath = compiled;
+        var game = GameInfo.FromId("kh2");
+
+        Assert.Equal(Path.Combine(installed, "kh2"), service.GetGameModsDirectory(game));
+        Assert.Equal(collections, service.CollectionsDirectory);
+        Assert.Equal(Path.Combine(compiled, "kh2"), service.GetGameModOutputDirectory(game));
+        Assert.Equal(compiled, service.CompiledModsRoot);
+    }
+
+    [Fact]
+    public void SharedStorageLocationKeepsInstalledAndBuiltModsSeparate()
+    {
+        var service = CreateConfigurationService();
+        var shared = Path.Combine(_rootDirectory, "shared");
+        service.Current.ModCollectionPath = shared;
+        service.Current.ModCollectionsPath = shared;
+        service.Current.GameModPath = shared;
+        var game = GameInfo.FromId("kh2");
+
+        Assert.Equal(Path.Combine(shared, "mods", "kh2"), service.GetGameModsDirectory(game));
+        Assert.Equal(Path.Combine(shared, "collections"), service.CollectionsDirectory);
+        Assert.Equal(Path.Combine(shared, "mod", "kh2"), service.GetGameModOutputDirectory(game));
+        Assert.Equal(Path.Combine(shared, "mod"), service.CompiledModsRoot);
+    }
+
+    [Fact]
     public void InterimAvaloniaConfigurationIsMigratedToOfficialNames()
     {
         Directory.CreateDirectory(_rootDirectory);
@@ -221,6 +255,8 @@ public sealed class SetupServicesTests : IDisposable
         foreach (var dependency in PanaceaDependencies)
             File.WriteAllText(Path.Combine(_rootDirectory, dependency), dependency);
         var service = CreateConfigurationService();
+        var compiledModsDirectory = Path.Combine(_rootDirectory, "custom-build");
+        service.Current.GameModPath = compiledModsDirectory;
         var panacea = new PanaceaService(service);
 
         await panacea.InstallAsync(false, gameDirectory);
@@ -230,6 +266,9 @@ public sealed class SetupServicesTests : IDisposable
         Assert.Contains("Panacea version OpenKH release2-test", installedStatus.Message);
         Assert.True(File.Exists(Path.Combine(gameDirectory, OperatingSystem.IsWindows() ? "DBGHELP.dll" : "version.dll")));
         Assert.Equal(gameDirectory, service.Current.PcReleaseLocation);
+        Assert.Contains(
+            $"mod_path={compiledModsDirectory}",
+            File.ReadAllLines(Path.Combine(gameDirectory, "panacea_settings.txt")));
 
         await panacea.RemoveAsync(false, gameDirectory);
 

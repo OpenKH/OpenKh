@@ -6,7 +6,7 @@
   <Grid Margin="28" RowDefinitions="Auto,18,*,18,Auto">
     <StackPanel Spacing="5">
       <TextBlock Text="Setup" FontSize="30" FontWeight="Bold" />
-      <TextBlock Text="Configure your games once. These settings are shared with the existing OpenKH Mod Manager."
+      <TextBlock Text="Configure game locations, loaders, and extracted data."
                  Foreground="#AAB9CF" TextWrapping="Wrap" />
     </StackPanel>
 
@@ -27,12 +27,30 @@
 
         <Border Classes="settings-card">
           <StackPanel Spacing="12">
-            <TextBlock Text="OpenKH folders" FontSize="18" FontWeight="SemiBold" />
-            <TextBlock Text="Mod storage folder" FontWeight="SemiBold" />
-            <Grid ColumnDefinitions="*,12,130">
-              <TextBox x:Name="ModStorageTextBox" Text="{Binding ModCollectionPath}" PlaceholderText="Use the OpenKH installation folder" />
-              <Button Grid.Column="2" Content="Browse" Tag="ModStorageTextBox" Click="BrowseFolder_OnClick" />
-            </Grid>
+            <TextBlock Text="Storage locations" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="The standard OpenKH folders are used unless custom locations are configured below."
+                       Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+            <Expander Header="Advanced storage locations">
+              <StackPanel Spacing="10" Margin="0,10,0,0">
+                <TextBlock Text="Installed mods folder" FontWeight="SemiBold" />
+                <Grid ColumnDefinitions="*,12,130">
+                  <TextBox x:Name="ModStorageTextBox" Text="{Binding ModCollectionPath}" PlaceholderText="Use OpenKH/mods" />
+                  <Button Grid.Column="2" Content="Browse" Tag="ModStorageTextBox" Click="BrowseFolder_OnClick" />
+                </Grid>
+                <TextBlock Text="Installed collections folder" FontWeight="SemiBold" />
+                <Grid ColumnDefinitions="*,12,130">
+                  <TextBox x:Name="CollectionStorageTextBox" Text="{Binding ModCollectionsPath}" PlaceholderText="Use OpenKH/mods/collections" />
+                  <Button Grid.Column="2" Content="Browse" Tag="CollectionStorageTextBox" Click="BrowseFolder_OnClick" />
+                </Grid>
+                <TextBlock Text="Built mods folder" FontWeight="SemiBold" />
+                <Grid ColumnDefinitions="*,12,130">
+                  <TextBox x:Name="BuiltModsTextBox" Text="{Binding GameModPath}" PlaceholderText="Use OpenKH/mod" />
+                  <Button Grid.Column="2" Content="Browse" Tag="BuiltModsTextBox" Click="BrowseFolder_OnClick" />
+                </Grid>
+                <TextBlock Text="If installed and built mods share a custom folder, OpenKH keeps them in separate mods and mod subfolders."
+                           Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
+              </StackPanel>
+            </Expander>
           </StackPanel>
         </Border>
 

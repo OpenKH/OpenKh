@@ -16,6 +16,8 @@ public sealed class SetupWindowViewModel : ObservableObject
         var configuration = service.Current;
         GameEdition = configuration.GameEdition == 1 ? 1 : 0;
         ModCollectionPath = configuration.ModCollectionPath;
+        ModCollectionsPath = configuration.ModCollectionsPath;
+        GameModPath = configuration.GameModPath;
         GameDataPath = configuration.GameDataPath;
         PcReleaseLocation = configuration.PcReleaseLocation;
         PcReleaseLocationKh3D = configuration.PcReleaseLocationKh3D;
@@ -61,6 +63,8 @@ public sealed class SetupWindowViewModel : ObservableObject
     public bool IsPcMode => GameEdition == 0;
     public bool IsPcsx2Mode => GameEdition == 1;
     public string? ModCollectionPath { get; set; }
+    public string? ModCollectionsPath { get; set; }
+    public string? GameModPath { get; set; }
     public string? GameDataPath { get; set; }
     public string? PcReleaseLocation
     {
@@ -109,6 +113,8 @@ public sealed class SetupWindowViewModel : ObservableObject
         var configuration = _service.Current;
         configuration.GameEdition = IsPcsx2Mode ? 1 : 2;
         configuration.ModCollectionPath = EmptyToNull(ModCollectionPath);
+        configuration.ModCollectionsPath = EmptyToNull(ModCollectionsPath);
+        configuration.GameModPath = EmptyToNull(GameModPath);
         configuration.GameDataPath = EmptyToNull(GameDataPath);
         configuration.PcReleaseLocation = EmptyToNull(PcReleaseLocation);
         configuration.PcReleaseLocationKh3D = EmptyToNull(PcReleaseLocationKh3D);
