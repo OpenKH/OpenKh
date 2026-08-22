@@ -65,19 +65,19 @@ Test-Success $LASTEXITCODE
 
 # Add items to solution
 Get-CSProjects "OpenKh.Command.*" | ForEach-Object {
-    dotnet sln $solution add $_ --in-root
+    dotnet sln $solution add $_ --in-root --include-references false
     Test-Success $LASTEXITCODE
 }
 Get-CSProjects "OpenKh.Tools.*" | ForEach-Object {
-    dotnet sln $solution add $_ --in-root
+    dotnet sln $solution add $_ --in-root --include-references false
     Test-Success $LASTEXITCODE
 }
 Get-CSProjects "OpenKh.WinShell.*" | ForEach-Object {
-    dotnet sln $solution add $_ --in-root
+    dotnet sln $solution add $_ --in-root --include-references false
     Test-Success $LASTEXITCODE
 }
 Get-CSProjects "OpenKh.Game*" | ForEach-Object {
-    dotnet sln $solution add $_ --in-root
+    dotnet sln $solution add $_ --in-root --include-references false
     Test-Success $LASTEXITCODE
 }
 
