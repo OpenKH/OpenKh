@@ -419,7 +419,7 @@ public partial class MainWindow : Window
     {
         Dispatcher.UIThread.Post(() =>
         {
-            if (ControllerWindowNavigator.TryHideVirtualKeyboard(action) ||
+            if (ControllerWindowNavigator.TryHandleVirtualKeyboard(action) ||
                 ControllerWindowNavigator.TryShowVirtualKeyboard(this, action) ||
                 ControllerWindowNavigator.TryScroll(this, action) ||
                 ControllerWindowNavigator.TryMoveFocus(this, action))
