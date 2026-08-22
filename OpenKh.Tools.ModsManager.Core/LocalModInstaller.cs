@@ -29,6 +29,20 @@ public sealed class LocalModInstaller
         CancellationToken cancellationToken = default) =>
         Task.Run(() => Install(packagePath, game, overwrite, cancellationToken), cancellationToken);
 
+    public string? FindInstalledMod(string packagePath, GameInfo game)
+    {
+        if (!File.Exists(packagePath))
+            throw new FileNotFoundException("The selected mod package does not exist.", packagePath);
+
+        using var archive = ZipFile.OpenRead(packagePath);
+        var package = InspectPackage(packagePath, archive);
+        var destinationRoot = package.Metadata?.IsCollection == true
+            ? GetCollectionsDirectory()
+            : GetGameModsDirectory(game);
+        var destinationDirectory = Path.Combine(destinationRoot, package.Name);
+        return Directory.Exists(destinationDirectory) ? package.Name : null;
+    }
+
     private ModInstallResult Install(
         string packagePath,
         GameInfo game,
@@ -39,29 +53,16 @@ public sealed class LocalModInstaller
             throw new FileNotFoundException("The selected mod package does not exist.", packagePath);
 
         using var archive = ZipFile.OpenRead(packagePath);
-        var patchArchive = PatchArchiveInfo.FromFileName(packagePath);
-        var packageLayout = patchArchive is null ? GetPackageLayout(archive) : new PackageLayout(string.Empty);
-        ModMetadata? metadata = null;
-        if (patchArchive is null)
-        {
-            var metadataEntry = archive.Entries.First(entry =>
-                NormalizeEntryName(entry.FullName).Equals(
-                    $"{packageLayout.Prefix}{MetadataFileName}",
-                    StringComparison.OrdinalIgnoreCase));
-            using var metadataReader = new StreamReader(metadataEntry.Open());
-            metadata = ModMetadata.Read(metadataReader);
-        }
-
-        var packageName = CreateSafeDirectoryName(Path.GetFileNameWithoutExtension(packagePath));
-        var destinationRoot = metadata?.IsCollection == true
+        var package = InspectPackage(packagePath, archive);
+        var destinationRoot = package.Metadata?.IsCollection == true
             ? GetCollectionsDirectory()
             : GetGameModsDirectory(game);
-        var destinationDirectory = Path.Combine(destinationRoot, packageName);
+        var destinationDirectory = Path.Combine(destinationRoot, package.Name);
 
         if (Directory.Exists(destinationDirectory))
         {
             if (!overwrite)
-                throw new ModAlreadyInstalledException(packageName);
+                throw new ModAlreadyInstalledException(package.Name);
 
             foreach (var file in Directory.EnumerateFiles(destinationDirectory, "*", SearchOption.AllDirectories))
                 File.SetAttributes(file, FileAttributes.Normal);
@@ -71,16 +72,16 @@ public sealed class LocalModInstaller
         Directory.CreateDirectory(destinationDirectory);
         try
         {
-            if (patchArchive is not null)
+            if (package.PatchArchive is not null)
             {
-                ExtractPatchArchive(archive, destinationDirectory, patchArchive, cancellationToken);
+                ExtractPatchArchive(archive, destinationDirectory, package.PatchArchive, cancellationToken);
             }
             else
             {
                 foreach (var entry in archive.Entries)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    ExtractEntry(entry, packageLayout.Prefix, destinationDirectory);
+                    ExtractEntry(entry, package.Layout.Prefix, destinationDirectory);
                 }
             }
 
@@ -94,9 +95,33 @@ public sealed class LocalModInstaller
         }
 
         return new ModInstallResult(
-            packageName,
-            string.IsNullOrWhiteSpace(metadata?.Title) ? patchArchive?.DisplayName ?? packageName : metadata.Title,
+            package.Name,
+            string.IsNullOrWhiteSpace(package.Metadata?.Title)
+                ? package.PatchArchive?.DisplayName ?? package.Name
+                : package.Metadata.Title,
             destinationDirectory);
+    }
+
+    private static PackageInspection InspectPackage(string packagePath, ZipArchive archive)
+    {
+        var patchArchive = PatchArchiveInfo.FromFileName(packagePath);
+        var packageLayout = patchArchive is null ? GetPackageLayout(archive) : new PackageLayout(string.Empty);
+        ModMetadata? metadata = null;
+        if (patchArchive is null)
+        {
+            var metadataEntry = archive.Entries.First(entry =>
+                NormalizeEntryName(entry.FullName).Equals(
+                    $"{packageLayout.Prefix}{MetadataFileName}",
+                    StringComparison.OrdinalIgnoreCase));
+            using var metadataReader = new StreamReader(metadataEntry.Open());
+            metadata = ModMetadata.Read(metadataReader);
+        }
+
+        return new PackageInspection(
+            CreateSafeDirectoryName(Path.GetFileNameWithoutExtension(packagePath)),
+            packageLayout,
+            patchArchive,
+            metadata);
     }
 
     private static void ExtractPatchArchive(
@@ -230,6 +255,12 @@ public sealed class LocalModInstaller
     }
 
     private sealed record PackageLayout(string Prefix);
+
+    private sealed record PackageInspection(
+        string Name,
+        PackageLayout Layout,
+        PatchArchiveInfo? PatchArchive,
+        ModMetadata? Metadata);
 
     private sealed record PatchArchiveInfo(string GameId, string ExtensionName, string DisplayName)
     {

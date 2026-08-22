@@ -398,6 +398,22 @@ public sealed class MainWindowViewModel : ObservableObject
 
         try
         {
+            if (!request.Overwrite)
+            {
+                var existingMod = _modInstaller.FindInstalledMod(
+                    request.Source,
+                    SelectedGame,
+                    request.Branch);
+                if (existingMod is not null)
+                {
+                    var replace = await ConfirmReplacementAsync(existingMod);
+                    if (!replace)
+                        return;
+
+                    request = request with { Overwrite = true };
+                }
+            }
+
             IsBusy = true;
             StatusText = "Preparing mod installation";
             var progress = new Progress<ModOperationProgress>(value =>
@@ -422,15 +438,9 @@ public sealed class MainWindowViewModel : ObservableObject
                 catch (ModAlreadyInstalledException exception) when (!request.Overwrite)
                 {
                     IsBusy = false;
-                    var replace = await _dialogs.ConfirmAsync(
-                        "Replace Existing Mod?",
-                        $"A mod named '{exception.ModName}' is already installed. Replace it with the selected mod?",
-                        "Replace Mod");
+                    var replace = await ConfirmReplacementAsync(exception.ModName);
                     if (!replace)
-                    {
-                        StatusText = "Mod installation was cancelled";
                         return;
-                    }
 
                     request = request with { Overwrite = true };
                     IsBusy = true;
@@ -540,6 +550,17 @@ public sealed class MainWindowViewModel : ObservableObject
             OnPropertyChanged(nameof(EnablePatching));
             SetSuccessStatus("Settings were saved");
         }
+    }
+
+    private async Task<bool> ConfirmReplacementAsync(string modName)
+    {
+        var replace = await _dialogs.ConfirmAsync(
+            "Replace Existing Mod?",
+            $"A mod named '{modName}' is already installed. Replace it with the selected mod?",
+            "Replace Mod");
+        if (!replace)
+            StatusText = "Mod installation was cancelled";
+        return replace;
     }
 
     private Task OpenInfoAsync() => _infoPrompt.ShowAsync();
@@ -802,10 +823,14 @@ public sealed class MainWindowViewModel : ObservableObject
         try
         {
             IsBusy = true;
+            var visibleIndex = Mods.IndexOf(mod);
             await _maintenanceService.RemoveAsync(mod.Model);
             _allMods.Remove(mod);
+            Mods.Remove(mod);
+            SelectedMod = Mods.Count == 0
+                ? null
+                : Mods[Math.Min(Math.Max(visibleIndex, 0), Mods.Count - 1)];
             _catalogService.SaveEnabledOrder(SelectedGame, _allMods.Select(item => item.Model));
-            ApplyFilter();
             NotifySummaryChanged();
             SetSuccessStatus($"{mod.Name} was removed");
         }

@@ -41,6 +41,36 @@ public sealed class RepositoryModInstaller
         return await CloneAsync(repository, game, overwrite, progress, cancellationToken);
     }
 
+    public string? FindInstalledMod(string source, GameInfo game, string? branch = null)
+    {
+        if (string.IsNullOrWhiteSpace(source))
+            throw new ArgumentException("Enter a repository, ZIP URL, or local file.", nameof(source));
+
+        source = source.Trim();
+        if (File.Exists(source))
+        {
+            var extension = Path.GetExtension(source);
+            if (extension.Equals(".lua", StringComparison.OrdinalIgnoreCase))
+            {
+                var id = Path.GetFileNameWithoutExtension(source);
+                return Directory.Exists(Path.Combine(_configuration.GetGameModsDirectory(game), id))
+                    ? id
+                    : null;
+            }
+
+            return _localInstaller.FindInstalledMod(source, game);
+        }
+
+        if (Uri.TryCreate(source, UriKind.Absolute, out var uri) && IsArchiveUri(uri))
+            return null;
+
+        var repository = RepositoryAddress.Parse(source, branch);
+        return Directory.Exists(Path.Combine(_configuration.GetGameModsDirectory(game), repository.Id)) ||
+               Directory.Exists(Path.Combine(_configuration.CollectionsDirectory, repository.Id))
+            ? repository.Id
+            : null;
+    }
+
     private async Task<ModInstallResult> InstallLocalFileAsync(
         string fileName,
         GameInfo game,

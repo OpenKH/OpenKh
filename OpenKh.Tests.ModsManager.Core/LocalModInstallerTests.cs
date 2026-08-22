@@ -75,6 +75,36 @@ public sealed class LocalModInstallerTests : IDisposable
         Assert.Equal("Example", exception.ModName);
     }
 
+    [Fact]
+    public async Task FindInstalledModDetectsAnExistingPackageWithoutThrowing()
+    {
+        var packagePath = CreatePackage(
+            "Example.zip",
+            ("mod.yml", "title: Example Mod\nassets: []"));
+        var layout = InstallationLayout.Detect("ignored", ["--data-root", _rootDirectory]);
+        var installer = new LocalModInstaller(layout);
+
+        Assert.Null(installer.FindInstalledMod(packagePath, GameInfo.FromId("kh2")));
+        await installer.InstallAsync(packagePath, GameInfo.FromId("kh2"));
+
+        Assert.Equal("Example", installer.FindInstalledMod(packagePath, GameInfo.FromId("kh2")));
+    }
+
+    [Fact]
+    public async Task FindInstalledModDetectsAnExistingPcPatchWithoutThrowing()
+    {
+        var packagePath = CreatePackage(
+            "Example.kh2pcpatch",
+            ("package/original/obj/example.bin", "content"));
+        var layout = InstallationLayout.Detect("ignored", ["--data-root", _rootDirectory]);
+        var installer = new LocalModInstaller(layout);
+
+        Assert.Null(installer.FindInstalledMod(packagePath, GameInfo.FromId("kh2")));
+        await installer.InstallAsync(packagePath, GameInfo.FromId("kh2"));
+
+        Assert.Equal("Example", installer.FindInstalledMod(packagePath, GameInfo.FromId("kh2")));
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_rootDirectory))
