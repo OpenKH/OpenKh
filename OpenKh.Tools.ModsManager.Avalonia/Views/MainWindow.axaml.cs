@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using OpenKh.Tools.ModsManager.Avalonia.Services;
 using OpenKh.Tools.ModsManager.Avalonia.ViewModels;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 namespace OpenKh.Tools.ModsManager.Avalonia.Views;
@@ -68,8 +69,15 @@ public sealed partial class MainWindow : Window
 
     private void ModList_OnSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs)
     {
-        if (sender is ListBox listBox && listBox.SelectedItem is not null)
-            listBox.ScrollIntoView(listBox.SelectedItem);
+        if (sender is not ListBox listBox || listBox.SelectedItem is not { } selectedItem)
+            return;
+
+        // Wait for collection and virtualization updates before bringing a moved item back into view.
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (ReferenceEquals(listBox.SelectedItem, selectedItem))
+                listBox.ScrollIntoView(selectedItem);
+        }, DispatcherPriority.Loaded);
     }
 
     private void ModList_OnGotFocus(object? sender, FocusChangedEventArgs eventArgs) =>

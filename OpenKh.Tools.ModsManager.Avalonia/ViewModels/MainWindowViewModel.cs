@@ -103,7 +103,7 @@ public sealed class MainWindowViewModel : ObservableObject
         ApplyToGameCommand = new AsyncRelayCommand(ApplyToGameAsync, () => !IsBusy && EnabledCount > 0);
         FastPatchCommand = new AsyncRelayCommand(FastPatchAsync, () => !IsBusy && EnabledCount > 0);
         RestoreGameCommand = new AsyncRelayCommand(RestoreGameAsync, () => !IsBusy);
-        FastRestoreCommand = new AsyncRelayCommand(FastRestoreAsync, () => !IsBusy);
+        ClearBuiltModsCommand = new AsyncRelayCommand(ClearBuiltModsAsync, () => !IsBusy);
         ToggleAdvancedOptionsCommand = new RelayCommand(() => ShowAdvancedOptions = !ShowAdvancedOptions);
         _controllerInput.StatusChanged += ControllerConnectionChanged;
         _launchService.RunningStateChanged += LaunchRunningStateChanged;
@@ -138,7 +138,7 @@ public sealed class MainWindowViewModel : ObservableObject
     public AsyncRelayCommand ApplyToGameCommand { get; }
     public AsyncRelayCommand FastPatchCommand { get; }
     public AsyncRelayCommand RestoreGameCommand { get; }
-    public AsyncRelayCommand FastRestoreCommand { get; }
+    public AsyncRelayCommand ClearBuiltModsCommand { get; }
     public RelayCommand ToggleAdvancedOptionsCommand { get; }
     public string InstallationDirectory => _catalogService.InstallationDirectory;
     public string ControllerStatusText => _controllerInput.StatusText;
@@ -182,7 +182,7 @@ public sealed class MainWindowViewModel : ObservableObject
             ApplyToGameCommand.NotifyCanExecuteChanged();
             FastPatchCommand.NotifyCanExecuteChanged();
             RestoreGameCommand.NotifyCanExecuteChanged();
-            FastRestoreCommand.NotifyCanExecuteChanged();
+            ClearBuiltModsCommand.NotifyCanExecuteChanged();
             SetupCommand.NotifyCanExecuteChanged();
             BuildCommand.NotifyCanExecuteChanged();
             BuildAndPlayCommand.NotifyCanExecuteChanged();
@@ -326,7 +326,9 @@ public sealed class MainWindowViewModel : ObservableObject
         var selectedId = SelectedMod.Id;
         _allMods.RemoveAt(oldIndex);
         _allMods.Insert(newIndex, SelectedMod);
-        Mods.Move(oldIndex, newIndex);
+        var selected = Mods[oldIndex];
+        Mods.RemoveAt(oldIndex);
+        Mods.Insert(newIndex, selected);
         SelectedMod = Mods.First(mod => mod.Id == selectedId);
         SaveEnabledOrder();
         MoveUpCommand.NotifyCanExecuteChanged();
@@ -345,7 +347,9 @@ public sealed class MainWindowViewModel : ObservableObject
         var oldIndex = _allMods.IndexOf(SelectedMod);
         _allMods.Remove(SelectedMod);
         _allMods.Insert(0, SelectedMod);
-        Mods.Move(oldIndex, 0);
+        var selected = Mods[oldIndex];
+        Mods.RemoveAt(oldIndex);
+        Mods.Insert(0, selected);
         SelectedMod = Mods.First(mod => mod.Id == selectedId);
         SaveEnabledOrder();
         MoveUpCommand.NotifyCanExecuteChanged();
@@ -620,17 +624,17 @@ public sealed class MainWindowViewModel : ObservableObject
         }
     }
 
-    private async Task FastRestoreAsync()
+    private async Task ClearBuiltModsAsync()
     {
         try
         {
             IsBusy = true;
             await _packagePatchService.RestoreAsync(SelectedGame, false, CreateStatusProgress());
-            StatusText = $"Fast restore completed for {SelectedGame.DisplayName}";
+            StatusText = $"Built mods were cleared for {SelectedGame.DisplayName}";
         }
         catch (Exception exception)
         {
-            StatusText = $"Could not fast restore the game: {exception.Message}";
+            StatusText = $"Could not clear built mods: {exception.Message}";
         }
         finally
         {

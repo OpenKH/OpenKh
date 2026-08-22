@@ -187,7 +187,7 @@ public sealed class PcPackagePatchService(ModManagerConfigurationService configu
         if (!restorePackages)
         {
             DeleteDirectoryIfPresent(configuration.GetGameModOutputDirectory(game));
-            progress?.Report(new ModOperationProgress("Fast restore completed", 1));
+            progress?.Report(new ModOperationProgress("Built mod output removed", 1));
             return;
         }
 

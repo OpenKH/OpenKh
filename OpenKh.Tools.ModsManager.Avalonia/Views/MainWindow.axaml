@@ -33,24 +33,30 @@
                   Content="Install mods"
                   HorizontalAlignment="Stretch" />
           <Button Classes="subtle" Command="{Binding PresetsCommand}" Content="Presets" HorizontalAlignment="Stretch" />
-          <Button Classes="subtle" Command="{Binding CreatorCommand}" Content="Creator" HorizontalAlignment="Stretch" />
           <Button x:Name="SetupNavigationButton" Classes="subtle" Command="{Binding SetupCommand}" HorizontalAlignment="Stretch">
             <StackPanel Orientation="Horizontal" Spacing="12">
-              <TextBlock Text="Setup" VerticalAlignment="Center" />
+              <TextBlock Text="Game setup" VerticalAlignment="Center" />
             </StackPanel>
           </Button>
-          <Button Classes="subtle" Command="{Binding SettingsCommand}" Content="Settings" HorizontalAlignment="Stretch" />
-          <Button Classes="subtle" Command="{Binding InfoCommand}" Content="Info" HorizontalAlignment="Stretch" />
+          <Button Classes="subtle" Command="{Binding SettingsCommand}" Content="App settings" HorizontalAlignment="Stretch" />
+          <Expander Header="More" HorizontalAlignment="Stretch">
+            <StackPanel Spacing="8" Margin="0,8,0,0">
+              <Button Classes="subtle" Command="{Binding CreatorCommand}" Content="Creator tools" HorizontalAlignment="Stretch" />
+              <Button Classes="subtle" Command="{Binding InfoCommand}" Content="About OpenKH" HorizontalAlignment="Stretch" />
+            </StackPanel>
+          </Expander>
           <Border Height="1" Margin="0,8" Background="#22324C" />
           <Button Classes="primary" Command="{Binding BuildAndPlayCommand}" HorizontalAlignment="Stretch">
-            <TextBlock Text="Build and play" TextWrapping="Wrap" TextAlignment="Center" />
+            <TextBlock Text="Build and launch" TextWrapping="Wrap" TextAlignment="Center" />
           </Button>
           <Button Classes="subtle" Command="{Binding BuildCommand}" HorizontalAlignment="Stretch">
             <TextBlock Text="Build mods" TextWrapping="Wrap" TextAlignment="Center" />
           </Button>
           <Button Classes="subtle" Command="{Binding PlayCommand}" HorizontalAlignment="Stretch">
-            <TextBlock Text="Play without rebuilding" TextWrapping="Wrap" TextAlignment="Center" />
+            <TextBlock Text="Launch without rebuilding" TextWrapping="Wrap" TextAlignment="Center" />
           </Button>
+          <Button Classes="subtle" Content="Clear built mods" Command="{Binding ClearBuiltModsCommand}"
+                  HorizontalAlignment="Stretch" />
           <Button Classes="subtle" Command="{Binding StopGameCommand}" IsVisible="{Binding IsGameRunning}"
                   Content="Stop running game" HorizontalAlignment="Stretch" />
           <Button Classes="subtle" Command="{Binding ToggleAdvancedOptionsCommand}"
@@ -64,8 +70,6 @@
               <Button Classes="subtle" Content="Build and fast patch" Command="{Binding FastPatchCommand}"
                       HorizontalAlignment="Stretch" />
               <Button Classes="subtle" Content="Build and full patch" Command="{Binding ApplyToGameCommand}"
-                      HorizontalAlignment="Stretch" />
-              <Button Classes="subtle" Content="Fast restore" Command="{Binding FastRestoreCommand}"
                       HorizontalAlignment="Stretch" />
               <Button Classes="subtle" Content="Full restore" Command="{Binding RestoreGameCommand}"
                       HorizontalAlignment="Stretch" />
@@ -239,8 +243,7 @@
                       Command="{Binding UpdateSelectedCommand}"
                       IsVisible="{Binding SelectedMod.HasUpdate}"
                       HorizontalAlignment="Stretch" />
-              <Button Classes="primary"
-                      Content="Open mod folder"
+              <Button Content="Open mod folder"
                       Command="{Binding OpenFolderCommand}"
                       HorizontalAlignment="Stretch" />
               <Button Content="Configure collection"

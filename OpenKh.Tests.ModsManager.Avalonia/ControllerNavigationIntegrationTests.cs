@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using global::Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -272,6 +273,29 @@ public class ControllerNavigationIntegrationTests
         ControllerWindowNavigator.MoveFocus(main, NavigationDirection.Right);
 
         Assert.Same(installedItem, window.FocusManager?.GetFocusedElement());
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void ActualMainWindowKeepsAMovedOffscreenModSelected()
+    {
+        var main = new MainWindow();
+        var list = main.FindControl<ListBox>("ModList")!;
+        var window = ShowContent(main, 1280, 640);
+        var mods = new ObservableCollection<string>(
+            Enumerable.Range(0, 40).Select(index => $"Installed mod {index}"));
+        list.ItemsSource = mods;
+        var selected = mods[^1];
+        list.SelectedItem = selected;
+        RefreshLayout(window, 1280, 640);
+
+        mods.Remove(selected);
+        mods.Insert(0, selected);
+        list.SelectedItem = selected;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(selected, list.SelectedItem);
+        Assert.Equal(selected, mods[0]);
         window.Close();
     }
 
