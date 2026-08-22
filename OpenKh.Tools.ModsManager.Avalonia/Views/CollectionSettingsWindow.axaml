@@ -24,7 +24,7 @@
     </Border>
     <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
       <Button x:Name="CancelButton" Content="Cancel" MinWidth="120" Click="Cancel_OnClick" />
-      <Button x:Name="SaveButton" Classes="primary" Content="Save collection" MinWidth="160" Click="Save_OnClick" />
+      <Button x:Name="SaveButton" Classes="primary" Content="Save Collection" MinWidth="160" Click="Save_OnClick" />
     </StackPanel>
   </Grid>
 </views:EmbeddedDialogControl>

@@ -15,16 +15,16 @@
             <TextBlock Text="Mod Manager" FontSize="18" FontWeight="SemiBold" />
             <CheckBox x:Name="AutoUpdateModsCheckBox" Content="Check repository mods for updates automatically" />
             <CheckBox x:Name="EnablePatchingCheckBox" Content="Enable package patching tools" />
-            <Button x:Name="CheckOpenKhUpdatesButton" Content="Check for OpenKH updates" HorizontalAlignment="Left" Click="CheckOpenKhUpdates_OnClick" />
+            <Button x:Name="CheckOpenKhUpdatesButton" Content="Check for OpenKH Updates" HorizontalAlignment="Left" Click="CheckOpenKhUpdates_OnClick" />
             <TextBlock x:Name="UpdateStatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
-            <Button x:Name="InstallOpenKhUpdateButton" Content="Open Launcher to install update"
+            <Button x:Name="InstallOpenKhUpdateButton" Content="Open Launcher to Install Update"
                     Classes="primary" HorizontalAlignment="Left" IsVisible="False"
                     Click="InstallOpenKhUpdate_OnClick" />
           </StackPanel>
         </Border>
         <Border Classes="settings-card">
           <StackPanel Spacing="12">
-            <TextBlock Text="Panacea settings" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="Panacea Settings" FontSize="18" FontWeight="SemiBold" />
             <TextBlock Text="These values are written to every configured Panacea installation when settings are saved."
                        Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
             <CheckBox x:Name="ShowConsoleCheckBox" Content="Enable Console" />
@@ -38,7 +38,7 @@
     </ScrollViewer>
     <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
       <Button x:Name="CancelButton" Content="Cancel" MinWidth="120" Click="Cancel_OnClick" />
-      <Button x:Name="SaveButton" Classes="primary" Content="Save settings" MinWidth="150" Click="Save_OnClick" />
+      <Button x:Name="SaveButton" Classes="primary" Content="Save Settings" MinWidth="150" Click="Save_OnClick" />
     </StackPanel>
   </Grid>
 </views:EmbeddedDialogControl>

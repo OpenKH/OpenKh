@@ -12,11 +12,11 @@
     <Border Grid.Row="2" Classes="settings-card">
       <StackPanel Spacing="10">
         <Button Content="Frequently Asked Questions" Tag="https://openkh.dev/tool/GUI.ModsManager/FAQ" Click="OpenLink_OnClick" />
-        <Button Content="Download latest version" Tag="https://github.com/OpenKH/OpenKh/releases" Click="OpenLink_OnClick" />
-        <Button Content="OpenKH source code" Tag="https://github.com/OpenKH/OpenKh" Click="OpenLink_OnClick" />
-        <Button Content="OpenKH documentation" Tag="https://openkh.dev" Click="OpenLink_OnClick" />
-        <Button Content="Report bug or missing features" Tag="https://github.com/OpenKH/OpenKh/issues" Click="OpenLink_OnClick" />
-        <Button Content="Join Discord server" Tag="https://discord.openkh.dev" Click="OpenLink_OnClick" />
+        <Button Content="Download Latest Version" Tag="https://github.com/OpenKH/OpenKh/releases" Click="OpenLink_OnClick" />
+        <Button Content="OpenKH Source Code" Tag="https://github.com/OpenKH/OpenKh" Click="OpenLink_OnClick" />
+        <Button Content="OpenKH Documentation" Tag="https://openkh.dev" Click="OpenLink_OnClick" />
+        <Button Content="Report Bug or Missing Features" Tag="https://github.com/OpenKH/OpenKh/issues" Click="OpenLink_OnClick" />
+        <Button Content="Join Discord Server" Tag="https://discord.openkh.dev" Click="OpenLink_OnClick" />
       </StackPanel>
     </Border>
     <Button x:Name="CloseButton" Grid.Row="4" Content="Close" MinWidth="120"

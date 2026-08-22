@@ -17,9 +17,9 @@
       <StackPanel Spacing="18" Width="{Binding Bounds.Width, ElementName=SetupScrollViewer}">
         <Border Classes="settings-card">
           <StackPanel Spacing="12">
-            <TextBlock Text="Game edition" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="Game Edition" FontSize="18" FontWeight="SemiBold" />
             <ComboBox x:Name="GameEditionComboBox" SelectedIndex="{Binding GameEdition}" SelectionChanged="GameEdition_OnSelectionChanged">
-              <ComboBoxItem Content="PC release" />
+              <ComboBoxItem Content="PC Release" />
               <ComboBoxItem Content="PCSX2" />
             </ComboBox>
           </StackPanel>
@@ -27,22 +27,22 @@
 
         <Border Classes="settings-card">
           <StackPanel Spacing="12">
-            <TextBlock Text="Storage locations" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="Storage Locations" FontSize="18" FontWeight="SemiBold" />
             <TextBlock Text="The standard OpenKH folders are used unless custom locations are configured below."
                        Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
-            <Expander Header="Advanced storage locations">
+            <Expander Header="Advanced Storage Locations">
               <StackPanel Spacing="10" Margin="0,10,0,0">
-                <TextBlock Text="Installed mods folder" FontWeight="SemiBold" />
+                <TextBlock Text="Installed Mods Folder" FontWeight="SemiBold" />
                 <Grid ColumnDefinitions="*,12,130">
                   <TextBox x:Name="ModStorageTextBox" Text="{Binding ModCollectionPath}" PlaceholderText="Use OpenKH/mods" />
                   <Button Grid.Column="2" Content="Browse" Tag="ModStorageTextBox" Click="BrowseFolder_OnClick" />
                 </Grid>
-                <TextBlock Text="Installed collections folder" FontWeight="SemiBold" />
+                <TextBlock Text="Installed Collections Folder" FontWeight="SemiBold" />
                 <Grid ColumnDefinitions="*,12,130">
                   <TextBox x:Name="CollectionStorageTextBox" Text="{Binding ModCollectionsPath}" PlaceholderText="Use OpenKH/mods/collections" />
                   <Button Grid.Column="2" Content="Browse" Tag="CollectionStorageTextBox" Click="BrowseFolder_OnClick" />
                 </Grid>
-                <TextBlock Text="Built mods folder" FontWeight="SemiBold" />
+                <TextBlock Text="Built Mods Folder" FontWeight="SemiBold" />
                 <Grid ColumnDefinitions="*,12,130">
                   <TextBox x:Name="BuiltModsTextBox" Text="{Binding GameModPath}" PlaceholderText="Use OpenKH/mod" />
                   <Button Grid.Column="2" Content="Browse" Tag="BuiltModsTextBox" Click="BrowseFolder_OnClick" />
@@ -56,10 +56,10 @@
 
         <Border Classes="settings-card" IsVisible="{Binding IsPcMode}">
           <StackPanel Spacing="12">
-            <TextBlock Text="PC release" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="PC Release" FontSize="18" FontWeight="SemiBold" />
             <Grid ColumnDefinitions="*">
               <StackPanel Spacing="6">
-                <TextBlock Text="PC platform" FontWeight="SemiBold" />
+                <TextBlock Text="PC Platform" FontWeight="SemiBold" />
                 <ComboBox x:Name="PcVersionComboBox" SelectedIndex="{Binding PcVersionIndex}" SelectionChanged="PcVersion_OnSelectionChanged">
                   <ComboBoxItem Content="Epic Games Store" />
                   <ComboBoxItem Content="Steam" />
@@ -68,7 +68,7 @@
               </StackPanel>
             </Grid>
             <Button x:Name="DetectInstallationsButton"
-                    Content="Detect installations"
+                    Content="Detect Installations"
                     HorizontalAlignment="Left"
                     Click="DetectInstallations_OnClick" />
             <TextBlock x:Name="DetectionStatusText"
@@ -77,12 +77,12 @@
                        TextWrapping="Wrap" />
             <Border Background="#111C2E" CornerRadius="10" Padding="14">
               <StackPanel Spacing="8">
-                <TextBlock Text="Game version" FontWeight="SemiBold" />
+                <TextBlock Text="Game Version" FontWeight="SemiBold" />
                 <TextBlock Text="Select which PC release files are installed. Steam Global installations use the dt folder automatically."
                            Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
                 <ComboBox x:Name="LanguageComboBox" SelectedIndex="{Binding LanguageIndex}">
-                  <ComboBoxItem Content="Global version" />
-                  <ComboBoxItem Content="Japanese version" />
+                  <ComboBoxItem Content="Global Version" />
+                  <ComboBoxItem Content="Japanese Version" />
                 </ComboBox>
               </StackPanel>
             </Border>
@@ -155,7 +155,7 @@
             </Border>
             <Border Background="#111C2E" CornerRadius="10" Padding="14" IsVisible="{Binding IsSteamPlatform}">
               <StackPanel Spacing="10">
-                <TextBlock Text="Direct Steam launch" FontSize="16" FontWeight="SemiBold" />
+                <TextBlock Text="Direct Steam Launch" FontSize="16" FontWeight="SemiBold" />
                 <TextBlock Text="Creating steam_appid.txt lets the Mod Manager launch a game executable directly. Steam must already be running."
                            Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
                 <Grid ColumnDefinitions="*,12,Auto">
@@ -180,12 +180,12 @@
         <Border Classes="settings-card" IsVisible="{Binding IsPcsx2Mode}">
           <StackPanel Spacing="12">
             <TextBlock Text="PCSX2" FontSize="18" FontWeight="SemiBold" />
-            <TextBlock Text="PCSX2 executable" FontWeight="SemiBold" />
+            <TextBlock Text="PCSX2 Executable" FontWeight="SemiBold" />
             <Grid ColumnDefinitions="*,12,130">
               <TextBox x:Name="Pcsx2TextBox" Text="{Binding Pcsx2Location}" />
               <Button Grid.Column="2" Content="Browse" Tag="Pcsx2TextBox" Click="BrowseFile_OnClick" />
             </Grid>
-            <TextBlock Text="PS2 region and language" FontWeight="SemiBold" />
+            <TextBlock Text="PS2 Region and Language" FontWeight="SemiBold" />
             <TextBlock Text="This controls the region and language values injected while the game is running."
                        Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
             <ComboBox SelectedIndex="{Binding RegionId}">
@@ -219,7 +219,7 @@
 
         <Border Classes="settings-card">
           <StackPanel Spacing="12">
-            <TextBlock Text="Game data" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="Game Data" FontSize="18" FontWeight="SemiBold" />
             <TextBlock x:Name="PcExtractionHelpText"
                        IsVisible="{Binding IsPcMode}"
                        Text="OpenKH can extract every game in the 1.5+2.5 collection and Dream Drop Distance from the 2.8 collection. Select the games you want to extract. Size values are rounded up."
@@ -235,31 +235,35 @@
               <CheckBox x:Name="ExtractRecomCheckBox" IsChecked="{Binding ExtractRecom}" Margin="0,0,16,6" />
               <CheckBox x:Name="ExtractKh3DCheckBox" IsChecked="{Binding ExtractKh3D}" IsVisible="{Binding IsPcMode}" Margin="0,0,16,6" />
             </WrapPanel>
-            <TextBlock Text="Extraction folder location" FontWeight="SemiBold" />
+            <TextBlock Text="Extraction Folder Location" FontWeight="SemiBold" />
             <Grid ColumnDefinitions="*,12,130">
               <TextBox x:Name="GameDataTextBox" Text="{Binding GameDataPath}" PlaceholderText="Use OpenKH/data"
                        TextChanged="ExtractionSource_OnTextChanged" />
               <Button Grid.Column="2" Content="Browse" Tag="GameDataTextBox" Click="BrowseFolder_OnClick" />
             </Grid>
             <TextBlock x:Name="ExistingDataStatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
-            <TextBlock Text="WARNING: If you do not extract a game's data, only Lua script mods will function properly."
-                       Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" />
+            <TextBlock Foreground="#C4D0E1" FontSize="11" TextWrapping="Wrap">
+              <Run Text="WARNING:" Foreground="#FFD166" FontWeight="Bold" />
+              <Run Text=" If you do not extract a game's data, only Lua script mods will function properly." />
+            </TextBlock>
             <StackPanel IsVisible="{Binding IsPcMode}" Spacing="6">
-              <TextBlock Text="WARNING: Remastered files account for about 80% of the listed extraction size. You can skip them to save space, but the consequences depend on the game:"
-                         Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" />
+              <TextBlock Foreground="#C4D0E1" FontSize="11" TextWrapping="Wrap">
+                <Run Text="WARNING:" Foreground="#FFD166" FontWeight="Bold" />
+                <Run Text=" Remastered files account for about 80% of the listed extraction size. You can skip them to save space, but the consequences depend on the game:" />
+              </TextBlock>
               <TextBlock Text="KH1: Remastered files include important data required for modifications beyond visual changes."
-                         Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" Margin="12,0,0,0" />
+                         Foreground="#C4D0E1" FontSize="11" TextWrapping="Wrap" Margin="12,0,0,0" />
               <TextBlock Text="KH2: Remastered files contain images, so some mods may have missing or incorrect visuals."
-                         Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" Margin="12,0,0,0" />
+                         Foreground="#C4D0E1" FontSize="11" TextWrapping="Wrap" Margin="12,0,0,0" />
               <TextBlock Text="Other games: Compatibility depends on the mod because their remastered files may also contain required data."
-                         Foreground="#F1B86B" FontSize="11" TextWrapping="Wrap" Margin="12,0,0,0" />
+                         Foreground="#C4D0E1" FontSize="11" TextWrapping="Wrap" Margin="12,0,0,0" />
               <CheckBox IsChecked="{Binding SkipRemastered}" Content="Skip Extracting Remastered Files" />
             </StackPanel>
             <TextBlock x:Name="ExtractionAvailabilityText" Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
             <TextBlock Text="Extraction can take between 5 and 15 minutes, or longer when several PC games are selected."
                        Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
             <Button x:Name="ExtractGameDataButton"
-                    Content="Extract game data"
+                    Content="Extract Game Data"
                     HorizontalAlignment="Left"
                     Click="ExtractGameData_OnClick" />
             <ProgressBar x:Name="ExtractionProgressBar" Minimum="0" Maximum="1" Value="0" Height="10" IsVisible="False" />
@@ -281,7 +285,7 @@
 
     <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
       <Button x:Name="CancelButton" Content="Cancel" MinWidth="120" Click="Cancel_OnClick" />
-      <Button x:Name="SaveButton" Classes="primary" Content="Save setup" MinWidth="150" Click="Save_OnClick" />
+      <Button x:Name="SaveButton" Classes="primary" Content="Save Setup" MinWidth="150" Click="Save_OnClick" />
     </StackPanel>
   </Grid>
 </views:EmbeddedDialogControl>

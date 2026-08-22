@@ -14,7 +14,7 @@
     </Border>
     <Grid Grid.Row="4" ColumnDefinitions="*,12,Auto">
       <TextBox x:Name="PresetNameTextBox" PlaceholderText="New preset name" />
-      <Button x:Name="SavePresetButton" Grid.Column="2" Content="Save current" Click="SavePreset_OnClick" />
+      <Button x:Name="SavePresetButton" Grid.Column="2" Content="Save Current" Click="SavePreset_OnClick" />
     </Grid>
     <StackPanel Grid.Row="6" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
       <Button x:Name="CloseButton" Content="Close" MinWidth="110" Click="Close_OnClick" />

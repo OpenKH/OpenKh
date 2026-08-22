@@ -5,7 +5,7 @@
         XYFocus.NavigationModes="Enabled">
   <Grid Margin="24" RowDefinitions="Auto,14,Auto,14,*,14,Auto">
     <StackPanel Spacing="5">
-      <TextBlock Text="Browse mods" FontSize="28" FontWeight="Bold" />
+      <TextBlock Text="Browse Mods" FontSize="28" FontWeight="Bold" />
       <TextBlock x:Name="GameHelpText" Foreground="#AAB9CF" />
     </StackPanel>
 
@@ -88,7 +88,7 @@
             </StackPanel>
           </ScrollViewer>
           <Button x:Name="InstallSelectedButton" Grid.Row="1" Classes="primary"
-                  Content="Install selected mod" Click="InstallSelected_OnClick" HorizontalAlignment="Stretch" />
+                  Content="Install Selected Mod" Click="InstallSelected_OnClick" HorizontalAlignment="Stretch" />
         </Grid>
       </Border>
     </Grid>

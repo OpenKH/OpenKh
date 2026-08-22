@@ -5,7 +5,7 @@
         XYFocus.NavigationModes="Enabled">
   <Grid Margin="28" RowDefinitions="Auto,18,*,18,Auto">
     <StackPanel Spacing="5">
-      <TextBlock Text="Mod creator" FontSize="27" FontWeight="Bold" />
+      <TextBlock Text="Mod Creator" FontSize="27" FontWeight="Bold" />
       <TextBlock Text="Create the initial mod.yml file for a new OpenKH mod."
                  Foreground="#AAB9CF" TextWrapping="Wrap" />
     </StackPanel>
@@ -36,19 +36,19 @@
           <TextBlock Text="Description" FontWeight="SemiBold" />
           <TextBox x:Name="DescriptionTextBox" Height="110" AcceptsReturn="True"
                    TextWrapping="Wrap" VerticalContentAlignment="Top" Padding="12" />
-          <TextBlock Text="Mod folder containing mod.yml" FontWeight="SemiBold" />
+          <TextBlock Text="Mod Folder Containing mod.yml" FontWeight="SemiBold" />
           <Grid ColumnDefinitions="*,12,130">
             <TextBox x:Name="DirectoryTextBox" PlaceholderText="Choose an empty mod folder" />
             <Button x:Name="BrowseButton" Grid.Column="2" Content="Browse" Click="Browse_OnClick" />
           </Grid>
-          <TextBlock Text="Diff tool" FontSize="18" FontWeight="SemiBold" Margin="0,6,0,0" />
+          <TextBlock Text="Diff Tool" FontSize="18" FontWeight="SemiBold" Margin="0,6,0,0" />
           <TextBlock Text="Optional executable used to compare the current mod.yml with a generated preview."
                      Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
           <Grid ColumnDefinitions="*,12,130">
             <TextBox x:Name="DiffToolTextBox" PlaceholderText="Leave empty to open the generated preview normally" />
             <Button x:Name="BrowseDiffToolButton" Grid.Column="2" Content="Browse" Click="BrowseDiffTool_OnClick" />
           </Grid>
-          <TextBlock Text="Target files appender" FontSize="18" FontWeight="SemiBold" Margin="0,6,0,0" />
+          <TextBlock Text="Target Files Appender" FontSize="18" FontWeight="SemiBold" Margin="0,6,0,0" />
           <TextBlock Text="Search extracted GameData, copy selected source files into the mod, and append copy assets to mod.yml."
                      Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
           <Grid ColumnDefinitions="*,12,130">
@@ -57,7 +57,7 @@
           </Grid>
           <Grid ColumnDefinitions="*,12,180">
             <TextBox x:Name="TargetSearchTextBox" PlaceholderText="Search target files by path" />
-            <Button x:Name="AppendFilesButton" Grid.Column="2" Content="Search and append" Click="AppendFiles_OnClick" />
+            <Button x:Name="AppendFilesButton" Grid.Column="2" Content="Search and Append" Click="AppendFiles_OnClick" />
           </Grid>
           <TextBlock x:Name="StatusText" Foreground="#91A2BA" TextWrapping="Wrap" />
         </StackPanel>
@@ -65,8 +65,8 @@
     </ScrollViewer>
     <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
       <Button x:Name="CloseButton" Content="Close" MinWidth="120" Click="Close_OnClick" />
-      <Button x:Name="PreviewButton" Content="Preview changes" MinWidth="150" Click="Preview_OnClick" />
-      <Button x:Name="CreateButton" Classes="primary" Content="Generate or update" MinWidth="170" Click="Create_OnClick" />
+      <Button x:Name="PreviewButton" Content="Preview Changes" MinWidth="150" Click="Preview_OnClick" />
+      <Button x:Name="CreateButton" Classes="primary" Content="Generate or Update" MinWidth="170" Click="Create_OnClick" />
     </StackPanel>
   </Grid>
 </views:EmbeddedDialogControl>
