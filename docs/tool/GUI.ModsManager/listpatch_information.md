@@ -273,7 +273,7 @@ Sora:
   HangHeight: 150
   HangMargin: 210
   StunTime: 0
-  MpDrive: 3000
+  MpChargeTime: 3000
   UpDownSpeed: 0
   DashSpeed: 0
   Acceleration: 0
