@@ -60,7 +60,7 @@ dotnet test --configuration $sourceConfiguration --verbosity $verbosity
 Test-Success $LASTEXITCODE
 
 # Create temporary solution
-dotnet new sln -n $solutionBase --force
+dotnet new sln -n $solutionBase --force --format sln
 Test-Success $LASTEXITCODE
 
 # Add items to solution
