@@ -44,6 +44,21 @@ public sealed class LocalModInstallerTests : IDisposable
         Assert.False(File.Exists(Path.Combine(_rootDirectory, "mods", "kh2", "outside.txt")));
     }
 
+    [Fact]
+    public async Task InstallRejectsPatchEntriesOutsideDestination()
+    {
+        var packagePath = CreatePackage(
+            "Unsafe.kh2pcpatch",
+            ("package/original/../../outside.txt", "unsafe"));
+        var layout = InstallationLayout.Detect("ignored", ["--data-root", _rootDirectory]);
+        var installer = new LocalModInstaller(layout);
+
+        await Assert.ThrowsAsync<InvalidDataException>(() =>
+            installer.InstallAsync(packagePath, GameInfo.FromId("kh2")));
+
+        Assert.False(File.Exists(Path.Combine(_rootDirectory, "mods", "kh2", "outside.txt")));
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_rootDirectory))

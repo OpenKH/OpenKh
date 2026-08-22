@@ -194,12 +194,17 @@ public sealed class LocalModInstaller
         string destinationDirectory,
         bool overwrite)
     {
+        // Canonicalize both paths before the prefix check so archive entries cannot escape the install directory.
+        var destinationRoot = Path.GetFullPath(destinationDirectory)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            + Path.DirectorySeparatorChar;
         var destinationPath = Path.GetFullPath(Path.Combine(
-            destinationDirectory,
+            destinationRoot,
             relativeName.Replace('/', Path.DirectorySeparatorChar)));
-        var relativeDestination = Path.GetRelativePath(destinationDirectory, destinationPath);
-        if (relativeDestination.Equals("..", StringComparison.Ordinal) ||
-            relativeDestination.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+        var pathComparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+        if (!destinationPath.StartsWith(destinationRoot, pathComparison))
         {
             throw new InvalidDataException("The package contains a file outside its destination directory.");
         }
