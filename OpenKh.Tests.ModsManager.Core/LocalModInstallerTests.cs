@@ -103,6 +103,16 @@ public sealed class LocalModInstallerTests : IDisposable
         await installer.InstallAsync(packagePath, GameInfo.FromId("kh2"));
 
         Assert.Equal("Example", installer.FindInstalledMod(packagePath, GameInfo.FromId("kh2")));
+        Assert.Equal(
+            "KH2PCPATCH",
+            File.ReadAllText(Path.Combine(
+                _rootDirectory,
+                "mods",
+                "kh2",
+                "Example",
+                ".openkh-pcpatch")));
+        var installedMod = Assert.Single(await new ModCatalogService(layout).LoadAsync(GameInfo.FromId("kh2")));
+        Assert.True(installedMod.IsPcPatch);
     }
 
     public void Dispose()

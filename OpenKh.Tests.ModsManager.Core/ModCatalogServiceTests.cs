@@ -78,6 +78,57 @@ public sealed class ModCatalogServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task LoadKeepsPcPatchesBelowOpenKhModsWithoutChangingRelativeOrder()
+    {
+        CreateMod("Author/PcPatchFirst", "First legacy mod (KH2PCPATCH)", "Author", "Legacy");
+        CreateMod("Author/OpenKhFirst", "First OpenKH mod", "Author", "OpenKH");
+        CreateMod("Author/PcPatchSecond", "Second legacy mod (KH2PCPATCH)", "Author", "Legacy");
+        CreateMod("Author/OpenKhSecond", "Second OpenKH mod", "Author", "OpenKH");
+        File.WriteAllLines(Path.Combine(_rootDirectory, "mod-order-KH2.txt"),
+        [
+            "Author/PcPatchFirst",
+            "Author/OpenKhFirst",
+            "Author/PcPatchSecond",
+            "Author/OpenKhSecond"
+        ]);
+        var service = new ModCatalogService(
+            InstallationLayout.Detect("ignored", ["--data-root", _rootDirectory]));
+
+        var mods = await service.LoadAsync(GameInfo.FromId("kh2"));
+
+        Assert.Equal(
+            new[]
+            {
+                "Author/OpenKhFirst",
+                "Author/OpenKhSecond",
+                "Author/PcPatchFirst",
+                "Author/PcPatchSecond"
+            },
+            mods.Select(mod => mod.Id));
+        Assert.False(mods[0].IsPcPatch);
+        Assert.False(mods[1].IsPcPatch);
+        Assert.True(mods[2].IsPcPatch);
+        Assert.True(mods[3].IsPcPatch);
+    }
+
+    [Fact]
+    public async Task SaveEnabledOrderKeepsPcPatchesBelowOpenKhMods()
+    {
+        CreateMod("Author/PcPatch", "Legacy mod (KH2PCPATCH)", "Author", "Legacy");
+        CreateMod("Author/OpenKh", "OpenKH mod", "Author", "OpenKH");
+        var service = new ModCatalogService(
+            InstallationLayout.Detect("ignored", ["--data-root", _rootDirectory]));
+        var game = GameInfo.FromId("kh2");
+        var mods = (await service.LoadAsync(game)).ToArray();
+
+        service.SaveEnabledOrder(game, mods.Reverse());
+
+        Assert.Equal(
+            new[] { "Author/OpenKh", "Author/PcPatch" },
+            File.ReadAllLines(Path.Combine(_rootDirectory, "mod-order-KH2.txt")));
+    }
+
+    [Fact]
     public async Task LoadIncludesFilesModifiedByTheMod()
     {
         var modDirectory = Path.Combine(_rootDirectory, "mods", "kh2", "Author", "FilesMod");

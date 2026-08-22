@@ -13,6 +13,7 @@ public sealed class ModEntry
     public string? ReportBugUrl { get; init; }
     public IReadOnlyList<string> FilesToPatch { get; init; } = [];
     public bool IsCollection { get; init; }
+    public bool IsPcPatch { get; init; }
     public bool IsEnabled { get; set; }
     public int UpdateCount { get; set; }
 }

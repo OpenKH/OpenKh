@@ -326,7 +326,10 @@ public sealed class MainWindowViewModel : ObservableObject
             return false;
 
         var index = _allMods.IndexOf(SelectedMod);
-        return index >= 0 && index + offset >= 0 && index + offset < _allMods.Count;
+        var targetIndex = index + offset;
+        return index >= 0 &&
+            targetIndex >= GetHighestAllowedIndex(SelectedMod) &&
+            targetIndex <= GetLowestAllowedIndex(SelectedMod);
     }
 
     private void MoveSelected(int offset)
@@ -350,7 +353,9 @@ public sealed class MainWindowViewModel : ObservableObject
     }
 
     private bool CanMoveSelectedToTop() =>
-        SelectedMod is not null && string.IsNullOrWhiteSpace(SearchText) && _allMods.IndexOf(SelectedMod) > 0;
+        SelectedMod is not null &&
+        string.IsNullOrWhiteSpace(SearchText) &&
+        _allMods.IndexOf(SelectedMod) > GetHighestAllowedIndex(SelectedMod);
 
     private void MoveSelectedToTop()
     {
@@ -358,16 +363,35 @@ public sealed class MainWindowViewModel : ObservableObject
             return;
         var selectedId = SelectedMod.Id;
         var oldIndex = _allMods.IndexOf(SelectedMod);
+        var targetIndex = GetHighestAllowedIndex(SelectedMod);
         _allMods.Remove(SelectedMod);
-        _allMods.Insert(0, SelectedMod);
+        _allMods.Insert(targetIndex, SelectedMod);
         var selected = Mods[oldIndex];
         Mods.RemoveAt(oldIndex);
-        Mods.Insert(0, selected);
+        Mods.Insert(targetIndex, selected);
         SelectedMod = Mods.First(mod => mod.Id == selectedId);
         SaveEnabledOrder();
         MoveUpCommand.NotifyCanExecuteChanged();
         MoveDownCommand.NotifyCanExecuteChanged();
         MoveTopCommand.NotifyCanExecuteChanged();
+    }
+
+    private int GetHighestAllowedIndex(ModListItemViewModel mod)
+    {
+        if (!mod.IsPcPatch)
+            return 0;
+
+        var firstPcPatch = _allMods.FindIndex(item => item.IsPcPatch);
+        return firstPcPatch < 0 ? _allMods.Count : firstPcPatch;
+    }
+
+    private int GetLowestAllowedIndex(ModListItemViewModel mod)
+    {
+        if (mod.IsPcPatch)
+            return _allMods.Count - 1;
+
+        var firstPcPatch = _allMods.FindIndex(item => item.IsPcPatch);
+        return firstPcPatch < 0 ? _allMods.Count - 1 : firstPcPatch - 1;
     }
 
     private void OpenSelectedFolder()

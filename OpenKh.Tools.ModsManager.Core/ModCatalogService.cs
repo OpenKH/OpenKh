@@ -26,7 +26,7 @@ public sealed class ModCatalogService
 
     public void SaveEnabledOrder(GameInfo game, IEnumerable<ModEntry> mods)
     {
-        var orderedMods = mods.ToArray();
+        var orderedMods = ApplyFormatPriority(mods).ToArray();
         File.WriteAllLines(
             GetEnabledModsPath(game),
             orderedMods.Where(mod => mod.IsEnabled).Select(mod => mod.Id));
@@ -54,13 +54,15 @@ public sealed class ModCatalogService
                     (savedOrder.Count > 0 || !enabledLookup.Contains(id)))
                 .OrderBy(id => id, StringComparer.OrdinalIgnoreCase));
 
-        return orderedIds
+        var mods = orderedIds
             .Select(id => CreateEntry(
                 locations[id],
                 enabledLookup.Contains(id),
                 game,
                 collectionSettings))
             .ToArray();
+
+        return ApplyFormatPriority(mods).ToArray();
     }
 
     private IEnumerable<ModLocation> EnumerateModLocations(GameInfo game)
@@ -133,8 +135,19 @@ public sealed class ModCatalogService
             ReportBugUrl = reportBugUrl,
             FilesToPatch = GetFilesToPatch(metadata, location.Id, game, collectionSettings),
             IsCollection = metadata?.IsCollection == true,
+            IsPcPatch = LegacyModFormat.IsPcPatch(location.Directory, metadata),
             IsEnabled = isEnabled
         };
+    }
+
+    private static IEnumerable<ModEntry> ApplyFormatPriority(IEnumerable<ModEntry> mods)
+    {
+        var orderedMods = mods.ToArray();
+
+        // PC Patch packages replace complete files, so OpenKH mods must always take priority over them.
+        return orderedMods
+            .Where(mod => !mod.IsPcPatch)
+            .Concat(orderedMods.Where(mod => mod.IsPcPatch));
     }
 
     private static IReadOnlyList<string> GetFilesToPatch(

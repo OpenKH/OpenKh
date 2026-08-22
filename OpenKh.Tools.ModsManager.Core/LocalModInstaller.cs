@@ -167,6 +167,9 @@ public sealed class LocalModInstaller
         };
         using var metadataStream = File.Create(Path.Combine(destinationDirectory, MetadataFileName));
         metadata.Write(metadataStream);
+        File.WriteAllText(
+            Path.Combine(destinationDirectory, LegacyModFormat.PcPatchMarkerFileName),
+            patchArchive.ExtensionName);
     }
 
     private static PackageLayout GetPackageLayout(ZipArchive archive)
