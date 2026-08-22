@@ -85,7 +85,7 @@ public sealed partial class MainWindow : Window
 
     public void HandleControllerAction(ControllerAction action)
     {
-        if (ControllerWindowNavigator.TryHideVirtualKeyboard(action) ||
+        if (ControllerWindowNavigator.TryHandleVirtualKeyboard(action) ||
             ControllerWindowNavigator.TryShowVirtualKeyboard(this, action) ||
             ControllerWindowNavigator.TryScroll(this, action))
             return;

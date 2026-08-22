@@ -15,14 +15,24 @@ public static class ControllerWindowNavigator
         Action<ControllerAction> handler) =>
         action =>
         {
-            if (!TryHideVirtualKeyboard(action) &&
+            if (!TryHandleVirtualKeyboard(action) &&
                 !TryShowVirtualKeyboard(root, action) &&
                 !TryScroll(root, action))
                 handler(action);
         };
 
-    public static bool TryHideVirtualKeyboard(ControllerAction action) =>
-        action == ControllerAction.Cancel && VirtualKeyboardService.Hide();
+    public static bool TryHandleVirtualKeyboard(ControllerAction action)
+    {
+        if (!VirtualKeyboardService.IsOpen)
+            return false;
+
+        // Steam's keyboard overlay can leave the owner window active. Keep its
+        // controller input from changing the UI behind the keyboard.
+        if (action == ControllerAction.Cancel)
+            VirtualKeyboardService.Hide();
+
+        return true;
+    }
 
     public static bool TryShowVirtualKeyboard(Control root, ControllerAction action)
     {

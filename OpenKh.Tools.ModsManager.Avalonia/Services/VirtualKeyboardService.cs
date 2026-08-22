@@ -12,25 +12,36 @@ public static class VirtualKeyboardService
     private const string SteamCloseKeyboardUri = "steam://close/keyboard";
     private const uint WindowSystemCommand = 0x0112;
     private const uint SystemCommandClose = 0xF060;
-    private static bool _isOpen;
+    private static KeyboardBackend _backend;
+    private static WeakReference<TextBox>? _target;
+
+    public static bool IsOpen => _backend != KeyboardBackend.None;
 
     public static void Show(TextBox textBox)
     {
         textBox.Focus(NavigationMethod.Directional);
+        _target = new WeakReference<TextBox>(textBox);
 
         try
         {
+            if (ShouldUseSteamKeyboard())
+            {
+                ShowSteamKeyboard();
+                _backend = KeyboardBackend.Steam;
+                return;
+            }
+
             if (OperatingSystem.IsWindows())
             {
                 ShowWindowsKeyboard();
-                _isOpen = true;
+                _backend = KeyboardBackend.Windows;
                 return;
             }
 
             if (OperatingSystem.IsLinux())
             {
                 ShowSteamKeyboard();
-                _isOpen = true;
+                _backend = KeyboardBackend.Steam;
             }
         }
         catch (Exception exception) when (
@@ -41,14 +52,14 @@ public static class VirtualKeyboardService
 
     public static bool Hide()
     {
-        if (!_isOpen)
+        if (_backend == KeyboardBackend.None)
             return false;
 
         try
         {
-            if (OperatingSystem.IsWindows())
+            if (_backend == KeyboardBackend.Windows)
                 HideWindowsKeyboard();
-            else if (OperatingSystem.IsLinux())
+            else if (_backend == KeyboardBackend.Steam)
                 OpenSteamUri(SteamCloseKeyboardUri);
         }
         catch (Exception exception) when (
@@ -57,7 +68,10 @@ public static class VirtualKeyboardService
         }
         finally
         {
-            _isOpen = false;
+            _backend = KeyboardBackend.None;
+            if (_target?.TryGetTarget(out var textBox) == true)
+                textBox.Focus(NavigationMethod.Directional);
+            _target = null;
         }
 
         return true;
@@ -86,6 +100,16 @@ public static class VirtualKeyboardService
 
     private static void OpenSteamUri(string uri)
     {
+        if (OperatingSystem.IsWindows())
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = uri,
+                UseShellExecute = true
+            });
+            return;
+        }
+
         var startInfo = new ProcessStartInfo
         {
             FileName = "steam",
@@ -93,6 +117,41 @@ public static class VirtualKeyboardService
         };
         startInfo.ArgumentList.Add(uri);
         Process.Start(startInfo);
+    }
+
+    private static bool ShouldUseSteamKeyboard()
+    {
+        if (!OperatingSystem.IsWindows() && !OperatingSystem.IsLinux())
+            return false;
+
+        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SteamAppId")) ||
+            !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SteamGameId")) ||
+            Environment.GetEnvironmentVariable("SteamDeck") == "1" ||
+            Environment.GetEnvironmentVariable("SteamGamepadUI") == "1")
+        {
+            return true;
+        }
+
+        try
+        {
+            var processes = Process.GetProcessesByName("steam");
+            try
+            {
+                return processes.Length > 0;
+            }
+            finally
+            {
+                foreach (var process in processes)
+                    process.Dispose();
+            }
+        }
+        catch (Exception exception) when (
+            exception is InvalidOperationException or
+            System.ComponentModel.Win32Exception or
+            PlatformNotSupportedException)
+        {
+            return false;
+        }
     }
 
     private static void HideWindowsKeyboard()
@@ -113,4 +172,11 @@ public static class VirtualKeyboardService
 
     [DllImport("user32.dll")]
     private static extern bool PostMessage(IntPtr window, uint message, IntPtr wordParameter, IntPtr longParameter);
+
+    private enum KeyboardBackend
+    {
+        None,
+        Windows,
+        Steam
+    }
 }
