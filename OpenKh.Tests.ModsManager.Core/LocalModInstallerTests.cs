@@ -59,6 +59,22 @@ public sealed class LocalModInstallerTests : IDisposable
         Assert.False(File.Exists(Path.Combine(_rootDirectory, "mods", "kh2", "outside.txt")));
     }
 
+    [Fact]
+    public async Task InstallRequestsConfirmationWhenModAlreadyExists()
+    {
+        var packagePath = CreatePackage(
+            "Example.zip",
+            ("mod.yml", "title: Example Mod\nassets: []"));
+        var layout = InstallationLayout.Detect("ignored", ["--data-root", _rootDirectory]);
+        var installer = new LocalModInstaller(layout);
+        await installer.InstallAsync(packagePath, GameInfo.FromId("kh2"));
+
+        var exception = await Assert.ThrowsAsync<ModAlreadyInstalledException>(() =>
+            installer.InstallAsync(packagePath, GameInfo.FromId("kh2")));
+
+        Assert.Equal("Example", exception.ModName);
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_rootDirectory))

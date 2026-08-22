@@ -224,7 +224,7 @@ public sealed class RepositoryModInstaller
         if (!Directory.Exists(destination))
             return;
         if (!overwrite)
-            throw new IOException($"The mod '{Path.GetFileName(destination)}' is already installed.");
+            throw new ModAlreadyInstalledException(Path.GetFileName(destination));
         DeleteDirectoryIfPresent(destination);
     }
 

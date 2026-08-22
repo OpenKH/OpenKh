@@ -61,10 +61,7 @@ public sealed class LocalModInstaller
         if (Directory.Exists(destinationDirectory))
         {
             if (!overwrite)
-            {
-                throw new IOException(
-                    $"A mod named '{packageName}' is already installed. Enable replacement to install it again.");
-            }
+                throw new ModAlreadyInstalledException(packageName);
 
             foreach (var file in Directory.EnumerateFiles(destinationDirectory, "*", SearchOption.AllDirectories))
                 File.SetAttributes(file, FileAttributes.Normal);
@@ -254,3 +251,14 @@ public sealed class LocalModInstaller
 }
 
 public sealed record ModInstallResult(string Id, string DisplayName, string Directory);
+
+public sealed class ModAlreadyInstalledException : IOException
+{
+    public ModAlreadyInstalledException(string modName)
+        : base($"A mod named '{modName}' is already installed.")
+    {
+        ModName = modName;
+    }
+
+    public string ModName { get; }
+}

@@ -30,6 +30,7 @@ public sealed class MainWindowViewModel : ObservableObject
     private ModListItemViewModel? _selectedMod;
     private string _searchText = string.Empty;
     private string _statusText = "Loading your mods";
+    private string _statusForeground = "#91A2BA";
     private bool _isBusy;
     private bool _showAdvancedOptions;
     private bool _startupUpdateCheckCompleted;
@@ -95,8 +96,8 @@ public sealed class MainWindowViewModel : ObservableObject
         UpdateSelectedCommand = new AsyncRelayCommand(UpdateSelectedAsync, () => !IsBusy && SelectedMod?.HasUpdate == true);
         RemoveSelectedCommand = new AsyncRelayCommand(RemoveSelectedAsync, () => !IsBusy && SelectedMod is not null);
         SetupCommand = new AsyncRelayCommand(OpenSetupAsync, () => !IsBusy);
-        BuildCommand = new AsyncRelayCommand(BuildAsync, () => !IsBusy && EnabledCount > 0);
-        BuildAndPlayCommand = new AsyncRelayCommand(BuildAndPlayAsync, () => !IsBusy && EnabledCount > 0);
+        BuildCommand = new AsyncRelayCommand(BuildAsync, () => !IsBusy);
+        BuildAndPlayCommand = new AsyncRelayCommand(BuildAndPlayAsync, () => !IsBusy);
         PlayCommand = new AsyncRelayCommand(PlayAsync, () => !IsBusy);
         StopGameCommand = new RelayCommand(StopGame, () => IsGameRunning);
         CollectionSettingsCommand = new AsyncRelayCommand(OpenCollectionSettingsAsync, () => !IsBusy && SelectedMod?.IsCollection == true);
@@ -214,7 +215,17 @@ public sealed class MainWindowViewModel : ObservableObject
     public string StatusText
     {
         get => _statusText;
-        private set => SetProperty(ref _statusText, value);
+        private set
+        {
+            StatusForeground = "#91A2BA";
+            SetProperty(ref _statusText, value);
+        }
+    }
+
+    public string StatusForeground
+    {
+        get => _statusForeground;
+        private set => SetProperty(ref _statusForeground, value);
     }
 
     public bool IsBusy
@@ -241,7 +252,9 @@ public sealed class MainWindowViewModel : ObservableObject
             PlayCommand.NotifyCanExecuteChanged();
             CollectionSettingsCommand.NotifyCanExecuteChanged();
             ApplyToGameCommand.NotifyCanExecuteChanged();
+            FastPatchCommand.NotifyCanExecuteChanged();
             RestoreGameCommand.NotifyCanExecuteChanged();
+            ClearBuiltModsCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -274,7 +287,7 @@ public sealed class MainWindowViewModel : ObservableObject
         }
         catch (Exception exception)
         {
-            StatusText = $"Could not load mods: {exception.Message}";
+            SetErrorStatus($"Could not load mods: {exception.Message}");
         }
         finally
         {
@@ -393,20 +406,45 @@ public sealed class MainWindowViewModel : ObservableObject
                     ? $"{value.Message} ({percentage:P0})"
                     : value.Message;
             });
-            var result = await _modInstaller.InstallAsync(
-                request.Source,
-                SelectedGame,
-                request.Branch,
-                request.Overwrite,
-                progress);
+            ModInstallResult result;
+            while (true)
+            {
+                try
+                {
+                    result = await _modInstaller.InstallAsync(
+                        request.Source,
+                        SelectedGame,
+                        request.Branch,
+                        request.Overwrite,
+                        progress);
+                    break;
+                }
+                catch (ModAlreadyInstalledException exception) when (!request.Overwrite)
+                {
+                    IsBusy = false;
+                    var replace = await _dialogs.ConfirmAsync(
+                        "Replace Existing Mod?",
+                        $"A mod named '{exception.ModName}' is already installed. Replace it with the selected mod?",
+                        "Replace Mod");
+                    if (!replace)
+                    {
+                        StatusText = "Mod installation was cancelled";
+                        return;
+                    }
+
+                    request = request with { Overwrite = true };
+                    IsBusy = true;
+                    StatusText = $"Replacing {exception.ModName}";
+                }
+            }
             await RefreshAsync();
             SelectedMod = Mods.FirstOrDefault(mod =>
                 mod.Id.Equals(result.Id, StringComparison.OrdinalIgnoreCase));
-            StatusText = $"{result.DisplayName} was installed successfully";
+            SetSuccessStatus($"{result.DisplayName} was installed successfully");
         }
         catch (Exception exception)
         {
-            StatusText = $"Could not install mod: {exception.Message}";
+            SetErrorStatus($"Could not install mod: {exception.Message}");
         }
         finally
         {
@@ -441,7 +479,7 @@ public sealed class MainWindowViewModel : ObservableObject
         }
         catch (Exception exception)
         {
-            StatusText = $"Could not check for updates: {exception.Message}";
+            SetErrorStatus($"Could not check for updates: {exception.Message}");
         }
         finally
         {
@@ -469,7 +507,7 @@ public sealed class MainWindowViewModel : ObservableObject
             return;
 
         await RefreshAsync();
-        StatusText = "Online mod installation completed";
+        SetSuccessStatus("Online mod installation completed");
     }
 
     private async Task OpenPresetsAsync()
@@ -490,7 +528,7 @@ public sealed class MainWindowViewModel : ObservableObject
             mod.Model.IsEnabled = enabled.Contains(mod.Id);
         _catalogService.SaveEnabledOrder(SelectedGame, order.Select(mod => mod.Model));
         await RefreshAsync();
-        StatusText = "Preset applied";
+        SetSuccessStatus("Preset applied");
     }
 
     private async Task OpenSettingsAsync()
@@ -500,7 +538,7 @@ public sealed class MainWindowViewModel : ObservableObject
             if (!EnablePatching)
                 ShowAdvancedOptions = false;
             OnPropertyChanged(nameof(EnablePatching));
-            StatusText = "Settings were saved";
+            SetSuccessStatus("Settings were saved");
         }
     }
 
@@ -523,7 +561,7 @@ public sealed class MainWindowViewModel : ObservableObject
         _configuration.Current.WizardVersionNumber = 1;
         _configuration.Save();
         await RefreshAsync();
-        StatusText = "Setup was completed";
+        SetSuccessStatus("Setup was completed");
     }
 
     private async Task BuildAsync()
@@ -536,11 +574,11 @@ public sealed class MainWindowViewModel : ObservableObject
                 SelectedGame,
                 _allMods.Select(mod => mod.Model).ToArray(),
                 progress: progress);
-            StatusText = $"Mods built in {outputDirectory}";
+            SetSuccessStatus($"Mods built in {outputDirectory}");
         }
         catch (Exception exception)
         {
-            StatusText = $"Could not build mods: {exception.Message}";
+            SetErrorStatus($"Could not build mods: {exception.Message}");
         }
         finally
         {
@@ -558,7 +596,7 @@ public sealed class MainWindowViewModel : ObservableObject
             var selectedName = SelectedMod.Name;
             await RefreshAsync();
             SelectedMod = Mods.FirstOrDefault(mod => mod.Id.Equals(selectedId, StringComparison.OrdinalIgnoreCase));
-            StatusText = $"{selectedName} collection settings were saved";
+            SetSuccessStatus($"{selectedName} collection settings were saved");
         }
     }
 
@@ -587,11 +625,11 @@ public sealed class MainWindowViewModel : ObservableObject
                 fastMode,
                 progress: progress);
             await _packagePatchService.ApplyAsync(SelectedGame, fastMode, progress);
-            StatusText = $"{(fastMode ? "Fast" : "Full")} patch completed for {SelectedGame.DisplayName}";
+            SetSuccessStatus($"{(fastMode ? "Fast" : "Full")} patch completed for {SelectedGame.DisplayName}");
         }
         catch (Exception exception)
         {
-            StatusText = $"Could not apply mods to the game: {exception.Message}";
+            SetErrorStatus($"Could not apply mods to the game: {exception.Message}");
         }
         finally
         {
@@ -604,7 +642,7 @@ public sealed class MainWindowViewModel : ObservableObject
         var confirmed = await _dialogs.ConfirmAsync(
             $"Restore {SelectedGame.DisplayName}?",
             "The original HED/PKG files will be restored from BackupImage and the current build output will be removed.",
-            "Restore game");
+            "Restore Game");
         if (!confirmed)
             return;
 
@@ -612,11 +650,11 @@ public sealed class MainWindowViewModel : ObservableObject
         {
             IsBusy = true;
             await _packagePatchService.RestoreAsync(SelectedGame, true, CreateStatusProgress());
-            StatusText = $"{SelectedGame.DisplayName} was restored";
+            SetSuccessStatus($"{SelectedGame.DisplayName} was restored");
         }
         catch (Exception exception)
         {
-            StatusText = $"Could not restore the game: {exception.Message}";
+            SetErrorStatus($"Could not restore the game: {exception.Message}");
         }
         finally
         {
@@ -630,11 +668,11 @@ public sealed class MainWindowViewModel : ObservableObject
         {
             IsBusy = true;
             await _packagePatchService.RestoreAsync(SelectedGame, false, CreateStatusProgress());
-            StatusText = $"Built mods were cleared for {SelectedGame.DisplayName}";
+            SetSuccessStatus($"Built mods were cleared for {SelectedGame.DisplayName}");
         }
         catch (Exception exception)
         {
-            StatusText = $"Could not clear built mods: {exception.Message}";
+            SetErrorStatus($"Could not clear built mods: {exception.Message}");
         }
         finally
         {
@@ -653,11 +691,11 @@ public sealed class MainWindowViewModel : ObservableObject
                 progress: CreateStatusProgress());
             StatusText = $"Launching {SelectedGame.DisplayName}";
             await _launchService.LaunchAsync(SelectedGame);
-            StatusText = $"{SelectedGame.DisplayName} was launched";
+            SetSuccessStatus($"{SelectedGame.DisplayName} was launched");
         }
         catch (Exception exception)
         {
-            StatusText = $"Could not build and launch: {exception.Message}";
+            SetErrorStatus($"Could not build and launch: {exception.Message}");
         }
         finally
         {
@@ -672,11 +710,11 @@ public sealed class MainWindowViewModel : ObservableObject
             IsBusy = true;
             StatusText = $"Launching {SelectedGame.DisplayName}";
             await _launchService.LaunchAsync(SelectedGame);
-            StatusText = $"{SelectedGame.DisplayName} was launched";
+            SetSuccessStatus($"{SelectedGame.DisplayName} was launched");
         }
         catch (Exception exception)
         {
-            StatusText = $"Could not launch game: {exception.Message}";
+            SetErrorStatus($"Could not launch game: {exception.Message}");
         }
         finally
         {
@@ -706,6 +744,18 @@ public sealed class MainWindowViewModel : ObservableObject
             : value.Message;
     });
 
+    private void SetSuccessStatus(string message)
+    {
+        StatusText = message;
+        StatusForeground = "#62D6A7";
+    }
+
+    private void SetErrorStatus(string message)
+    {
+        StatusText = message;
+        StatusForeground = "#FF7A7A";
+    }
+
     private async Task UpdateSelectedAsync()
     {
         if (SelectedMod is null)
@@ -724,11 +774,11 @@ public sealed class MainWindowViewModel : ObservableObject
             await _maintenanceService.UpdateAsync(SelectedMod.Model, SelectedGame, progress);
             await RefreshAsync();
             SelectedMod = Mods.FirstOrDefault(mod => mod.Id.Equals(selectedId, StringComparison.OrdinalIgnoreCase));
-            StatusText = $"{SelectedMod?.Name ?? selectedId} was updated successfully";
+            SetSuccessStatus($"{SelectedMod?.Name ?? selectedId} was updated successfully");
         }
         catch (Exception exception)
         {
-            StatusText = $"Could not update mod: {exception.Message}";
+            SetErrorStatus($"Could not update mod: {exception.Message}");
         }
         finally
         {
@@ -745,7 +795,7 @@ public sealed class MainWindowViewModel : ObservableObject
         var confirmed = await _dialogs.ConfirmAsync(
             $"Remove {mod.Name}?",
             $"This will permanently remove '{mod.Id}' from this OpenKH installation.",
-            "Remove mod");
+            "Remove Mod");
         if (!confirmed)
             return;
 
@@ -757,11 +807,11 @@ public sealed class MainWindowViewModel : ObservableObject
             _catalogService.SaveEnabledOrder(SelectedGame, _allMods.Select(item => item.Model));
             ApplyFilter();
             NotifySummaryChanged();
-            StatusText = $"{mod.Name} was removed";
+            SetSuccessStatus($"{mod.Name} was removed");
         }
         catch (Exception exception)
         {
-            StatusText = $"Could not remove mod: {exception.Message}";
+            SetErrorStatus($"Could not remove mod: {exception.Message}");
         }
         finally
         {

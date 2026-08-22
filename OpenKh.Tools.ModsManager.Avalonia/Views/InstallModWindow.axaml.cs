@@ -29,7 +29,7 @@ public sealed partial class InstallModWindow : EmbeddedDialogControl
         });
 
         if (files.Count > 0 && files[0].TryGetLocalPath() is { } fileName)
-            SourceTextBox.Text = fileName;
+            Close(new ModInstallRequest(fileName, null));
     }
 
     private void Install_OnClick(object? sender, RoutedEventArgs eventArgs)
@@ -43,8 +43,7 @@ public sealed partial class InstallModWindow : EmbeddedDialogControl
 
         Close(new ModInstallRequest(
             source,
-            string.IsNullOrWhiteSpace(BranchTextBox.Text) ? null : BranchTextBox.Text.Trim(),
-            OverwriteCheckBox.IsChecked == true));
+            string.IsNullOrWhiteSpace(BranchTextBox.Text) ? null : BranchTextBox.Text.Trim()));
     }
 
     private void Cancel_OnClick(object? sender, RoutedEventArgs eventArgs) => Close(null);
@@ -76,8 +75,6 @@ public sealed partial class InstallModWindow : EmbeddedDialogControl
             Close(null);
         else if (focused == ChooseFileButton)
             ChooseFile_OnClick(ChooseFileButton, new RoutedEventArgs());
-        else if (focused == OverwriteCheckBox)
-            OverwriteCheckBox.IsChecked = OverwriteCheckBox.IsChecked != true;
         else
             ControllerWindowNavigator.MoveFocus(this, 1);
     }

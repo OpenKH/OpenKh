@@ -3,34 +3,44 @@
         xmlns:views="using:OpenKh.Tools.ModsManager.Avalonia.Views"
         x:Class="OpenKh.Tools.ModsManager.Avalonia.Views.InstallModWindow"
         XYFocus.NavigationModes="Enabled">
-  <Grid Margin="28" RowDefinitions="Auto,20,Auto,12,Auto,20,Auto,*,Auto">
+  <Grid Margin="28" RowDefinitions="Auto,20,Auto,14,Auto,14,Auto,*,Auto">
     <StackPanel Spacing="5">
-      <TextBlock Text="Install a mod" FontSize="27" FontWeight="Bold" />
-      <TextBlock Text="Paste a repository or package URL, or choose a local file."
+      <TextBlock Text="Install a Mod" FontSize="27" FontWeight="Bold" />
+      <TextBlock Text="Choose one of the two installation methods below."
                  Foreground="#AAB9CF" TextWrapping="Wrap" />
     </StackPanel>
 
-    <StackPanel Grid.Row="2" Spacing="7">
-      <TextBlock Text="Repository or package" FontWeight="SemiBold" />
-      <TextBox x:Name="SourceTextBox"
-               PlaceholderText="OpenKH/example-mod or https://github.com/OpenKH/example-mod"
-               TextWrapping="NoWrap" />
-      <TextBlock Text="GitHub repositories, custom Git hosts, ZIP links, OpenKH patch archives, and Lua files are supported."
-                 Foreground="#71839E" FontSize="11" TextWrapping="Wrap" />
-    </StackPanel>
+    <Border Grid.Row="2" Classes="settings-card">
+      <Grid ColumnDefinitions="*,16,Auto">
+        <StackPanel Spacing="7">
+          <TextBlock Text="Repository or Package URL" FontSize="16" FontWeight="SemiBold" />
+          <TextBox x:Name="SourceTextBox"
+                   PlaceholderText="OpenKH/example-mod or https://github.com/OpenKH/example-mod"
+                   TextWrapping="NoWrap" />
+          <TextBlock Text="Branch (Optional)" FontWeight="SemiBold" />
+          <TextBox x:Name="BranchTextBox" PlaceholderText="main" />
+          <TextBlock Text="GitHub repositories, custom Git hosts, ZIP links, OpenKH patch archives, and Lua files are supported."
+                     Foreground="#71839E" FontSize="11" TextWrapping="Wrap" />
+        </StackPanel>
+        <Button x:Name="InstallButton" Grid.Column="2" Classes="primary"
+                Content="Install From Repository" MinWidth="190"
+                VerticalAlignment="Bottom" Click="Install_OnClick" />
+      </Grid>
+    </Border>
 
-    <Grid Grid.Row="4" ColumnDefinitions="*,14,180">
-      <StackPanel Spacing="7">
-        <TextBlock Text="Branch (optional)" FontWeight="SemiBold" />
-        <TextBox x:Name="BranchTextBox" PlaceholderText="main" />
-      </StackPanel>
-      <Button x:Name="ChooseFileButton" Grid.Column="2" Content="Choose local file" Click="ChooseFile_OnClick"
-              VerticalAlignment="Bottom" />
-    </Grid>
+    <TextBlock Grid.Row="4" Text="OR" HorizontalAlignment="Center"
+               Foreground="#71839E" FontWeight="Bold" />
 
-    <Border Grid.Row="6" Background="#111C2E" CornerRadius="10" Padding="14">
-      <CheckBox x:Name="OverwriteCheckBox"
-                Content="Replace an existing installation with the same name" />
+    <Border Grid.Row="6" Classes="settings-card">
+      <Grid ColumnDefinitions="*,16,Auto">
+        <StackPanel Spacing="5" VerticalAlignment="Center">
+          <TextBlock Text="Local Mod File" FontSize="16" FontWeight="SemiBold" />
+          <TextBlock Text="Choose a ZIP, OpenKH patch archive, or Lua file. Installation starts after the file is selected."
+                     Foreground="#AAB9CF" TextWrapping="Wrap" />
+        </StackPanel>
+        <Button x:Name="ChooseFileButton" Grid.Column="2" Content="Choose Local File"
+                MinWidth="190" Click="ChooseFile_OnClick" VerticalAlignment="Center" />
+      </Grid>
     </Border>
 
     <TextBlock Grid.Row="7" Margin="0,16,0,0"
@@ -39,7 +49,6 @@
 
     <StackPanel Grid.Row="8" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
       <Button x:Name="CancelButton" Content="Cancel" MinWidth="120" Click="Cancel_OnClick" />
-      <Button x:Name="InstallButton" Classes="primary" Content="Install" MinWidth="140" Click="Install_OnClick" />
     </StackPanel>
   </Grid>
 </views:EmbeddedDialogControl>
