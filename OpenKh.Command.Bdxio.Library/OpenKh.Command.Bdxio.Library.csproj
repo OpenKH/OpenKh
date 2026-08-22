@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AssemblyName>OpenKh.Command.Bdxio.Library</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\OpenKh.Command.Bdxio\Antlr4\**\*.cs" Link="Antlr4\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\OpenKh.Command.Bdxio\Models\**\*.cs" Link="Models\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\OpenKh.Command.Bdxio\Utils\**\*.cs" Link="Utils\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLog" Version="5.3.2" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
+    <PackageReference Include="Xe.BinaryMapper" Version="1.5.2" />
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+    <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
+  </ItemGroup>
+
+</Project>
