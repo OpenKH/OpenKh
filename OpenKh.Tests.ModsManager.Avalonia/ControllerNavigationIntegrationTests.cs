@@ -49,6 +49,21 @@ public class ControllerNavigationIntegrationTests
     }
 
     [AvaloniaFact]
+    public void RepositoryInstallActionAlignsWithTheBranchField()
+    {
+        var install = new InstallModWindow();
+        var window = ShowContent(install, 1500, 900);
+        var branch = install.FindControl<TextBox>("BranchTextBox")!;
+        var installButton = install.FindControl<Button>("InstallButton")!;
+
+        var branchCenter = GetCenter(branch, install);
+        var buttonCenter = GetCenter(installButton, install);
+
+        Assert.InRange(Math.Abs(branchCenter.Y - buttonCenter.Y), 0, 1);
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void BrowseGridMovesDownToTheRenderedCardBelow()
     {
         var cards = Enumerable.Range(0, 6)
