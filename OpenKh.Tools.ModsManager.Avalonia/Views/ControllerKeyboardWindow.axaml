@@ -19,7 +19,7 @@
                 HorizontalAlignment="Center" VerticalAlignment="Center" />
 
     <TextBlock Grid.Row="6"
-               Text="D-pad or left stick: move   A or Cross: type   B or Circle: close"
+               Text="D-pad or left stick: move   A or Cross: type   X or Square: backspace   Y or Triangle: shift   B or Circle: close"
                Foreground="#71839E" FontSize="11" HorizontalAlignment="Center" />
   </Grid>
 </views:EmbeddedDialogControl>

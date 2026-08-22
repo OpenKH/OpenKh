@@ -1,8 +1,11 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Media;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using OpenKh.Tools.ModsManager.Avalonia.ViewModels;
 using OpenKh.Tools.ModsManager.Core;
 using OpenKh.Tools.ModsManager.Avalonia.Services;
@@ -492,12 +495,10 @@ public sealed partial class SetupWindow : EmbeddedDialogControl
             return;
         }
 
-        var extractionDescription = viewModel.SkipRemastered
-            ? "Remastered files will be skipped. Review the compatibility warning in Setup before continuing."
-            : "The selected games will be extracted completely, including remastered files.";
+        var extractionDescription = GetExtractionConfirmationDescription(viewModel);
         var confirmed = _dialogs is null || await _dialogs.ConfirmAsync(
             "Extract game data?",
-            $"{extractionDescription} This may require substantial disk space and can take 5 to 15 minutes or longer.\n\nExisting extracted data for the selected games may be overwritten.",
+            extractionDescription,
             "Start extraction");
         if (!confirmed)
             return;
@@ -529,6 +530,19 @@ public sealed partial class SetupWindow : EmbeddedDialogControl
         {
             SetExtractionBusy(false);
         }
+    }
+
+    private static string GetExtractionConfirmationDescription(SetupWindowViewModel viewModel)
+    {
+        if (viewModel.IsPcsx2Mode)
+        {
+            return "The selected ISO files will be extracted. Existing extracted data for the selected games may be overwritten.";
+        }
+
+        var extractionDescription = viewModel.SkipRemastered
+            ? "Remastered files will be skipped. Review the compatibility warning in Setup before continuing."
+            : "The selected games will be extracted completely, including remastered files.";
+        return $"{extractionDescription} This may require substantial disk space and can take 5 to 15 minutes or longer.\n\nExisting extracted data for the selected games may be overwritten.";
     }
 
     private void SetExtractionBusy(bool busy)
@@ -636,6 +650,19 @@ public sealed partial class SetupWindow : EmbeddedDialogControl
             _activeComboBox = comboBox;
             comboBox.IsDropDownOpen = true;
         }
+        else if (GetFocusedExpander(focused) is { } expander)
+        {
+            expander.IsExpanded = !expander.IsExpanded;
+            if (expander.IsExpanded)
+            {
+                // The expanded content is attached during the next layout pass.
+                Dispatcher.UIThread.Post(() =>
+                {
+                    ModStorageTextBox.BringIntoView();
+                    ModStorageTextBox.Focus();
+                }, DispatcherPriority.Input);
+            }
+        }
         else if (focused is Button button)
         {
             if (button == ExtractGameDataButton)
@@ -657,5 +684,15 @@ public sealed partial class SetupWindow : EmbeddedDialogControl
         }
         else
             ControllerWindowNavigator.MoveFocus(this, 1);
+    }
+
+    private static Expander? GetFocusedExpander(object? focused)
+    {
+        if (focused is Expander expander)
+            return expander;
+
+        return focused is ToggleButton toggleButton
+            ? toggleButton.GetVisualAncestors().OfType<Expander>().FirstOrDefault()
+            : null;
     }
 }

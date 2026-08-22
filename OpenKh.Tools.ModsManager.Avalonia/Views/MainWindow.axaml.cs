@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using OpenKh.Tools.ModsManager.Avalonia.Services;
 using OpenKh.Tools.ModsManager.Avalonia.ViewModels;
@@ -105,7 +106,13 @@ public sealed partial class MainWindow : Window
         }
 
         if (action is ControllerAction.MoveUp or ControllerAction.MoveDown or ControllerAction.MoveTop)
-            SelectFocusedMod(FocusManager?.GetFocusedElement() as Control);
+        {
+            var focusedControl = FocusManager?.GetFocusedElement() as Control;
+            if (!TryGetFocusedMod(focusedControl, out var focusedMod))
+                return;
+
+            ModList.SelectedItem = focusedMod;
+        }
 
         if (DataContext is MainWindowViewModel viewModel)
             viewModel.HandleControllerAction(action);
@@ -114,21 +121,16 @@ public sealed partial class MainWindow : Window
     private bool ActivateFocusedControl()
     {
         var focused = FocusManager?.GetFocusedElement();
-        if (focused is Control focusedControl)
-        {
-            var expander = focusedControl as Expander ??
-                focusedControl.GetVisualAncestors().OfType<Expander>().FirstOrDefault();
-            if (expander is not null)
-            {
-                expander.IsExpanded = !expander.IsExpanded;
-                return true;
-            }
-        }
-
         if (focused is Button button && button.Command is { } command)
         {
             if (command.CanExecute(button.CommandParameter))
                 command.Execute(button.CommandParameter);
+            return true;
+        }
+
+        if (GetFocusedExpander(focused) is { } expander)
+        {
+            expander.IsExpanded = !expander.IsExpanded;
             return true;
         }
 
@@ -153,11 +155,27 @@ public sealed partial class MainWindow : Window
         return false;
     }
 
+    private static Expander? GetFocusedExpander(object? focused)
+    {
+        if (focused is Expander expander)
+            return expander;
+
+        return focused is ToggleButton toggleButton
+            ? toggleButton.GetVisualAncestors().OfType<Expander>().FirstOrDefault()
+            : null;
+    }
+
     private void SelectFocusedMod(Control? focusedControl)
+    {
+        if (TryGetFocusedMod(focusedControl, out var mod))
+            ModList.SelectedItem = mod;
+    }
+
+    private static bool TryGetFocusedMod(Control? focusedControl, out ModListItemViewModel? mod)
     {
         var item = focusedControl as ListBoxItem ??
             focusedControl?.GetVisualAncestors().OfType<ListBoxItem>().FirstOrDefault();
-        if (item?.DataContext is ModListItemViewModel mod)
-            ModList.SelectedItem = mod;
+        mod = item?.DataContext as ModListItemViewModel;
+        return mod is not null;
     }
 }

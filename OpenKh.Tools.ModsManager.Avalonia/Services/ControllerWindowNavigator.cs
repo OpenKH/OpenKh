@@ -176,19 +176,25 @@ public static class ControllerWindowNavigator
         IsNavigationTargetKind(control) &&
         !control.GetVisualAncestors()
             .OfType<Control>()
-            .Any(ancestor => IsAvailable(ancestor) && IsNavigationTargetKind(ancestor));
+            .Any(ancestor =>
+                ancestor is not Expander &&
+                IsAvailable(ancestor) &&
+                IsNavigationTargetKind(ancestor));
 
     private static bool IsNavigationTargetKind(Control control) =>
         control is Button or TextBox or ComboBox or CheckBox or ToggleSwitch or Expander or ListBoxItem;
 
     private static Control? GetNavigationTarget(Control focused)
     {
-        return focused.GetVisualAncestors()
+        var targets = focused.GetVisualAncestors()
             .Prepend(focused)
             .OfType<Control>()
             .Where(IsAvailable)
             .Where(IsNavigationTargetKind)
-            .LastOrDefault();
+            .ToArray();
+
+        // Expanded content must navigate as individual controls instead of resolving back to its parent.
+        return targets.LastOrDefault(target => target is not Expander) ?? targets.LastOrDefault();
     }
 
     private static Control? FindStartingTarget(Control root)
@@ -225,8 +231,8 @@ public static class ControllerWindowNavigator
         ReferenceEquals(control, root) || control.GetVisualAncestors().Contains(root);
 
     private static bool IsNestedNavigationTarget(Control source, Control candidate) =>
-        candidate.GetVisualAncestors().Contains(source) ||
-        source.GetVisualAncestors().Contains(candidate);
+        candidate.GetVisualAncestors().Contains(source) && source is not Expander ||
+        source.GetVisualAncestors().Contains(candidate) && candidate is not Expander;
 
     private static Rect? GetBoundsRelativeTo(Control control, Control root)
     {

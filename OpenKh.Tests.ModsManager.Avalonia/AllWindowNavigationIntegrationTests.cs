@@ -123,7 +123,10 @@ public sealed class AllWindowNavigationIntegrationTests
         .Where(IsNavigationKind)
         .Where(control => !control.GetVisualAncestors()
             .OfType<Control>()
-            .Any(ancestor => IsAvailable(ancestor) && IsNavigationKind(ancestor)))
+            .Any(ancestor =>
+                ancestor is not Expander &&
+                IsAvailable(ancestor) &&
+                IsNavigationKind(ancestor)))
         .ToArray();
 
     private static Control? GetOutermostTarget(Control? control) => control?

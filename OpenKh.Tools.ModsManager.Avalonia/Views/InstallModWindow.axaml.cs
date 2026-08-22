@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using OpenKh.Tools.ModsManager.Avalonia.Services;
@@ -33,6 +34,20 @@ public sealed partial class InstallModWindow : EmbeddedDialogControl
     }
 
     private void Install_OnClick(object? sender, RoutedEventArgs eventArgs)
+    {
+        InstallFromRepository();
+    }
+
+    private void RepositoryField_OnKeyDown(object? sender, KeyEventArgs eventArgs)
+    {
+        if (eventArgs.Key != Key.Enter)
+            return;
+
+        eventArgs.Handled = true;
+        InstallFromRepository();
+    }
+
+    private void InstallFromRepository()
     {
         var source = SourceTextBox.Text?.Trim();
         if (string.IsNullOrWhiteSpace(source))

@@ -10,6 +10,7 @@ using Avalonia.VisualTree;
 using OpenKh.Tools.ModsManager.Avalonia.Services;
 using OpenKh.Tools.ModsManager.Avalonia.ViewModels;
 using OpenKh.Tools.ModsManager.Avalonia.Views;
+using OpenKh.Tools.ModsManager.Core;
 using System.Reflection;
 using Xunit;
 
@@ -34,6 +35,34 @@ public class ControllerNavigationIntegrationTests
         Assert.Same(
             setup.FindControl<TextBox>("BuiltModsTextBox"),
             resolver.Invoke(setup, ["BuiltModsTextBox"]));
+    }
+
+    [AvaloniaFact]
+    public void Pcsx2ExtractionConfirmationOnlyDescribesIsoExtraction()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "OpenKhSetupConfirmationTests", Guid.NewGuid().ToString("N"));
+        try
+        {
+            var layout = InstallationLayout.Detect("ignored", ["--data-root", root]);
+            var configuration = new ModManagerConfigurationService(layout);
+            configuration.Current.GameEdition = 1;
+            var viewModel = new SetupWindowViewModel(configuration);
+            var resolver = typeof(SetupWindow).GetMethod(
+                "GetExtractionConfirmationDescription",
+                BindingFlags.Static | BindingFlags.NonPublic)!;
+
+            var message = Assert.IsType<string>(resolver.Invoke(null, [viewModel]));
+
+            Assert.Contains("ISO files", message);
+            Assert.Contains("may be overwritten", message);
+            Assert.DoesNotContain("remastered", message, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("disk space", message, StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            if (Directory.Exists(root))
+                Directory.Delete(root, true);
+        }
     }
 
     [AvaloniaFact]
@@ -100,6 +129,63 @@ public class ControllerNavigationIntegrationTests
 
         install.Close();
         await installTask;
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public async Task ControllerKeyboardSupportsFaceButtonShortcuts()
+    {
+        var main = new MainWindow();
+        var window = ShowContent(main, 1280, 800);
+        var install = new InstallModWindow();
+        var installTask = main.ShowPageAsync<ModInstallRequest>(install);
+        Dispatcher.UIThread.RunJobs();
+        var target = install.FindControl<TextBox>("SourceTextBox")!;
+        target.Text = "ab";
+        target.CaretIndex = 2;
+        target.SelectionStart = 2;
+        target.SelectionEnd = 2;
+
+        VirtualKeyboardService.Show(target);
+        Dispatcher.UIThread.RunJobs();
+        var keyboard = main.GetVisualDescendants().OfType<ControllerKeyboardWindow>().Single();
+
+        Assert.True(ControllerWindowNavigator.TryHandleVirtualKeyboard(ControllerAction.Secondary));
+        Assert.Equal("a", target.Text);
+
+        Assert.True(ControllerWindowNavigator.TryHandleVirtualKeyboard(ControllerAction.MoveTop));
+        FocusKeyboardButton(keyboard, "Character:b");
+        Assert.True(ControllerWindowNavigator.TryHandleVirtualKeyboard(ControllerAction.Confirm));
+        Assert.Equal("aB", target.Text);
+
+        Assert.True(ControllerWindowNavigator.TryHandleVirtualKeyboard(ControllerAction.Cancel));
+        await WaitForKeyboardToCloseAsync();
+        install.Close();
+        await installTask;
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public async Task PressingEnterSubmitsARepositoryInstall()
+    {
+        var main = new MainWindow();
+        var window = ShowContent(main, 1280, 800);
+        var install = new InstallModWindow();
+        var installTask = main.ShowPageAsync<ModInstallRequest>(install);
+        Dispatcher.UIThread.RunJobs();
+        var source = install.FindControl<TextBox>("SourceTextBox")!;
+        source.Text = "OpenKH/example-mod";
+
+        source.RaiseEvent(new KeyEventArgs
+        {
+            RoutedEvent = InputElement.KeyDownEvent,
+            Key = Key.Enter,
+            Source = source
+        });
+
+        var request = await installTask;
+        Assert.NotNull(request);
+        Assert.Equal("OpenKH/example-mod", request.Source);
         window.Close();
     }
 
@@ -217,6 +303,58 @@ public class ControllerNavigationIntegrationTests
         Assert.True(folderInput.Focus());
         ControllerWindowNavigator.MoveFocus(window, NavigationDirection.Down);
         Assert.Same(platformCombo, window.FocusManager?.GetFocusedElement());
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void SetupControllerOpensAdvancedStorageAndEntersItsFirstField()
+    {
+        var setup = new SetupWindow();
+        var window = ShowContent(setup, 1500, 1000);
+        var expander = setup.FindControl<Expander>("AdvancedStorageExpander")!;
+        var firstField = setup.FindControl<TextBox>("ModStorageTextBox")!;
+        var headerButton = expander.GetVisualDescendants().OfType<Button>().First();
+
+        Assert.False(expander.IsExpanded);
+        Assert.True(headerButton.Focus());
+
+        setup.HandleControllerAction(ControllerAction.Confirm);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(expander.IsExpanded);
+        Assert.Same(firstField, window.FocusManager?.GetFocusedElement());
+
+        setup.HandleControllerAction(ControllerAction.NavigateRight);
+        Dispatcher.UIThread.RunJobs();
+
+        var browseButton = setup.GetVisualDescendants()
+            .OfType<Button>()
+            .Single(button => Equals(button.Tag, "ModStorageTextBox"));
+        Assert.Same(browseButton, window.FocusManager?.GetFocusedElement());
+
+        setup.HandleControllerAction(ControllerAction.NavigateDown);
+        Dispatcher.UIThread.RunJobs();
+        var collectionBrowseButton = setup.GetVisualDescendants()
+            .OfType<Button>()
+            .Single(button => Equals(button.Tag, "CollectionStorageTextBox"));
+        Assert.Same(collectionBrowseButton, window.FocusManager?.GetFocusedElement());
+
+        setup.HandleControllerAction(ControllerAction.NavigateLeft);
+        Dispatcher.UIThread.RunJobs();
+        var collectionField = setup.FindControl<TextBox>("CollectionStorageTextBox")!;
+        Assert.Same(collectionField, window.FocusManager?.GetFocusedElement());
+
+        setup.HandleControllerAction(ControllerAction.NavigateDown);
+        Dispatcher.UIThread.RunJobs();
+        var builtModsField = setup.FindControl<TextBox>("BuiltModsTextBox")!;
+        Assert.Same(builtModsField, window.FocusManager?.GetFocusedElement());
+
+        setup.HandleControllerAction(ControllerAction.NavigateRight);
+        Dispatcher.UIThread.RunJobs();
+        var builtModsBrowseButton = setup.GetVisualDescendants()
+            .OfType<Button>()
+            .Single(button => Equals(button.Tag, "BuiltModsTextBox"));
+        Assert.Same(builtModsBrowseButton, window.FocusManager?.GetFocusedElement());
         window.Close();
     }
 
@@ -386,6 +524,56 @@ public class ControllerNavigationIntegrationTests
 
         Assert.Same(installedItem, window.FocusManager?.GetFocusedElement());
         window.Close();
+    }
+
+    [AvaloniaFact]
+    public void MainWindowControllerActivatesMoreCommandsWithoutCollapsingTheMenu()
+    {
+        var main = new MainWindow();
+        var creatorButton = main.FindControl<Button>("CreatorToolsButton")!;
+        var aboutButton = main.FindControl<Button>("AboutOpenKhButton")!;
+        var moreExpander = main.FindControl<Expander>("MoreExpander")!;
+        var creatorInvocations = 0;
+        var aboutInvocations = 0;
+        creatorButton.Command = new RelayCommand(() => creatorInvocations++);
+        aboutButton.Command = new RelayCommand(() => aboutInvocations++);
+        moreExpander.IsExpanded = true;
+        var window = ShowContent(main, 1280, 800);
+
+        Assert.True(creatorButton.Focus());
+        main.HandleControllerAction(ControllerAction.Confirm);
+        Assert.Equal(1, creatorInvocations);
+        Assert.True(moreExpander.IsExpanded);
+
+        Assert.True(aboutButton.Focus());
+        main.HandleControllerAction(ControllerAction.Confirm);
+        Assert.Equal(1, aboutInvocations);
+        Assert.True(moreExpander.IsExpanded);
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void ModReorderingRequiresFocusInsideAModRow()
+    {
+        var resolver = typeof(MainWindow).GetMethod(
+            "TryGetFocusedMod",
+            BindingFlags.Static | BindingFlags.NonPublic)!;
+        var mod = new ModListItemViewModel(
+            new ModEntry
+            {
+                Id = "example/mod",
+                Name = "Example Mod",
+                Directory = "example"
+            },
+            () => { });
+        var modItem = new ListBoxItem { DataContext = mod };
+        object?[] modArguments = [modItem, null];
+        object?[] unrelatedArguments = [new Button(), null];
+
+        Assert.True(Assert.IsType<bool>(resolver.Invoke(null, modArguments)));
+        Assert.Same(mod, modArguments[1]);
+        Assert.False(Assert.IsType<bool>(resolver.Invoke(null, unrelatedArguments)));
+        Assert.Null(unrelatedArguments[1]);
     }
 
     [AvaloniaFact]

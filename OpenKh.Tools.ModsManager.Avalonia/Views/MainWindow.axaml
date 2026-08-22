@@ -39,10 +39,10 @@
             </StackPanel>
           </Button>
           <Button Classes="subtle" Command="{Binding SettingsCommand}" Content="App Settings" HorizontalAlignment="Stretch" />
-          <Expander Header="More" HorizontalAlignment="Stretch">
+          <Expander x:Name="MoreExpander" Header="More" HorizontalAlignment="Stretch">
             <StackPanel Spacing="8" Margin="0,8,0,0">
-              <Button Classes="subtle" Command="{Binding CreatorCommand}" Content="Creator Tools" HorizontalAlignment="Stretch" />
-              <Button Classes="subtle" Command="{Binding InfoCommand}" Content="About OpenKH" HorizontalAlignment="Stretch" />
+              <Button x:Name="CreatorToolsButton" Classes="subtle" Command="{Binding CreatorCommand}" Content="Creator Tools" HorizontalAlignment="Stretch" />
+              <Button x:Name="AboutOpenKhButton" Classes="subtle" Command="{Binding InfoCommand}" Content="About OpenKH" HorizontalAlignment="Stretch" />
             </StackPanel>
           </Expander>
           <Border Height="1" Margin="0,8" Background="#22324C" />

@@ -38,6 +38,18 @@ public sealed partial class ControllerKeyboardWindow : EmbeddedDialogControl
 
     public void HandleControllerAction(ControllerAction action)
     {
+        if (action == ControllerAction.Secondary)
+        {
+            Backspace();
+            return;
+        }
+
+        if (action == ControllerAction.MoveTop)
+        {
+            ToggleShift();
+            return;
+        }
+
         if (ControllerWindowNavigator.TryMoveFocus(this, action))
             return;
 

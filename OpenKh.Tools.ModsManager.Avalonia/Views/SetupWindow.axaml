@@ -30,7 +30,7 @@
             <TextBlock Text="Storage Locations" FontSize="18" FontWeight="SemiBold" />
             <TextBlock Text="The standard OpenKH folders are used unless custom locations are configured below."
                        Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
-            <Expander Header="Advanced Storage Locations">
+            <Expander x:Name="AdvancedStorageExpander" Header="Advanced Storage Locations">
               <StackPanel Spacing="10" Margin="0,10,0,0">
                 <TextBlock Text="Installed Mods Folder" FontWeight="SemiBold" />
                 <Grid ColumnDefinitions="*,12,130">
@@ -260,7 +260,7 @@
               <CheckBox IsChecked="{Binding SkipRemastered}" Content="Skip Extracting Remastered Files" />
             </StackPanel>
             <TextBlock x:Name="ExtractionAvailabilityText" Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
-            <TextBlock Text="Extraction can take between 5 and 15 minutes, or longer when several PC games are selected."
+            <TextBlock Text="Extraction can take between 5 and 15 minutes, or longer when several games are selected."
                        Foreground="#91A2BA" FontSize="11" TextWrapping="Wrap" />
             <Button x:Name="ExtractGameDataButton"
                     Content="Extract Game Data"
