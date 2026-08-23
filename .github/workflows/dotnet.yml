@@ -56,10 +56,6 @@ jobs:
       run: powershell -ExecutionPolicy Unrestricted ./.github/scripts/create-release-archive.ps1 -SourceDirectory openkh -DestinationPath openkh.zip
       shell: pwsh
 
-    - name: Create Linux and Steam Deck release archive
-      run: powershell -ExecutionPolicy Unrestricted ./.github/scripts/create-release-archive.ps1 -SourceDirectory openkh-linux-x64 -DestinationPath openkh-linux-x64.zip
-      shell: pwsh
-
     - name: validate update archive
       shell: pwsh
       run: |
@@ -91,42 +87,6 @@ jobs:
           }
         }
 
-        $linuxArchive = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path "openkh-linux-x64.zip"))
-        try {
-          $linuxArchiveEntries = @($linuxArchive.Entries | ForEach-Object { $_.FullName })
-        }
-        finally {
-          $linuxArchive.Dispose()
-        }
-        $linuxRequiredEntries = @(
-          "openkh-linux-x64/OpenKh.Launcher",
-          "openkh-linux-x64/Apps/OpenKh.Tools.ModsManager",
-          "openkh-linux-x64/Apps/OpenKH.Panacea.dll",
-          "openkh-linux-x64/Apps/avcodec-vgmstream-59.dll",
-          "openkh-linux-x64/Apps/avformat-vgmstream-59.dll",
-          "openkh-linux-x64/Apps/avutil-vgmstream-57.dll",
-          "openkh-linux-x64/Apps/bass.dll",
-          "openkh-linux-x64/Apps/bass_vgmstream.dll",
-          "openkh-linux-x64/Apps/libatrac9.dll",
-          "openkh-linux-x64/Apps/libcelt-0061.dll",
-          "openkh-linux-x64/Apps/libcelt-0110.dll",
-          "openkh-linux-x64/Apps/libg719_decode.dll",
-          "openkh-linux-x64/Apps/libmpg123-0.dll",
-          "openkh-linux-x64/Apps/libspeex-1.dll",
-          "openkh-linux-x64/Apps/libvorbis.dll",
-          "openkh-linux-x64/Apps/swresample-vgmstream-4.dll",
-          "openkh-linux-x64/install-openkh-linux.sh"
-        )
-        foreach ($entry in $linuxRequiredEntries) {
-          if ($entry -notin $linuxArchiveEntries) {
-            throw "Required Linux update entry '$entry' is missing from openkh-linux-x64.zip."
-          }
-        }
-        $invalidLinuxEntry = $linuxArchiveEntries | Where-Object { $_.Contains('\') } | Select-Object -First 1
-        if ($invalidLinuxEntry) {
-          throw "Linux archive entry '$invalidLinuxEntry' contains a Windows path separator."
-        }
-
     - name: Upload Linux release layout
       uses: actions/upload-artifact@v4
       with:
@@ -145,7 +105,6 @@ jobs:
         title: "OpenKh Latest Build"
         files: |
           openkh.zip
-          openkh-linux-x64.zip
 
     - name: "GitHub release numbered"
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -157,7 +116,6 @@ jobs:
         title: "OpenKh Build ${{github.run_number}} (${{github.ref_name}})"
         files: |
           openkh.zip
-          openkh-linux-x64.zip
 
   appimage:
     needs: build

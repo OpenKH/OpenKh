@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Formats.Tar;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -19,7 +20,7 @@ namespace OpenKh.Tools.Launcher.Updates
         }
 
         public async Task UpdateAsync(
-            string downloadZipUrl,
+            string downloadUrl,
             Action<float> progress,
             CancellationToken cancellation,
             string executableToRestart = ""
@@ -27,41 +28,39 @@ namespace OpenKh.Tools.Launcher.Updates
         {
             if (LauncherInstallation.IsAppImage && LauncherInstallation.AppImagePath is { } appImagePath)
             {
-                await UpdateAppImageAsync(downloadZipUrl, appImagePath, progress, cancellation);
+                await UpdateAppImageAsync(downloadUrl, appImagePath, progress, cancellation);
                 return;
             }
 
             var tempId = Guid.NewGuid().ToString("N");
-            var tempZipFile = Path.Combine(Path.GetTempPath(), $"openkh-{tempId}.zip");
+            var archiveExtension = OperatingSystem.IsWindows() ? ".zip" : ".tar.gz";
+            var tempArchiveFile = Path.Combine(Path.GetTempPath(), $"openkh-{tempId}{archiveExtension}");
 
             using (var client = new HttpClient())
             {
-                using (var zipOutput = File.Create(tempZipFile))
+                using (var archiveOutput = File.Create(tempArchiveFile))
                 {
-                    using (var resp = await client.GetAsync(downloadZipUrl, cancellation))
+                    using (var resp = await client.GetAsync(downloadUrl, cancellation))
                     {
                         resp.EnsureSuccessStatusCode();
                         var maxLen = resp.Content.Headers.ContentLength;
-                        var zipInput = await resp.Content.ReadAsStreamAsync(cancellation);
-                        await CopyToAsyncWithProgress(zipInput, zipOutput, maxLen, progress, cancellation);
+                        var archiveInput = await resp.Content.ReadAsStreamAsync(cancellation);
+                        await CopyToAsyncWithProgress(archiveInput, archiveOutput, maxLen, progress, cancellation);
                     }
                 }
             }
 
-            var tempZipDir = Path.Combine(Path.GetTempPath(), $"openkh-{tempId}");
-            Directory.CreateDirectory(tempZipDir);
+            var tempArchiveDirectory = Path.Combine(Path.GetTempPath(), $"openkh-{tempId}");
+            Directory.CreateDirectory(tempArchiveDirectory);
 
-            using (var zip = ZipFile.OpenRead(tempZipFile))
-            {
-                zip.ExtractToDirectory(tempZipDir);
-            }
+            ExtractArchive(tempArchiveFile, tempArchiveDirectory);
 
-            File.Delete(tempZipFile);
-            var extractedDirectories = Directory.GetDirectories(tempZipDir);
-            var extractedFiles = Directory.GetFiles(tempZipDir);
+            File.Delete(tempArchiveFile);
+            var extractedDirectories = Directory.GetDirectories(tempArchiveDirectory);
+            var extractedFiles = Directory.GetFiles(tempArchiveDirectory);
             var copyFrom = extractedDirectories.Length == 1 && extractedFiles.Length == 0
                 ? extractedDirectories[0]
-                : tempZipDir;
+                : tempArchiveDirectory;
             var copyTo = _installationDirectory;
             var packagedModManagerExecutable = Path.Combine(
                 copyFrom,
@@ -85,7 +84,7 @@ namespace OpenKh.Tools.Launcher.Updates
 
             if (!OperatingSystem.IsWindows())
             {
-                await StartUnixUpdateAsync(tempId, tempZipDir, copyFrom, copyTo, restartExecutable);
+                await StartUnixUpdateAsync(tempId, tempArchiveDirectory, copyFrom, copyTo, restartExecutable);
                 return;
             }
 
@@ -115,7 +114,7 @@ namespace OpenKh.Tools.Launcher.Updates
 
         private static async Task StartUnixUpdateAsync(
             string tempId,
-            string tempZipDir,
+            string temporaryDirectory,
             string copyFrom,
             string copyTo,
             string restartExecutable
@@ -128,7 +127,7 @@ namespace OpenKh.Tools.Launcher.Updates
                 .AppendLine($"mkdir -p {EscapeShellArg(copyTo)}")
                 .AppendLine($"cp -a {EscapeShellArg(Path.Combine(copyFrom, "."))} {EscapeShellArg(copyTo)}")
                 .AppendLine($"chmod +x {EscapeShellArg(restartExecutable)} 2>/dev/null || true")
-                .AppendLine($"rm -rf {EscapeShellArg(tempZipDir)}")
+                .AppendLine($"rm -rf {EscapeShellArg(temporaryDirectory)}")
                 .AppendLine($"{EscapeShellArg(restartExecutable)} >/dev/null 2>&1 &")
                 .AppendLine($"rm -f {EscapeShellArg(scriptPath)}")
                 .ToString();
@@ -147,6 +146,25 @@ namespace OpenKh.Tools.Launcher.Updates
                 CreateNoWindow = true,
                 ArgumentList = { scriptPath },
             });
+        }
+
+        internal static void ExtractArchive(string archivePath, string destinationDirectory)
+        {
+            if (archivePath.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase))
+            {
+                using var archive = File.OpenRead(archivePath);
+                using var gzip = new GZipStream(archive, CompressionMode.Decompress);
+                TarFile.ExtractToDirectory(gzip, destinationDirectory, overwriteFiles: false);
+                return;
+            }
+
+            if (archivePath.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            {
+                ZipFile.ExtractToDirectory(archivePath, destinationDirectory);
+                return;
+            }
+
+            throw new InvalidDataException($"Unsupported OpenKH update archive: {Path.GetFileName(archivePath)}");
         }
 
         private static async Task UpdateAppImageAsync(

@@ -10,7 +10,7 @@ namespace OpenKh.Tools.Launcher.Updates
 {
     public class OpenKhReleaseUpdateCheckerService
     {
-        public record CheckResult(bool HasUpdate, string CurrentVersion, string NewVersion, string DownloadZipUrl);
+        public record CheckResult(bool HasUpdate, string CurrentVersion, string NewVersion, string DownloadUrl);
 
         private static readonly Regex _validTag = new Regex("^release2-(?<build>\\d+)$");
         private readonly string _installationDirectory;
@@ -59,7 +59,7 @@ namespace OpenKh.Tools.Launcher.Updates
                     HasUpdate: localReleaseTag != remoteReleaseTag,
                     CurrentVersion: localReleaseTag,
                     NewVersion: remoteReleaseTag,
-                    DownloadZipUrl: latestAsset.Asset.BrowserDownloadUrl
+                    DownloadUrl: latestAsset.Asset.BrowserDownloadUrl
                 );
             }
 
@@ -67,7 +67,7 @@ namespace OpenKh.Tools.Launcher.Updates
                 HasUpdate: false,
                 CurrentVersion: "",
                 NewVersion: "",
-                DownloadZipUrl: ""
+                DownloadUrl: ""
             );
         }
 
@@ -76,6 +76,6 @@ namespace OpenKh.Tools.Launcher.Updates
                 ? "openkh.zip"
                 : LauncherInstallation.IsAppImage
                     ? "openkh-x86_64.AppImage"
-                    : "openkh-linux-x64.zip";
+                    : "openkh-linux-x64.tar.gz";
     }
 }

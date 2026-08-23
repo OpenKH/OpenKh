@@ -220,7 +220,7 @@ public partial class MainWindow : Window
 
             CheckForUpdatesButton.Content = "Downloading Update...";
             await new OpenKhUpdateInstallerService(BaseDirectory).UpdateAsync(
-                result.DownloadZipUrl,
+                result.DownloadUrl,
                 rate => Dispatcher.UIThread.Post(() => CheckForUpdatesButton.Content = $"Downloading {rate:P0}"),
                 CancellationToken.None,
                 Environment.ProcessPath ?? string.Empty);

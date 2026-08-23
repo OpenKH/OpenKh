@@ -11,7 +11,7 @@ public static class OpenKhUpdateEnvironment
         ? "openkh.zip"
         : IsAppImage
             ? "openkh-x86_64.AppImage"
-            : "openkh-linux-x64.zip";
+            : "openkh-linux-x64.tar.gz";
 
     public static string? FindLauncher(string installationDirectory, string applicationBaseDirectory)
     {

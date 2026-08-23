@@ -24,4 +24,4 @@ The script creates self-contained, single-file builds for Windows, Linux, and St
 
 The release workflow also packages the Linux Launcher and Mod Manager as
 `openkh-x86_64.AppImage`. The AppImage build uses the prepared Linux release
-layout, so it contains the same Panacea files as the portable ZIP.
+layout, so it contains the same Panacea files as the portable `tar.gz` archive.
