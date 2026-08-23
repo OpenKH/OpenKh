@@ -105,6 +105,7 @@ public sealed partial class MainWindow : Window
                 return;
         }
 
+        var restoreModFocus = false;
         if (action is ControllerAction.MoveUp or ControllerAction.MoveDown or ControllerAction.MoveTop)
         {
             var focusedControl = FocusManager?.GetFocusedElement() as Control;
@@ -112,10 +113,27 @@ public sealed partial class MainWindow : Window
                 return;
 
             ModList.SelectedItem = focusedMod;
+            restoreModFocus = true;
         }
 
         if (DataContext is MainWindowViewModel viewModel)
+        {
             viewModel.HandleControllerAction(action);
+            if (restoreModFocus && viewModel.SelectedMod is { } selectedMod)
+                RestoreModFocus(ModList, selectedMod);
+        }
+    }
+
+    private static void RestoreModFocus(ListBox list, ModListItemViewModel selectedMod)
+    {
+        list.ScrollIntoView(selectedMod);
+        Dispatcher.UIThread.Post(() =>
+        {
+            var item = list.GetVisualDescendants()
+                .OfType<ListBoxItem>()
+                .FirstOrDefault(candidate => ReferenceEquals(candidate.DataContext, selectedMod));
+            item?.Focus(NavigationMethod.Directional);
+        }, DispatcherPriority.Loaded);
     }
 
     private bool ActivateFocusedControl()

@@ -600,6 +600,42 @@ public class ControllerNavigationIntegrationTests
     }
 
     [AvaloniaFact]
+    public void ActualMainWindowRestoresFocusToAModAfterReordering()
+    {
+        var mods = new ObservableCollection<ModListItemViewModel>(
+        [
+            CreateModListItem("First mod"),
+            CreateModListItem("Second mod"),
+            CreateModListItem("Third mod")
+        ]);
+        var list = new ListBox
+        {
+            Width = 600,
+            Height = 320,
+            ItemsSource = mods
+        };
+        var window = ShowCanvas(700, 400, [(list, 20, 20)]);
+        list.SelectedItem = mods[1];
+        var focusedMod = mods[1];
+        var focusedRow = list.GetVisualDescendants()
+            .OfType<ListBoxItem>()
+            .Single(item => ReferenceEquals(item.DataContext, focusedMod));
+        Assert.True(focusedRow.Focus(NavigationMethod.Directional));
+
+        mods.Move(1, 0);
+        list.SelectedItem = focusedMod;
+        var restoreFocus = typeof(MainWindow).GetMethod(
+            "RestoreModFocus",
+            BindingFlags.Static | BindingFlags.NonPublic)!;
+        restoreFocus.Invoke(null, [list, focusedMod]);
+        Dispatcher.UIThread.RunJobs();
+
+        var focusedAfterMove = Assert.IsType<ListBoxItem>(window.FocusManager?.GetFocusedElement());
+        Assert.Same(focusedMod, focusedAfterMove.DataContext);
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void ActualSetupCanNavigateFromLuaBackendToGameDataAndBack()
     {
         var setup = new SetupWindow();
@@ -659,6 +695,15 @@ public class ControllerNavigationIntegrationTests
         ListBoxItem item => $"ListBoxItem:{item.DataContext}",
         _ => $"{control.GetType().Name}:{control.Name}"
     };
+
+    private static ModListItemViewModel CreateModListItem(string name) => new(
+        new ModEntry
+        {
+            Id = $"example/{name.Replace(' ', '-')}",
+            Name = name,
+            Directory = name
+        },
+        () => { });
 
     private static global::Avalonia.Point GetCenter(Control control, Control root)
     {
