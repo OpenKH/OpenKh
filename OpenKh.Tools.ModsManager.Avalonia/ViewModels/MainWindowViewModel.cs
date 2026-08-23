@@ -422,6 +422,7 @@ public sealed class MainWindowViewModel : ObservableObject
 
         try
         {
+            var replacingExistingMod = false;
             if (!request.Overwrite)
             {
                 var existingMod = _modInstaller.FindInstalledMod(
@@ -430,6 +431,7 @@ public sealed class MainWindowViewModel : ObservableObject
                     request.Branch);
                 if (existingMod is not null)
                 {
+                    replacingExistingMod = true;
                     var replace = await ConfirmReplacementAsync(existingMod);
                     if (!replace)
                         return;
@@ -461,6 +463,7 @@ public sealed class MainWindowViewModel : ObservableObject
                 }
                 catch (ModAlreadyInstalledException exception) when (!request.Overwrite)
                 {
+                    replacingExistingMod = true;
                     IsBusy = false;
                     var replace = await ConfirmReplacementAsync(exception.ModName);
                     if (!replace)
@@ -471,7 +474,10 @@ public sealed class MainWindowViewModel : ObservableObject
                     StatusText = $"Replacing {exception.ModName}";
                 }
             }
-            await RefreshAsync();
+            if (replacingExistingMod)
+                await RefreshAsync();
+            else
+                await RefreshInstalledModAsync(result.Id);
             SelectedMod = Mods.FirstOrDefault(mod =>
                 mod.Id.Equals(result.Id, StringComparison.OrdinalIgnoreCase));
             SetSuccessStatus($"{result.DisplayName} was installed successfully");
@@ -537,11 +543,19 @@ public sealed class MainWindowViewModel : ObservableObject
         if (!await _onlineModsPrompt.ShowAsync(
                 SelectedGame,
                 _allMods.Select(mod => mod.Id).ToArray(),
-                RefreshAsync))
+                RefreshInstalledModAsync))
             return;
 
         await RefreshAsync();
         SetSuccessStatus("Online mod installation completed");
+    }
+
+    private async Task RefreshInstalledModAsync(string modId)
+    {
+        _catalogService.MoveInstalledModToHighestPriority(SelectedGame, modId);
+        await RefreshAsync();
+        SelectedMod = Mods.FirstOrDefault(mod =>
+            mod.Id.Equals(modId, StringComparison.OrdinalIgnoreCase));
     }
 
     private async Task OpenPresetsAsync()

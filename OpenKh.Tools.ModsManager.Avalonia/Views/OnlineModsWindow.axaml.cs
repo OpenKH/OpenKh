@@ -15,7 +15,7 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
     private readonly RepositoryModInstaller? _installer;
     private readonly GameInfo? _game;
     private readonly IReadOnlyCollection<string> _installedIds = [];
-    private readonly Func<Task>? _onModInstalled;
+    private readonly Func<string, Task>? _onModInstalled;
     private readonly List<OnlineModItem> _allMods = [];
     private readonly ObservableCollection<OnlineModItem> _visibleMods = [];
     private readonly HashSet<string> _installedRepositories = new(StringComparer.OrdinalIgnoreCase);
@@ -36,7 +36,7 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
         RepositoryModInstaller installer,
         GameInfo game,
         IReadOnlyCollection<string> installedIds,
-        Func<Task> onModInstalled) : this()
+        Func<string, Task> onModInstalled) : this()
     {
         _catalog = catalog;
         _installer = installer;
@@ -183,11 +183,11 @@ public sealed partial class OnlineModsWindow : EmbeddedDialogControl
                     LoadingProgressBar.IsIndeterminate = true;
                 }
             });
-            await _installer.InstallAsync(selected.Repository, _game, progress: progress);
+            var result = await _installer.InstallAsync(selected.Repository, _game, progress: progress);
             _installedAny = true;
             _installedRepositories.Add(selected.Repository);
             if (_onModInstalled is not null)
-                await _onModInstalled();
+                await _onModInstalled(result.Id);
             var currentSelection = ModsList.SelectedItem as OnlineModItem;
             var installedIndex = _visibleMods.IndexOf(selected);
             _allMods.Remove(selected);

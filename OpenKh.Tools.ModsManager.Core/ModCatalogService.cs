@@ -35,6 +35,19 @@ public sealed class ModCatalogService
             orderedMods.Select(mod => mod.Id));
     }
 
+    public void MoveInstalledModToHighestPriority(GameInfo game, string modId)
+    {
+        var mods = Load(game);
+        var installedMod = mods.FirstOrDefault(mod =>
+            mod.Id.Equals(modId, StringComparison.OrdinalIgnoreCase));
+        if (installedMod is null)
+            return;
+
+        SaveEnabledOrder(
+            game,
+            new[] { installedMod }.Concat(mods.Where(mod => !ReferenceEquals(mod, installedMod))));
+    }
+
     private IReadOnlyList<ModEntry> Load(GameInfo game)
     {
         var enabledIds = ReadEnabledIds(game);

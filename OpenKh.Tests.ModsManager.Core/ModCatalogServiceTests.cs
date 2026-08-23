@@ -129,6 +129,32 @@ public sealed class ModCatalogServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task NewlyInstalledModMovesToHighestOpenKhPriority()
+    {
+        CreateMod("Author/ExistingFirst", "Existing first", "Author", "OpenKH");
+        CreateMod("Author/ExistingSecond", "Existing second", "Author", "OpenKH");
+        CreateMod("Author/PcPatch", "Legacy mod (KH2PCPATCH)", "Author", "Legacy");
+        var service = new ModCatalogService(
+            InstallationLayout.Detect("ignored", ["--data-root", _rootDirectory]));
+        var game = GameInfo.FromId("kh2");
+        service.SaveEnabledOrder(game, await service.LoadAsync(game));
+        CreateMod("Author/NewSeed", "New seed", "Author", "OpenKH");
+
+        service.MoveInstalledModToHighestPriority(game, "Author/NewSeed");
+        var mods = await service.LoadAsync(game);
+
+        Assert.Equal(
+            new[]
+            {
+                "Author/NewSeed",
+                "Author/ExistingFirst",
+                "Author/ExistingSecond",
+                "Author/PcPatch"
+            },
+            mods.Select(mod => mod.Id));
+    }
+
+    [Fact]
     public async Task LoadIncludesFilesModifiedByTheMod()
     {
         var modDirectory = Path.Combine(_rootDirectory, "mods", "kh2", "Author", "FilesMod");

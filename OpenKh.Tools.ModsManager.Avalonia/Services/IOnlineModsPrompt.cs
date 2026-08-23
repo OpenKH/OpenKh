@@ -7,5 +7,5 @@ public interface IOnlineModsPrompt
     Task<bool> ShowAsync(
         GameInfo game,
         IReadOnlyCollection<string> installedIds,
-        Func<Task> onModInstalled);
+        Func<string, Task> onModInstalled);
 }

@@ -13,7 +13,7 @@ public sealed class AvaloniaOnlineModsPrompt(
     public async Task<bool> ShowAsync(
         GameInfo game,
         IReadOnlyCollection<string> installedIds,
-        Func<Task> onModInstalled)
+        Func<string, Task> onModInstalled)
     {
         var window = new OnlineModsWindow(catalog, installer, game, installedIds, onModInstalled);
         using var capture = controller.Capture(
