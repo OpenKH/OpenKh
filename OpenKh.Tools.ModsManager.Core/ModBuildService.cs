@@ -41,6 +41,23 @@ public sealed class ModBuildService(ModManagerConfigurationService configuration
             using var stream = File.OpenRead(metadataFile);
             var metadata = Metadata.Read(stream);
             collectionSettings.TryGetValue(mod.Id, out var optionalAssets);
+            var progressLock = new object();
+            var lastReportedPercentage = -1;
+            void ReportPatchProgress(int completed, int total)
+            {
+                var modPercentage = total == 0 ? 100 : completed * 100 / total;
+                lock (progressLock)
+                {
+                    if (modPercentage <= lastReportedPercentage)
+                        return;
+
+                    lastReportedPercentage = modPercentage;
+                    var overallPercentage = (index + modPercentage / 100d) / enabledMods.Length;
+                    progress?.Report(new ModOperationProgress(
+                        $"Building {mod.Name}",
+                        overallPercentage));
+                }
+            }
             patcher.Patch(
                 Path.Combine(configuration.GameDataDirectory, game.Id),
                 outputDirectory,
@@ -52,7 +69,8 @@ public sealed class ModBuildService(ModManagerConfigurationService configuration
                 game.Id,
                 configuration.Current.PcReleaseLanguage,
                 false,
-                optionalAssets);
+                optionalAssets,
+                ReportPatchProgress);
         }
 
         using var writer = File.CreateText(Path.Combine(outputDirectory, "patch-package-map.txt"));

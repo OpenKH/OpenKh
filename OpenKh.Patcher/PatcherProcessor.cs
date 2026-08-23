@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using YamlDotNet.Serialization;
 
 namespace OpenKh.Patcher
@@ -48,9 +49,9 @@ namespace OpenKh.Patcher
                 DestinationPath = destinationPath;
             }
 
-            public string GetOriginalAssetPath(string path) => Path.Combine(OriginalAssetPath, path);
-            public string GetSourceModAssetPath(string path) => Path.Combine(SourceModAssetPath, path);
-            public string GetDestinationPath(string path) => Path.Combine(DestinationPath, path);
+            public string GetOriginalAssetPath(string path) => Path.Combine(OriginalAssetPath, NormalizeAssetPath(path));
+            public string GetSourceModAssetPath(string path) => Path.Combine(SourceModAssetPath, NormalizeAssetPath(path));
+            public string GetDestinationPath(string path) => Path.Combine(DestinationPath, NormalizeAssetPath(path));
             public void EnsureDirectoryExists(string fileName) => Directory.CreateDirectory(Path.GetDirectoryName(fileName));
             public void CopyOriginalFile(string fileName, string dstFile)
             {
@@ -62,6 +63,10 @@ namespace OpenKh.Patcher
                         File.Copy(originalFile, dstFile);
                 }
             }
+
+            private static string NormalizeAssetPath(string path) =>
+                path.Replace('\\', Path.DirectorySeparatorChar)
+                    .Replace('/', Path.DirectorySeparatorChar);
         }
 
         public void Patch(string originalAssets, string outputDir, string modFilePath)
@@ -95,7 +100,8 @@ namespace OpenKh.Patcher
             string LaunchGame = null,
             string Language = "en",
             bool Tests = false,
-            Dictionary<string, bool> collectionOptionalEnabledMods = null
+            Dictionary<string, bool> collectionOptionalEnabledMods = null,
+            Action<int, int> progress = null
         )
         {
             if (collectionOptionalEnabledMods == null)
@@ -112,15 +118,21 @@ namespace OpenKh.Patcher
                     return;
 
                 var exclusiveLock = new object();
-                metadata.Assets.AsParallel().ForAll(assetFile =>
+                var assets = metadata.Assets
+                    .Where(assetFile => assetFile.Game == null || assetFile.Game == LaunchGame)
+                    .Where(assetFile => assetFile.CollectionOptional != true ||
+                        collectionOptionalEnabledMods.TryGetValue(assetFile.Name, out var enabled) && enabled)
+                    .ToArray();
+                var progressMaximum = assets.Sum(assetFile =>
+                    1 + (assetFile.Multi?.Count(entry => !string.IsNullOrEmpty(entry.Name)) ?? 0));
+                var progressValue = 0;
+
+                void ReportProgress() => progress?.Invoke(
+                    Interlocked.Increment(ref progressValue),
+                    progressMaximum);
+
+                assets.AsParallel().ForAll(assetFile =>
                 {
-                    if (assetFile.Game != null && assetFile.Game != LaunchGame)
-                        return;
-                    if (assetFile.CollectionOptional == true)
-                        if (!collectionOptionalEnabledMods.ContainsKey(assetFile.Name))
-                            return;
-                        else if (!collectionOptionalEnabledMods[assetFile.Name])
-                            return;
                     var names = new List<string>();
                     names.Add(assetFile.Name);
                     if (assetFile.Multi != null)
@@ -132,7 +144,10 @@ namespace OpenKh.Patcher
                             assetFile.Platform = "both";
 
                         if (assetFile.Required && !File.Exists(context.GetOriginalAssetPath(name)))
+                        {
+                            ReportProgress();
                             continue;
+                        }
 
                         string _packageFile = null;
                         switch (LaunchGame)
@@ -178,17 +193,26 @@ namespace OpenKh.Patcher
                                 default:
                                 {
                                     if (assetFile.Platform.ToLower() == "pc")
+                                    {
+                                        ReportProgress();
                                         continue;
+                                    }
 
                                     else if (_pcFile)
+                                    {
+                                        ReportProgress();
                                         continue;
+                                    }
                                 }
                                 break;
 
                                 case 2:
                                 {
                                     if (assetFile.Platform.ToLower() == "ps2")
+                                    {
+                                        ReportProgress();
                                         continue;
+                                    }
 
                                     if (assetFile.Platform.ToLower() != "ps2")
                                         packageMapLocation = _packageFile + "/" + _extraPath + name;
@@ -205,7 +229,7 @@ namespace OpenKh.Patcher
                             // Protect against multiple mods having the same file where one uses forward slash and one uses backslash
                             lock (exclusiveLock)
                             {
-                                packageMap[name.Replace("\\", "/")] = packageMapLocation;
+                                packageMap[name.Replace("\\", "/")] = packageMapLocation.Replace("\\", "/");
                             }
                         }
 
@@ -345,6 +369,7 @@ namespace OpenKh.Patcher
                         catch (IOException) { }
                         //This is here so the user does not have to close Mod Manager to see what the warnings were if any. Helpful especially on PC since the build window closes after build unlike emulator where it stays open during mod injection.
                         Log.Flush();
+                        ReportProgress();
                     }
                 });
             }

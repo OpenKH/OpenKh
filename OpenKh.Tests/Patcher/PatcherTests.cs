@@ -71,6 +71,59 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
+        public void Kh2CopyBinariesAcceptsWindowsSeparatorsOnEveryPlatform()
+        {
+            var patcher = new PatcherProcessor();
+            var packageMap = new Dictionary<string, string>();
+            var progressValues = new List<(int Value, int Maximum)>();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "somedir\\nested\\somefile.bin",
+                        Multi = new List<Multi>
+                        {
+                            new Multi
+                            {
+                                Name = "somedir\\nested\\second.bin"
+                            }
+                        },
+                        Method = "copy",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "somedir\\nested\\somefile.bin"
+                            }
+                        }
+                    }
+                }
+            };
+
+            CreateFile(ModInputDir, "somedir", "nested", "somefile.bin").Dispose();
+
+            patcher.Patch(
+                AssetsInputDir,
+                ModOutputDir,
+                patch,
+                ModInputDir,
+                platform: 2,
+                packageMap: packageMap,
+                LaunchGame: "kh2",
+                Tests: true,
+                progress: (value, maximum) => progressValues.Add((value, maximum)));
+
+            AssertFileExists(ModOutputDir, "somedir", "nested", "somefile.bin");
+            AssertFileExists(ModOutputDir, "somedir", "nested", "second.bin");
+            Assert.Equal(
+                "kh2_first/original/somedir/nested/somefile.bin",
+                packageMap["somedir/nested/somefile.bin"]);
+            Assert.Equal([(1, 2), (2, 2)], progressValues);
+        }
+
+        [Fact]
         public void Kh2CreateBinArcIfSourceDoesntExistsTest()
         {
             var patcher = new PatcherProcessor();
