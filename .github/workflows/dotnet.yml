@@ -172,6 +172,26 @@ jobs:
         name: openkh-linux-layout
         path: openkh-linux-x64
 
+    - name: Build portable Linux archive
+      shell: bash
+      run: |
+        chmod +x \
+          openkh-linux-x64/OpenKh.Launcher \
+          openkh-linux-x64/Apps/OpenKh.Tools.ModsManager \
+          openkh-linux-x64/install-openkh-linux.sh
+        tar -czf openkh-linux-x64.tar.gz openkh-linux-x64
+
+    - name: Validate portable Linux archive
+      shell: bash
+      run: |
+        archive_root="$RUNNER_TEMP/openkh-tar-test"
+        mkdir -p "$archive_root"
+        tar -xzf openkh-linux-x64.tar.gz -C "$archive_root"
+        test -x "$archive_root/openkh-linux-x64/OpenKh.Launcher"
+        test -x "$archive_root/openkh-linux-x64/Apps/OpenKh.Tools.ModsManager"
+        test -x "$archive_root/openkh-linux-x64/install-openkh-linux.sh"
+        test -f "$archive_root/openkh-linux-x64/Apps/OpenKH.Panacea.dll"
+
     - name: Install AppImage build dependencies
       run: |
         sudo apt-get update
@@ -227,15 +247,22 @@ jobs:
         path: openkh-x86_64.AppImage
         if-no-files-found: error
 
+    - name: Upload portable Linux archive
+      uses: actions/upload-artifact@v4
+      with:
+        name: openkh-linux-tarball
+        path: openkh-linux-x64.tar.gz
+        if-no-files-found: error
+
     - name: Add AppImage to latest release
       if: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
       env:
         GH_TOKEN: ${{ github.token }}
-      run: gh release upload latest openkh-x86_64.AppImage --clobber
+      run: gh release upload latest openkh-x86_64.AppImage openkh-linux-x64.tar.gz --clobber
 
     - name: Add AppImage to numbered release
       if: ${{ github.event_name == 'push' }}
       env:
         GH_TOKEN: ${{ github.token }}
         RELEASE_TAG: release2-${{ github.run_number }}
-      run: gh release upload "$RELEASE_TAG" openkh-x86_64.AppImage --clobber
+      run: gh release upload "$RELEASE_TAG" openkh-x86_64.AppImage openkh-linux-x64.tar.gz --clobber

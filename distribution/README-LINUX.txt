@@ -13,8 +13,8 @@ The AppImage contains both the Launcher and Mod Manager. Settings, installed
 mods, and extracted game data are stored in $XDG_DATA_HOME/OpenKH or, when that
 variable is not set, $HOME/.local/share/OpenKH.
 
-PORTABLE ZIP
-------------
+PORTABLE TAR.GZ
+---------------
 
 Open a terminal in this folder and run:
 
