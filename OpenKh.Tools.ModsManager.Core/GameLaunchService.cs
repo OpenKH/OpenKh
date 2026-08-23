@@ -162,7 +162,8 @@ public sealed class GameLaunchService(ModManagerConfigurationService configurati
                 .Select(line => line.Split('=', 2))
                 .ToDictionary(parts => parts[0].Trim(), parts => parts[1].Trim(), StringComparer.OrdinalIgnoreCase)
             : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        values["mod_path"] = Path.GetFullPath(Path.Combine(configuration.GetGameModOutputDirectory(game), ".."));
+        values["mod_path"] = PanaceaPath.ToLoaderPath(
+            Path.GetFullPath(Path.Combine(configuration.GetGameModOutputDirectory(game), "..")));
         values["show_console"] = configuration.Current.ShowConsole.ToString().ToLowerInvariant();
         values["quick_launch"] = game.Id;
         File.WriteAllLines(settingsPath, values.Select(value => $"{value.Key}={value.Value}"));

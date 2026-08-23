@@ -41,6 +41,18 @@ public sealed class SetupServicesTests : IDisposable
         Assert.Equal("en", configuration.PcReleaseLanguage);
     }
 
+    [Theory]
+    [InlineData("/home/deck/.local/share/OpenKH/mod", true, "Z:\\home\\deck\\.local\\share\\OpenKH\\mod")]
+    [InlineData("/run/media/deck/SD Card/OpenKH/mod", true, "Z:\\run\\media\\deck\\SD Card\\OpenKH\\mod")]
+    [InlineData("C:\\OpenKH\\mod", false, "C:\\OpenKH\\mod")]
+    public void PanaceaUsesAPathVisibleToItsWindowsProcess(
+        string path,
+        bool isLinux,
+        string expected)
+    {
+        Assert.Equal(expected, PanaceaPath.ToLoaderPath(path, isLinux));
+    }
+
     [Fact]
     public void LegacyGameEngineConfigurationIsMigratedToPcRelease()
     {
@@ -267,7 +279,7 @@ public sealed class SetupServicesTests : IDisposable
         Assert.True(File.Exists(Path.Combine(gameDirectory, OperatingSystem.IsWindows() ? "DBGHELP.dll" : "version.dll")));
         Assert.Equal(gameDirectory, service.Current.PcReleaseLocation);
         Assert.Contains(
-            $"mod_path={compiledModsDirectory}",
+            $"mod_path={PanaceaPath.ToLoaderPath(compiledModsDirectory)}",
             File.ReadAllLines(Path.Combine(gameDirectory, "panacea_settings.txt")));
 
         await panacea.RemoveAsync(false, gameDirectory);

@@ -102,7 +102,7 @@ public sealed class PanaceaService(ModManagerConfigurationService configuration)
                 .Select(line => line.Split('=', 2))
                 .ToDictionary(parts => parts[0].Trim(), parts => parts[1].Trim(), StringComparer.OrdinalIgnoreCase)
             : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        values["mod_path"] = configuration.CompiledModsRoot;
+        values["mod_path"] = PanaceaPath.ToLoaderPath(configuration.CompiledModsRoot);
         values["show_console"] = configuration.Current.ShowConsole.ToString().ToLowerInvariant();
         values["debug_log"] = configuration.Current.DebugLog.ToString().ToLowerInvariant();
         values["sound_debug"] = configuration.Current.SoundDebug.ToString().ToLowerInvariant();
@@ -147,7 +147,7 @@ public sealed class PanaceaService(ModManagerConfigurationService configuration)
         var settingsFile = Path.Combine(releaseDirectory, "panacea_settings.txt");
         File.WriteAllLines(settingsFile,
         [
-            $"mod_path={configuration.CompiledModsRoot}",
+            $"mod_path={PanaceaPath.ToLoaderPath(configuration.CompiledModsRoot)}",
             $"show_console={configuration.Current.ShowConsole.ToString().ToLowerInvariant()}"
         ]);
         configuration.Current.PanaceaInstalled = true;
