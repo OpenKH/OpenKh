@@ -217,6 +217,7 @@ namespace OpenKh.Bbs
             [Data] public int Archive4Sector { get; set; }
             public Partition<PartitionFileEntry>[] Partitions { get; set; }
             public Directory[] _directories;
+            public DirectoryEntry[] DirectoryEntries { get; set; } = Array.Empty<DirectoryEntry>();
         }
 
         protected class ArchivePartitionHeader
@@ -251,6 +252,14 @@ namespace OpenKh.Bbs
                     .Select(x => DirectoryEntry.Read(stream)).ToArray();
 
                 return dir;
+            }
+
+            internal static DirectoryEntry[] ReadAll(Stream stream, int baseOffset, int DirEntriescount)
+            {
+                stream.Position = baseOffset;
+
+                return Enumerable.Range(0, DirEntriescount)
+                    .Select(x => DirectoryEntry.Read(stream)).ToArray();
             }
         }
         public class DirectoryEntry
@@ -290,9 +299,9 @@ namespace OpenKh.Bbs
             _header.Partitions = ReadPartitions<PartitionFileEntry>(stream, 0x30, _header.PartitionCount);
             ReadPartitionLba(_header.Partitions, stream, _header.PartitionOffset);
 
+            _header.DirectoryEntries = Directory.ReadAll(stream, _header.DirectoryOffset, _header.DirectoryEntriesCount);
             _header._directories = Enumerable.Range(0, _header.DirectoryCount)
                     .Select(x => Directory.Read(stream, _header.DirectoryOffset, x, _header.DirectoryEntriesCount, _header.DirectoryCount)).ToArray();
-
 
             int header2Offset = _header.ArchivePartitionSector * 0x800;
             stream.Position = header2Offset;
@@ -615,7 +624,36 @@ namespace OpenKh.Bbs
                             file.Offset==0?0:GetArchiveIndex(_header, file.Offset));
                     }
                 }
+
+                foreach (var file in GetDirectoryEntryTail())
+                {
+                    NameDictionary.TryGetValue(file.FileHash, out var fileName);
+                    NameDictionary.TryGetValue(file.DirectoryHash, out var folderName);
+
+                    yield return new Entry(
+                        this,
+                        file.Offset,
+                        file.Size,
+                        fileName,
+                        "",
+                        folderName,
+                        file.FileHash,
+                        file.DirectoryHash,
+                        (uint)file.LocationOffset,
+                        file.Offset==0?0:GetArchiveIndex(_header, file.Offset));
+                }
             }
+        }
+
+        private IEnumerable<DirectoryEntry> GetDirectoryEntryTail()
+        {
+            if (_header.DirectoryCount == 0)
+                return _header.DirectoryEntries;
+
+            int entriesPerDirectory = _header.DirectoryEntriesCount / _header.DirectoryCount;
+            int groupedEntriesCount = entriesPerDirectory * _header.DirectoryCount;
+
+            return _header.DirectoryEntries.Skip(groupedEntriesCount);
         }
 
         public int GetOffset(string fileName)
