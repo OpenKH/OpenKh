@@ -6,6 +6,7 @@ using OpenKh.Tools.Kh2MdlxEditor.ViewModels;
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -110,7 +111,14 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         }
         private void Side_Texture(object sender, EventArgs e)
         {
-            contentFrame.Content = new TextureFile_Control(mainVM.TextureFile);
+            LoadTextureControl();
+        }
+        private void LoadTextureControl()
+        {
+            if (mainVM != null && mainVM.TextureFile != null)
+            {
+                contentFrame.Content = new TextureFile_Control(mainVM.TextureFile, mainVM, LoadTextureControl);
+            }
         }
         private void Side_Collision(object sender, EventArgs e)
         {
@@ -187,12 +195,15 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 sfd.ShowDialog();
                 if (sfd.FileName != "")
                 {
-                    string dirPath = System.IO.Path.GetDirectoryName(sfd.FileName);
+
+                    string dirPath;
+
+                    dirPath = Path.GetDirectoryName(sfd.FileName);
 
                     if (!Directory.Exists(dirPath))
                         return;
 
-                    dirPath += "\\";
+                    dirPath += Path.DirectorySeparatorChar;
 
                     AssimpGeneric.ExportScene(scene, fileFormat, sfd.FileName);
                     exportTextures(dirPath);
@@ -206,8 +217,10 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 ModelTexture.Texture texture = mainVM.TextureFile.Images[i];
                 BitmapSource bitmapImage = texture.GetBimapSource();
 
-                string fullPath = filePath + "Texture" + i.ToString("D4");
+                string fileName = "Texture" + i.ToString("D4");
+                string fullPath = filePath + fileName;
                 string finalPath = fullPath;
+
                 int repeat = 0;
                 while (File.Exists(finalPath))
                 {
@@ -215,7 +228,18 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                     finalPath = fullPath + " (" + repeat + ")";
                 }
 
-                AssimpGeneric.ExportBitmapSourceAsPng(bitmapImage, fullPath);
+                finalPath = Path.GetFullPath(finalPath);
+
+                var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
+
+                if (!finalPath.StartsWith(Path.GetFullPath(filePath + Path.DirectorySeparatorChar), comparison))
+                {
+                    throw new Exception($"The file {fileName} is outside the output directory");
+                }
+
+                AssimpGeneric.ExportBitmapSourceAsPng(bitmapImage, finalPath);
             }
         }
         public void reloadModelControl()

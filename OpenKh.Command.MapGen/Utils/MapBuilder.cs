@@ -36,6 +36,17 @@ namespace OpenKh.Command.MapGen.Utils
 
             var singleFaces = ConvertModelIntoFaces(modelFile, config);
 
+            // Apply explicit material priority ordering from mapdef.yml.
+            // Faces whose material has a priority set come first (ascending),
+            // followed by unprioritized faces in their original order.
+            singleFaces = singleFaces
+                .Select((face, originalIndex) => (face, originalIndex))
+                .OrderBy(x => x.face.matDef.priority.HasValue ? 0 : 1)
+                .ThenBy(x => x.face.matDef.priority ?? 0)
+                .ThenBy(x => x.originalIndex)
+                .Select(x => x.face)
+                .ToList();
+
             logger.Debug($"Loading process has done.");
 
             logger.Debug($"Starting MapBuilding.");
@@ -51,7 +62,7 @@ namespace OpenKh.Command.MapGen.Utils
             }
             else if (config.disableBSPCollisionBuilder)
             {
-                logger.Debug($"Running flatten doct builder.");
+                logger.Debug($"Running flatten doct builder (Legacy.)");
 
                 doctBuilt = new FlattenDoctBuilder(
                     new BSPNodeSplitter(
@@ -68,9 +79,9 @@ namespace OpenKh.Command.MapGen.Utils
             }
             else if (config.disableBSPCollisionBuilder2)
             {
-                logger.Debug($"Running flatten doct builder.");
+                logger.Debug($"Running flatten doct builder (with group support.)");
 
-                doctBuilt = new FlattenDoctBuilder(
+                doctBuilt = new FlattenDoctBuilderAlt(
                     new BSPNodeSplitter(
                         singleFaces
                             .Where(it => !it.matDef.nodraw),
@@ -226,15 +237,30 @@ namespace OpenKh.Command.MapGen.Utils
                         }
                     );
 
-                    return config.disableBSPCollisionBuilder
-                        ? new FlattenCollisionBuilder(
-                            splitter,
-                            matDef => matDef.surfaceFlags
-                        )
-                        : new HierarchicalCollisionBuilder(
+                    if (config.disableBSPCollisionBuilder2)
+                    {
+                        // Use the logic for the "group" value when disableBSPCollisionBuilder2 is set
+                        return new FlattenCollisionBuilderAlt(
                             splitter,
                             matDef => matDef.surfaceFlags
                         );
+                    }
+                    else if (config.disableBSPCollisionBuilder)
+                    {
+                        // Use the existing logic for disabling BSP collision builder
+                        return new FlattenCollisionBuilder(
+                            splitter,
+                            matDef => matDef.surfaceFlags
+                        );
+                    }
+                    else
+                    {
+                        // Default to the hierarchical collision builder
+                        return new HierarchicalCollisionBuilder(
+                            splitter,
+                            matDef => matDef.surfaceFlags
+                        );
+                    }
                 }
 
                 {

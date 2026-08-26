@@ -57,9 +57,21 @@ namespace OpenKh.Command.SpawnScript
 
             protected int OnExecute(CommandLineApplication app)
             {
-                OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), $"{Path.GetFileNameWithoutExtension(InputPath)}.txt");
-                var spawnScript = File.OpenRead(InputPath).Using(AreaDataScript.Read);
-                File.WriteAllText(OutputPath, AreaDataScript.Decompile(spawnScript));
+                var OutputName = $"{Path.GetFileNameWithoutExtension(InputPath)}.txt";
+                var InputBaseDir = Path.GetDirectoryName(InputPath);
+                if (String.IsNullOrEmpty(InputBaseDir))
+                {
+                    InputBaseDir = Environment.CurrentDirectory;
+                }
+                OutputPath ??= Path.Combine(InputBaseDir, OutputName);
+                if (!String.IsNullOrEmpty(OutputPath))
+                {
+                    var spawnScript = File.OpenRead(InputPath).Using(AreaDataScript.Read);
+
+                    var fullPath = Path.GetFullPath(OutputPath);
+
+                    File.WriteAllText(fullPath, AreaDataScript.Decompile(spawnScript));
+                }
                 return 0;
             }
         }
@@ -76,9 +88,22 @@ namespace OpenKh.Command.SpawnScript
 
             protected int OnExecute(CommandLineApplication app)
             {
-                OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), $"{Path.GetFileNameWithoutExtension(InputPath)}.spawnscript");
-                var spawnScript = AreaDataScript.Compile(File.ReadAllText(InputPath));
-                File.Create(OutputPath).Using(stream => AreaDataScript.Write(stream, spawnScript));
+                var OutputName = $"{Path.GetFileNameWithoutExtension(InputPath)}.spawnscript";
+                var InputBaseDir = Path.GetDirectoryName(InputPath);
+                if (String.IsNullOrEmpty(InputBaseDir))
+                {
+                    InputBaseDir = Environment.CurrentDirectory;
+                }
+                OutputPath ??= Path.Combine(InputBaseDir, OutputName);
+                if (!String.IsNullOrEmpty(OutputPath))
+                {
+                    var spawnScript = AreaDataScript.Compile(File.ReadAllText(InputPath));
+                    
+                    var fullPath = Path.GetFullPath(OutputPath);
+
+                    using var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                    AreaDataScript.Write(stream, spawnScript);
+                }
                 return 0;
             }
         }

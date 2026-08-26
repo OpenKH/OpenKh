@@ -64,8 +64,22 @@ jobs:
         
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
+    #- name: Autobuild
+    #  uses: github/codeql-action/autobuild@v3
+
+    # Note that direct use of `github/codeql-action/autobuild@v3` is not recommended. Try to use `dotnet build` or `msbuild` instead.
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Restore NuGet packages
+      run: nuget restore OpenKh.sln
+
+    - name: Build solution (MSBuild)
+      run: msbuild OpenKh.sln /m /t:Build /p:Configuration=Release /p:Platform="Any CPU"
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun

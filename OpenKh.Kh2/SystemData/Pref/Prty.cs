@@ -1,9 +1,65 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.SystemData
 {
+    public class PrtyFile
+    {
+        public int Count { get; set; }
+        public int[] Offsets { get; set; }
+        public Dictionary<int, Prty> UniqueEntries { get; set; }
+
+        public static PrtyFile Read(Stream stream)
+        {
+            stream.Position = 0;
+            var reader = new BinaryReader(stream, Encoding.Default, true);
+
+            int count = reader.ReadInt32();
+
+            var offsets = new int[count];
+            for (int i = 0; i < count; i++)
+                offsets[i] = reader.ReadInt32();
+
+            var unique = new Dictionary<int, Prty>();
+
+            foreach (var offset in offsets.Skip(1).Distinct())
+            {
+                stream.Position = offset;
+                var entry = BinaryMapping.ReadObject<Prty>(stream);
+                unique[offset] = entry;
+            }
+
+            return new PrtyFile
+            {
+                Count = count,
+                Offsets = offsets,
+                UniqueEntries = unique
+            };
+        }
+
+        public void Write(Stream stream)
+        {
+            stream.SetLength(0);
+            stream.Position = 0;
+
+            var writer = new BinaryWriter(stream, Encoding.Default, true);
+
+            writer.Write(Count);
+
+            foreach (var offset in Offsets)
+                writer.Write(offset);
+
+            foreach (var kvp in UniqueEntries)
+            {
+                stream.Position = kvp.Key;
+                BinaryMapping.WriteObject(stream, kvp.Value);
+            }
+        }
+    }
+
     public class Prty
     {
         //Structure: 0x4 bytes for Count, then for Count, offsets pointing to different characters in the file. 
@@ -67,8 +123,9 @@ namespace OpenKh.Kh2.SystemData
             {"LimitForm", 33}
         };
 
-		//Read/Write doesn't currently work. 
+        //Read/Write doesn't currently work. 
 
+        /*
         public static (List<Prty> Items, List<int> Offsets) Read(Stream stream)
         {
             return BaseTableOffsetWithPaddings<Prty>.ReadWithOffsets(stream);
@@ -78,6 +135,6 @@ namespace OpenKh.Kh2.SystemData
         {
             BaseTableOffsetWithPaddings<Prty>.WriteWithOffsets(stream, entries, originalOffsets);
         }
-
+        */
     }
 }

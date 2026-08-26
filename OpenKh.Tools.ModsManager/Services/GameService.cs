@@ -19,6 +19,8 @@ namespace OpenKh.Tools.ModsManager.Services
                 UniqueFileName = "btltbl.bin",
                 Detectors = new()
                 {
+                    new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPS_251.05;1" },
+                    new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLUS_203.70;1" },
                     new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPS_251.97;1" },
                     new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPS_251.98;1" },
                 }
@@ -39,6 +41,17 @@ namespace OpenKh.Tools.ModsManager.Services
                     new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPM_666.75;1" },
                 }
             },
+            new GameInfoModel()
+            {
+                Id = "Recom",
+                Name = "Kingdom Hearts Re:Chain of Memories",
+                UniqueFileName = "CST_sora.pss",
+                Detectors = new()
+                {
+                    new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPM_666.76;1" },
+                    new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLUS_217.99;1" },
+                }
+            }
         };
 
         public static GameInfoModel DetectGameId(string isoFilePath)

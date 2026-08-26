@@ -125,7 +125,7 @@ namespace OpenKh.Command.IdxImg
 
                 [Required]
                 [Option(ShortName = "g", LongName = "game_id", Description = "Which game to patch for")]
-                [AllowedValues("kh1", "kh2", "bbs", "Recom", "kh3d")]
+                [McMaster.Extensions.CommandLineUtils.AllowedValues("kh1", "kh2", "bbs", "Recom", "kh3d")]
                 public string GameId { get; }
 
                 protected int OnExecute(CommandLineApplication app)
@@ -138,7 +138,7 @@ namespace OpenKh.Command.IdxImg
 
                     var map = new ConcurrentDictionary<string, string>();
                     var patcher = new PatcherProcessor();
-                    foreach (var mod_name in enabled.Reverse())
+                    foreach (var mod_name in enabled.AsEnumerable().Reverse())
                     {
                         var mod_folder = Path.Combine(ModsFolder, mod_name);
                         var metadata = File.OpenRead(Path.Combine(mod_folder, "mod.yml")).Using(Metadata.Read);

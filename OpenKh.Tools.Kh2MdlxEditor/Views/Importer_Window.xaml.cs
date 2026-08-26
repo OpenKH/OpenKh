@@ -1,3 +1,4 @@
+using OpenKh.Tools.Kh2MdlxEditor.Utils;
 using OpenKh.Tools.Kh2MdlxEditor.ViewModels;
 using System;
 using System.Linq;
@@ -71,6 +72,11 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
             try
             {
                 ErrorMessage.Content = "Loading...";
+
+                // Set the static flags based on checkbox states
+                MdlxEditorImporter.KEEP_ORIGINAL_SHADOW = importerVM.KeepShadow;
+                MdlxEditorImporter.KEEP_ORIGINAL_SKELETON = importerVM.KeepSkeleton;
+
                 importerVM.ImportModel();
                 ErrorMessage.Content = "Finished";
                 if (mainWindow != null)

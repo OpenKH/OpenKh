@@ -8,6 +8,7 @@
 
 ## Dictionaries
 
-  * [Mdls](dictionary/mdls.md)
+  * [Character models (MDLS files)](dictionary/mdls.md)
+  * [Weapon models (WPN files)](dictionary/wpn.md)
   * [Inventory](dictionary/inventory.md)
   * [Commands](dictionary/command.md)

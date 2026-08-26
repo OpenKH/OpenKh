@@ -2,26 +2,27 @@
 
 | Id | World |
 |----|-------|
-| AL | Agrabah
-| AW | Wonderland
-| DC | Disney Castle
-| DH | Dive to Heart
-| DI | Destiny Island
-| EW | End of the World
-| GB | Unknown
-| HE | Olympus Coliseum
-| LM | Atlantica
-| NM | Halloweentown
-| PC | Hollow Bastion
-| PI | Monstro
-| PO | 100 Acre Wood
-| PP | Neverland
-| TW | Traverse Town
-| TZ | Deep Jungle
-| ZZ | Miscellaneous
+| AL | Agrabah |
+| AW | Wonderland |
+| DC | Disney Castle |
+| DH | Dive to the Heart |
+| DI | Destiny Islands |
+| EW | End of the World |
+| GB | Unknown |
+| HE | Olympus Coliseum |
+| LM | Atlantica |
+| NM | Halloween Town |
+| PC | Hollow Bastion |
+| PI | Monstro |
+| PO | 100 Acre Wood |
+| PP | Neverland |
+| TW | Traverse Town |
+| TZ | Deep Jungle |
+| ZZ | Miscellaneous |
 
 Agrabah
-| Filename | Area | 
+
+| Filename | Area |
 |----------|-----------|
 | al00_01.bin | Desert |
 | al00_02.bin | Agrabah |
@@ -34,7 +35,8 @@ Agrabah
 | al00_09.bin | Cave: Escape |
 
 Wonderland
-| Filename | Area | 
+
+| Filename | Area |
 |----------|-----------|
 | aw00_01.bin | Rabbit Hole |
 | aw00_02.bin | Bizzare Room |
@@ -46,22 +48,25 @@ Wonderland
 | aw00_08.bin | Tiny Party Garden |
 
 Disney Castle
-| Filename | Area | 
+
+| Filename | Area |
 |----------|-----------|
 | dc00_01.bin | Audience Chamber |
 | dc00_02.bin | Courtyard |
 | dc00_03.bin | Gummi Hangar |
 | dc00_04.bin | Epilogue |
 
-Dive to Heart
-| Filename | Area | 
+Dive to the Heart
+
+| Filename | Area |
 |----------|-----------|
 | dh00_01.bin | Awakening |
 | dh00_02.bin | Awakening (Boss) |
 | dh00_03.bin | Seashore |
 
-Destiny Island
-| Filename | Area | 
+Destiny Islands
+
+| Filename | Area |
 |----------|-----------|
 | di00_01.bin | Seashore |
 | di00_02.bin | Cove |
@@ -73,7 +78,8 @@ Destiny Island
 | di00_08.bin | Secret Place (Past) |
 
 End of the World
-| Filename | Area | 
+
+| Filename | Area |
 |----------|-----------|
 | ew00_01.bin | Gate to the Dark |
 | ew00_02.bin | Giant Crevasse |
@@ -84,19 +90,20 @@ End of the World
 | ew00_07.bin | Deep Jungle (World Terminus) |
 | ew00_08.bin | Agrabah (World Terminus) |
 | ew00_09.bin | Atlantica (World Terminus) |
-| ew00_10.bin | Halloweentown (World Terminus) |
+| ew00_10.bin | Halloween Town (World Terminus) |
 | ew00_11.bin | Neverland (World Terminus) |
 | ew00_12.bin | 100 Acre Wood (World Terminus) |
 | ew00_13.bin | Laboratory (World Terminus) |
 | ew00_14.bin | Volcanic Crater |
-| ew00_15.bin | Homecoming (Boss)-Destroyed Islands |
+| ew00_15.bin | Homecoming (Boss) - Destroyed Islands |
 | ew00_16.bin | Seashore |
 | ew00_17.bin | Door to Darkness |
 | ew00_18.bin | The Void (Final Boss) |
 | ew00_19.bin | Homecoming (Purple Dark Water) |
 
 Olympus Coliseum
-| Filename | Area | 
+
+| Filename | Area |
 |----------|-----------|
 | he00_01.bin | Coliseum Gates |
 | he00_02.bin | Coliseum: Arena |
@@ -105,7 +112,8 @@ Olympus Coliseum
 | he00_05.bin | Coliseum: Arena (Boss)  |
 
 Atlantica
-| Filename | Area | 
+
+| Filename | Area |
 |----------|-----------|
 | lm00_01.bin | Undersea Valley |
 | lm00_02.bin | Undersea Gorge |
@@ -125,8 +133,9 @@ Atlantica
 | lm00_16.bin | Undersea Valley (Beta) |
 | lm00_17.bin | Undersea Valley (Beta) |
 
-Halloweentown
-| Filename | Area | 
+Halloween Town
+
+| Filename | Area |
 |----------|-----------|
 | nm00_01.bin | Guillotine Square |
 | nm00_02.bin | Moonlight Hill |
@@ -137,7 +146,8 @@ Halloweentown
 | nm00_07.bin | Research Lab |
 
 Hollow Bastion
-| Filename | Area | 
+
+| Filename | Area |
 |----------|-----------|
 | pc00_01.bin | Rising Falls |
 | pc00_02.bin | Castle Gates |
@@ -153,7 +163,8 @@ Hollow Bastion
 | pc00_12.bin | Castle Chapel (Cutscene) |
 
 Monstro
-| Filename | Area | 
+
+| Filename | Area |
 |----------|-----------|
 | pi00_01.bin | Mouth |
 | pi00_02.bin | Mouth (Low Water) |
@@ -161,7 +172,8 @@ Monstro
 | pi00_04.bin | Chambers |
 
 100 Acre Wood
-| Filename | Area | 
+
+| Filename | Area |
 |----------|-----------|
 | po00_01.bin | Pooh's House |
 | po00_02.bin | Rabbit's House |
@@ -174,7 +186,8 @@ Monstro
 | po00_09.bin | 100 Acre Wood (Opened Book) |
 
 Neverland
-| Filename | Area | 
+
+| Filename | Area |
 |----------|-----------|
 | pp00_01.bin | Ship: Hold |
 | pp00_02.bin | Pirate Ship |
@@ -182,7 +195,8 @@ Neverland
 | pp00_04.bin | Clock Tower (Beta) |
 
 Traverse Town
-| Filename | Area | 
+
+| Filename | Area |
 |----------|-----------|
 | tw00_01.bin | 1st District |
 | tw00_02.bin | 2nd District |
@@ -199,7 +213,8 @@ Traverse Town
 | tw00_13.bin | 3rd District (Small House) |
 
 Deep Jungle
-| Filename | Area | 
+
+| Filename | Area |
 |----------|-----------|
 | tz00_01.bin | Tree House |
 | tz00_02.bin | Camp |

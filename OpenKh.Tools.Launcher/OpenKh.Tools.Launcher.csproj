@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>OpenKh.Launcher</AssemblyName>
+    <RootNamespace>OpenKh.Tools.Launcher</RootNamespace>
+    <AssemblyTitle>OpenKH Launcher</AssemblyTitle>
+    <Product>OpenKH Launcher</Product>
+    <Authors>OpenKH contributors</Authors>
+    <Company>OpenKH</Company>
+    <Description>Start OpenKH applications from one organized place.</Description>
+    <ApplicationIcon>..\images\openKH_Old.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="..\images\OpenKH.png" Link="Assets\OpenKH.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Octokit" Version="14.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\OpenKh.Tools.ModsManager\Services\OpenkhInstallation.cs" Link="Updates\OpenkhInstallation.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Services\OpenkhUpdateCheckerService.cs" Link="Updates\OpenkhUpdateCheckerService.cs" />
+    <Compile Include="..\OpenKh.Tools.ModsManager\Services\OpenkhUpdateProceederService.cs" Link="Updates\OpenkhUpdateProceederService.cs" />
+  </ItemGroup>
+
+</Project>

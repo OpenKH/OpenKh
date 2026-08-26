@@ -1,17 +1,17 @@
+using Assimp;
+using McMaster.Extensions.CommandLineUtils;
+using OpenKh.Bbs;
+using OpenKh.Common.Utils;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Parsers;
 using OpenKh.Imaging;
-
 using System;
-using McMaster.Extensions.CommandLineUtils;
-using System.IO;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations;
-using OpenKh.Bbs;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Numerics;
-using OpenKh.Common.Utils;
-using Assimp;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace OpenKh.Command.PmpConverter
 {
@@ -67,7 +67,6 @@ namespace OpenKh.Command.PmpConverter
             Pmp pmp = MeshGroupList2PMP(p);
             using Stream stream = File.Create(fileOut);
             Pmp.Write(stream, pmp);
-            stream.Close();
         }
 
         private static Pmp MeshGroupList2PMP(List<MeshGroup> meshGroup)
@@ -118,10 +117,10 @@ namespace OpenKh.Command.PmpConverter
                     // Set extra flags.
                     if (UsesUniformColor)
                     {
-                        var UniformColor = (uint)(desc.Vertices[0].A / 255f);
-                        UniformColor += (uint)(desc.Vertices[0].B / 255f) << 8;
-                        UniformColor += (uint)(desc.Vertices[0].G / 255f) << 16;
-                        UniformColor += (uint)(desc.Vertices[0].R / 255f) << 24;
+                        var UniformColor = (uint)(desc.Vertices[0].A * 255f);
+                        UniformColor |= (uint)(desc.Vertices[0].B * 255f) << 8;
+                        UniformColor |= (uint)(desc.Vertices[0].G * 255f) << 16;
+                        UniformColor |= (uint)(desc.Vertices[0].R * 255f) << 24;
                         chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBit(chunk.SectionInfo.VertexFlags, 24, true);
                         chunk.SectionInfo_opt2 = new Pmo.MeshSectionOptional2();
                         chunk.SectionInfo_opt2.DiffuseColor = UniformColor;
@@ -331,17 +330,40 @@ namespace OpenKh.Command.PmpConverter
             var assimp = new Assimp.AssimpContext();
             var scene = assimp.ImportFile(filePath, Assimp.PostProcessSteps.PreTransformVertices);
             var baseFilePath = Path.GetDirectoryName(filePath);
+            if (String.IsNullOrEmpty(baseFilePath))
+            {
+                baseFilePath = ".";
+            }
             TexList = new List<string>();
             TextureData = new List<Tm2>();
 
             foreach (Assimp.Material mat in scene.Materials)
             {
-                TexList.Add(Path.GetFileName(mat.TextureDiffuse.FilePath));
-                Stream str = File.OpenRead(TexList[TexList.Count - 1]);
+                if (String.IsNullOrEmpty(mat.TextureDiffuse.FilePath))
+                {
+                    throw new Exception($"Material '{mat.Name}' has no diffuse texture specified");
+                }
 
-                PngImage png = new PngImage(str);
-                Tm2 tmImage = Tm2.Create(png);
-                TextureData.Add(tmImage);
+                var texPath = Path.IsPathRooted(mat.TextureDiffuse.FilePath)
+                    ? Path.GetFullPath(mat.TextureDiffuse.FilePath)
+                    : Path.GetFullPath(Path.Combine(baseFilePath, mat.TextureDiffuse.FilePath));
+
+                var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
+
+                if (!texPath.StartsWith(Path.GetFullPath(baseFilePath + Path.DirectorySeparatorChar), comparison))
+                {
+                    throw new Exception($"The file {texPath} is outside the output directory");
+                }
+
+                TexList.Add(Path.GetFileName(texPath));
+                using (Stream str = new FileStream(texPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    PngImage png = new PngImage(str);
+                    Tm2 tmImage = Tm2.Create(png);
+                    TextureData.Add(tmImage);
+                }
             }
 
             for(int i = 0; i < scene.RootNode.ChildCount; i++)
@@ -364,10 +386,10 @@ namespace OpenKh.Command.PmpConverter
                         vertices[k].Z = x.Vertices[k].Z * Scale;
                         vertices[k].Tu = x.TextureCoordinateChannels[0][k].X;
                         vertices[k].Tv = 1.0f - x.TextureCoordinateChannels[0][k].Y;
-                        vertices[k].R = x.VertexColorChannels[0][i].R;
-                        vertices[k].G = x.VertexColorChannels[0][i].G;
-                        vertices[k].B = x.VertexColorChannels[0][i].B;
-                        vertices[k].A = x.VertexColorChannels[0][i].A;
+                        vertices[k].R = x.VertexColorChannels[0][k].R;
+                        vertices[k].G = x.VertexColorChannels[0][k].G;
+                        vertices[k].B = x.VertexColorChannels[0][k].B;
+                        vertices[k].A = x.VertexColorChannels[0][k].A;
                     }
 
                     meshDescriptor.Vertices = vertices;

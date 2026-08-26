@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Xunit;
 using Xunit.Sdk;
 using YamlDotNet.Serialization;
@@ -874,6 +875,239 @@ namespace OpenKh.Tests.Patcher
                 Assert.Equal(150, itemStream.Stats[0].Ability);
             });
 
+        }
+
+        [Fact]
+        public void ListPatchShopTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "03system.bin",
+                        Method = "binarc",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "shop",
+                                Method = "listpatch",
+                                Type = "Unknown41",
+                                Source = new List<AssetFile>
+                                {
+                                    new AssetFile
+                                    {
+                                        Name = "ShopList.yml",
+                                        Type = "shop"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "03system.bin")).Using(stream =>
+            {
+                var shop = new OpenKh.Kh2.SystemData.Shop
+                {
+                    ShopEntries = new List<OpenKh.Kh2.SystemData.Shop.ShopEntry>
+                    {
+                        new OpenKh.Kh2.SystemData.Shop.ShopEntry
+                        {
+                            CommandArgument = 0x0067,
+                            UnlockMenuFlag = 0x0029,
+                            NameID = 0x8AB8,
+                            ShopKeeperEntityID = 0x0539,
+                            PosX = 0x008B,
+                            PosY = 0x006C,
+                            PosZ = -576, //0xFDC0,
+                            ExtraInventoryBitMask = 0x81,
+                            SoundID = 0x01,
+                            InventoryCount = 0x0001,
+                            ShopID = 0x00,
+                            Unk19 = 0x02,
+                            InventoryOffset = 0x0028,
+                            Reserved = 0x00
+                        }
+                    },
+                    InventoryEntries = new List<OpenKh.Kh2.SystemData.Shop.InventoryEntry>
+                    {
+                        new OpenKh.Kh2.SystemData.Shop.InventoryEntry
+                        {
+                            UnlockEventID = 0xFFFF,
+                            ProductCount = 0x0002,
+                            ProductOffset = 0x0030,
+                            Reserved = 0x00
+                        }
+                    },
+                    ProductEntries = new List<OpenKh.Kh2.SystemData.Shop.ProductEntry>
+                    {
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x0094
+                        },
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x008B
+                        },
+                    },
+                    ValidProductEntries = new List<OpenKh.Kh2.SystemData.Shop.ProductEntry>
+                    {
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x0094
+                        },
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x008B
+                        },
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x0000
+                        },
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x0000
+                        },
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x0000
+                        },
+                        new OpenKh.Kh2.SystemData.Shop.ProductEntry
+                        {
+                            ItemID = 0x0000
+                        }
+                    }
+                };
+
+                using var shopStream = new MemoryStream();
+                OpenKh.Kh2.SystemData.Shop.Write(shopStream, shop);
+                Bar.Write(stream, new Bar {
+                    new Bar.Entry
+                    {
+                        Name = "shop",
+                        Type = Bar.EntryType.Unknown41,
+                        Stream = shopStream
+                    }
+                });
+            });
+
+            var moddedShop = new OpenKh.Kh2.SystemData.Shop.ShopHelper
+            {
+                ShopEntryHelpers = new List<OpenKh.Kh2.SystemData.Shop.ShopEntryHelper>
+                {
+                    new OpenKh.Kh2.SystemData.Shop.ShopEntryHelper
+                    {
+                        CommandArgument = 0x0068,
+                        UnlockMenuFlag = 0x002A,
+                        NameID = 0x8AB9,
+                        ShopKeeperEntityID = 0x0749,
+                        PosX = 0x0086,
+                        PosY = 0x0096,
+                        PosZ = -591, // 0xFDB1,
+                        ExtraInventoryBitMask = 0x82,
+                        SoundID = 0x01,
+                        InventoryCount = 0x0001,
+                        ShopID = 0x00,
+                        Unk19 = 0x02,
+                        InventoryStartIndex = 0
+                    }
+                },
+                InventoryEntryHelpers = new List<OpenKh.Kh2.SystemData.Shop.InventoryEntryHelper>
+                {
+                    new OpenKh.Kh2.SystemData.Shop.InventoryEntryHelper
+                    {
+                        InventoryIndex = 0,
+                        UnlockEventID = 0xFFFF,
+                        ProductCount = 0x0002,
+                        ProductStartIndex = 0,
+                    }
+                },
+                ProductEntryHelpers = new List<OpenKh.Kh2.SystemData.Shop.ProductEntryHelper>
+                {
+                    new OpenKh.Kh2.SystemData.Shop.ProductEntryHelper
+                    {
+                        ProductIndex = 0,
+                        ItemID = 0x0043
+                    },
+                    new OpenKh.Kh2.SystemData.Shop.ProductEntryHelper
+                    {
+                        ProductIndex = 1,
+                        ItemID = 0x0128
+                    }
+                },
+                ValidProductEntryHelpers = new List<OpenKh.Kh2.SystemData.Shop.ProductEntryHelper>
+                {
+                    new OpenKh.Kh2.SystemData.Shop.ProductEntryHelper
+                    {
+                        ProductIndex = 0,
+                        ItemID = 0x0043
+                    },
+                    new OpenKh.Kh2.SystemData.Shop.ProductEntryHelper
+                    {
+                        ProductIndex = 1,
+                        ItemID = 0x0128
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(ModInputDir, "ShopList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+
+                var serializer = new Serializer();
+
+                writer.Write(serializer.Serialize(moddedShop));
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            AssertFileExists(ModOutputDir, "03system.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "03system.bin")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var verifyShop = OpenKh.Kh2.SystemData.Shop.Read(binarc[0].Stream);
+                uint inventoryEntriesBaseOffset = (uint)(OpenKh.Kh2.SystemData.Shop.HeaderSize + verifyShop.ShopEntries.Count * OpenKh.Kh2.SystemData.Shop.ShopEntrySize);
+                uint productEntriesBaseOffset = (uint)(inventoryEntriesBaseOffset + verifyShop.InventoryEntries.Count * OpenKh.Kh2.SystemData.Shop.InventoryEntrySize);
+                foreach (var shopEntryHelper in moddedShop.ShopEntryHelpers)
+                {
+                    int shopID = shopEntryHelper.ShopID;
+                    Assert.Equal(verifyShop.ShopEntries[shopID].CommandArgument, shopEntryHelper.CommandArgument);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].UnlockMenuFlag, shopEntryHelper.UnlockMenuFlag);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].NameID, shopEntryHelper.NameID);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].ShopKeeperEntityID, shopEntryHelper.ShopKeeperEntityID);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].PosX, shopEntryHelper.PosX);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].PosY, shopEntryHelper.PosY);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].PosZ, shopEntryHelper.PosZ);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].ExtraInventoryBitMask, shopEntryHelper.ExtraInventoryBitMask);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].SoundID, shopEntryHelper.SoundID);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].InventoryCount, shopEntryHelper.InventoryCount);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].ShopID, shopEntryHelper.ShopID);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].Unk19, shopEntryHelper.Unk19);
+                    Assert.Equal(verifyShop.ShopEntries[shopID].InventoryOffset, (int)(inventoryEntriesBaseOffset + shopEntryHelper.InventoryStartIndex * OpenKh.Kh2.SystemData.Shop.InventoryEntrySize));
+                }
+                foreach (var inventoryEntryHelper in moddedShop.InventoryEntryHelpers)
+                {
+                    Assert.Equal(verifyShop.InventoryEntries[inventoryEntryHelper.InventoryIndex].UnlockEventID, inventoryEntryHelper.UnlockEventID);
+                    Assert.Equal(verifyShop.InventoryEntries[inventoryEntryHelper.InventoryIndex].ProductCount, inventoryEntryHelper.ProductCount);
+                    Assert.Equal(verifyShop.InventoryEntries[inventoryEntryHelper.InventoryIndex].ProductOffset, (int)(productEntriesBaseOffset + inventoryEntryHelper.ProductStartIndex * OpenKh.Kh2.SystemData.Shop.ProductEntrySize));
+                }
+                foreach (var productEntryHelper in moddedShop.ProductEntryHelpers)
+                {
+                    Assert.Equal(verifyShop.ProductEntries[productEntryHelper.ProductIndex].ItemID, productEntryHelper.ItemID);
+                }
+                foreach (var productEntryHelper in moddedShop.ValidProductEntryHelpers)
+                {
+                    Assert.Equal(verifyShop.ValidProductEntries[productEntryHelper.ProductIndex].ItemID, productEntryHelper.ItemID);
+                }
+            });
         }
 
         [Fact]
@@ -2955,6 +3189,411 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
+        public void ListPatchSlctTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "14mission.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "slct",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "SlctList.yml",
+                                        Type = "slct"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "14mission.bar")).Using(stream =>
+            {
+                var slctEntry = new List<Kh2.Slct>()
+                {
+                    new Kh2.Slct
+                    {
+                        Id = 1,
+                        ChoiceNum = 2,
+                        ChoiceDefault = 3,
+                        Choice = Enumerable.Range(0, 4).Select(_ => new Kh2.ChoiceEntry { Id = 0, MessageId = 0 }).ToArray(),
+                        Padding = new byte[25]
+                    }
+                    };
+                using var slctStream = new MemoryStream();
+                Kh2.Slct.Write(slctStream, slctEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "slct",
+                        Type = Bar.EntryType.List,
+                        Stream = slctStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "SlctList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- Id: 1");
+                writer.WriteLine("  ChoiceNum: 2");
+                writer.WriteLine("  ChoiceDefault: 3");
+                writer.WriteLine("  Choice:");
+                writer.WriteLine("  - Id: 0");
+                writer.WriteLine("    MessageId: 0");
+                writer.WriteLine("  Padding:");
+                writer.WriteLine("    - 0");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            AssertFileExists(ModOutputDir, "14mission.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "14mission.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var slctStream = Kh2.Slct.Read(binarc[0].Stream);
+                Assert.Equal(1, slctStream[0].Id);
+                Assert.Equal(2, slctStream[0].ChoiceNum);
+                Assert.Equal(3, slctStream[0].ChoiceDefault);
+            });
+        }
+
+        [Fact]
+        public void ListPatchWentTest()
+        {
+            var patcher = new PatcherProcessor();
+
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+        {
+            new AssetFile()
+            {
+                Name = "03system.bin",
+                Method = "binarc",
+                Source = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "went",
+                        Method = "listpatch",
+                        Type = "List",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "WentList.yml",
+                                Type = "went"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "03system.bin")).Using(stream =>
+            {
+                var went = new Kh2.SystemData.Went
+                {
+                    Offsets = new List<uint>(new uint[70]),
+                    Sets = new List<Kh2.SystemData.Went.WentSet>()
+                };
+
+                var set = new Kh2.SystemData.Went.WentSet()
+                {
+                    OriginalOffset = 1,
+                    WeaponIds = new List<uint>() { 100 }
+                };
+
+                went.Sets.Add(set);
+
+                went.Offsets[1] = 1;
+
+                using var wentStream = new MemoryStream();
+                went.Write(wentStream);
+
+                Bar.Write(stream, new Bar()
+        {
+            new Bar.Entry()
+            {
+                Name = "went",
+                Type = Bar.EntryType.List,
+                Stream = wentStream
+            }
+        });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "WentList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+
+                writer.WriteLine("Sora:");
+                writer.WriteLine("  0: 500");
+                writer.WriteLine("  1: 777");
+
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            AssertFileExists(ModOutputDir, "03system.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "03system.bin")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var went = Kh2.SystemData.Went.Read(binarc[0].Stream);
+
+                uint soraOffset = went.Offsets[1];
+
+                var set = went.Sets.Find(x => x.OriginalOffset == soraOffset);
+
+                Assert.Equal(2, set.WeaponIds.Count);
+                Assert.Equal((uint)500, set.WeaponIds[0]);
+                Assert.Equal((uint)777, set.WeaponIds[1]);
+            });
+        }
+
+        [Fact]
+        public void ListPatchSstmTest()
+        {
+            var patcher = new PatcherProcessor();
+
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+        {
+            new AssetFile()
+            {
+                Name = "03system.bin",
+                Method = "binarc",
+                Source = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "pref",
+                        Method = "binarc",
+                        Type = "Binary",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "sstm",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "SstmList.yml",
+                                        Type = "sstm"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "03system.bin")).Using(stream =>
+            {
+                var sstm = new Kh2.SystemData.Sstm()
+                {
+                    DriveTime = 10.0f,
+                    AntiFormDriveCount = 5
+                };
+
+                using var sstmStream = new MemoryStream();
+                sstm.Write(sstmStream);
+
+                using var prefStream = new MemoryStream();
+                Bar.Write(prefStream, new Bar()
+        {
+            new Bar.Entry()
+            {
+                Name = "sstm",
+                Type = Bar.EntryType.List,
+                Stream = sstmStream
+            }
+        });
+
+                Bar.Write(stream, new Bar()
+        {
+            new Bar.Entry()
+            {
+                Name = "pref",
+                Type = Bar.EntryType.Binary,
+                Stream = prefStream
+            }
+        });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "SstmList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("DriveTime: 123.5");
+                writer.WriteLine("AntiFormDriveCount: 99");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            File.OpenRead(Path.Combine(ModOutputDir, "03system.bin")).Using(stream =>
+            {
+                var systemBar = Bar.Read(stream);
+                var prefBar = Bar.Read(systemBar[0].Stream);
+
+                var sstm = Kh2.SystemData.Sstm.Read(prefBar[0].Stream);
+
+                Assert.Equal(123.5f, sstm.DriveTime);
+                Assert.Equal(99, sstm.AntiFormDriveCount);
+            });
+        }
+
+        [Fact]
+        public void ListPatchPrtyTest()
+        {
+            var patcher = new PatcherProcessor();
+
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+        {
+            new AssetFile()
+            {
+                Name = "03system.bin",
+                Method = "binarc",
+                Source = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "pref",
+                        Method = "binarc",
+                        Type = "Binary",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "prty",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "PrtyList.yml",
+                                        Type = "prty"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "03system.bin")).Using(stream =>
+            {
+                const int count = 70;
+
+                var sharedEntry = new Kh2.SystemData.Prty()
+                {
+                    WalkSpeed = 1.0f,
+                    RunSpeed = 2.0f
+                };
+
+                var prtyFile = new Kh2.SystemData.PrtyFile()
+                {
+                    Count = count,
+                    Offsets = new int[count],
+                    UniqueEntries = new Dictionary<int, Kh2.SystemData.Prty>()
+                };
+
+                using var tempStream = new MemoryStream();
+
+                prtyFile.Write(tempStream);
+
+                int headerSize = 4 + (count * 4);
+                int entryOffset = headerSize;
+
+                for (int i = 0; i < count; i++)
+                    prtyFile.Offsets[i] = (i == 0) ? 0 : entryOffset;
+
+                prtyFile.UniqueEntries[entryOffset] = sharedEntry;
+
+                using var prtyStream = new MemoryStream();
+                prtyFile.Write(prtyStream);
+
+                using var prefStream = new MemoryStream();
+                Bar.Write(prefStream, new Bar()
+        {
+            new Bar.Entry()
+            {
+                Name = "prty",
+                Type = Bar.EntryType.List,
+                Stream = prtyStream
+            }
+        });
+
+                Bar.Write(stream, new Bar()
+        {
+            new Bar.Entry()
+            {
+                Name = "pref",
+                Type = Bar.EntryType.Binary,
+                Stream = prefStream
+            }
+        });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "PrtyList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("Sora:");
+                writer.WriteLine("  WalkSpeed: 5.5");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            File.OpenRead(Path.Combine(ModOutputDir, "03system.bin")).Using(stream =>
+            {
+                var systemBar = Bar.Read(stream);
+                var prefBar = Bar.Read(systemBar[0].Stream);
+
+                var prtyFile = Kh2.SystemData.PrtyFile.Read(prefBar[0].Stream);
+
+                int realIndex = Kh2.SystemData.Prty.CharacterMap["Sora"] + 1;
+                int offset = prtyFile.Offsets[realIndex];
+
+                var entry = prtyFile.UniqueEntries[offset];
+
+                Assert.Equal(5.5f, entry.WalkSpeed);
+            });
+        }
+
+
+        [Fact]
         public void ListPatchPlacesTest()
         {
             var patcher = new PatcherProcessor();
@@ -3582,6 +4221,182 @@ namespace OpenKh.Tests.Patcher
             }, ModOutputDir, patch.Assets[0].Multi[0].Name);
         }
 
+
+        [Fact]
+        public void Kh1ArdResourceReplaceTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = Kh1ArdPatch(("1", "xa_al_9999.mset"), ("2", "tw_6100.moa"));
+
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "xa_ex_0010.mdls", "xa_ex_0010.mset", "ex_6540.moa", "ex_6540.moa.mset")));
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            AssertArdResources(new[]
+            {
+                "xa_ex_0010.mdls", "xa_al_9999.mset", "tw_6100.moa", "ex_6540.moa.mset"
+            }, ModOutputDir, "tw01.ard");
+        }
+
+        [Fact]
+        public void Kh1ArdResourceReadsTheReplacementsFromItsSourceFileTest()
+        {
+            var yml =
+                "title: source file test\n" +
+                "assets:\n" +
+                "- name: tw01.ard\n" +
+                "  method: kh1ardresource\n" +
+                "  source:\n" +
+                "  - name: files/tw01.yml\n";
+
+            var patch = new MemoryStream(Encoding.UTF8.GetBytes(yml)).Using(Metadata.Read);
+
+            CreateFile(ModInputDir, "files/tw01.yml")
+                .Using(x => x.Write(Encoding.UTF8.GetBytes("1: xa_al_9999.mset\n")));
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "a.mdls", "a.mset", "b.moa", "b.moa.mset")));
+
+            new PatcherProcessor().Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            AssertArdResources(new[] { "a.mdls", "xa_al_9999.mset", "b.moa", "b.moa.mset" },
+                ModOutputDir, "tw01.ard");
+        }
+
+        [Fact]
+        public void Kh1ArdResourceReplaceOfReplacedFileTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = Kh1ArdPatch(("1", "xa_al_9999.mset"));
+
+            // The vanilla file the patch must NOT be applied to.
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "vanilla_a.mdls", "vanilla_a.mset", "vanilla_b.moa", "vanilla_b.moa.mset")));
+
+            // A higher ranked mod already staged its own replacement of the same file.
+            CreateFile(ModOutputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "replaced_a.mdls", "replaced_a.mset", "replaced_b.moa", "replaced_b.moa.mset")));
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            AssertArdResources(new[]
+            {
+                "replaced_a.mdls", "xa_al_9999.mset", "replaced_b.moa", "replaced_b.moa.mset"
+            }, ModOutputDir, "tw01.ard");
+        }
+
+        [Fact]
+        public void Kh1ArdResourceReplacePreservesTheRestOfTheFileTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = Kh1ArdPatch(("0", "c.mdls"));
+
+            var original = CreateArd("a.mdls", "a.mset", "b.moa", "b.moa.mset");
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(original));
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true);
+
+            var patched = File.ReadAllBytes(Path.Combine(ModOutputDir, "tw01.ard"));
+            Assert.Equal(original.Length, patched.Length);
+            // The header and everything past the resource list must be byte identical.
+            Assert.Equal(original.Take(ArdResourceListOffset), patched.Take(ArdResourceListOffset));
+            Assert.Equal(original.Skip(ArdResourceListEnd), patched.Skip(ArdResourceListEnd));
+        }
+
+        [Fact]
+        public void Kh1ArdResourceReplaceOutOfRangeThrowsTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = Kh1ArdPatch(("9", "nope.mdls"));
+
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "a.mdls", "a.mset", "b.moa", "b.moa.mset")));
+
+            Assert.Throws<PatcherException>(() =>
+                patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true));
+        }
+
+        [Fact]
+        public void Kh1ArdResourceReplaceEmptyNameThrowsTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = Kh1ArdPatch(("0", ""));
+
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "a.mdls", "a.mset", "b.moa", "b.moa.mset")));
+
+            Assert.Throws<PatcherException>(() =>
+                patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true));
+        }
+
+        [Fact]
+        public void Kh1ArdResourceReplaceNameTooLongThrowsTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = Kh1ArdPatch(("0", new string('x', OpenKh.Kh1.Ard.MaxNameLength + 1)));
+
+            CreateFile(AssetsInputDir, "tw01.ard").Using(x => x.Write(CreateArd(
+                "a.mdls", "a.mset", "b.moa", "b.moa.mset")));
+
+            Assert.Throws<PatcherException>(() =>
+                patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir, Tests: true));
+        }
+
+        private const int ArdHeaderSize = 4 + (32 + 1) * 4;
+        private const int ArdResourceListOffset = 0x100;
+
+        private static int ArdResourceListEnd => ArdResourceListOffset + 4 * OpenKh.Kh1.Ard.NameSize;
+
+        private static Metadata Kh1ArdPatch(params (string Index, string Name)[] replacements)
+        {
+            var lines = replacements.Select(x => $"{x.Index}: {x.Name}");
+            File.WriteAllText(Path.Combine(ModInputDir, "tw01.yml"),
+                string.Join(Environment.NewLine, lines) + Environment.NewLine);
+
+            return new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "tw01.ard",
+                        Method = "kh1ardresource",
+                        Source = new List<AssetFile> { new AssetFile { Name = "tw01.yml" } }
+                    }
+                }
+            };
+        }
+
+        /// <summary>
+        /// Builds a minimal but structurally valid .ard: 32 entries, with entry 5 holding
+        /// the given names and a marker block after it to catch collateral damage.
+        /// </summary>
+        private static byte[] CreateArd(params string[] names)
+        {
+            var listEnd = ArdResourceListOffset + names.Length * OpenKh.Kh1.Ard.NameSize;
+            var length = listEnd + 0x80;
+            var data = new byte[length];
+
+            BitConverter.GetBytes(32).CopyTo(data, 0);
+            for (var i = 0; i <= 32; i++)
+            {
+                var offset = i <= 5 ? ArdResourceListOffset : i == 6 ? listEnd : length;
+                BitConverter.GetBytes(offset).CopyTo(data, 4 + i * 4);
+            }
+
+            for (var i = 0; i < names.Length; i++)
+                Encoding.ASCII.GetBytes(names[i]).CopyTo(data, ArdResourceListOffset + i * OpenKh.Kh1.Ard.NameSize);
+
+            for (var i = listEnd; i < length; i++)
+                data[i] = 0xCD;
+
+            Assert.True(ArdHeaderSize <= ArdResourceListOffset);
+            return data;
+        }
+
+        private static void AssertArdResources(string[] expected, params string[] paths) =>
+            File.OpenRead(Path.Join(paths)).Using(x =>
+                Assert.Equal(expected, OpenKh.Kh1.Ard.ReadResourceList(x)));
 
         private static void AssertFileExists(params string[] paths)
         {

@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Globalization;
+using System.Numerics;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Utils
@@ -63,6 +64,14 @@ namespace OpenKh.Kh2.Utils
 
         public static bool operator !=(BoundingBoxInt16 left, BoundingBoxInt16 right) => !(left == right);
 
-        public override string ToString() => $"({Minimum}, {Maximum})";
+        public override string ToString()
+        {
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "({0}, {1})",
+                Minimum.ToString(),
+                Maximum.ToString()
+            );
+        }
     }
 }

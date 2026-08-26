@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,29 @@ namespace OpenKh.Tools.ModsManager.Services
 {
     public static class ConfigurationService
     {
+        private class LegacyConfigMigration
+        {
+            private static readonly IDeserializer _legacyvaluedeserializer =
+                new DeserializerBuilder()
+                .IgnoreFields()
+                .IgnoreUnmatchedProperties()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            public string ModCollectionPath { get; internal set; }
+            public string ModCollectionsPath { get; internal set; }
+            public string GameModPath { get; internal set; }
+            public string GameDataPath { get; internal set; }
+
+            public static LegacyConfigMigration Open(string fileName)
+            {
+                if (!File.Exists(fileName))
+                    return new LegacyConfigMigration();
+
+                using var reader = new StreamReader(fileName);
+                return _legacyvaluedeserializer.Deserialize<LegacyConfigMigration>(reader);
+            }
+        }
+
         private class Config
         {
             private static readonly IDeserializer _deserializer =
@@ -25,11 +49,14 @@ namespace OpenKh.Tools.ModsManager.Services
                 .Build();
 
             public int WizardVersionNumber { get; set; }
-            public string ModCollectionPath { get; internal set; }
-            public string GameModPath { get; internal set; }
-            public string GameDataPath { get; internal set; }
-            public int GameEdition { get; internal set; }
-            public string IsoLocation { get; internal set; }
+            public string ExtractedGameDataPath { get; internal set; }
+            public string InstalledModsPath { get; internal set; }
+            public string InstalledCollectionsPath { get; internal set; }
+            public string CompiledModPath { get; internal set; }
+            public int GameEdition { get; internal set; } = 1;
+            public string IsoLocationKH2 { get; internal set; }
+            public string IsoLocationKH1 { get; internal set; }
+            public string IsoLocationRecom { get; internal set; }
             public string OpenKhGameEngineLocation { get; internal set; }
             public string Pcsx2Location { get; internal set; }
             public string PcReleaseLocation { get; internal set; }
@@ -42,7 +69,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool SoundDebug { get; internal set; } = false;
             public bool EnableCache { get; internal set; } = true;
             public bool QuickMenu { get; internal set; } = false;
-            public bool DevView { get; internal set; } = false;
+            public bool EnablePatching { get; internal set; } = false;
             public bool AutoUpdateMods { get; internal set; }
             public string pcVersion { get; internal set; } = "EGS";
             public bool steamAPITrick1525 {  get; internal set; } = false;
@@ -70,15 +97,29 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        private static string StoragePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        private static string StoragePath = OpenkhInstallation.Directory;
         private static string ConfigPath = Path.Combine(StoragePath, "mods-manager.yml");
         private static string EnabledModsPathKH1 = Path.Combine(StoragePath, "mods-KH1.txt");
         private static string EnabledModsPathKH2 = Path.Combine(StoragePath, "mods-KH2.txt");
         private static string EnabledModsPathBBS = Path.Combine(StoragePath, "mods-BBS.txt");
         private static string EnabledModsPathRECOM = Path.Combine(StoragePath, "mods-ReCoM.txt");
         private static string EnabledModsPathKH3D = Path.Combine(StoragePath, "mods-KH3D.txt");
+        private static string EnabledCollectionModsPathKH1 = Path.Combine(StoragePath, "collection-mods-KH1.json");
+        private static string EnabledCollectionModsPathKH2 = Path.Combine(StoragePath, "collection-mods-KH2.json");
+        private static string EnabledCollectionModsPathBBS = Path.Combine(StoragePath, "collection-mods-BBS.json");
+        private static string EnabledCollectionModsPathRECOM = Path.Combine(StoragePath, "collection-mods-ReCoM.json");
+        private static string EnabledCollectionModsPathKH3D = Path.Combine(StoragePath, "collection-mods-KH3D.json");
+        private static readonly LegacyConfigMigration _legacyconfig = LegacyConfigMigration.Open(ConfigPath);
         private static readonly Config _config = Config.Open(ConfigPath);
         public static string PresetPath = Path.Combine(StoragePath, "presets");
+        private static readonly HashSet<string> _supportedGames = new HashSet<string>()
+        {
+            "kh2",
+            "kh1",
+            "bbs",
+            "Recom",
+            "kh3d"
+        };
 
         public class YamlGenPref
         {
@@ -91,7 +132,19 @@ namespace OpenKh.Tools.ModsManager.Services
 
         static ConfigurationService()
         {
-            string modsPath = Path.GetFullPath(Path.Combine(ModCollectionPath, ".."));
+            if (!string.IsNullOrEmpty(_legacyconfig.GameDataPath) && string.IsNullOrEmpty(_config.ExtractedGameDataPath))
+                _config.ExtractedGameDataPath = _legacyconfig.GameDataPath;
+            if (!string.IsNullOrEmpty(_legacyconfig.ModCollectionPath) && string.IsNullOrEmpty(_config.InstalledModsPath))
+                _config.InstalledModsPath = _legacyconfig.ModCollectionPath;
+            if (!string.IsNullOrEmpty(_legacyconfig.ModCollectionsPath) && string.IsNullOrEmpty(_config.InstalledCollectionsPath))
+                _config.InstalledCollectionsPath = _legacyconfig.ModCollectionsPath;
+            if (!string.IsNullOrEmpty(_legacyconfig.GameModPath) && string.IsNullOrEmpty(_config.CompiledModPath))
+                _config.CompiledModPath = _legacyconfig.GameModPath;
+
+
+            string modsPath = Path.GetFullPath(Path.Combine(InstalledModsPath, ".."));
+            if (!Directory.Exists(Path.Combine(InstalledCollectionsPath)))
+                Directory.CreateDirectory(InstalledCollectionsPath);
             if (!Directory.Exists(Path.Combine(modsPath, "kh2")))
                 Directory.CreateDirectory(Path.Combine(modsPath, "kh2"));
             if (!Directory.Exists(Path.Combine(modsPath, "kh1")))
@@ -170,6 +223,55 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
+        public static Dictionary<string, Dictionary<string, bool>> EnabledCollectionMods
+        {
+            get
+            {
+                var optionsJson = "";
+                switch (LaunchGame)
+                {
+                    case "kh1":
+                        optionsJson = File.Exists(EnabledCollectionModsPathKH1) ? File.ReadAllText(EnabledCollectionModsPathKH1) : "";
+                        break;
+                    case "bbs":
+                        optionsJson = File.Exists(EnabledCollectionModsPathBBS) ? File.ReadAllText(EnabledCollectionModsPathBBS) : "";
+                        break;
+                    case "Recom":
+                        optionsJson = File.Exists(EnabledCollectionModsPathRECOM) ? File.ReadAllText(EnabledCollectionModsPathRECOM) : "";
+                        break;
+                    case "kh3d":
+                        optionsJson = File.Exists(EnabledCollectionModsPathKH3D) ? File.ReadAllText(EnabledCollectionModsPathKH3D) : "";
+                        break;
+                    default:
+                        optionsJson = File.Exists(EnabledCollectionModsPathKH2) ? File.ReadAllText(EnabledCollectionModsPathKH2) : "";
+                        break;
+                }
+                return optionsJson != "" ? JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, bool>>> (optionsJson) : new Dictionary<string, Dictionary<string, bool>> { };
+            }
+            set
+            {
+                var jsonOut = JsonConvert.SerializeObject(value);
+                switch (LaunchGame)
+                {
+                    case "kh1":
+                        File.WriteAllText(EnabledCollectionModsPathKH1, jsonOut);
+                        break;
+                    case "bbs":
+                        File.WriteAllText(EnabledCollectionModsPathBBS, jsonOut);
+                        break;
+                    case "Recom":
+                        File.WriteAllText(EnabledCollectionModsPathRECOM, jsonOut);
+                        break;
+                    case "kh3d":
+                        File.WriteAllText(EnabledCollectionModsPathKH3D, jsonOut);
+                        break;
+                    default:
+                        File.WriteAllText(EnabledCollectionModsPathKH2, jsonOut);
+                        break;
+                }
+            }
+        }
+
         public static ICollection<string> FeaturedMods { get; private set; }
         public static ICollection<string> BlacklistedMods { get; private set; }
 
@@ -182,33 +284,62 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
-
-        public static string ModCollectionPath
-        {
-            get => _config.ModCollectionPath ?? Path.GetFullPath(Path.Combine(StoragePath, "mods", LaunchGame));
-            set
-            {
-                _config.ModCollectionPath = value;
-                _config.Save(ConfigPath);
-            }
-        }
-
-        public static string GameModPath
-        {
-            get => _config.GameModPath ?? Path.GetFullPath(Path.Combine(StoragePath, "mod"));
-            set
-            {
-                _config.GameModPath = value;
-                _config.Save(ConfigPath);
-            }
-        }
-
         public static string GameDataLocation
         {
-            get => _config.GameDataPath ?? Path.GetFullPath(Path.Combine(StoragePath, "data"));
+            get => _config.ExtractedGameDataPath ?? Path.GetFullPath(Path.Combine(StoragePath, "data"));
             set
             {
-                _config.GameDataPath = value;
+                _config.ExtractedGameDataPath = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static string InstalledModsPath
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(_config.InstalledModsPath) && _config.InstalledModsPath != _config.CompiledModPath)
+                    return Path.Combine(_config.InstalledModsPath, LaunchGame);
+                else
+                    return Path.Combine(_config.InstalledModsPath ?? Path.GetFullPath(StoragePath), "mods", LaunchGame);
+            }
+            set
+            {
+                _config.InstalledModsPath = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static string InstalledCollectionsPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_config.InstalledCollectionsPath))
+                    return Path.GetFullPath(Path.Combine(StoragePath, "mods", "collections"));
+                else if (_config.InstalledCollectionsPath != _config.InstalledModsPath)
+                    return _config.InstalledCollectionsPath;
+                else
+                    return Path.Combine(_config.InstalledCollectionsPath, "collections");
+            }
+            set
+            {
+                _config.InstalledCollectionsPath = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static string CompiledModPath
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(_config.CompiledModPath) && _config.CompiledModPath != _config.InstalledModsPath)
+                    return Path.Combine(_config.CompiledModPath, LaunchGame);
+                else
+                    return Path.Combine(_config.CompiledModPath ?? Path.GetFullPath(StoragePath), "mod", LaunchGame);
+            }
+            set
+            {
+                _config.CompiledModPath = value;
                 _config.Save(ConfigPath);
             }
         }
@@ -223,12 +354,30 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        public static string IsoLocation
+        public static string IsoLocationKH2
         {
-            get => _config.IsoLocation;
+            get => _config.IsoLocationKH2;
             set
             {
-                _config.IsoLocation = value;
+                _config.IsoLocationKH2 = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static string IsoLocationKH1
+        {
+            get => _config.IsoLocationKH1;
+            set
+            {
+                _config.IsoLocationKH1 = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static string IsoLocationRecom
+        {
+            get => _config.IsoLocationRecom;
+            set
+            {
+                _config.IsoLocationRecom = value;
                 _config.Save(ConfigPath);
             }
         }
@@ -346,12 +495,12 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
-        public static bool DevView
+        public static bool EnablePatching
         {
-            get => _config.DevView;
+            get => _config.EnablePatching;
             set
             {
-                _config.DevView = value;
+                _config.EnablePatching = value;
                 _config.Save(ConfigPath);
             }
         }
@@ -402,7 +551,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 }
                 else
                 {
-                    _config.GamesToExtract.Remove("kh1");
+                    _config.GamesToExtract.RemoveAll(x => x == "kh1");
                 }
                 _config.Save(ConfigPath);
             }
@@ -418,7 +567,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 }
                 else
                 {
-                    _config.GamesToExtract.Remove("kh2");
+                    _config.GamesToExtract.RemoveAll(x => x == "kh2");
                 }
                 _config.Save(ConfigPath);
             }
@@ -434,7 +583,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 }
                 else
                 {
-                    _config.GamesToExtract.Remove("bbs");
+                    _config.GamesToExtract.RemoveAll(x => x == "bbs");
                 }
                 _config.Save(ConfigPath);
             }
@@ -450,7 +599,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 }
                 else
                 {
-                    _config.GamesToExtract.Remove("Recom");
+                    _config.GamesToExtract.RemoveAll(x => x == "Recom");
                 }
                 _config.Save(ConfigPath);
             }
@@ -466,7 +615,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 }
                 else
                 {
-                    _config.GamesToExtract.Remove("kh3d");
+                    _config.GamesToExtract.RemoveAll(x => x == "kh3d");
                 }
                 _config.Save(ConfigPath);
             }
@@ -482,7 +631,7 @@ namespace OpenKh.Tools.ModsManager.Services
         }
         public static string LaunchGame
         {
-            get => _config.LaunchGame;
+            get => _supportedGames.Contains(_config.LaunchGame) ? _config.LaunchGame : _config.LaunchGame = "kh2";
             set
             {
                 _config.LaunchGame = value;

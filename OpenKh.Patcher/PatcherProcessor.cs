@@ -1,16 +1,16 @@
+using OpenKh.Bbs;
+using OpenKh.Command.Bdxio.Models;
+using OpenKh.Command.Bdxio.Utils;
 using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
-using OpenKh.Command.Bdxio.Models;
-using OpenKh.Command.Bdxio.Utils;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization;
-using OpenKh.Bbs;
 
 namespace OpenKh.Patcher
 {
@@ -94,10 +94,12 @@ namespace OpenKh.Patcher
             IDictionary<string, string> packageMap = null,
             string LaunchGame = null,
             string Language = "en",
-            bool Tests = false
+            bool Tests = false,
+            Dictionary<string, bool> collectionOptionalEnabledMods = null
         )
         {
-
+            if (collectionOptionalEnabledMods == null)
+                collectionOptionalEnabledMods = new Dictionary<string, bool> { };
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
             try
             {
@@ -106,11 +108,19 @@ namespace OpenKh.Patcher
                     throw new Exception("No assets found.");
                 if (metadata.Game != null && GamesList.Contains(metadata.Game.ToLower()) && metadata.Game.ToLower() != LaunchGame.ToLower())
                     return;
+                if (metadata.IsCollection && !metadata.CollectionGames.Contains(LaunchGame))
+                    return;
 
                 var exclusiveLock = new object();
-
                 metadata.Assets.AsParallel().ForAll(assetFile =>
                 {
+                    if (assetFile.Game != null && assetFile.Game != LaunchGame)
+                        return;
+                    if (assetFile.CollectionOptional == true)
+                        if (!collectionOptionalEnabledMods.ContainsKey(assetFile.Name))
+                            return;
+                        else if (!collectionOptionalEnabledMods[assetFile.Name])
+                            return;
                     var names = new List<string>();
                     names.Add(assetFile.Name);
                     if (assetFile.Multi != null)
@@ -261,6 +271,7 @@ namespace OpenKh.Patcher
                                 // The following codes are for validation purposes only.
 
                                 List<string> globalFilePaths = new List<string> { ".a.fr", ".a.gr", ".a.it", ".a.sp", ".a.us", "/fr/", "/gr/", "/it/", "/sp/", "/us/" };
+                                List<string> emulatorRegionPaths = new List<string> { "/jp/", "/us/", "/it/", "/sp/", "/gr/", "/fr/", "/fm/" };
                                 if (assetFile.Method != "copy" && assetFile.Method != "imd")
                                 {
                                     if (platform == 2)
@@ -282,7 +293,15 @@ namespace OpenKh.Patcher
                                     }
                                     else
                                     {
-                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
+                                        string matchedRegion = emulatorRegionPaths.FirstOrDefault(x => name.Contains(x));
+                                        if (matchedRegion != null)
+                                        {
+                                            string emuRegionPath = context.GetOriginalAssetPath(name.Substring(0, name.IndexOf(matchedRegion) + 3));
+                                            if (Directory.Exists(emuRegionPath))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
                                     }
                                 }
                                 else if (assetFile.Source[0].Type == "internal")
@@ -306,7 +325,15 @@ namespace OpenKh.Patcher
                                     }
                                     else
                                     {
-                                        Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
+                                        string matchedRegion = emulatorRegionPaths.FirstOrDefault(x => assetFile.Source[0].Name.Contains(x));
+                                        if (matchedRegion != null)
+                                        {
+                                            string emuRegionPath = context.GetOriginalAssetPath(assetFile.Source[0].Name.Substring(0, assetFile.Source[0].Name.IndexOf(matchedRegion) + 3));
+                                            if (Directory.Exists(emuRegionPath))
+                                            {
+                                                Log.Warn("File not found: " + context.GetOriginalAssetPath(assetFile.Source[0].Name) + " Skipping. \nPlease check your game extraction.");
+                                            }
+                                        }
                                     }
                                 }
                                 else
@@ -362,6 +389,9 @@ namespace OpenKh.Patcher
                     break;
                 case "areadatascript":
                     PatchAreaDataScript(context, assetFile.Source, stream);
+                    break;
+                case "kh1ardresource":
+                    PatchKh1ArdResource(context, assetFile, stream);
                     break;
                 case "bdscript":
                     PatchBdscript(context, assetFile, stream);
@@ -600,6 +630,44 @@ namespace OpenKh.Patcher
             Kh2.Ard.AreaDataScript.Write(stream.SetPosition(0), scripts.Values);
         }
 
+        private static void PatchKh1ArdResource(Context context, AssetFile assetFile, Stream stream)
+        {
+            if (assetFile.Source == null || assetFile.Source.Count == 0)
+                throw new Exception($"File '{assetFile.Name}' does not contain any source");
+
+            if (!Kh1.Ard.IsValid(stream))
+                throw new InvalidDataException($"'{assetFile.Name}' is not a valid KH1 .ard archive");
+
+            var resources = Kh1.Ard.ReadResourceList(stream);
+            foreach (var source in assetFile.Source)
+            {
+                var srcFile = context.GetSourceModAssetPath(source.Name);
+                if (!File.Exists(srcFile))
+                    throw new FileNotFoundException($"The mod does not contain the file {source.Name}", srcFile);
+
+                var replacements = deserializer.Deserialize<Dictionary<int, string>>(File.ReadAllText(srcFile))
+                    ?? new Dictionary<int, string>();
+
+                foreach (var replacement in replacements)
+                {
+                    if (replacement.Key < 0 || replacement.Key >= resources.Count)
+                        throw new IndexOutOfRangeException(
+                            $"'{source.Name}' sets resource index {replacement.Key}, but '{assetFile.Name}' only has {resources.Count} entries (0 to {resources.Count - 1})");
+
+                    if (string.IsNullOrEmpty(replacement.Value))
+                        throw new Exception($"'{source.Name}' does not give a name for resource index {replacement.Key}");
+
+                    resources[replacement.Key] = replacement.Value;
+                }
+            }
+
+            Kh1.Ard.WriteResourceList(stream, resources);
+
+            // The resource list is edited in place; keep the rest of the archive intact,
+            // as PatchFile truncates the stream to whatever position it is left at.
+            stream.Position = stream.Length;
+        }
+
         private static void PatchBdscript(Context context, AssetFile assetFile, Stream stream)
         {
 
@@ -651,6 +719,10 @@ namespace OpenKh.Patcher
         private static readonly Dictionary<string, byte> worldIndexMap = new Dictionary<string, byte>(StringComparer.OrdinalIgnoreCase){
     { "worldzz", 0 }, { "endofsea", 1 }, { "twilighttown", 2 },  { "destinyisland", 3 },  { "hollowbastion", 4 }, { "beastscastle", 5 }, { "olympuscoliseum", 6 },  { "agrabah", 7 }, { "thelandofdragons", 8 },  { "100acrewood", 9 },  { "prideland", 10 }, { "atlantica", 11 }, { "disneycastle", 12 }, { "timelessriver", 13}, {"halloweentown", 14}, { "worldmap", 15 }, { "portroyal", 16 }, { "spaceparanoids", 17 }, { "theworldthatneverwas", 18 }
     };
+
+        private static readonly Dictionary<string, int> wentNameMap =
+    new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+    {        ["Sora"] = 1, ["SoraNM"] = 11, ["Donald"] = 17, ["DonaldNM"] = 19, ["Goofy"] = 20, ["GoofyLK"] = 21, ["GoofyNM"] = 22, ["Aladdin"] = 23, ["Auron"] = 24, ["Mulan"] = 25, ["Ping"] = 26, ["Tron"] = 27, ["Mickey"] = 28, ["Beast"] = 31, ["Jack"] = 32, ["Simba"] = 33, ["Sparrow"] = 34, ["Riku"] = 35, ["SparrowHuman"] = 36, ["SoraTR"] = 37, ["SoraWI"] = 43, ["DonaldTR"] = 49, ["DonaldWI"] = 50, ["GoofyTR"] = 51, ["GoofyWI"] = 52 };
 
         private static readonly IDeserializer deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
 
@@ -777,15 +849,125 @@ namespace OpenKh.Patcher
 
                         foreach (var character in moddedLevels)
                         {
-                            foreach (var level in moddedLevels[character.Key])
+                            var charIndex = characterMap[character.Key] - 1;
+                            var characterData = levelList.Characters[charIndex];
+
+                            foreach (var level in character.Value)
                             {
-                                levelList.Characters[characterMap[character.Key] - 1].Levels[level.Key - 1] = moddedLevels[character.Key][level.Key];
+                                int levelIndex = level.Key - 1;
+                                while (characterData.Levels.Count <= levelIndex)
+                                {
+                                    characterData.Levels.Add(new Kh2.Battle.Lvup.PlayableCharacter.Level());
+                                }
+                                characterData.Levels[levelIndex] = level.Value;
                             }
+                            characterData.NumLevels = characterData.Levels.Count;
                         }
 
                         levelList.Write(stream.SetPosition(0));
                         break;
+                        
+                    case "went":
+                    {
+                        var went = Kh2.SystemData.Went.Read(stream);
 
+                        var mod = deserializer.Deserialize<
+                            Dictionary<string, Dictionary<int, uint>>
+                        >(sourceText);
+
+                        foreach (var headerEntry in mod)
+                        {
+                            if (!wentNameMap.TryGetValue(headerEntry.Key, out int headerIndex))
+                                throw new Exception($"Invalid Went name: {headerEntry.Key}");
+
+                            uint offset = went.Offsets[headerIndex];
+                            if (offset == 0)
+                                continue;
+
+                            var set = went.Sets
+                                .Find(x => x.OriginalOffset == offset);
+
+                            if (set == null)
+                                throw new Exception($"Set not found for offset {offset}");
+
+                            foreach (var entry in headerEntry.Value)
+                            {
+                                int weaponIndex = entry.Key;
+                                uint weaponId = entry.Value;
+
+                                while (set.WeaponIds.Count <= weaponIndex)
+                                    set.WeaponIds.Add(0);
+
+                                set.WeaponIds[weaponIndex] = weaponId;
+                            }
+                        }
+
+                        stream.SetLength(0);
+                        stream.Position = 0;
+
+                        went.Write(stream);
+                        break;
+                    }
+
+                    case "sstm":
+                    {
+                        var sstm = Kh2.SystemData.Sstm.Read(stream);
+
+                        var mod = deserializer.Deserialize<Dictionary<string, object>>(sourceText);
+
+                        foreach (var entry in mod)
+                        {
+                            var prop = typeof(Kh2.SystemData.Sstm).GetProperty(entry.Key);
+                            if (prop == null)
+                                throw new Exception($"Invalid SSTM field: {entry.Key}");
+
+                            var converted = Convert.ChangeType(
+                                entry.Value,
+                                Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType
+                            );
+
+                            prop.SetValue(sstm, converted);
+                        }
+
+                        sstm.Write(stream);
+                        break;
+                    }
+
+                    case "prty":
+                    {
+                        var file = Kh2.SystemData.PrtyFile.Read(stream);
+
+                        var mod = deserializer.Deserialize<Dictionary<string, Dictionary<string, object>>>(sourceText);
+
+                        foreach (var character in mod)
+                        {
+                            if (!Kh2.SystemData.Prty.CharacterMap.TryGetValue(character.Key, out int index))
+                                throw new Exception($"Invalid PRTY character: {character.Key}");
+
+                            int realIndex = index + 1;
+                            int offset = file.Offsets[realIndex];
+
+                            var entry = file.UniqueEntries[offset];
+
+                            foreach (var field in character.Value)
+                            {
+                                var prop = typeof(Kh2.SystemData.Prty).GetProperty(field.Key);
+                                if (prop == null)
+                                    throw new Exception($"Invalid PRTY field: {field.Key}");
+
+                                var converted = Convert.ChangeType(
+                                    field.Value,
+                                    Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType
+                                );
+
+                                prop.SetValue(entry, converted);
+                            }
+                        }
+
+                        file.Write(stream);
+                        break;
+                    }
+                        
                     case "bons":
                         var bonusRaw = Kh2.Battle.Bons.Read(stream);
                         var bonusList = new Dictionary<byte, Dictionary<string, Kh2.Battle.Bons>>();
@@ -913,6 +1095,27 @@ namespace OpenKh.Patcher
                         Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList);
                         break;
 
+                    case "slct":
+                        var slctList = Kh2.Slct.Read(stream);
+                        var moddedSlct = deserializer.Deserialize<List<Kh2.Slct>>(sourceText);
+
+                        foreach (var entries in moddedSlct)
+                        {
+                            var existingEntry = slctList.FirstOrDefault(x => x.Id == entries.Id);
+
+                            if (existingEntry != null)
+                            {
+                                slctList[slctList.IndexOf(existingEntry)] = entries;
+                            }
+                            else
+                            {
+                                slctList.Add(entries);
+                            }
+                        }
+
+                        Kh2.Slct.Write(stream.SetPosition(0), slctList);
+                        break;
+                        
                     case "localset":
                         var localList = Kh2.Localset.Read(stream);
                         var moddedLocal = deserializer.Deserialize<List<Kh2.Localset>>(sourceText);
@@ -983,6 +1186,120 @@ namespace OpenKh.Patcher
                         }
 
                         Kh2.Battle.Enmp.Write(stream.SetPosition(0), enmpList);
+                        break;
+
+                    case "shop":
+                        var shop = Kh2.SystemData.Shop.Read(stream);
+                        var moddedShop = deserializer.Deserialize<Kh2.SystemData.Shop.ShopHelper>(sourceText);
+                        ushort inventoriesBaseOffset = (ushort)(Kh2.SystemData.Shop.HeaderSize + shop.ShopEntries.Count * Kh2.SystemData.Shop.ShopEntrySize);
+                        ushort productsBaseOffset = (ushort)(inventoriesBaseOffset + shop.InventoryEntries.Count * Kh2.SystemData.Shop.InventoryEntrySize);
+                        List<Kh2.SystemData.Shop.ShopEntryHelper> moddedShopEntryHelpers = shop.ShopEntries.Select(x => x.ToShopEntryHelper(inventoriesBaseOffset)).ToList();
+                        if (moddedShop?.ShopEntryHelpers != null)
+                        {
+                            foreach (var shopEntryHelper in moddedShop.ShopEntryHelpers)
+                            {
+                                int entryIndex = moddedShopEntryHelpers.FindIndex(x => x.ShopID == shopEntryHelper.ShopID);
+                                if (entryIndex < 0)
+                                {
+                                    moddedShopEntryHelpers.Add(shopEntryHelper);
+                                }
+                                else
+                                {
+                                    moddedShopEntryHelpers[entryIndex] = shopEntryHelper;
+                                }
+                            }
+                        }
+                        inventoriesBaseOffset = (ushort)(Kh2.SystemData.Shop.HeaderSize + moddedShopEntryHelpers.Count * Kh2.SystemData.Shop.ShopEntrySize);
+                        shop.ShopEntries = moddedShopEntryHelpers.Select(x => x.ToShopEntry(inventoriesBaseOffset)).ToList();
+                        List<Kh2.SystemData.Shop.InventoryEntryHelper> moddedInventoryEntryHelpers = shop.InventoryEntries.Select((x, index) =>
+                            x.ToInventoryEntryHelper(index, productsBaseOffset)
+                        ).ToList();
+                        if (moddedShop?.InventoryEntryHelpers != null)
+                        {
+                            foreach (var inventoryEntryHelper in moddedShop.InventoryEntryHelpers)
+                            {
+                                int invIndex = inventoryEntryHelper.InventoryIndex;
+                                if (invIndex < 0)
+                                    throw new InvalidDataException($"Shop listpatch: InventoryIndex {invIndex} is an invalid index.");
+                                if (invIndex >= moddedInventoryEntryHelpers.Count)
+                                {
+                                    int dummiesToAdd = invIndex - moddedInventoryEntryHelpers.Count;
+                                    for (int i = 0; i < dummiesToAdd; i++)
+                                    {
+                                        moddedInventoryEntryHelpers.Add(new Kh2.SystemData.Shop.InventoryEntryHelper {
+                                            InventoryIndex = moddedInventoryEntryHelpers.Count + i,
+                                            UnlockEventID = 0,
+                                            ProductCount = 0,
+                                            ProductStartIndex = 0
+                                        });
+                                    }
+                                    moddedInventoryEntryHelpers.Add(inventoryEntryHelper);
+                                }
+                                else
+                                {
+                                    moddedInventoryEntryHelpers[invIndex] = inventoryEntryHelper;
+                                }
+                            }
+                        }
+                        productsBaseOffset = (ushort)(inventoriesBaseOffset + moddedInventoryEntryHelpers.Count * Kh2.SystemData.Shop.InventoryEntrySize);
+                        shop.InventoryEntries = moddedInventoryEntryHelpers.Select(x => x.ToInventoryEntry(productsBaseOffset)).ToList();
+                        List<Kh2.SystemData.Shop.ProductEntryHelper> moddedProductEntryHelpers = shop.ProductEntries.Select((x, index) => x.ToProductEntryHelper(index)).ToList();
+                        if (moddedShop?.ProductEntryHelpers != null)
+                        {
+                            foreach (var productEntryHelper in moddedShop.ProductEntryHelpers)
+                            {
+                                int prodIndex = productEntryHelper.ProductIndex;
+                                if (prodIndex < 0)
+                                    throw new InvalidDataException($"Shop listpatch: ProductIndex {prodIndex} is an invalid index.");
+                                if (prodIndex >= moddedProductEntryHelpers.Count)
+                                {
+                                    int dummiesToAdd = prodIndex - moddedProductEntryHelpers.Count;
+                                    for (int i = 0; i < dummiesToAdd; i++)
+                                    {
+                                        moddedProductEntryHelpers.Add(new Kh2.SystemData.Shop.ProductEntryHelper
+                                        {
+                                            ProductIndex = moddedProductEntryHelpers.Count + i,
+                                            ItemID = 0
+                                        });
+                                    }
+                                    moddedProductEntryHelpers.Add(productEntryHelper);
+                                }
+                                else
+                                {
+                                    moddedProductEntryHelpers[prodIndex] = productEntryHelper;
+                                }
+                            }
+                        }
+                        shop.ProductEntries = moddedProductEntryHelpers.Select(x => x.ToProductEntry()).ToList();
+                        List<Kh2.SystemData.Shop.ProductEntryHelper> moddedValidProductEntryHelpers = shop.ValidProductEntries.Select((x, index) => x.ToProductEntryHelper(index)).ToList();
+                        if (moddedShop?.ValidProductEntryHelpers != null)
+                        {
+                            foreach (var productEntryHelper in moddedShop.ValidProductEntryHelpers)
+                            {
+                                int prodIndex = productEntryHelper.ProductIndex;
+                                if (prodIndex < 0)
+                                    throw new InvalidDataException($"Shop listpatch: ValidProductIndex {prodIndex} is an invalid index.");
+                                if (prodIndex >= moddedValidProductEntryHelpers.Count)
+                                {
+                                    int dummiesToAdd = prodIndex - moddedValidProductEntryHelpers.Count;
+                                    for (int i = 0; i < dummiesToAdd; i++)
+                                    {
+                                        moddedValidProductEntryHelpers.Add(new Kh2.SystemData.Shop.ProductEntryHelper
+                                        {
+                                            ProductIndex = moddedValidProductEntryHelpers.Count + i,
+                                            ItemID = 0
+                                        });
+                                    }
+                                    moddedValidProductEntryHelpers.Add(productEntryHelper);
+                                }
+                                else
+                                {
+                                    moddedValidProductEntryHelpers[prodIndex] = productEntryHelper;
+                                }
+                            }
+                        }
+                        shop.ValidProductEntries = moddedValidProductEntryHelpers.Select(x => x.ToProductEntry()).ToList();
+                        Kh2.SystemData.Shop.Write(stream.SetPosition(0), shop);
                         break;
 
                     case "sklt":
@@ -1486,3 +1803,6 @@ namespace OpenKh.Patcher
         }
     }
 }
+
+
+

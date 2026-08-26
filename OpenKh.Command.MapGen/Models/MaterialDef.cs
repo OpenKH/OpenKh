@@ -118,6 +118,12 @@ namespace OpenKh.Command.MapGen.Models
         /// </summary>
         public bool normal { get; set; } = false;
 
+        /// <summary>
+        /// Explicit build priority. Lower number = built first.
+        /// Meshes with no priority set are appended after all prioritized meshes in their original order.
+        /// </summary>
+        public int? priority { get; set; }
+
         public static MaterialDef CreateFallbackFor(string name) =>
             new MaterialDef
             {

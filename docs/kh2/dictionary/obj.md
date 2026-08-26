@@ -479,7 +479,7 @@
 | 793 | MENU_FRIEND_1 | MENU_FRIEND_1 |
 | 794 | MENU_FRIEND_2 | MENU_FRIEND_2 |
 | 795 | B_EX120 | (B) Demyx (Only playing sitar?) |
-| 796 | H_BB020_TSURU | (H) ??? (TSURU) (BB) |
+| 796 | H_BB020_TSURU | (H) Beast (Prince Suit) (TSURU) (BB) |
 | 797 | H_BB040_TSURU | (H) Belle (ball dress) (TSURU) (BB) |
 | 798 | H_LK020 | (H) Simba (LK) |
 | 799 | F_BB130 | (F) ??? - Minigame related? (BB) |

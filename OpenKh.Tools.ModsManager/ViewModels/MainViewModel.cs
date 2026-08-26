@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using static OpenKh.Tools.ModsManager.Helpers;
@@ -38,13 +39,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private Process _runningProcess;
         private bool _isBuilding;
         private bool _pc;
+        private bool _pcsx2;
         private bool _panaceaInstalled;
         private bool _panaceaConsoleEnabled;
         private bool _panaceaDebugLogEnabled;
         private bool _panaceaSoundDebugEnabled;
         private bool _panaceaCacheEnabled;
         private bool _panaceaQuickMenuEnabled;
-        private bool _devView;
+        private bool _enablePatching;
         private bool _autoUpdateMods = false;
         private string _launchGame = "kh2";
         private List<string> _supportedGames = new List<string>()
@@ -54,6 +56,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             "bbs",
             "Recom",
             "kh3d"
+        };
+        private List<string> _supportedPCSX2Games = new List<string>()
+        {
+            "kh2",
+            "kh1",
+            "Recom"
         };
         private int _wizardVersionNumber = 1;
         private string[] executable = new string[]
@@ -89,11 +97,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand BuildAndRunCommand { get; set; }
         public RelayCommand StopRunningInstanceCommand { get; set; }
         public RelayCommand WizardCommand { get; set; }
-        public RelayCommand OpenLinkCommand { get; set; }
-        public RelayCommand CheckOpenkhUpdateCommand { get; set; }
-        public RelayCommand OpenPresetMenuCommand { get; set; }
-        public RelayCommand CheckForModUpdatesCommand { get; set; }
-        public RelayCommand YamlGeneratorCommand { get; set; }
+        public ICommand OpenPresetMenuCommand { get; private set; }
+        public ICommand CheckForModUpdatesCommand { get; private set; }
+        public ICommand OpenLinkCommand { get; private set; }
+        public ICommand CheckOpenkhUpdateCommand { get; private set; }
+        public ICommand YamlGeneratorCommand { get; private set; }
+        public ICommand OpenModSearchCommand { get; private set; }
 
         public ModViewModel SelectedValue
         {
@@ -117,12 +126,50 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public Visibility IsModInfoVisible => IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PatchVisible => PC &&  EnablePatching ? Visibility.Visible : Visibility.Collapsed;
         public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
+        public bool GameSelectInteractable => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && MultiEmuGames);
+        public Visibility GameSelectVisible => PC || PCSX2 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH2 => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationKH2 != null) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH1 => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationKH1 != null) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectBBS => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectRecom => (PC && Directory.Exists(ConfigurationService.PcReleaseLocation)) || (PCSX2 && ConfigurationService.IsoLocationRecom != null) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameSelectKH3D => (PC && Directory.Exists(ConfigurationService.PcReleaseLocationKH3D)) ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PanaceaSettings => PC && PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
 
+        public enum GameIDs {
+            KH2 = 0,
+            KH1 = 1,
+            BBS = 2,
+            Recom = 3,
+            KH3D = 4,
+        };
+
+        public bool MultiEmuGames
+        {
+            get
+            {
+                int count = 0;
+                if (ConfigurationService.IsoLocationKH2 != null)
+                {
+                    count++;
+                }
+                if (ConfigurationService.IsoLocationKH1 != null)
+                {
+                    count++;
+                }
+                if (ConfigurationService.IsoLocationRecom != null)
+                {
+                    count++;
+                }
+                if (count > 1)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
         public bool PanaceaConsoleEnabled
         {
             get => _panaceaConsoleEnabled;
@@ -181,13 +228,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 UpdatePanaceaSettings();
             }
         }
-        public bool DevView
+        public bool EnablePatching
         {
-            get => _devView;
+            get => _enablePatching;
             set
             {
-                _devView = value;
-                ConfigurationService.DevView = DevView;
+                _enablePatching = value;
+                ConfigurationService.EnablePatching = EnablePatching;
                 OnPropertyChanged(nameof(PatchVisible));
             }
         }
@@ -207,7 +254,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 _panaceaInstalled = value;
                 OnPropertyChanged(nameof(PatchVisible));
-                OnPropertyChanged(nameof(ModLoader));
                 OnPropertyChanged(nameof(PanaceaSettings));
             }
         }
@@ -219,10 +265,27 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 _pc = value;
                 OnPropertyChanged(nameof(PC));
-                OnPropertyChanged(nameof(ModLoader));
                 OnPropertyChanged(nameof(PatchVisible));
                 OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
+                OnPropertyChanged(nameof(GameSelectVisible));
+                OnPropertyChanged(nameof(GameSelectInteractable));
+                OnPropertyChanged(nameof(PanaceaSettings));
+            }
+        }
+
+        public bool PCSX2
+        {
+            get => _pcsx2;
+            set
+            {
+                _pcsx2 = value;
+                OnPropertyChanged(nameof(PCSX2));
+                OnPropertyChanged(nameof(PatchVisible));
+                OnPropertyChanged(nameof(notPC));
+                OnPropertyChanged(nameof(isPC));
+                OnPropertyChanged(nameof(GameSelectVisible));
+                OnPropertyChanged(nameof(GameSelectInteractable));
                 OnPropertyChanged(nameof(PanaceaSettings));
             }
         }
@@ -234,55 +297,51 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 switch (_launchGame)
                 {
                     case "kh2":
-                        launchExecutable = 0;
-                        return 0;
+                        launchExecutable = (int)GameIDs.KH2;
+                        break;
                     case "kh1":
-                        launchExecutable = 1;
-                        return 1;
+                        launchExecutable = (int)GameIDs.KH1;
+                        break;
                     case "bbs":
-                        launchExecutable = 2;
-                        return 2;
+                        launchExecutable = (int)GameIDs.BBS;
+                        break;
                     case "Recom":
-                        launchExecutable = 3;
-                        return 3;
+                        launchExecutable = (int)GameIDs.Recom;
+                        break;
                     case "kh3d":
-                        launchExecutable = 4;
-                        return 4;
+                        launchExecutable = (int)GameIDs.KH3D;
+                        break;
                     default:
-                        launchExecutable = 0;
-                        return 0;
+                        launchExecutable = (int)GameIDs.KH2;
+                        break;
                 }
+                return launchExecutable;
             }
             set
             {
                 launchExecutable = value;
-                switch (value)
+                switch ((GameIDs)value)
                 {
-                    case 0:
+                    case GameIDs.KH2:
                         _launchGame = "kh2";
-                        ConfigurationService.LaunchGame = "kh2";
                         break;
-                    case 1:
+                    case GameIDs.KH1:
                         _launchGame = "kh1";
-                        ConfigurationService.LaunchGame = "kh1";
                         break;
-                    case 2:
+                    case GameIDs.BBS:
                         _launchGame = "bbs";
-                        ConfigurationService.LaunchGame = "bbs";
                         break;
-                    case 3:
+                    case GameIDs.Recom:
                         _launchGame = "Recom";
-                        ConfigurationService.LaunchGame = "Recom";
                         break;
-                    case 4:
+                    case GameIDs.KH3D:
                         _launchGame = "kh3d";
-                        ConfigurationService.LaunchGame = "kh3d";
                         break;
                     default:
                         _launchGame = "kh2";
-                        ConfigurationService.LaunchGame = "kh2";
                         break;
                 }
+                ConfigurationService.LaunchGame = _launchGame;
                 ReloadModsList();
                 if (ModsList.Count > 0)
                     _ = FetchUpdates();
@@ -307,11 +366,27 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public MainViewModel()
         {
-            if (ConfigurationService.GameEdition == 2)
+            if (Directory.Exists($"gitfetch"))
+            {
+                var _fetchAllFiles = Directory.GetFiles($"gitfetch", "*", SearchOption.AllDirectories);
+                var _fetchAllDirectories = Directory.GetDirectories($"gitfetch", "*", SearchOption.AllDirectories);
+
+                foreach (var _fetchFile in _fetchAllFiles)
+                    File.SetAttributes(_fetchFile, FileAttributes.Normal);
+
+                foreach (string _fetchDirectory in _fetchAllDirectories)
+                    File.SetAttributes(_fetchDirectory, FileAttributes.Normal);
+
+                Directory.Delete($"gitfetch", true);
+            }
+
+
+            if (ConfigurationService.GameEdition == SetupWizardViewModel.PC)
             {
                 PC = true;
+                PCSX2 = false;
                 PanaceaInstalled = ConfigurationService.PanaceaInstalled;
-                DevView = ConfigurationService.DevView;
+                EnablePatching = ConfigurationService.EnablePatching;
                 _panaceaConsoleEnabled = ConfigurationService.ShowConsole;
                 _panaceaDebugLogEnabled = ConfigurationService.DebugLog;
                 _panaceaSoundDebugEnabled = ConfigurationService.SoundDebug;
@@ -323,7 +398,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     try
                     {
                         string PanaceaSourceLocation = Path.Combine(AppContext.BaseDirectory, "OpenKH.Panacea.dll");
-                        if (ConfigurationService.PcReleaseLanguage != null)
+                        if (ConfigurationService.PcReleaseLocation != null)
                         {
                             string PanaceaDestinationLocation = Path.Combine(ConfigurationService.PcReleaseLocation, "DBGHELP.dll");
                             string PanaceaAlternateLocation = Path.Combine(ConfigurationService.PcReleaseLocation, "version.dll");
@@ -354,6 +429,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             }
                         }
                         ConfigurationService.Updated = false;
+                        MessageBox.Show(
+                               $"Panacea has successfully been updated alongside Mods Manager.\nIf you notice any mod loading bugs you might still want to uninstall and reinstall Panacea just in case.",
+                               "Success",
+                               MessageBoxButton.OK,
+                               MessageBoxImage.Information);
                     }
                     catch
                     {
@@ -366,17 +446,45 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     }
                 }
             }
-            else
+            else if (ConfigurationService.GameEdition == SetupWizardViewModel.PCSX2)
+            {
                 PC = false;
-            if (_supportedGames.Contains(ConfigurationService.LaunchGame) && PC)
+                PCSX2 = true;
+            }
+            else
+            {
+                PC = false;
+                PCSX2 = false;
+            }
+            if (_supportedGames.Contains(ConfigurationService.LaunchGame) && PC || _supportedPCSX2Games.Contains(ConfigurationService.LaunchGame) && PCSX2)
                 _launchGame = ConfigurationService.LaunchGame;
             else
                 ConfigurationService.LaunchGame = _launchGame;
 
             AutoUpdateMods = ConfigurationService.AutoUpdateMods;
 
-            Log.OnLogDispatch += (long ms, string tag, string message) =>
-                _debuggingWindow.Log(ms, tag, message);
+            try
+            {
+                Log.OnLogDispatch += (long ms, string tag, string message) =>
+                    _debuggingWindow.Log(ms, tag, message);
+            }
+            catch
+            {
+                MessageBox.Show(
+                       $"Mods Manager had problems starting. Will now force close any instances of Mods Manager to hopefully allow you to re-open the program.",
+                       "Error",
+                       MessageBoxButton.OK,
+                       MessageBoxImage.Error);
+                Process[] runningProcesses = Process.GetProcesses();
+                foreach (Process process in runningProcesses)
+                {
+                    if (process.ProcessName == "OpenKh.Tools.ModsManager" && process.Id != Process.GetCurrentProcess().Id)
+                    {
+                        process.Kill(true);
+                    }
+                }
+                Process.GetCurrentProcess().Kill();
+            }
 
             ReloadModsList();
             SelectedValue = ModsList.FirstOrDefault();
@@ -397,6 +505,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         var name = view.RepositoryName;
                         var isZipFile = view.IsZipFile;
                         var isLuaFile = view.IsLuaFile;
+                        var platformUrl = view.PlatformURL;
+                        var branchName = view.BranchName;
                         progressWindow = Application.Current.Dispatcher.Invoke(() =>
                         {
                             var progressWindow = new InstallModProgressWindow
@@ -408,14 +518,30 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             progressWindow.Show();
                             return progressWindow;
                         });
+
+                        if (name.Contains("@"))
+                        {
+                            var _fetchNameWithPlatform = name.Split("@");
+
+                            name = _fetchNameWithPlatform[0];
+                            platformUrl = _fetchNameWithPlatform[1];
+                        }
+
                         await ModsService.InstallMod(name, isZipFile, isLuaFile, progress =>
                         {
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
                         }, nProgress =>
                         {
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
-                        });
-                        var actualName = isZipFile || isLuaFile ? Path.GetFileNameWithoutExtension(name) : name;
+                        }, platformUrl, branchName);
+                        var repoName = name;
+                        if (!isZipFile && !isLuaFile)
+                        {
+                            var nameParts = name.Split('/');
+                            if (nameParts.Length == 3)
+                                repoName = $"{nameParts[0]}/{nameParts[1]}";
+                        }
+                        var actualName = isZipFile || isLuaFile ? Path.GetFileNameWithoutExtension(name) : repoName;
                         var mod = ModsService.GetMods(new string[] { actualName }).First();
                         Application.Current.Dispatcher.Invoke(() =>
                         {
@@ -452,14 +578,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     Handle(() =>
                     {
-                        foreach (var filePath in Directory.GetFiles(mod.Path, "*", SearchOption.AllDirectories))
-                        {
-                            var attributes = File.GetAttributes(filePath);
-                            if (attributes.HasFlag(FileAttributes.ReadOnly))
-                                File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
-                        }
-
-                        Directory.Delete(mod.Path, true);
+                        ModsService.CleanModFiles(mod.Path);
                         ModsList.RemoveAt(ModsList.IndexOf(SelectedValue));
                     });
                 }
@@ -528,15 +647,88 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 var dialog = new SetupWizardWindow();
                 if (dialog.ShowDialog() != null)
                 {
-                    if (ConfigurationService.GameEdition == 2)
+                    if (ConfigurationService.GameEdition == SetupWizardViewModel.PC)
                     {
                         PC = true;
+                        PCSX2 = false;
                         PanaceaInstalled = ConfigurationService.PanaceaInstalled;
+                        if (!Directory.Exists(ConfigurationService.PcReleaseLocation))
+                        {
+                            if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                            {
+                                GametoLaunch = (int)GameIDs.KH3D;
+                            }
+                            else
+                            {
+                                MessageBox.Show(
+                                "Unable to locate install locations for both KINGDOM HEARTS HD 1.5+2.5 ReMIX and KINGDOM HEARTS HD 2.8 Final Chapter Prologue. They are either missing or corrupted. Please re-run the setup wizard and confirm the install paths are correct.",
+                                "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                        }
+                    }
+                    else if (ConfigurationService.GameEdition == SetupWizardViewModel.PCSX2)
+                    {
+                        PC = false;
+                        PCSX2 = true;
+                        string? launchIso;
+                        switch (_launchGame)
+                        {
+                            case "kh2":
+                                launchIso = ConfigurationService.IsoLocationKH2;
+                                break;
+                            case "kh1":
+                                launchIso = ConfigurationService.IsoLocationKH1;
+                                break;
+                            case "Recom":
+                                launchIso = ConfigurationService.IsoLocationRecom;
+                                break;
+                            default:
+                                launchIso = null;
+                                break;
+                        }
+                        GameInfoModel? game;
+                        if (!String.IsNullOrEmpty(launchIso))
+                        {
+                            game = GameService.DetectGameId(launchIso);
+                        }
+                        else
+                        {
+                            game = null;
+                        }
+                        if (!_supportedPCSX2Games.Contains(_launchGame) || launchIso == null || game == null || game?.Id != _launchGame)
+                        {
+                            if (ConfigurationService.IsoLocationKH2 != null && (game = GameService.DetectGameId(ConfigurationService.IsoLocationKH2)) != null && game?.Id == "kh2")
+                            {
+                                GametoLaunch = (int)GameIDs.KH2;
+                            }
+                            else if (ConfigurationService.IsoLocationKH1 != null && (game = GameService.DetectGameId(ConfigurationService.IsoLocationKH1)) != null && game?.Id == "kh1")
+                            {
+                                GametoLaunch = (int)GameIDs.KH1;
+                            }
+                            else if (ConfigurationService.IsoLocationRecom != null && (game = GameService.DetectGameId(ConfigurationService.IsoLocationRecom)) != null && game?.Id == "Recom")
+                            {
+                                GametoLaunch = (int)GameIDs.Recom;
+                            }
+                            else
+                            {
+                                GametoLaunch = (int)GameIDs.KH2;
+                            }
+                        }
                     }
                     else
+                    {
                         PC = false;
+                        PCSX2 = false;
+                        GametoLaunch = (int)GameIDs.KH2;
+                    }
                     ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
                 }
+                OnPropertyChanged(nameof(GametoLaunch));
+                OnPropertyChanged(nameof(GameSelectKH2));
+                OnPropertyChanged(nameof(GameSelectKH1));
+                OnPropertyChanged(nameof(GameSelectBBS));
+                OnPropertyChanged(nameof(GameSelectRecom));
+                OnPropertyChanged(nameof(GameSelectKH3D));
             });
 
             OpenPresetMenuCommand = new RelayCommand(_ =>
@@ -577,6 +769,41 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
             );
 
+            OpenModSearchCommand = new RelayCommand(
+                _ =>
+                {
+                    var searchWindow = new ModSearchWindow(
+                        reloadModsList: () => ReloadModsList()
+                    )
+                    {
+                        Owner = _getActiveWindowService.GetActiveWindow(),
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner
+                    };
+                    searchWindow.Closing += (_, e) =>
+                    {
+                        if (!e.Cancel)
+                        {
+                            searchWindow.Owner?.Focus();
+                            // Reload mods list to show newly installed mods
+                            ReloadModsList();
+                        }
+                    };
+                    searchWindow.Show();
+                }
+            );
+
+            if (Directory.Exists(ConfigurationService.InstalledModsPath))
+            {
+                var _fetchAllFiles = Directory.GetFiles(ConfigurationService.InstalledModsPath, "*", SearchOption.AllDirectories);
+                var _fetchAllDirectories = Directory.GetDirectories(ConfigurationService.InstalledModsPath, "*", SearchOption.AllDirectories);
+
+                foreach (var _fetchFile in _fetchAllFiles)
+                    File.SetAttributes(_fetchFile, FileAttributes.Normal);
+
+                foreach (string _fetchDirectory in _fetchAllDirectories)
+                    File.SetAttributes(_fetchDirectory, FileAttributes.Normal);
+            }
+
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
             _ = FetchUpdates();
 
@@ -615,7 +842,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private async Task<bool> BuildPatches(bool fastMode)
         {
             IsBuilding = true;
-            var result = await ModsService.RunPacherAsync(fastMode);
+            var result = await ModsService.RunPatcherAsync(fastMode);
             IsBuilding = false;
 
             return result;
@@ -627,39 +854,63 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             bool isPcsx2 = false;
             switch (ConfigurationService.GameEdition)
             {
-                case 0:
+                case SetupWizardViewModel.OpenKHGameEngine:
                     Log.Info("Starting OpenKH Game Engine");
                     processStartInfo = new ProcessStartInfo
                     {
                         FileName = ConfigurationService.OpenKhGameEngineLocation,
                         WorkingDirectory = Path.GetDirectoryName(ConfigurationService.OpenKhGameEngineLocation),
-                        Arguments = $"--data \"{ConfigurationService.GameDataLocation}\" --modpath \"{ConfigurationService.GameModPath}\"",
+                        Arguments = $"--data \"{ConfigurationService.GameDataLocation}\" --modpath \"{ConfigurationService.CompiledModPath}\"",
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,
                     };
                     break;
-                case 1:
+                case SetupWizardViewModel.PCSX2:
                     Log.Info("Starting PCSX2");
                     _pcsx2Injector.RegionId = ConfigurationService.RegionId;
                     _pcsx2Injector.Region = Kh2.Constants.Regions[_pcsx2Injector.RegionId];
                     _pcsx2Injector.Language = Kh2.Constants.Languages[_pcsx2Injector.RegionId];
 
-                    processStartInfo = new ProcessStartInfo
+                    String IsoLocation;
+                    switch (_launchGame)
                     {
-                        FileName = ConfigurationService.Pcsx2Location,
-                        WorkingDirectory = Path.GetDirectoryName(ConfigurationService.Pcsx2Location),
-                        Arguments = $"\"{ConfigurationService.IsoLocation}\"",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                    };
-                    isPcsx2 = true;
+                        case "kh2":
+                            IsoLocation = ConfigurationService.IsoLocationKH2;
+                            break;
+                        case "kh1":
+                            IsoLocation = ConfigurationService.IsoLocationKH1;
+                            break;
+                        case "Recom":
+                            IsoLocation = ConfigurationService.IsoLocationRecom;
+                            break;
+                        default:
+                            IsoLocation = ConfigurationService.IsoLocationKH2;
+                            break;
+                    }
+
+                    if (IsoLocation != null)
+                    {
+                        processStartInfo = new ProcessStartInfo
+                        {
+                            FileName = ConfigurationService.Pcsx2Location,
+                            WorkingDirectory = Path.GetDirectoryName(ConfigurationService.Pcsx2Location),
+                            Arguments = $"\"{IsoLocation}\"",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                        };
+                        isPcsx2 = true;
+                    }
+                    else
+                    {
+                        processStartInfo = null;
+                    }
                     break;
-                case 2:
+                case SetupWizardViewModel.PC:
                     if (ConfigurationService.PCVersion == "EGS" && !(_launchGame == "kh3d"))
                     {
-                        if (ConfigurationService.PcReleaseLocation != null)
+                        if (Directory.Exists(ConfigurationService.PcReleaseLocation))
                         {
                             if (ConfigurationService.PanaceaInstalled)
                             {
@@ -667,11 +918,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 if (!File.Exists(panaceaSettings))
                                 {
                                     File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
-                                    new string[]
-                                    {
-                                $"mod_path={ConfigurationService.GameModPath}",
-                                $"show_console={false}",
-                                    });
+                                    [
+                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
+                                    $"show_console={false}",
+                                    ]);
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
@@ -687,32 +937,26 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                         {
                             MessageBox.Show(
-                           "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
-                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
                     }
                     else if (ConfigurationService.PCVersion == "EGS" && _launchGame == "kh3d")
                     {
-                        if (ConfigurationService.PcReleaseLocationKH3D != null)
+                        if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
                         {
-                            string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
                             if (ConfigurationService.PanaceaInstalled)
                             {
+                                string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
                                 if (!File.Exists(panaceaSettings))
                                 {
-                                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
-                                    {
                                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
-                                        new string[]
-                                        {
-                                    $"mod_path={ConfigurationService.GameModPath}",
-                                    $"show_console={false}",
-                                        });
-                                    }
-                                    else
-                                        File.Create(panaceaSettings);
+                                        [
+                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
+                                        $"show_console={false}",
+                                        ]);
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
@@ -728,15 +972,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                         {
                             MessageBox.Show(
-                           "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
-                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
                     }
                     if (ConfigurationService.PCVersion == "Steam" && !(_launchGame == "kh3d") && ConfigurationService.SteamAPITrick1525 == false)
                     {
-                        if (ConfigurationService.PcReleaseLocation != null)
+                        if (Directory.Exists(ConfigurationService.PcReleaseLocation))
                         {
                             if (ConfigurationService.PanaceaInstalled)
                             {
@@ -744,11 +988,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 if (!File.Exists(panaceaSettings))
                                 {
                                     File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
-                                    new string[]
-                                    {
-                                $"mod_path={ConfigurationService.GameModPath}",
-                                $"show_console={false}",
-                                    });
+                                    [
+                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
+                                    $"show_console={false}",
+                                    ]);
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
@@ -764,32 +1007,26 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                         {
                             MessageBox.Show(
-                           "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
-                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
                     }
                     else if (ConfigurationService.PCVersion == "Steam" && _launchGame == "kh3d" && ConfigurationService.SteamAPITrick28 == false)
                     {
-                        if (ConfigurationService.PcReleaseLocationKH3D != null)
+                        if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
                         {
                             string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
                             if (ConfigurationService.PanaceaInstalled)
                             {
                                 if (!File.Exists(panaceaSettings))
                                 {
-                                    if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
-                                    {
-                                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
-                                        new string[]
-                                        {
-                                    $"mod_path={ConfigurationService.GameModPath}",
+                                    File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
+                                    [
+                                    $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
                                     $"show_console={false}",
-                                        });
-                                    }
-                                    else
-                                        File.Create(panaceaSettings);
+                                    ]);
                                 }
                                 File.AppendAllText(panaceaSettings, "\nquick_launch=" + _launchGame);
                             }
@@ -805,8 +1042,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                         {
                             MessageBox.Show(
-                           "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
-                           "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
+                            "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
                         }
@@ -819,11 +1056,51 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             if (!(_launchGame == "kh3d"))
                             {
-                                filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
+                                if (Directory.Exists(ConfigurationService.PcReleaseLocation))
+                                {
+                                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
+                                    if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
+                                    {
+                                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
+                                        [
+                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
+                                        $"show_console={false}",
+                                        ]);
+                                    }
+                                    filename = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]);
+                                }
+                                else
+                                {
+                                    MessageBox.Show(
+                                    "Unable to locate KINGDOM HEARTS HD 1.5+2.5 ReMIX install. Please re-run the setup wizard and confirm it is correct.",
+                                    "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    CloseAllWindows();
+                                    return Task.CompletedTask;
+                                }
                             }
                             else
                             {
-                                filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
+                                if (Directory.Exists(ConfigurationService.PcReleaseLocationKH3D))
+                                {
+                                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
+                                    if (ConfigurationService.PanaceaInstalled && !File.Exists(panaceaSettings))
+                                    {
+                                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt"),
+                                        [
+                                        $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
+                                        $"show_console={false}",
+                                        ]);
+                                    }
+                                    filename = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, executable[launchExecutable]);
+                                }
+                                else
+                                {
+                                    MessageBox.Show(
+                                    "Unable to locate KINGDOM HEARTS HD 2.8 Final Chapter Prologue install. Please re-run the setup wizard and confirm it is correct.",
+                                    "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    CloseAllWindows();
+                                    return Task.CompletedTask;
+                                }
                             }
                             processStartInfo = new ProcessStartInfo
                             {
@@ -893,14 +1170,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 Log.Info(data);
         }
 
-        private void ReloadModsList()
+        public void ReloadModsList()
         {
             ModsList = new ObservableCollection<ModViewModel>(
                 ModsService.GetMods(ModsService.Mods).Select(Map));
             OnPropertyChanged(nameof(ModsList));
+            OnPropertyChanged(nameof(ModViewModel.CollectionModsList));
         }
 
-        private ModViewModel Map(ModModel mod) => new ModViewModel(mod, this);
+        private ModViewModel Map(ModModel mod) => new (mod, this);
 
         public void ModEnableStateChanged()
         {
@@ -953,22 +1231,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             await Task.Run(() =>
             {
-                if (ConfigurationService.GameEdition == 2)
+                if (ConfigurationService.GameEdition == SetupWizardViewModel.PC)
                 {
                     // Use the package map file to rearrange the files in the structure needed by the patcher
-                    var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, _launchGame, "patch-package-map.txt");
+                    var packageMapLocation = Path.Combine(ConfigurationService.CompiledModPath, "patch-package-map.txt");
                     var packageMap = File
                         .ReadLines(packageMapLocation)
                         .Select(line => line.Split(" $$$$ "))
                         .ToDictionary(array => array[0], array => array[1]);
 
-                    var patchStagingDir = Path.Combine(ConfigurationService.GameModPath, _launchGame, "patch-staging");
+                    var patchStagingDir = Path.Combine(ConfigurationService.CompiledModPath, "patch-staging");
                     if (Directory.Exists(patchStagingDir))
                         Directory.Delete(patchStagingDir, true);
                     Directory.CreateDirectory(patchStagingDir);
                     foreach (var entry in packageMap)
                     {
-                        var sourceFile = Path.Combine(ConfigurationService.GameModPath, _launchGame, entry.Key);
+                        var sourceFile = Path.Combine(ConfigurationService.CompiledModPath, entry.Key);
                         var destFile = Path.Combine(patchStagingDir, entry.Value);
                         if (File.Exists(sourceFile))
                         {
@@ -977,7 +1255,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }
                     }
 
-                    foreach (var directory in Directory.GetDirectories(Path.Combine(ConfigurationService.GameModPath, _launchGame)))
+                    foreach (var directory in Directory.GetDirectories(Path.Combine(ConfigurationService.CompiledModPath)))
                         if (!"patch-staging".Equals(Path.GetFileName(directory)))
                             Directory.Delete(directory, true);
 
@@ -989,18 +1267,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         specialDirs = Directory.GetDirectories(specialStagingDir).Select(directory => Path.GetFileName(directory)).ToArray();
 
                     foreach (var packageName in stagingDirs)
-                        Directory.Move(Path.Combine(patchStagingDir, packageName), Path.Combine(ConfigurationService.GameModPath, _launchGame, packageName));
+                        Directory.Move(Path.Combine(patchStagingDir, packageName), Path.Combine(ConfigurationService.CompiledModPath, packageName));
                     foreach (var specialDir in specialDirs)
-                        Directory.Move(Path.Combine(ConfigurationService.GameModPath, _launchGame, "special", specialDir), Path.Combine(ConfigurationService.GameModPath, _launchGame, specialDir));
+                        Directory.Move(Path.Combine(ConfigurationService.CompiledModPath, "special", specialDir), Path.Combine(ConfigurationService.CompiledModPath, specialDir));
 
                     stagingDirs.Remove("special"); // Since it's not actually a real game package
                     Directory.Delete(patchStagingDir, true);
 
-                    var specialModDir = Path.Combine(ConfigurationService.GameModPath, _launchGame, "special");
+                    var specialModDir = Path.Combine(ConfigurationService.CompiledModPath, "special");
                     if (Directory.Exists(specialModDir))
                         Directory.Delete(specialModDir, true);
 
-                    foreach (var directory in stagingDirs.Select(packageDir => Path.Combine(ConfigurationService.GameModPath, _launchGame, packageDir)))
+                    foreach (var directory in stagingDirs.Select(packageDir => Path.Combine(ConfigurationService.CompiledModPath, packageDir)))
                     {
                         if (specialDirs.Contains(Path.GetDirectoryName(directory)))
                             continue;
@@ -1145,7 +1423,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             await Task.Run(() =>
             {
-                if (ConfigurationService.GameEdition == 2)
+                if (ConfigurationService.GameEdition == SetupWizardViewModel.PC)
                 {
                     if (patched && _launchGame != "kh3d")
                     {
@@ -1195,11 +1473,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }
 
                     }
-                    if (Directory.Exists(ConfigurationService.GameModPath))
+                    if (Directory.Exists(ConfigurationService.CompiledModPath))
                     {
                         try
                         {
-                            Directory.Delete(Path.Combine(ConfigurationService.GameModPath, _launchGame), true);
+                            Directory.Delete(ConfigurationService.CompiledModPath, true);
                         }
                         catch (Exception ex)
                         {
@@ -1289,42 +1567,34 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             if (PanaceaInstalled)
             {
+                string configTargetPath;
+
                 if (_launchGame != "kh3d" && ConfigurationService.PcReleaseLocation != null)
-                {
-                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt");
-                    string[] lines = File.ReadAllLines(panaceaSettings);
-                    string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\n";
-                    foreach (string entry in lines)
-                    {
-                        if (entry.Contains("dev_path"))
-                        {
-                            textToWrite += entry;
-                            break;
-                        }
-                    }
-                    textToWrite += $"\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
-                        $"debug_log={_panaceaDebugLogEnabled}\r\nsound_debug={_panaceaSoundDebugEnabled}\r\n" +
-                        $"enable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
-                    File.WriteAllText(panaceaSettings, textToWrite);
-                }
+                    configTargetPath = ConfigurationService.PcReleaseLocation;
                 else if (ConfigurationService.PcReleaseLocationKH3D != null)
+                    configTargetPath = ConfigurationService.PcReleaseLocationKH3D;
+                else
                 {
-                    string panaceaSettings = Path.Combine(ConfigurationService.PcReleaseLocationKH3D, "panacea_settings.txt");
-                    string[] lines = File.ReadAllLines(panaceaSettings);
-                    string textToWrite = $"mod_path={ConfigurationService.GameModPath}\r\n";
-                    foreach (string entry in lines)
-                    {
-                        if (entry.Contains("dev_path"))
-                        {
-                            textToWrite += entry;
-                            break;
-                        }
-                    }
-                    textToWrite += $"\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
-                        $"debug_log={_panaceaDebugLogEnabled}\r\nsound_debug={_panaceaSoundDebugEnabled}\r\n" +
-                        $"enable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
-                    File.WriteAllText(panaceaSettings, textToWrite);
+                    Log.Warn("Unable to update Panacea settings! Game installation directory is not configured or is invalid.");
+
+                    return;
                 }
+
+                string panaceaSettings = Path.Combine(configTargetPath, "panacea_settings.txt");
+                string[] lines = File.Exists(panaceaSettings) ? File.ReadAllLines(panaceaSettings) : Array.Empty<string>();
+                string textToWrite = $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}\r\n";
+                foreach (string entry in lines)
+                {
+                    if (entry.Contains("dev_path"))
+                    {
+                        textToWrite += entry;
+                        break;
+                    }
+                }
+                textToWrite += $"\r\nshow_console={_panaceaConsoleEnabled}\r\n" +
+                    $"debug_log={_panaceaDebugLogEnabled}\r\nsound_debug={_panaceaSoundDebugEnabled}\r\n" +
+                    $"enable_cache={_panaceaCacheEnabled}\r\nquick_menu={_panaceaQuickMenuEnabled}";
+                File.WriteAllText(panaceaSettings, textToWrite);
             }
         }
 

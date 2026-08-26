@@ -31,7 +31,7 @@
 | 27 | Wisdom Form |
 | 28 | Orichalcum Ring |
 | 29 | Final Form |
-| 30 | Anti-Form |
+| 30 | Antiform |
 | 31 | Master Form |
 | 32 | Torn Pages |
 | 34 | Master's Ring |
@@ -54,7 +54,7 @@
 | 52 | Cosmic Ring |
 | 53 | Medal |
 | 54 | Battlefields of War |
-| 55 | Sword of Ancestors |
+| 55 | Sword of the Ancestor |
 | 56 | Cosmic Arts |
 | 57 | Shadow Archive |
 | 58 | Shadow Archive+ |
@@ -70,15 +70,15 @@
 | 68 | Divine Bandanna |
 | 69 | Power Band |
 | 70 | Buster Band |
-| 71 | Anti-Form Dummy |
+| 71 | Antiform Dummy |
 | 72 | Scimitar |
-| 73 | Way of Dawn |
+| 73 | Way to the Dawn |
 | 74 | Identity Disk |
 | 75 | Mage's Staff |
 | 78 | Protect Belt |
 | 79 | Gaia Belt |
-| 80 | FAKE (looks like Sword of the Ancestors) |
-| 81 | FAKE (Keyblade,looks like Kingdom Key) |
+| 80 | FAKE (looks like Sword of the Ancestor) |
+| 81 | FAKE (Keyblade, looks like Kingdom Key) |
 | 82 | Guard |
 | 87 | Magnet Element |
 | 88 | Reflect Element |
@@ -505,10 +505,10 @@
 | 566 | Dodge Roll LV3 |
 | 567 | Dodge Roll MAX |
 | 568 | Auto Limit |
-| 569 | Sonic Rave |
-| 570 | Last Arcanum |
+| 569 | Sonic Blade |
+| 570 | Ars Arcanum |
 | 571 | Strike Raid |
-| 572 | Infinity |
+| 572 | Ragnarok |
 | 573 | Zantetsuken |
 | 574 | Ripple Drive |
 | 575 | Hurricane Period |

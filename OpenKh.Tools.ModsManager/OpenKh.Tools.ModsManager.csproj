@@ -1,20 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyTitle>Mods Manager</AssemblyTitle>
     <Product>Mods Manager - OpenKH</Product>
-  </PropertyGroup>
+  <AssemblyVersion>25.02.10.0</AssemblyVersion><FileVersion>25.02.10.0</FileVersion><Version>25.02.10.0-local</Version><InformationalVersion>25.02.10.0-local</InformationalVersion><Authors>OpenKH contributors</Authors><Company>OpenKH</Company><Copyright>Copyright (C) OpenKH </Copyright><Description>https://github.com/OpenKH/OpenKh</Description></PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.0" />
-    <PackageReference Include="LibGit2Sharp" Version="0.30.0" />
+    <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Runtime.Caching" Version="8.0.0" />
-    <PackageReference Include="System.Reactive.Linq" Version="6.0.1" />
-    <PackageReference Include="Octokit" Version="13.0.1" />
+    <PackageReference Include="System.Runtime.Caching" Version="8.0.1" />
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="Octokit" Version="14.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +24,7 @@
     <ProjectReference Include="..\OpenKh.Kh1\OpenKh.Kh1.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
     <ProjectReference Include="..\OpenKh.Patcher\OpenKh.Patcher.csproj" />
+    <ProjectReference Include="..\OpenKh.Recom\OpenKh.Recom.csproj" />
     <ProjectReference Include="..\OpenKh.Tools.Common.WPF\OpenKh.Tools.Common.Wpf.csproj" />
     <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />

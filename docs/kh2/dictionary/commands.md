@@ -104,14 +104,14 @@
 | 116 | Last Howl |
 | 117 | Outcry |
 | 118 | Stalwart Fang |
-| 119 | Fire |
-| 120 | Fire |
-| 121 | Blizzard |
-| 122 | Blizzard |
-| 123 | Thunder |
-| 124 | Thunder |
-| 125 | Cure |
-| 126 | Cure |
+| 119 | Fira |
+| 120 | Firaga |
+| 121 | Blizzara |
+| 122 | Blizzaga |
+| 123 | Thundara |
+| 124 | Thundaga |
+| 125 | Cura |
+| 126 | Curaga |
 | 127 | - |
 | 128 | Shooting Star |
 | 129 | Banishing Blade |
@@ -155,11 +155,11 @@
 | 172 | >ID not found< |
 | 173 | Release |
 | 174 | Magnet |
-| 175 | Magnet |
-| 176 | Magnet |
+| 175 | Magnera |
+| 176 | Magnega |
 | 177 | Reflect |
-| 178 | Reflect |
-| 179 | Reflect |
+| 178 | Reflera |
+| 179 | Reflega |
 | 180 | Riku |
 | 181 | Riku |
 | 182 | >ID not found< |
@@ -222,7 +222,7 @@
 | 241 | Go To The Tournament |
 | 242 | Mega-Potion |
 | 243 | Mega-Ether |
-| 244 | Megaelixir |
+| 244 | Megalixir |
 | 245 | Charge |
 | 246 | Go To The Tournament |
 | 247 | Approach |

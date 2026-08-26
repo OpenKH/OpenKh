@@ -3,6 +3,7 @@
 Unused Assets Are Sorted by [File Types](file-type.md)
 
 ## Models
+
 | File Name          | Description | Image(s) |
 |--------------------|-------------|----------|
 | B_EX340.mdlx       | Unused model of the head of Xemnas's Dragon's Head | ![image](./images/unused/unused_models/B_EX340.PNG) |

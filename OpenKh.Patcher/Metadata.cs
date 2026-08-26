@@ -22,6 +22,8 @@ namespace OpenKh.Patcher
         [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public string Game { get; set; }
         [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public int Specifications { get; set; }
         public List<Dependency> Dependencies { get; set; }
+        [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public bool IsCollection { get; set; }
+        [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public List<string> CollectionGames { get; set; }
         public List<AssetFile> Assets { get; set; }
 
         private static readonly IDeserializer deserializer =
@@ -100,6 +102,7 @@ namespace OpenKh.Patcher
         /// "copy"
         /// "imgd"
         /// "imgz"
+        /// "kh1ardresource"
         /// "kh2msg"
         /// "listpatch"
         /// "spawnpoint"
@@ -186,6 +189,8 @@ namespace OpenKh.Patcher
         [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public string Language { get; set; }
         [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public bool IsSwizzled { get; set; }
         [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public int Index { get; set; }
+        [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public string Game { get; set; }
+        [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public bool CollectionOptional { get; set; }
     }
 
     public class Multi

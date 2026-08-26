@@ -24,6 +24,20 @@ namespace OpenKh.Tools.ModsManager.Exceptions
         }
     }
 
+    public class BranchNotValidException : Exception
+    {
+        public string ModName { get; }
+
+        public string BranchName { get; }
+
+        public BranchNotValidException(string modName, string branchName) :
+            base($"The branch '{branchName}' is not valid for '{modName}'.\nOr The mod '{modName}' does not contain a valid OpenKH compatible mod due to the missing 'mod.yml' file.")
+        {
+            ModName = modName;
+            BranchName = branchName;
+        }
+    }
+
     public class RepositoryNotFoundException : Exception
     {
         public string RepositoryName { get; set; }
@@ -32,6 +46,17 @@ namespace OpenKh.Tools.ModsManager.Exceptions
             base($"Repository '{repositoryName}' not found.")
         {
 
+        }
+    }
+
+    public class ModMovedWithoutGameException : Exception
+    {
+        public string ModName { get; }
+
+        public ModMovedWithoutGameException(string modName) :
+            base($"The mod '{modName}' has been changed from a collection but a base game was not specified and could not be moved, it will be removed. Please reinstall in the appropriate launch game.")
+        {
+            ModName = modName;
         }
     }
 }

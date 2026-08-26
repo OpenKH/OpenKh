@@ -43,6 +43,9 @@ namespace OpenKh.Tools.LayoutEditor.Controls
         private readonly DebugSequenceRenderer _debugSequenceRenderer;
         private int _selectedAnimationGroup;
 
+        // Static clipboard for copy/paste across animation groups and files
+        private static Sequence.Animation _copiedAnimation = null;
+
         private Sequence.AnimationGroup SelectedAnimationGroup =>
             _sequence.AnimationGroups[_selectedAnimationGroup];
 
@@ -191,10 +194,30 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
         public void Copy()
         {
+            // Note: The selectedEntry is tracked by ImSequencer and passed when Copy button is clicked
+            // We'll handle the actual copy in the button handler
+        }
+
+        public void CopyAnimation(int selectedIndex)
+        {
+            // Copy the selected animation to the static clipboard
+            if (selectedIndex >= 0 && selectedIndex < SelectedAnimationGroup.Animations.Count)
+            {
+                var animationToCopy = SelectedAnimationGroup.Animations[selectedIndex];
+                _copiedAnimation = animationToCopy.Clone();
+            }
         }
 
         public void Paste()
         {
+            // Only paste if we have something in the clipboard
+            if (_copiedAnimation != null)
+            {
+                // Clone the copied animation and add it to the current animation group
+                var pastedAnimation = _copiedAnimation.Clone();
+                SelectedAnimationGroup.Animations.Add(pastedAnimation);
+                InvalidateAnimationList();
+            }
         }
 
         private void InvalidateAnimationList()

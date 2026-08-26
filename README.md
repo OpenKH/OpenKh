@@ -18,7 +18,11 @@ New builds of OpenKH are automatically generated every time one of the contribut
 
 All the builds from `master` and from pull requestes are generated from [GitHub Actions](https://github.com/OpenKh/OpenKh/actions).
 
-OpenKH tools require the instllation of the [.NET 6.0 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0). All the UI tools are designed to work on Windows, while command line tools will work on any operating system.
+After extracting a release, open `OpenKh.Launcher.exe`. The launcher presents the Mod Manager as the recommended option for installing and playing mods, while editors, converters, and command-line utilities remain in a separate section of the interface for mod creators. Modding tools can be marked as favorites so they stay at the top of the list between launcher sessions. All applications and their dependencies are stored together under `Apps`, leaving the release root with a single visible executable entry point. The launcher checks for update availability in the background and displays an indicator when a new version exists. Nothing is downloaded or installed until the user selects the update action and confirms it. Updates are applied without opening the Mod Manager. The launcher can also create a Mod Manager desktop shortcut.
+
+Existing installations are migrated to the organized layout when the updated launcher or an existing Mod Manager shortcut is opened. Mod Manager settings, presets, mod lists, and user content remain available while obsolete application files are removed from the release root. A hidden compatibility entry point remains in the release root so existing shortcuts continue to work after migration and future updates.
+
+OpenKH tools require the installation of the [.NET 8.0 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0). All the UI tools are designed to work on Windows, while command line tools will work on any operating system.
 
 
 <p align="center">
@@ -26,6 +30,8 @@ OpenKH tools require the instllation of the [.NET 6.0 Runtime](https://dotnet.mi
 </p>
 
 Note: All CLI and GUI programs **should** be cross-platform, though extensive testing primarily happens on Windows systems. As such, users may be required to run GUI programs under a WINE prefix for Linux, Mac, BSD, etc.
+
+Note: Since `OpenKh Build 1446 (master)` (Sep 16, 2025 release) OpenKh has changed the framework from .NET 6.0 to .NET 8.0.
 
 ## OpenKH in depth
 
@@ -39,7 +45,7 @@ From a community perspective, OpenKH will provide the best form of documentation
 
 ## Build from source code
 
-The minimum requirement is [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0). Once the repository is downloaded, `build.ps1` or `build.sh` needs be executed. This is determined by the operating system in use. Alternatively, for those who prefer an IDE environment under Windows, you can always open the included solution file `OpenKh.sln` in Visual Studio and compile through the `Build` menu.
+The minimum requirement is [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0). Once the repository is downloaded, `build.ps1` or `build.sh` needs be executed. This is determined by the operating system in use. Alternatively, for those who prefer an IDE environment under Windows, you can always open the included solution file `OpenKh.sln` in Visual Studio and compile through the `Build` menu.
 
 ## Additional info
 

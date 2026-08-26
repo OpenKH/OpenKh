@@ -16,30 +16,8 @@ This document will focus on teaching you how to create mods using the OpenKH Mod
     * [areadatascript](#areadatascript-kh2---modifies-a-series-programs-found-within-a-kh2-spawnscript-subfile-located-within-ard-files-using-the-text-format-created-by-openkhcommandspawnscript-you-can-only-provide-a-subset-of-the-programs-found-within-the-spawnscript-the-others-will-be-taken-from-the-original-file)
     * [areadataspawn](#areadataspawn-kh2---modifies-a-kh2-spawnpoint-subfile-located-within-ard-files-using-an-yaml-file-created-using-openkhcommandspawnscript)
     * [listpatch](#listpatch-kh2---can-modify-the-following-different-types-of-list-binaries-found-within-kh2)
-      * [trsr](#trsr-source-example)
-      * [cmd](#cmd-source-example)
-      * [item](#item-source-example)
-      * [sklt](#sklt-source-example)
-      * [arif](#arif-source-example)
-      * [memt](#memt-source-example)
-      * [fmab](#fmab-source-example)
-      * [enmp](#enmp-source-example)
-      * [fmlv](#fmlv-source-example)
-      * [lvpm](#lvpm-source-example)
-      * [lvup](#lvup-source-example)
-      * [bons](#bons-source-example)
-      * [atkp](#atkp-source-example)
-      * [przt](#przt-source-example)
-      * [magc](#magc-source-example)
-      * [limt](#limt-source-example)
-      * [vtbl](#vtbl-source-example)
-      * [btlv](#btlv-source-example)
-      * [objentry](#objentry-source-example)
-      * [libretto](#libretto-source-example)
-      * [localset](#localset-source-example)
-      * [soundinfo](#soundinfo-source-example)
-      * [place](#place-source-example)
-      * [jigsaw](#jigsaw-source-example)
+  * [synthpatch](#synthpatch-kh2)     
+  * [kh1ardresource](#kh1ardresource-kh1---replaces-entries-in-the-resource-list-of-a-kh1-ard-file)
   * [bbsarc](#bbsarc-bbs)
   * [Example of a Fully Complete `mod.yml` File](#an-example-of-a-fully-complete-modyml-can-be-seen-below-and-the-full-source-of-the-mod-can-be-seen-here)
 * [Generating a Simple `mod.yml` for New Mod Authors](#generating-a-simple-modyml-for-new-mod-authors)
@@ -62,6 +40,17 @@ The mod.yml file is a YAML format specification for your mod. It will contain th
 * `logo` - The path to the icon.png
 * `assets` - A list of assets that will be modified when the mod runs. 
   * See [`asset types`](#asset-types), for details on creating an asset. Some asset types will work on any game, while others are game specific.
+
+Additional optional fields for the mod.yml include:
+* `game` - If this mod is for a single specific game you can specify it here to ensure safe install
+* `speciications` -
+* `dependencies` -
+* `isCollection` - Specifies that this is a collection of mods, potentially cross game
+* `collectionGames` - A list of the short hand titles of the games the mod collection covers (accepted values: `kh1`, `kh2`, `bbs`, `Recom`, `kh3d`)
+
+Additional optional fields for Assets:
+* `game` - The game this specific asset belongs to when part of a mod collection
+* `collectionOptional` - Marks the asset as optionally installable, and sets it to show in the collecion settings pane
 
 While you are developing a mod you can create a folder inside the `mods` directory of the mod manager release. I.e.:
 
@@ -299,10 +288,14 @@ Asset Example
  * `trsr`
  * `cmd`
  * `item`
+ * `shop`
  * `sklt`
  * `arif`
  * `memt`
+ * `went`
  * `fmab`
+ * `prty`
+ * `sstm`
  * `enmp`
  * `fmlv`
  * `lvup`
@@ -319,6 +312,7 @@ Asset Example
  * `soundinfo`
  * `place`
  * `jigsaw`
+ * `slct`
 
 Asset Example
 ```
@@ -337,489 +331,27 @@ Asset Example
     source:
       - name: AtkpList.yml
         type: atkp
+
+#In order to patch a list file which is a subfile of a subfile, you must do the following:
+- name: 03system.bin
+  method: binarc
+  source:
+  - name: pref
+    method: binarc
+    type: Binary
+    source:
+      - name: prty
+        method: listpatch
+        type: List
+        source:
+          - name: PrtyList.yml
+            type: prty
 ```
 
-### `trsr` Source Example
-```
-2:
-  ItemId: 347
-```
-### `cmd` Source Example
-```
-- Id: 1
-  Execute: 3
-  Argument: 3
-  SubMenu: 1
-  CmdIcon: 3
-  MessageId: 33249
-  Flags: Cursor, InBattleOnly
-  Range: -1
-  Dir: 0
-  DirRange: -1
-  Cost: 0
-  CmdCamera: 0
-  Priority: 100
-  CmdReceiver: 0
-  Time: 0
-  Require: 0
-  Mark: 1
-  CmdAction: 0
-  ReactionCount: 0
-  DistRange: 0
-  Score: 0
-  DisableForm: 63552
-  Group: 2
-  Reserve: 0
-```
-### `item` Source Example
-```
-Stats:
-- Ability: 412
-  AbilityPoints: 0
-  Attack: 0
-  DarkResistance: 100
-  Defense: 0
-  FireResistance: 100
-  GeneralResistance: 100
-  IceResistance: 100
-  Id: 116
-  LightningResistance: 100
-  Magic: 7
-  Unknown: 0
-  Unknown08: 100
-  Unknown0d: 100
-Items:
-- Id: 1
-  Type: Consumable
-  Flag0: 0
-  Flag1: 40
-  Rank: C
-  StatEntry: 1
-  Name: 33528
-  Description: 33529
-  ShopBuy: 40
-  ShopSell: 10
-  Command: 23
-  Slot: 0
-  Picture: 1
-  Icon1: 9
-  Icon2: 0
-  InsertBefore: 7 #This will insert the item ID before the item ID you specify here. Defaults to 0, which will append to the item list instead. You can alternatively use InsertAfter. 
-```
-### `sklt` Source Example
-```
-- CharacterId: 1
-  Bone1: 178
-  Bone2: 86
-```
-### `arif` Source Example
-```
-End of Sea: #End of Sea. Names are taken from worlds.md
-  2:
-    Flags: IsKnownArea, IndoorArea, Monochrome #Other acceptable flags are NoShadow and HasGlow.
-    Reverb: 10
-    SoundEffectBank1: 20
-    SoundEffectBank2: 30
-    Bgms:
-      - BgmField: 2000
-        BgmBattle: 2000
-      - BgmField: 600
-        BgmBattle: 600
-      - BgmField: 1200
-        BgmBattle: 1200
-      - BgmField: 1200
-        BgmBattle: 1200
-      - BgmField: 1000
-        BgmBattle: 1000
-      - BgmField: 1000
-        BgmBattle: 1000
-      - BgmField: 1500
-        BgmBattle: 1500
-      - BgmField: 1500
-        BgmBattle: 1500
-    Voice: 40
-    NavigationMapItem: 50
-    Command: 60
-    Reserved: []
-```
-### `memt` Source Example
-```
-MemtEntries: 
-  - Index: 0 #Index to edit. Specify new indices to append new entries
-    WorldId: 2
-    CheckStoryFlag: 209
-    FlagForWorld: The World That Never Was #Specify world name
-    CheckStoryFlagNegation: 0
-    NegationFlagForWorld: Twilight Town #Specify world name
-    CheckArea: 2
-    Padding: 0
-    PlayerSize: 4299264
-    FriendSize: 1625344
-    Members: [84, 92, 93, 2073, 85, 86, 2397, 87, 88, 89, 91, 264, 200, 1529, 2431, 1530, 1531, 264]
-  - Index: 37
-    WorldId: 2
-    CheckStoryFlag: 209
-    FlagForWorld: Twilight Town #Specify world name
-    CheckStoryFlagNegation: 0
-    FlagNegationForWorld: Twilight Town #Specify world name
-    CheckArea: 2
-    Padding: 0
-    PlayerSize: 4299264
-    FriendSize: 1625344
-    Members: [84, 92, 93, 2073, 85, 86, 2397, 87, 88, 89, 91, 264, 200, 1529, 2431, 1530, 1531, 264]
+For more detailed information on each listpatch, please visit [here](./listpatch_information.md).
 
-
-MemberIndices:
-  - Index: 0
-    Player: 15
-    Friend1: 20
-    Friend2: 32
-    FriendWorld: 42
-```
-
-### `fmab` Source Example
-```
-Entries:
-  1: #This is "Growth Ability Level"; so this edits the second entry in the list, or, LV 2.
-    HighJumpHeight: 999
-    AirDodgeHeight: 999
-    AirDodgeSpeed: 3.0
-    AirSlideTime: 1.0
-    AirSlideSpeed: 2.0
-    AirSlideBrake: 1.0
-    AirSlideStopBrake: 1.0
-    AirSlideInvulnerableFrames: 0.5
-    GlideSpeed: 2.0
-    GlideFallRatio: 0.8
-    GlideFallHeight: 1.2
-    GlideFallMax: 1.5
-    GlideAcceleration: 2.5
-    GlideStartHeight: 1.0
-    GlideEndHeight: 0.8
-    GlideTurnSpeed: 1.5
-    DodgeRollInvulnerableFrames: 0.7
-  2:
-    HighJumpHeight: 9999
-    AirDodgeHeight: 999
-    AirDodgeSpeed: 3.0
-    AirSlideTime: 1.0
-    AirSlideSpeed: 2.0
-    AirSlideBrake: 1.0
-    AirSlideStopBrake: 1.0
-    AirSlideInvulnerableFrames: 0.5
-    GlideSpeed: 2.0
-    GlideFallRatio: 0.8
-    GlideFallHeight: 1.2
-    GlideFallMax: 1.5
-    GlideAcceleration: 2.5
-    GlideStartHeight: 1.0
-    GlideEndHeight: 0.8
-    GlideTurnSpeed: 1.5
-    DodgeRollInvulnerableFrames: 0.7
-```
-
-### `enmp` Source Example
-```
-- Id: 0
-  Level: 1
-  Health: 
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  MaxDamage: 1
-  MinDamage: 1
-  PhysicalWeakness: 1
-  FireWeakness: 1
-  IceWeakness: 1
-  ThunderWeakness: 1
-  DarkWeakness: 1
-  LightWeakness: 1
-  GeneralWeakness: 1
-  Experience: 1
-  Prize: 1
-  BonusLevel: 1  
-```
-
-### `fmlv` Source Example
-```
-Final:
-- Ability: 578
-  Experience: 12
-  FormId: 5
-  FormLevel: 1
-  GrowthAbilityLevel: 1
-```
-
-### `lvpm` Source Example
-```
-- Level: 0
-  HpMultiplier: 100
-  Strength: 45
-  Defense: 26
-  MaxStrength: 16
-  MinStrength: 5
-  Experience: 3212
-```
-
-### `lvup` Source Example
-```
-Sora:
-  2:
-    Ap: 0
-    Character: Sora
-    Defense: 0
-    Exp: 100
-    Level: 2
-    Magic: 0
-    Padding: 0
-    ShieldAbility: 577
-    StaffAbility: 577
-    Strength: 0
-    SwordAbility: 577
-```
-
-### `bons` Source Example
-```
-2:
-  Sora:
-    AccessorySlotUpgrade: 0
-    ArmorSlotUpgrade: 0
-    BonusItem1: 99
-    BonusItem2: 0
-    CharacterId: 1
-    Description: ''
-    DriveGaugeUpgrade: 0
-    HpIncrease: 0
-    ItemSlotUpgrade: 0
-    MpIncrease: 0
-    RewardId: 2
-    Unknown0c: 0
-```
-
-### `atkp` Source Example
-```
-- Id: 0 #Hitbox 0
-  SubId: 3
-  Type: 1
-  CriticalAdjust: 0
-  Power: 25
-  Team: 0
-  Element: 0
-  EnemyReaction: 0
-  EffectOnHit: 2
-  KnockbackStrength1: 32767
-  KnockbackStrength2: 0
-  Unknown: 0000
-  Flags: BGHit, LimitPAX, Land, CapturePAX, ThankYou, KillBoss #Every possible AttackFlag shown
-  RefactSelf: 0
-  RefactOther: 0
-  ReflectedMotion: 0
-  ReflectHitBack: 0
-  ReflectAction: 0
-  ReflectHitSound: 0
-  ReflectRC: 0
-  ReflectRange: 0
-  ReflectAngle: 0
-  DamageEffect: 0
-  Switch: 1
-  Interval: 1
-  FloorCheck: 1
-  DriveDrain: 1
-  RevengeDamage: 1
-  AttackTrReaction: 1
-  ComboGroup: 1
-  RandomEffect: 1
-  Kind: ComboFinisher
-  HpDrain: 15
-```
-
-### `przt` Source Example
-```
-- Id: 1
-  SmallHpOrbs: 0
-  BigHpOrbs: 1
-  BigMoneyOrbs: 1
-  MediumMoneyOrbs: 1
-  SmallMoneyOrbs: 1
-  SmallMpOrbs: 1
-  BigMpOrbs: 1
-  SmallDriveOrbs: 0
-  BigDriveOrbs: 1
-  Item1: 1
-  Item1Percentage: 1
-  Item2: 0
-  Item2Percentage: 0
-  Item3: 0
-  Item3Percentage: 0
-```
-
-### `magc` Source Example
-```
-- Id: 0 
-  Level: 3
-  World: 1
-  FileName: magic/FIRE_3.mag
-  Item: 21
-  Command: 120
-  GroundMotion: 56
-  GroundBlend: 2
-  FinishMotion: 57
-  FinishBlend: 2
-  AirMotion: 58
-  AirBlend: 2
-  Voice: 7
-  VoiceFinisher: 11
-  VoiceSelf: -1
-```
-### `limt` Source Example
-```
-- Id: 1
-  Character: Sora
-  Summon: None
-  Group: 0
-  FileName: TESTLIMIT
-  SpawnId: 0
-  Command: 100
-  Limit: 0
-  World: 00
-  Padding: []
-- Id: 30
-  Character: Donald
-  Summon: Goofy
-  Group: 0
-  FileName: TESTLIMIT
-  SpawnId: 0
-  Command: 100
-  Limit: 0
-  World: 00
-  Padding: []
-```
-
-### `vtbl` Source Example
-```
-- Id: 26
-  CharacterId: 1
-  Priority: 01
-  Voices:
-    - VsbIndex: 5
-      Weight: 100
-    - VsbIndex: -1
-      Weight: 0
-    - VsbIndex: -1
-      Weight: 0
-    - VsbIndex: -1
-      Weight: 0
-    - VsbIndex: 6
-      Weight: 5
-  Reserved: 0
-```
-
-### `btlv` Source Example
-```
-- Id: 0
-  ProgressFlag: 0x1099
-  WorldZZ: 1
-  WorldOfDarkness: 1
-  TwilightTown: 1
-  DestinyIslands: 1
-  HollowBastion: 1
-  BeastCastle: 1
-  OlympusColiseum: 1
-  Agrabah: 1
-  LandOfDragons: 1
-  HundredAcreWoods: 1
-  PrideLands: 1
-  Atlantica: 1
-  DisneyCastle: 1
-  TimelessRiver: 1
-  HalloweenTown: 1
-  PortRoyal: 1
-  SpaceParanoids: 1
-  TheWorldThatNeverWas: 1
-  Padding: []
-```
-
-### `objentry` Source Example
-```
-4:
-  ObjectId: 4
-  ObjectType: ZAKO
-  SubType: 0
-  DrawPriority: 0
-  WeaponJoint: 0
-  ModelName: M_EX520
-  AnimationName: M_EX520.mset
-  Flag: 8
-  TargetType: 1
-  Padding: 0
-  NeoStatus: 1006
-  NeoMoveset: 0
-  Weight: 100
-  SpawnLimiter: 8
-  Page: 1
-  ShadowSize: 1
-  CommandMenuOption: Default
-  SpawnObject1: 0
-  SpawnObject2: 0
-  SpawnObject3: 0
-  SpawnObject4: 0
-```
-
-### `libretto` Source Example
-```
-- TalkMessageId: 752 #Id to update. This is used as "ReactionCommand" in ARDs.
-  Type: 3 #Specify the type of Message. 1, 2, and 3 seem functionally identical, while 0 does nothing.
-  Contents: #Contents to update. Will insert additional Contents as necessary. When no additional are detected, terminates with 0.
-    - CodeType: 0x0001 #CodeType. Most worlds use a value of 1, while the World Map uses 0x100 to 0x113.
-      Unknown: 0x0001 #Unknown what this is used for. 
-      TextId: 0x3DEB #TextID in that worlds .bar file in the msg folder to reference.
-    - CodeType: 0x0001
-      Unknown: 0x0001
-      TextId: 0x183C
-```
-### `localset` Source Example
-```
-- ProgramId: 999
-  MapNumber: 25
-```
-### `soundinfo` Source Example
-```
-- Index: 0			#Specify an index to modify; otherwise if the index doesn't exist it will be created.
-  Reverb: -1
-  Rate: 1
-  EnvironmentWAV: 99
-  EnvironmentSEB: 99
-  EnvironmentNUMBER: 99
-  FootstepWAV: 99
-  FootstepSORA: 99
-  FootstepDONALD: 99
-  FootstepGOOFY: 99
-  FootstepWORLDFRIEND: 99
-  FootstepOTHER: 99
-```
-### `place` Source Example
-```
-- Index: 0			#Index should match the ID of the room in the world; i.e, Index 0 = al00 if you were modifying Agrabah.
-  MessageId: 1234
-  Padding: 0
-```
-### `jigsaw` Source Example
-```
-- Picture: 2
-  Part: 4
-  Text: 1500
-  World: 2
-  Room: 1
-  JigsawIdWorld: 99
-  Unk07: 0
-  Unk08: 0
-```
-
-* `synthpatch` (KH2) - Modifies Mixdata.bar, a file used for various properties related to synthesis in KH2. 
+## `synthpatch` (KH2) 
+Modifies Mixdata.bar, a file used for various properties related to synthesis in KH2. 
 
  * `recipe`
  * `level`
@@ -881,6 +413,37 @@ Asset Example
   Count: 1
   ShopUnlock: 201
 ```
+
+## `kh1ardresource` (KH1) - Replaces entries in the resource list of a KH1 `.ard` file.
+
+Every KH1 `.ard` contains a list of the models and animation sets its map loads. Each
+entry is a fixed-size slot holding one name, and the slots generally run as `(model, mset)` pairs.
+This method rewrites individual slots in place, so the rest of the binary is left byte for byte identical.
+
+Use it to swap a model or animation set without having to `copy` the whole multi-megabyte
+`.ard` into your mod, which would clobber any other mod's changes to that file.
+
+Asset Example
+
+```
+- name: tw01.ard
+  method: kh1ardresource
+  source:
+  - name: files/tw01.yml
+```
+
+YAML Source Example - the key is the slot index, the value is the new name:
+
+```
+0: xa_al_9999.mdls
+1: xa_al_9999.mset
+8: tw_6100.moa
+9: tw_6100.moa.mset
+```
+
+Notes:
+ * Only existing slots can be overwritten.
+ * A name can be at most 31 ASCII characters, and cannot be empty.
 
 ### `bbsarc` (BBS)
 Allows you to add/patch files inside a bbs `.arc` container without having to `copy` the entire arc file into your mod. You can use any method to patch those files, although at time of writing the only one that works for BBS files (other than `bbsarc`) is `copy`.
@@ -998,7 +561,7 @@ To start, here are the steps:
 
 ## Publishing a Mod on GitHub
 
-Mods should be published to a public GitHUb repository, so that users can install the mod just by providing the repository name.
+Mods should be published to a public GitHub repository, so that users can install the mod just by providing the repository name.
 
 It is recommended to apply the following tags to the repository, in order to make it easily found by searching GitHub for mods manager mods:
 

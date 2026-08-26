@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -99,19 +99,44 @@ namespace OpenKh.Tools.Common
 		{
 			var pos = (IntPtr)(BaseAddress + Position);
 
+            byte[] data = new byte[0];
 			int written;
-			if (offset == 0)
-			{
-				WriteProcessMemory(_hProcess, pos, buffer, count, out written);
-			}
-			else
-			{
-				var data = new byte[count];
-				Array.Copy(buffer, offset, data, 0, count);
-				WriteProcessMemory(_hProcess, pos, data, count, out written);
-			}
-
-			Position += written;
+            uint oldProtect = 0;
+            bool retry = false;
+            do
+            {
+                if (offset == 0)
+                {
+                    WriteProcessMemory(_hProcess, pos, buffer, count, out written);
+                }
+                else
+                {
+                    if (!retry)
+                    {
+                        data = new byte[count];
+                        Array.Copy(buffer, offset, data, 0, count);
+                    }
+                    WriteProcessMemory(_hProcess, pos, data, count, out written);
+                }
+                if (!retry)
+                {
+                    if (written != count)
+                    {
+                        VirtualProtectEx(_hProcess, pos, (uint)count, 0x40, out oldProtect);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if (retry)
+                {
+                    uint dummy;
+                    VirtualProtectEx(_hProcess, pos, (uint)count, oldProtect, out dummy);
+                }
+                retry = !retry;
+            } while (retry);
+            Position += written;
 		}
 
 		private void OpenProcess(Process process)

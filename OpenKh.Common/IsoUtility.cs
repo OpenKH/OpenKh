@@ -46,5 +46,11 @@ namespace OpenKh.Common
 
             return -1;
         }
+
+        public static Stream GetSectors(Stream isoStream, long startSector, int sectorCount)
+        {
+            isoStream.SetPosition(startSector * BlockLength);
+            return new MemoryStream(isoStream.ReadBytes(sectorCount * BlockLength));
+        }
     }
 }

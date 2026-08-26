@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Globalization;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Utils
@@ -54,6 +55,16 @@ namespace OpenKh.Kh2.Utils
 
         public static bool operator !=(Vector3Int16 left, Vector3Int16 right) => !(left == right);
 
-        public override string ToString() => $"({X}, {Y}, {Z})";
+        public override string ToString()
+        {
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "({0}, {1}, {2})",
+                X,
+                Y,
+                Z
+            );
+        }
+
     }
 }

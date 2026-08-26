@@ -73,6 +73,7 @@ namespace OpenKh.Tools.Kh2MsetMotionEditor.Usecases
                             string.Join(
                                 Path.DirectorySeparatorChar,
                                 SplitToPathNodes(Path.GetDirectoryName(loadFrom)!)
+                                    .AsEnumerable()
                                     .Reverse()
                                     .Skip(numRelativeDepth - 1)
                                     .Reverse()

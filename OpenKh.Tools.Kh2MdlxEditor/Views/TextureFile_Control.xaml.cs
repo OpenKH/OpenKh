@@ -19,11 +19,14 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
     public partial class TextureFile_Control : UserControl
     {
         TextureFile_VM textureFileControlModel { get; set; }
+        private Main2_VM _mainVM;
+        private Action _refreshCallback;
 
         public TextureFile_Control()
         {
             InitializeComponent();
         }
+
         public TextureFile_Control(ModelTexture textureFile)
         {
             InitializeComponent();
@@ -31,8 +34,25 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
             reloadContents();
         }
 
+        // Constructor that accepts Main2_VM to update texture reference
+        public TextureFile_Control(ModelTexture textureFile, Main2_VM mainVM, Action refreshCallback = null)
+        {
+            InitializeComponent();
+            _mainVM = mainVM;
+            _refreshCallback = refreshCallback;
+            textureFileControlModel = new TextureFile_VM(textureFile, (newTexture) => {
+                // Update the Main2_VM reference when texture is replaced
+                if (_mainVM != null)
+                {
+                    _mainVM.TextureFile = newTexture;
+                }
+            });
+            reloadContents();
+        }
+
         public void reloadContents()
         {
+            DataContext = null; // Force refresh
             DataContext = textureFileControlModel;
 
             if (textureFileControlModel.textureData.Images != null && textureFileControlModel.textureData.Images.Count > 0)
@@ -66,9 +86,10 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
             }
             contentFrameAnimation.Content = new TexAnim_Control(texAnimSelected, clutPalette);
         }
+
         public void Texture_Export(object sender, RoutedEventArgs e)
         {
-            if(LV_Textures.SelectedItem != null)
+            if (LV_Textures.SelectedItem != null)
             {
                 BitmapSource bitmapImage = (LV_Textures.SelectedItem as ModelTexture.Texture).GetBimapSource();
 
@@ -84,6 +105,41 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 }
             }
         }
+
+        // Replace texture feature
+        public void Texture_Replace(object sender, RoutedEventArgs e)
+        {
+            if (LV_Textures.SelectedItem != null)
+            {
+                int selectedIndex = LV_Textures.SelectedIndex;
+
+                System.Windows.Forms.OpenFileDialog ofd;
+                ofd = new System.Windows.Forms.OpenFileDialog();
+                ofd.Title = "Select PNG image to replace texture";
+                ofd.Filter = "PNG files (*.png)|*.png";
+                ofd.ShowDialog();
+
+                if (ofd.FileName != "")
+                {
+                    try
+                    {
+                        textureFileControlModel.replaceTextureAt(selectedIndex, ofd.FileName);
+
+                        // Trigger the refresh callback to reload the entire control
+                        _refreshCallback?.Invoke();
+
+                        MessageBox.Show($"Texture replaced successfully!\nNew size: {textureFileControlModel.textureData.Images[selectedIndex].Size}",
+                            "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error replacing texture: {ex.Message}\n\nStack trace:\n{ex.StackTrace}",
+                            "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
         // Works for the textures, but the textures are outputted from the actual data, so it only works visually on the tool
         public void Texture_Remove(object sender, RoutedEventArgs e)
         {
@@ -94,7 +150,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 reloadContents();
             }
         }
-        // Works for the textures, but the textures are outputted from the actual data, so it only works visually on the tool
+
         public void Texture_Add(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.OpenFileDialog sfd;
@@ -110,6 +166,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 }
             }
         }
+
         public void Animation_Export(object sender, RoutedEventArgs e)
         {
             if (LV_Animations.SelectedItem != null)

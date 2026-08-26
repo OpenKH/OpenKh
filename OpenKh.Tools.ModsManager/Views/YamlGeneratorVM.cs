@@ -90,7 +90,7 @@ namespace OpenKh.Tools.ModsManager.Views
         }
         #endregion
 
-        #region ModYmlFilePath 
+        #region ModYmlFilePath
         private string _modYmlFilePath = "";
         public string ModYmlFilePath
         {
@@ -101,7 +101,7 @@ namespace OpenKh.Tools.ModsManager.Views
                 OnPropertyChanged(nameof(ModYmlFilePath));
             }
         }
-        #endregion 
+        #endregion
 
         #region GeneratingTask
         private Task _generatingTask;
@@ -143,7 +143,7 @@ namespace OpenKh.Tools.ModsManager.Views
         }
         #endregion
 
-        #region GameDataPath 
+        #region GameDataPath
         private string _gameDataPath = "";
         public string GameDataPath
         {
@@ -154,7 +154,7 @@ namespace OpenKh.Tools.ModsManager.Views
                 OnPropertyChanged(nameof(GameDataPath));
             }
         }
-        #endregion 
+        #endregion
 
         #region AppenderCommand
         private ICommand _appenderCommand = null;

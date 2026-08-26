@@ -1,6 +1,7 @@
 # [Kingdom Hearts](index.md) - Models (Weapons)
 
 Sora's Weapons
+
 | Filename | Weapon | 
 |----------|-----------|
 | xw_dh_5000.wpn | Dream Sword |
@@ -14,7 +15,7 @@ Sora's Weapons
 | xw_ex_5050.wpn | Pumpkinhead |
 | xw_ex_5060.wpn | Crabclaw |
 | xw_ex_5070.wpn | Divine Rose |
-| xw_ex_5080.wpn | Spellbinder|
+| xw_ex_5080.wpn | Spellbinder |
 | xw_ex_5090.wpn | Olympia |
 | xw_ex_5100.wpn | Lionheart |
 | xw_ex_5110.wpn | Metal Chocobo |
@@ -29,6 +30,7 @@ Sora's Weapons
 | xw_ex_5200.wpn | One-Winged Angel |
 
 Donald's Weapons
+
 | Filename | Weapon | 
 |----------|-----------|
 | xw_ex_5210.wpn | Mage's Staff |
@@ -49,6 +51,7 @@ Donald's Weapons
 | xw_ex_5360.wpn | Fantasista |
 
 Goofy's Weapons
+
 | Filename | Weapon | 
 |----------|-----------|
 | xw_ex_5410.wpn | Knight's Shield |
@@ -70,6 +73,7 @@ Goofy's Weapons
 | xw_ex_5570.wpn | Seven Elements |
 
 Misc. Character's Weapons
+
 | Filename | Weapon | 
 |----------|-----------|
 | xw_al_5000.wpn | Aladdin's Sword/Scimitar |

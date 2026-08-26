@@ -36,12 +36,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             .Compose()
             .AddExtensions("PCSX2 Emulator", "exe");
 
-        const int OpenKHGameEngine = 0;
-        const int PCSX2 = 1;
-        const int PC = 2;
+        public const int OpenKHGameEngine = 0;
+        public const int PCSX2 = 1;
+        public const int PC = 2;
 
         private int _gameEdition;
-        private string _isoLocation = ConfigurationService.IsoLocation;
+        private string _isoLocation = null;
+        private string _isoLocationKH2 = ConfigurationService.IsoLocationKH2;
+        private string _isoLocationKH1 = ConfigurationService.IsoLocationKH1;
+        private string _isoLocationRecom = ConfigurationService.IsoLocationRecom;
         private string _openKhGameEngineLocation = ConfigurationService.OpenKhGameEngineLocation;
         private string _pcsx2Location = ConfigurationService.Pcsx2Location;
         private string _pcReleaseLocation = ConfigurationService.PcReleaseLocation;
@@ -102,16 +105,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string GameName { get; set; }
         public string IsoLocation
         {
-            get
-            {
-                if (File.Exists(_isoLocation))
-                {
-                    var game = GameService.DetectGameId(_isoLocation);
-                    GameId = game?.Id;
-                    GameName = game?.Name;
-                }
-                return _isoLocation;
-            }
+            get => _isoLocation;
             set
             {
                 _isoLocation = value;
@@ -120,7 +114,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     var game = GameService.DetectGameId(_isoLocation);
                     GameId = game?.Id;
                     GameName = game?.Name;
-                    ConfigurationService.IsoLocation = _isoLocation;
                 }
                 else
                 {
@@ -129,21 +122,109 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
 
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(IsIsoSelected));
-                OnPropertyChanged(nameof(GameId));
                 OnPropertyChanged(nameof(GameName));
-                OnPropertyChanged(nameof(GameRecognizedVisibility));
-                OnPropertyChanged(nameof(GameNotRecognizedVisibility));
-                OnPropertyChanged(nameof(IsGameRecognized));
+            }
+        }
+        public void ValidateIsoLocations()
+        {
+            GameName = null;
+            if (!File.Exists(_isoLocationKH2) || GameService.DetectGameId(_isoLocationKH2)?.Id != "kh2")
+            {
+                _isoLocation = _isoLocationKH2;
+                GameId = null;
+                if (string.IsNullOrEmpty(GameName))
+                {
+                    GameName = "Kingdom Hearts II";
+                }
+                else
+                {
+                    GameName += " & Kingdom Hearts II";
+                }
+            }
+            if (!File.Exists(_isoLocationKH1) || GameService.DetectGameId(_isoLocationKH1)?.Id != "kh1")
+            {
+                _isoLocation = _isoLocationKH1;
+                GameId = null;
+                if (string.IsNullOrEmpty(GameName))
+                {
+                    GameName = "Kingdom Hearts I";
+                }
+                else
+                {
+                    GameName += " & Kingdom Hearts I";
+                }
+            }
+            if (!File.Exists(_isoLocationRecom) || GameService.DetectGameId(_isoLocationRecom)?.Id != "Recom")
+            {
+                _isoLocation = _isoLocationRecom;
+                GameId = null;
+                if (string.IsNullOrEmpty(GameName))
+                {
+                    GameName = "Kingdom Hearts Re:Chain of Memories";
+                }
+                else
+                {
+                    GameName += " & Kingdom Hearts Re:Chain of Memories";
+                }
+            }
+            OnPropertyChanged(nameof(GameName));
+            OnPropertyChanged(nameof(GameNotRecognizedVisibility));
+            OnPropertyChanged(nameof(IsGameRecognized));
+        }
+        public string IsoLocationKH2
+        {
+            get => _isoLocationKH2;
+            set
+            {
+                _isoLocationKH2 = value;
+                WizardPageAfterGameData = !string.IsNullOrEmpty(_isoLocationKH2) ? PageRegion : LastPage;
+                ConfigurationService.IsoLocationKH2 = _isoLocationKH2;
+
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameDataFound));
                 OnPropertyChanged(nameof(GameDataFoundVisibility));
                 OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(KH2RecognizedVisibility));
+                OnPropertyChanged(nameof(WizardPageAfterGameData));
+            }
+        }
+        public string IsoLocationKH1
+        {
+            get => _isoLocationKH1;
+            set
+            {
+                _isoLocationKH1 = value;
+                ConfigurationService.IsoLocationKH1 = _isoLocationKH1;
+
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(KH1RecognizedVisibility));
+            }
+        }
+        public string IsoLocationRecom
+        {
+            get => _isoLocationRecom;
+            set
+            {
+                _isoLocationRecom = value;
+                ConfigurationService.IsoLocationRecom = _isoLocationRecom;
+
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(RecomRecognizedVisibility));
             }
         }
         public bool IsIsoSelected => (!string.IsNullOrEmpty(IsoLocation) && File.Exists(IsoLocation));
         public bool IsGameRecognized => (IsIsoSelected && GameId != null);
         public Visibility GameRecognizedVisibility => IsIsoSelected && GameId != null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameNotRecognizedVisibility => IsIsoSelected && GameId == null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility KH1RecognizedVisibility => !string.IsNullOrEmpty(_isoLocationKH1) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility KH2RecognizedVisibility => !string.IsNullOrEmpty(_isoLocationKH2) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility RecomRecognizedVisibility => !string.IsNullOrEmpty(_isoLocationRecom) ? Visibility.Visible : Visibility.Collapsed;
 
         public bool IsGameSelected
         {
@@ -181,7 +262,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => PageRegion,
+                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -201,7 +282,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 WizardPageAfterGameData = _gameEdition switch
                 {
                     OpenKHGameEngine => LastPage,
-                    PCSX2 => PageRegion,
+                    PCSX2 => !string.IsNullOrEmpty(_isoLocationKH2) ? PageRegion : LastPage,
                     PC => LastPage,
                     _ => null,
                 };
@@ -371,25 +452,24 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
                     File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))) &&
                     Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
-                    File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == 2)
+                    File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == PC)
                 {
                     return "both";
                 }
                 else if (Directory.Exists(PcReleaseLocation) && (File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")) ||
-                    File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))) && _gameEdition == 2)
+                    File.Exists(Path.Combine(PcReleaseLocation, "steam_api64.dll"))) && _gameEdition == PC)
                 {
 
                     return "1.5+2.5";
                 }
                 else if (Directory.Exists(PcReleaseLocationKH3D) && (File.Exists(Path.Combine(PcReleaseLocationKH3D, "EOSSDK-Win64-Shipping.dll")) ||
-                    File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == 2)
+                    File.Exists(Path.Combine(PcReleaseLocationKH3D, "steam_api64.dll"))) && _gameEdition == PC)
                 {
 
                     return "2.8";
                 }
                 return "";
             }
-            set { }
         }
 
         public int GameCollection
@@ -545,7 +625,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public bool IsNotExtracting { get; private set; }
-        public bool IsGameDataFound => IsNotExtracting && (GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) ||
+        public bool IsGameDataFound => IsNotExtracting &&
+            ((GameEdition == PCSX2 && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) ||
+            GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) ||
+            GameService.FolderContainsUniqueFile("Recom", Path.Combine(GameDataLocation, "Recom")))) ||
             (GameEdition == PC && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) ||
             GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) ||
             Directory.Exists(Path.Combine(GameDataLocation, "bbs", "message")) ||
@@ -575,13 +658,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 if (PcReleaseLocation != null && GameCollection == 0)
                 {
-                    return (File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.dll")) || File.Exists(Path.Combine(PcReleaseLocation, "dinput8.dll"))) &&
-                        File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
+                    return File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.dll")) && File.Exists(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
                 }
                 else if (PcReleaseLocationKH3D != null && GameCollection == 1)
                 {
-                    return (File.Exists(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.dll")) || File.Exists(Path.Combine(PcReleaseLocationKH3D, "dinput8.dll"))) &&
-                        File.Exists(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"));
+                    return File.Exists(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.dll")) && File.Exists(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"));
                 }
                 else
                     return false;
@@ -729,8 +810,46 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public SetupWizardViewModel()
         {
             IsNotExtracting = true;
-            SelectIsoCommand = new RelayCommand(_ =>
-                FileDialog.OnOpen(fileName => IsoLocation = fileName, _isoFilter));
+            ValidateIsoLocations();
+            SelectIsoCommand = new RelayCommand(param => {
+                string gameId = param as string;
+                FileDialog.OnOpen(
+                    fileName => {
+                        IsoLocation = fileName;
+                        switch (gameId)
+                        {
+                            case "kh2":
+                                IsoLocationKH2 = fileName;
+                                if (string.IsNullOrEmpty(GameName))
+                                {
+                                    GameName = "Kingdom Hearts II";
+                                }
+                                break;
+                            case "kh1":
+                                IsoLocationKH1 = fileName;
+                                if (string.IsNullOrEmpty(GameName))
+                                {
+                                    GameName = "Kingdom Hearts I";
+                                }
+                                break;
+                            case "Recom":
+                                IsoLocationRecom = fileName;
+                                if (string.IsNullOrEmpty(GameName))
+                                {
+                                    GameName = "Kingdom Hearts Re:Chain of Memories";
+                                }
+                                break;
+                        }
+
+                        OnPropertyChanged(nameof(GameName));
+                        OnPropertyChanged(nameof(IsIsoSelected));
+                        OnPropertyChanged(nameof(GameRecognizedVisibility));
+                        OnPropertyChanged(nameof(GameNotRecognizedVisibility));
+                        OnPropertyChanged(nameof(IsGameRecognized));
+                    },
+                    _isoFilter
+                );
+            });
             SelectOpenKhGameEngineCommand = new RelayCommand(_ =>
                 FileDialog.OnOpen(fileName => OpenKhGameEngineLocation = fileName, _openkhGeFilter));
             SelectPcsx2Command = new RelayCommand(_ =>
@@ -743,10 +862,55 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 FileDialog.OnFolder(path => GameDataLocation = path));
             ExtractGameDataCommand = new RelayCommand(async _ =>
             {
-                BEGIN:
+            BEGIN:
                 try
                 {
-                    await ExtractGameData(IsoLocation, GameDataLocation);
+                    if (GameEdition == PCSX2)
+                    {
+                        if (Extractkh2 && !string.IsNullOrEmpty(IsoLocationKH2) && GameService.DetectGameId(IsoLocationKH2)?.Id == "kh2")
+                        {
+                            await ExtractGameData(IsoLocationKH2, GameDataLocation);
+                        }
+                        if (Extractkh1 && !string.IsNullOrEmpty(IsoLocationKH1) && GameService.DetectGameId(IsoLocationKH1)?.Id == "kh1")
+                        {
+                            await ExtractGameData(IsoLocationKH1, GameDataLocation);
+                        }
+                        if (Extractrecom && !string.IsNullOrEmpty(IsoLocationRecom) && GameService.DetectGameId(IsoLocationRecom)?.Id == "Recom")
+                        {
+                            await ExtractGameData(IsoLocationRecom, GameDataLocation);
+                        }
+                    }
+                    else if (GameEdition == PC)
+                    {
+                        string GamesFound = PcReleaseSelections;
+                        if (GamesFound == "1.5+2.5")
+                        {
+                            if (Extractkh3d)
+                            {
+                                Extractkh3d = false;
+                            }
+                        }
+                        else if (GamesFound == "2.8")
+                        {
+                            if (Extractkh1)
+                            {
+                                Extractkh1 = false;
+                            }
+                            if (Extractkh2)
+                            {
+                                Extractkh2 = false;
+                            }
+                            if (Extractbbs)
+                            {
+                                Extractbbs = false;
+                            }
+                            if (Extractrecom)
+                            {
+                                Extractrecom = false;
+                            }
+                        }
+                        await ExtractGameData(null, GameDataLocation);
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -1010,20 +1174,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         if (Directory.Exists(PcReleaseLocation))
                         {
                             File.WriteAllLines(Path.Combine(PcReleaseLocation, "panacea_settings.txt"),
-                                new string[]
-                                {
-                                $"mod_path={ConfigurationService.GameModPath}",
+                                [
+                                $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
                                 $"show_console={false}",
-                                });
+                                ]);
                         }
                         if (Directory.Exists(PcReleaseLocationKH3D))
                         {
                             File.WriteAllLines(Path.Combine(PcReleaseLocationKH3D, "panacea_settings.txt"),
-                                new string[]
-                                {
-                                $"mod_path={ConfigurationService.GameModPath}",
+                                [
+                                $"mod_path={Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath,".."))}",
                                 $"show_console={false}",
-                                });
+                                ]);
                         }
                     }
                     catch (Exception ex)
@@ -1204,14 +1366,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             if (File.Exists(Path.Combine(TempExtractionLocation, "DBGHELP.dll")))
                             {
-                                if (Process.GetProcessesByName("winlogon").Length > 0)
-                                {
-                                    File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "LuaBackend.dll"), true);
-                                }
-                                else
-                                {
-                                    File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "dinput8.dll"), true);
-                                }
+                                File.Move(Path.Combine(TempExtractionLocation, "DBGHELP.dll"), Path.Combine(DestinationCollection, "LuaBackend.dll"), true);
                             }
                             if (File.Exists(Path.Combine(TempExtractionLocation, "LuaBackend.toml")))
                             {
@@ -1220,27 +1375,27 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 if (LuaScriptPaths.Contains("kh1") && GameCollection == 0)
                                 {
                                     int index = config.IndexOf("true }", config.IndexOf("[kh1]")) + 6;
-                                    config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}").Replace("\\", "/"));
+                                    config = config.Insert(index, ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "kh1/scripts\" , relative = false}").Replace("\\", "/"));
                                 }
                                 if (LuaScriptPaths.Contains("kh2") && GameCollection == 0)
                                 {
                                     int index = config.IndexOf("true }", config.IndexOf("[kh2]")) + 6;
-                                    config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}").Replace("\\", "/"));
+                                    config = config.Insert(index, ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "kh2/scripts\" , relative = false}").Replace("\\", "/"));
                                 }
                                 if (LuaScriptPaths.Contains("bbs") && GameCollection == 0)
                                 {
                                     int index = config.IndexOf("true }", config.IndexOf("[bbs]")) + 6;
-                                    config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}").Replace("\\", "/"));
+                                    config = config.Insert(index, ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "bbs/scripts\" , relative = false}").Replace("\\", "/"));
                                 }
                                 if (LuaScriptPaths.Contains("Recom") && GameCollection == 0)
                                 {
                                     int index = config.IndexOf("true }", config.IndexOf("[recom]")) + 6;
-                                    config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}").Replace("\\", "/"));
+                                    config = config.Insert(index, ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "Recom/scripts\" , relative = false}").Replace("\\", "/"));
                                 }
                                 if (LuaScriptPaths.Contains("kh3d") && GameCollection == 1)
                                 {
                                     int index = config.IndexOf("true }", config.IndexOf("[kh3d]")) + 6;
-                                    config = config.Insert(index, ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}").Replace("\\", "/"));
+                                    config = config.Insert(index, ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "kh3d/scripts\" , relative = false}").Replace("\\", "/"));
                                 }
                                 if (ConfigurationService.PCVersion == "Steam")
                                 {
@@ -1336,7 +1491,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                                 int index = config.IndexOf("scripts", config.IndexOf("[kh1]"));
                                                 config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                                 config = config.Insert(index, "scripts = [{ path = \"scripts/kh1/\", relative = true }" +
-                                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
+                                                    ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
                                                 break;
                                             }
                                         }
@@ -1346,7 +1501,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         int index = config.IndexOf("scripts", config.IndexOf("[kh1]"));
                                         config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                         config = config.Insert(index, "scripts = [{ path = \"scripts/kh1/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "kh1/scripts\" , relative = false}]").Replace("\\", "/"));
                                     }
                                 }
                                 if (LuaScriptPaths.Contains("kh2") && GameCollection == 0)
@@ -1364,7 +1519,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                                 int index = config.IndexOf("scripts", config.IndexOf("[kh2]"));
                                                 config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                                 config = config.Insert(index, "scripts = [{ path = \"scripts/kh2/\", relative = true }" +
-                                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
+                                                    ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
                                                 break;
                                             }
                                         }
@@ -1374,7 +1529,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         int index = config.IndexOf("scripts", config.IndexOf("[kh2]"));
                                         config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                         config = config.Insert(index, "scripts = [{ path = \"scripts/kh2/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "kh2/scripts\" , relative = false}]").Replace("\\", "/"));
                                     }
                                 }
                                 if (LuaScriptPaths.Contains("bbs") && GameCollection == 0)
@@ -1392,7 +1547,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                                 int index = config.IndexOf("scripts", config.IndexOf("[bbs]"));
                                                 config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                                 config = config.Insert(index, "scripts = [{ path = \"scripts/bbs/\", relative = true }" +
-                                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
+                                                    ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
                                                 break;
                                             }
                                         }
@@ -1402,7 +1557,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         int index = config.IndexOf("scripts", config.IndexOf("[bbs]"));
                                         config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                         config = config.Insert(index, "scripts = [{ path = \"scripts/bbs/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "bbs/scripts\" , relative = false}]").Replace("\\", "/"));
                                     }
                                 }
                                 if (LuaScriptPaths.Contains("Recom") && GameCollection == 0)
@@ -1420,7 +1575,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                                 int index = config.IndexOf("scripts", config.IndexOf("[recom]"));
                                                 config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                                 config = config.Insert(index, "scripts = [{ path = \"scripts/recom/\", relative = true }" +
-                                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
+                                                    ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
                                                 break;
                                             }
                                         }
@@ -1430,7 +1585,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         int index = config.IndexOf("scripts", config.IndexOf("[recom]"));
                                         config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                         config = config.Insert(index, "scripts = [{ path = \"scripts/recom/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "Recom/scripts\" , relative = false}]").Replace("\\", "/"));
                                     }
                                 }
                                 if (LuaScriptPaths.Contains("kh3d") && GameCollection == 1)
@@ -1448,7 +1603,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                                 int index = config.IndexOf("scripts", config.IndexOf("[kh3d]"));
                                                 config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                                 config = config.Insert(index, "scripts = [{ path = \"scripts/kh3d/\", relative = true }" +
-                                                    ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
+                                                    ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
                                                 break;
                                             }
                                         }
@@ -1458,7 +1613,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                         int index = config.IndexOf("scripts", config.IndexOf("[kh3d]"));
                                         config = config.Remove(index, config.IndexOf("]", index) - index + 1);
                                         config = config.Insert(index, "scripts = [{ path = \"scripts/kh3d/\", relative = true }" +
-                                            ", {path = \"" + Path.Combine(ConfigurationService.GameModPath, "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
+                                            ", {path = \"" + Path.Combine(Path.GetFullPath(Path.Combine(ConfigurationService.CompiledModPath, "..")), "kh3d/scripts\" , relative = false}]").Replace("\\", "/"));
                                     }
                                 }
                                 if (ConfigurationService.PCVersion == "Steam")
@@ -1538,13 +1693,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         if (GameCollection == 0)
                         {
                             File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.dll"));
-                            File.Delete(Path.Combine(PcReleaseLocation, "dinput8.dll"));
                             File.Delete(Path.Combine(PcReleaseLocation, "LuaBackend.toml"));
                         }
                         else if (GameCollection == 1)
                         {
                             File.Delete(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.dll"));
-                            File.Delete(Path.Combine(PcReleaseLocation, "dinput8.dll"));
                             File.Delete(Path.Combine(PcReleaseLocationKH3D, "LuaBackend.toml"));
                         }
                         OnPropertyChanged(nameof(IsLuaBackendInstalled));
@@ -1689,12 +1842,41 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 switch (GameEdition)
                 {
                     default:
+                        break;
+
+                    case PCSX2:
                     {
-                        await _gameDataExtractionService.ExtractKh2Ps2EditionAsync(
-                            isoLocation: isoLocation,
-                            gameDataLocation: gameDataLocation,
-                            onProgress: CreateOnProgressProcessor()
-                        );
+                        if (isoLocation != null)
+                        {
+                            var game = GameService.DetectGameId(isoLocation);
+                            if (game != null)
+                            {
+                                switch (game?.Id)
+                                {
+                                    case "kh1":
+                                        await _gameDataExtractionService.ExtractKh1Ps2EditionAsync(
+                                            isoLocation: isoLocation,
+                                            gameDataLocation: gameDataLocation,
+                                            onProgress: CreateOnProgressProcessor()
+                                        );
+                                        break;
+                                    case "kh2":
+                                        await _gameDataExtractionService.ExtractKh2Ps2EditionAsync(
+                                            isoLocation: isoLocation,
+                                            gameDataLocation: gameDataLocation,
+                                            onProgress: CreateOnProgressProcessor()
+                                        );
+                                        break;
+                                    case "Recom":
+                                        await _gameDataExtractionService.ExtractRecomPs2EditionAsync(
+                                            isoLocation: isoLocation,
+                                            gameDataLocation: gameDataLocation,
+                                            onProgress: CreateOnProgressProcessor()
+                                        );
+                                        break;
+                                }
+                            }
+                        }
                         break;
                     }
 

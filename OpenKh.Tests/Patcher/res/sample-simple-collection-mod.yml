@@ -1,0 +1,24 @@
+title: My awesome untitled mod - part 2
+specifications: 1
+isCollection: true
+collectionGames:
+  - "kh1"
+  - "kh2"
+assets:
+- name: scripts/test.lua
+  method: copy
+  game: "kh1"
+  source:
+    - name: test_mod_files/test_1.lua
+- name: scripts/inner_folder/test.lua
+  method: copy
+  game: "kh2"
+  source:
+    - name: test_mod_files/test_2.lua
+- name: scripts/test_optional.lua
+  method: copy
+  collectionOptional: true
+  game: "kh1"
+  source:
+    - name: test_mod_files/test_optional.lua
+

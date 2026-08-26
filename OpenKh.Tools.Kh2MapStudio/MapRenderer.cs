@@ -359,10 +359,11 @@ namespace OpenKh.Tools.Kh2MapStudio
                             _shader.SetRenderTexture(pass, _whiteTexture);
                             foreach (var item in spawnPoint.EventActivators)
                             {
-                                _shader.SetModelView(Matrix4x4.CreateRotationX(item.RotationX) *
+                                _shader.SetModelView(
+                                    Matrix4x4.CreateScale(item.ScaleX, item.ScaleY, item.ScaleZ) *
+                                    Matrix4x4.CreateRotationX(item.RotationX) *
                                     Matrix4x4.CreateRotationY(item.RotationY) *
                                     Matrix4x4.CreateRotationZ(item.RotationZ) *
-                                    Matrix4x4.CreateScale(item.ScaleX, item.ScaleY, item.ScaleZ) *
                                     Matrix4x4.CreateTranslation(item.PositionX, -item.PositionY, -item.PositionZ));
                                 pass.Apply();
 

@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
+        <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
+        <ProjectReference Include="..\OpenKh.Ddd\OpenKh.Ddd.csproj" />
+        <ProjectReference Include="..\OpenKh.Imaging\OpenKh.Imaging.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Properties\Settings.Designer.cs">
+        <DesignTimeSharedInput>True</DesignTimeSharedInput>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Settings.settings</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Properties\Settings.settings">
+        <Generator>SettingsSingleFileGenerator</Generator>
+        <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      </None>
+    </ItemGroup>
+
+</Project>

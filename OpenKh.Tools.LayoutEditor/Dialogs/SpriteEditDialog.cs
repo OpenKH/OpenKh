@@ -60,7 +60,18 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             }
 
             if (ImGui.Button("Add Sprite"))
-                _spriteModels.Add(new SpriteModel(new Kh2.Sequence.Sprite(), _spriteDrawing, _atlasTexture, _textureBinder, _settings));
+            {
+                var _newSprite = new Kh2.Sequence.Sprite();
+
+                _newSprite.ColorTop = 0x80808080;
+                _newSprite.ColorLeft = 0x80808080;
+                _newSprite.ColorBottom = 0x80808080;
+                _newSprite.ColorRight = 0x80808080;
+                
+                var _newSpriteModel = new SpriteModel(_newSprite, _spriteDrawing, _atlasTexture, _textureBinder, _settings);
+                _spriteModels.Add(_newSpriteModel);
+            }
+                
             ImGui.SameLine();
             if (ImGui.Button("Remove Sprite"))
             {

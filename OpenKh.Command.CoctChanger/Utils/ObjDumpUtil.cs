@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Numerics;
 
 namespace OpenKh.Command.CoctChanger.Utils
 {
@@ -21,9 +23,38 @@ namespace OpenKh.Command.CoctChanger.Utils
             {
                 type = typeof(T),
                 list = expressions
-                    .Select(expression => $"{GetMemberName(expression)}={expression.Compile().Invoke(item)}")
+                    .Select(expression => $"{GetMemberName(expression)}={FormatValue(expression.Compile().Invoke(item))}")
                     .ToList()
             };
+        }
+
+        private static string FormatValue(object value)
+        {
+            if (value is Plane plane)
+            {
+                return string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{{Normal:<{0}, {1}, {2}> D:{3}}}",
+                    plane.Normal.X,
+                    plane.Normal.Y,
+                    plane.Normal.Z,
+                    plane.D
+                );
+            }
+
+            if (value is Vector4 vector4)
+            {
+                return string.Format(
+                    CultureInfo.InvariantCulture,
+                    "<{0}, {1}, {2}, {3}>",
+                    vector4.X,
+                    vector4.Y,
+                    vector4.Z,
+                    vector4.W
+                );
+            }
+
+            return value?.ToString() ?? "null";
         }
 
         private static string GetMemberName(LambdaExpression expression)
@@ -44,7 +75,7 @@ namespace OpenKh.Command.CoctChanger.Utils
 
         public ObjDumpUtil Add(string name, object value)
         {
-            list.Add($"{name}={value}");
+            list.Add($"{name}={FormatValue(value)}");
             return this;
         }
     }

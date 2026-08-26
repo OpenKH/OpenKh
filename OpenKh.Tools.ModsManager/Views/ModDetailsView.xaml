@@ -48,6 +48,19 @@
                 This mod is available only locally and it is not linked to any GitHub repository.
             </TextBlock>
         </StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Visibility="{Binding CollectionSettingsVisibility}">
+                <Button Margin="0 0 0 3"
+                        Command="{Binding CollectionSettingsCommand}"
+                        ToolTip="Control which optional mod files are patched for this collection.">
+                    <TextBlock Text="Collection Settings"></TextBlock>
+                </Button>
+            </StackPanel>
+        </Grid>
         <Expander Header="Files to patch">
             <TextBlock Text="{Binding FilesToPatch}" TextWrapping="Wrap" d:Text="msg/jp/sys.bar"/>
         </Expander>

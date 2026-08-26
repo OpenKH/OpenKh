@@ -7,6 +7,8 @@ namespace OpenKh.Kh2.SystemData
     public class Sstm
     {
         //[Data] public uint Id { get; set; }
+        [Data] public int MagicCode { get; set; }
+        [Data] public int Unknown { get; set; }
         [Data] public float CeilingStop { get; set; }
         [Data] public float CeilingDisableCommandTime { get; set; }
         [Data] public float HangRangeH { get; set; }
@@ -103,6 +105,22 @@ namespace OpenKh.Kh2.SystemData
         [Data] public float DefenseMaster { get; set; }
         [Data] public int DefenseMasterRatio { get; set; }
 
+
+        public static Sstm Read(Stream stream)
+        {
+            stream.Position = 0;
+            return BinaryMapping.ReadObject<Sstm>(stream);
+        }
+
+        public void Write(Stream stream)
+        {
+            stream.SetLength(0);
+            stream.Position = 0;
+            BinaryMapping.WriteObject(stream, this);
+        }
+
+
+        /*
         public class SstmPatch
         {
             public Dictionary<string, float> Properties { get; set; } = new Dictionary<string, float>();
@@ -112,7 +130,7 @@ namespace OpenKh.Kh2.SystemData
         public static List<Sstm> Read(Stream stream) => BaseTableSstm<Sstm>.Read(stream);
 
         public static void Write(Stream stream, IEnumerable<Sstm> entries) => BaseTableSstm<Sstm>.Write(stream, entries);
-
+        */
     }
 
 }
