@@ -1,5 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Engine.Input;
+using OpenKh.Kh2;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.ModManager.Classes;
 using System;
@@ -12,13 +13,20 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Xe.IO;
 using Loggers = Serilog.Log;
 
 namespace OpenKh.Tools.ModManager.Services
 {
     public class InjectorService
     {
+        // Y'all need to deal with THIS one until I can switch over to DiscUtil.
+        private static readonly string[][] GAME_EXECUTABLES =
+        [
+            [],
+            ["SLPM_666.75;1", "SLES_541.14;1", "SLES_542.32;1", "SLES_542.33;1", "SLES_542.34;1", "SLES_542.35;1", "SLPM_662.33;1", "SLUS_210.05;1", "SLPM_550.19;1", "SCAJ_201.64;1"]
+        ];
+
         private static readonly HashSet<string> DENY_FILES = new HashSet<string>
         {
             "dkmovie.x",
@@ -47,16 +55,43 @@ namespace OpenKh.Tools.ModManager.Services
         CancellationTokenSource _cancelSource;
         CancellationToken _cancelToken;
 
-        uint _loadFileFunc = 0x1682b8;
-        uint _getFileSizeFunc = 0x1AE1B0;
-        uint _subFileSizeFunc = 0x1AE460;
+        uint _loadFileFunc;   
+        uint _getFileSizeFunc;
+        uint _subFileSizeFunc;
 
+        // Hard-Coded for KH2 rn.
         uint _bufferPtr = 0x350E88;
-        uint _regionPtr = 0x33CAF0;
+        uint _regionPtr = 0x33CAF0; // F0 FF BD 27 34 00 ?? 3C 00 00 B0 FF ?? ?? ?? 24 08 00 BF FF
         uint _languagePtr = 0x33CAF4;
 
         uint _hookPtrLoad = 0xFFF00;
         uint _hookPtrSize = 0xFFF00;
+
+        static uint FetchPattern(Stream stream, byte[] pattern, string mask)
+        {
+            stream.Position = 0x00;
+
+            var patternLen = mask.Length;
+            var maxSearch = stream.Length - patternLen;
+
+            for (uint i = 0; i <= maxSearch; i++)
+            {
+                int j = 0;
+
+                for (; j < patternLen; j++)
+                {
+                    stream.Position = i + j;
+
+                    if (mask[j] != '?' && pattern[j] != stream.ReadByte())
+                        break;
+                }
+
+                if (j == patternLen)
+                    return i;
+            }
+
+            return uint.MaxValue;
+        }
 
         public Config TargetConfig { get; set; }
 
@@ -114,6 +149,31 @@ namespace OpenKh.Tools.ModManager.Services
 
             var _fetchPathGame = _targetConfig.Frontend.TargetGame == Game.KINGDOM_HEARTS ? TargetConfig.Emulator.RomPath[0] : TargetConfig.Emulator.RomPath[1];
 
+            using (var _fetchStreamISO = new FileStream(_fetchPathGame, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                switch (_targetConfig.Frontend.TargetGame)
+                {
+                    case Game.KINGDOM_HEARTS_II:
+                    {
+                        foreach (var _gameExec in GAME_EXECUTABLES[0x01])
+                        {
+                            var _fetchExecOffset = IsoUtility.GetFileOffset(_fetchStreamISO, _gameExec);
+
+                            if (_fetchExecOffset == -1)
+                                continue;
+
+                            var _fetchSubStrExec = new SubStream(_fetchStreamISO, _fetchExecOffset * 0x800, _fetchStreamISO.Length - (_fetchExecOffset * 0x800));
+
+                            _loadFileFunc = FetchPattern(_fetchSubStrExec, [0xF0, 0xFF, 0xBD, 0x27, 0x08, 0x00, 0xBF, 0xFF, 0x00, 0x00, 0xB0, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2D, 0x80, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2D, 0x20, 0x00, 0x00, 0x2D, 0x10, 0x00, 0x02], "xxxxxxxxxxxx????xxxxxxxx????xxxxxxxx") + 0xFF000;
+                            _getFileSizeFunc = FetchPattern(_fetchSubStrExec, [0xF0, 0xFF, 0xBD, 0x27, 0x00, 0x00, 0xBF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x40, 0x10, 0x2D, 0x78, 0x00, 0x00, 0x0C, 0x00, 0x4F, 0x8C], "xxxxxxxx????xxxxxxxxxxxxxxxx") + 0xFF000;
+                            _subFileSizeFunc = FetchPattern(_fetchSubStrExec, [0xF0, 0xFF, 0xBD, 0x27, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xB0, 0xFF, 0x08, 0x00, 0xBF, 0xFF, 0x2D, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2D, 0x28, 0x00, 0x02, 0x09, 0x00, 0x40, 0x14], "xxxx????xxxxxxxxxxxx????????xxxxxxxx") + 0xFF000;
+
+                            break;
+                        }
+                    } break;
+                }
+            }
+          
             _targetProcess = new Process
             {
                 StartInfo = new ProcessStartInfo(_fetchPathEmu)
