@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Octokit;
@@ -95,28 +96,32 @@ namespace OpenKh.Tools.ModManager.ViewModels
                             // If the file doesn't exist, abort.
                             if (_fetchMetadataOK.StatusCode == HttpStatusCode.OK)
                             {
-                                var _fetchContent = await _makeClient.GetStringAsync(_fetchMetadataURL, CancellationToken.None);
-                                var _fetchImageRAW = _fetchImageOK.StatusCode == HttpStatusCode.OK ? await _makeClient.GetByteArrayAsync(_fetchIconURL, CancellationToken.None) : null;
+                                
+                                    var _fetchContent = await _makeClient.GetStringAsync(_fetchMetadataURL, CancellationToken.None);
+                                    var _fetchImageRAW = _fetchImageOK.StatusCode == HttpStatusCode.OK ? await _makeClient.GetByteArrayAsync(_fetchIconURL, CancellationToken.None) : null;
 
-                                var _fetchMetadata = Metadata.Read(new StringReader(_fetchContent));
+                                    var _fetchMetadata = Metadata.Read(new StringReader(_fetchContent));
 
-                                if (_fetchMetadata != null && _fetchMetadata.IsValid)
+                                Dispatcher.UIThread.Post(async () =>
                                 {
-                                    var _modModel = new ModModel
+                                    if (_fetchMetadata != null && _fetchMetadata.IsValid)
                                     {
-                                        ModTitle = !String.IsNullOrEmpty(_fetchMetadata.Title) ? _fetchMetadata.Title : _fetchMod.Name,
-                                        ModAuthor = !String.IsNullOrEmpty(_fetchMetadata.OriginalAuthor) ? _fetchMetadata.OriginalAuthor : _fetchMod.Owner.Login,
-                                        ModDescription = !String.IsNullOrEmpty(_fetchMetadata.Description) ? _fetchMetadata.Description : "This mod does not have a description, but we believe it's pretty cool.",
-                                        ModFilesList = _fetchMetadata.Assets.Select(x => x.Name).ToArray(),
-                                        ModIcon = _fetchImageRAW != null ? new Bitmap(new MemoryStream(_fetchImageRAW)) : null,
-                                        ModPath = _fetchMod.FullName,
-                                        ModActive = false,
-                                        ModValid = true
-                                    };
+                                        var _modModel = new ModModel
+                                        {
+                                            ModTitle = !String.IsNullOrEmpty(_fetchMetadata.Title) ? _fetchMetadata.Title : _fetchMod.Name,
+                                            ModAuthor = !String.IsNullOrEmpty(_fetchMetadata.OriginalAuthor) ? _fetchMetadata.OriginalAuthor : _fetchMod.Owner.Login,
+                                            ModDescription = !String.IsNullOrEmpty(_fetchMetadata.Description) ? _fetchMetadata.Description : "This mod does not have a description, but we believe it's pretty cool.",
+                                            ModFilesList = _fetchMetadata.Assets.Select(x => x.Name).ToArray(),
+                                            ModIcon = _fetchImageRAW != null ? new Bitmap(new MemoryStream(_fetchImageRAW)) : null,
+                                            ModPath = _fetchMod.FullName,
+                                            ModActive = false,
+                                            ModValid = true
+                                        };
 
-                                    lock (_lockObject)
-                                        InstalledMods.Add(_modModel);
-                                }
+                                        lock (_lockObject)
+                                            InstalledMods.Add(_modModel);
+                                    }
+                                });
                             }
                         });
 

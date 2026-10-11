@@ -1,30 +1,31 @@
 #pragma warning disable S4790   // Disabled because the hashing algorithm used in this class is not being used for security.
 #pragma warning disable CS4014  // Disabled because this class contains non-awaited tasks.
 
+using System;
+using System.IO;
+using System.Text;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Diagnostics;
+using System.IO.Compression;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Collections.Concurrent;
+
+using SharpYaml;
 using Avalonia.Controls;
 using DiscUtils.Iso9660;
-using OpenKh.Common;
+
 using OpenKh.Egs;
 using OpenKh.Kh1;
 using OpenKh.Kh2;
-using OpenKh.Patcher;
 using OpenKh.Recom;
-using OpenKh.Tools.ModManager.Classes;
-using OpenKh.Tools.ModManager.Models;
-using SharpYaml;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using OpenKh.Common;
+using OpenKh.Patcher;
 
-using Xe.BinaryMapper;
+using OpenKh.Tools.ModManager.Models;
+using OpenKh.Tools.ModManager.Classes;
 
 using Loggers = Serilog.Log;
 

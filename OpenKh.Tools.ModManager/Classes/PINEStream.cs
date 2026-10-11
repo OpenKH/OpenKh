@@ -1,12 +1,11 @@
 using System;
 using System.IO;
+using System.Net;
+using System.Linq;
 using System.Net.Sockets;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Linq;
-using System.Net;
-using System.Diagnostics;
 
 namespace OpenKh.Tools.ModManager.Classes
 {
