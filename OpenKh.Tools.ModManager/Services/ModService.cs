@@ -2,8 +2,7 @@
 #pragma warning disable CS4014  // Disabled because this class contains non-awaited tasks.
 
 using Avalonia.Controls;
-using LibGit2Sharp;
-using LibGit2Sharp.Handlers;
+using DiscUtils.Iso9660;
 using OpenKh.Common;
 using OpenKh.Egs;
 using OpenKh.Kh1;
@@ -20,13 +19,12 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Xe.IO;
+
+using Xe.BinaryMapper;
 
 using Loggers = Serilog.Log;
 
@@ -277,14 +275,10 @@ namespace OpenKh.Tools.ModManager.Services
                             {
                                 case 0x00:
                                 {
-                                    var _fetchOffsetIDX = IsoUtility.GetFileOffset(_fetchStreamISO, "KINGDOM.IDX;1");
-                                    var _fetchOffsetIMG = IsoUtility.GetFileOffset(_fetchStreamISO, "SYSTEM.CNF;1");
+                                    var _fetchReader = new CDReader(_fetchStreamISO, true);
+                                    var _fetchFileIDX = _fetchReader.OpenFile("\\KINGDOM.IDX;1", FileMode.Open);
 
-                                    var _fetchSubStrIDX = new SubStream(_fetchStreamISO, _fetchOffsetIDX * 0x800, _fetchStreamISO.Length - (_fetchOffsetIDX * 0x800));
-                                    var _fetchSubStrIMG = new SubStream(_fetchStreamISO, _fetchOffsetIMG * 0x800, _fetchStreamISO.Length - (_fetchOffsetIMG * 0x800));
-
-                                    var _fetchIDX = Idx1.Read(_fetchSubStrIDX);
-                                    var _fetchIMG = new Img1(_fetchSubStrIMG, _fetchIDX, 0x00);
+                                    var _fetchIMG = new Img1(_fetchStreamISO, Idx1.Read(_fetchFileIDX), 0x00);
 
                                     var _fetchCount = _fetchIMG.Entries.Count;
                                     var _fetchProcessed = 0x00;
@@ -321,14 +315,12 @@ namespace OpenKh.Tools.ModManager.Services
                                 } break;
                                 case 0x01:
                                 {
-                                    var _fetchOffsetIDX = IsoUtility.GetFileOffset(_fetchStreamISO, "KH2.IDX;1");
-                                    var _fetchOffsetIMG = IsoUtility.GetFileOffset(_fetchStreamISO, "KH2.IMG;1");
+                                    var _fetchReader = new CDReader(_fetchStreamISO, true);
 
-                                    var _fetchSubStrIDX = new SubStream(_fetchStreamISO, _fetchOffsetIDX * 0x800, _fetchStreamISO.Length - (_fetchOffsetIDX * 0x800));
-                                    var _fetchSubStrIMG = new SubStream(_fetchStreamISO, _fetchOffsetIMG * 0x800, _fetchStreamISO.Length - (_fetchOffsetIMG * 0x800));
+                                    var _fetchFileIDX = _fetchReader.OpenFile("\\KH2.IDX;1", FileMode.Open);
+                                    var _fetchFileIMG = _fetchReader.OpenFile("\\KH2.IMG;1", FileMode.Open);
 
-                                    var _fetchIDX = Idx.Read(_fetchSubStrIDX);
-                                    var _fetchIMG = new Img(_fetchSubStrIMG, _fetchIDX, true);
+                                    var _fetchIMG = new Img(_fetchFileIMG, Idx.Read(_fetchFileIDX), true);
 
                                     var _fetchCount = _fetchIMG.Entries.Count;
                                     var _fetchProcessed = 0x00;
@@ -364,12 +356,24 @@ namespace OpenKh.Tools.ModManager.Services
 
                                 case 0x02:
                                 {
+                                    var _fetchReader = new CDReader(_fetchStreamISO, true);
+
                                     _fetchStreamISO.SetPosition(0x244 * 0x800 + 0x08);
-
                                     var _fetchRDISize = _fetchStreamISO.ReadInt16() + 0x01;
-                                    var _fetchRDIStream = IsoUtility.GetSectors(_fetchStreamISO, 0x244, _fetchRDISize);
 
-                                    var _fetchRDI = RootDirInfo.Read(_fetchRDIStream);
+                                    _fetchStreamISO.SetPosition(0x244 * 0x800);
+                                    var _fetchRDIBuffer = _fetchStreamISO.ReadBytes(_fetchRDISize * 0x800);
+
+                                    using (var _fetchRDIStream = new MemoryStream(_fetchRDIBuffer))
+                                    {
+                                        var _targetFilePath = Path.Combine(_fetchDataPath, "Recom");
+                                        var _fetchRDI = RootDirInfo.Read(_fetchRDIStream);
+
+                                        if (!Directory.Exists(_targetFilePath))
+                                            Directory.CreateDirectory(_targetFilePath);
+
+                                        // This is as far as I am getting right now.
+                                    }
                                 } break;
                             }
                         }
