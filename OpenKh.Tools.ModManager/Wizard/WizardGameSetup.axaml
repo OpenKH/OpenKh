@@ -33,10 +33,11 @@
         <Label Content="Game Platform:" />
         <ComboBox Name="PlatformBox"
             SelectedIndex="{ReflectionBinding CurrentConfig.Frontend.TargetPlatform}"
-            HorizontalAlignment="Stretch" PlaceholderText="Select a Platform..." Margin="0, 5, 0, 5">
+            HorizontalAlignment="Stretch" PlaceholderText="Select a Platform..." Margin="0, 5, 0, 5" SelectionChanged="OnGameSelectChanged">
             <ComboBoxItem Content="Emulator" />
             <ComboBoxItem Content="Steam" />
             <ComboBoxItem Content="Epic Games Store" />
+            <ComboBoxItem Content="Microsoft Store / XBOX" />
         </ComboBox>
 
         <!-- StackPanel for PC Platforms -->
@@ -86,19 +87,38 @@
                     <PathIcon Data="{StaticResource icon_open_folder}" Height="24" Width="24" />
                 </Button>
             </Grid>
+                <StackPanel>
+                    <StackPanel.IsVisible>
+                        <MultiBinding Converter="{StaticResource CheckIfNotEqual}">
+                            <Binding Path="#PlatformBox.SelectedIndex"/>
+                            <ReflectionBinding Source="{x:Static class:Platform.MICROSOFT_STORE}" />
+                        </MultiBinding>
+                    </StackPanel.IsVisible>
+                    <TextBlock TextWrapping="Wrap"> 
+                        You can also choose to <Bold>detect your installations</Bold>
+                        instead. Note that this will try to fetch your platform-specific library locations
+                        and may not always be successful. 
+                    </TextBlock>
 
-            <TextBlock TextWrapping="Wrap"> 
-                You can also choose to <Bold>detect your installations</Bold>
-                instead. Note that this will try to fetch your platform-specific library locations
-                and may not always be successful. 
-            </TextBlock>
+                    <TextBlock TextWrapping="Wrap" Margin="0, 10, 0, 5"> 
+                        <Bold>NOTE:</Bold> Detecting installations on Linux works for Steam only.
+                    </TextBlock>
 
-            <TextBlock TextWrapping="Wrap" Margin="0, 10, 0, 5"> 
-                <Bold>NOTE:</Bold> Detecting installations on Linux works for Steam only.
-            </TextBlock>
+                    <Button Margin="0, 5, 0, 10" Height="30" HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center" Content="Detect Installations..." Click="OnDetectClick"/>
+                </StackPanel>
 
-            <Button Margin="0, 5, 0, 10" Height="30" HorizontalAlignment="Stretch"
-                HorizontalContentAlignment="Center" Content="Detect Installations..." Click="OnDetectClick"/>
+                <StackPanel>
+                    <StackPanel.IsVisible>
+                        <MultiBinding Converter="{StaticResource CheckIfEqual}">
+                            <Binding Path="#PlatformBox.SelectedIndex"/>
+                            <ReflectionBinding Source="{x:Static class:Platform.MICROSOFT_STORE}" />
+                        </MultiBinding>
+                    </StackPanel.IsVisible>
+                    <TextBlock TextWrapping="Wrap"> 
+                        <Bold>NOTE:</Bold> Microsoft Store games are always installed to "C:/XboxGames" unless changed with developer tools. <Bold>Change the file paths at your own risk!</Bold> 
+                    </TextBlock>
+                </StackPanel>
         </StackPanel>
 
         <!-- Stack Panel for Emulator -->

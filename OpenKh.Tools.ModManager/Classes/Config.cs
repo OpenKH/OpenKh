@@ -16,7 +16,8 @@ namespace OpenKh.Tools.ModManager.Classes
     {
         PCSX2,
         STEAM,
-        EPIC_GAMES_STORE
+        EPIC_GAMES_STORE,
+        MICROSOFT_STORE
     };
 
     public enum BuildType : int

@@ -154,7 +154,7 @@ namespace OpenKh.Tools.ModManager.Wizard
                 {
                     Title = "Select ISO File for Kingdom Hearts II...",
                     AllowMultiple = false,
-                    FileTypeFilter = [ new FilePickerFileType("ISO Image") { Patterns = ["*.iso"] } ]
+                    FileTypeFilter = [new FilePickerFileType("ISO Image") { Patterns = ["*.iso"] }]
                 });
 
                 if (_fetchFile.Count >= 1)
@@ -172,7 +172,7 @@ namespace OpenKh.Tools.ModManager.Wizard
                     }
 
                     else
-                    { 
+                    {
                         _fetchConfig.Emulator.RomPath[0x01] = _fetchFile[0x00].Path.LocalPath;
 
                         IconMissingKH2.IsVisible = false;
@@ -313,10 +313,14 @@ namespace OpenKh.Tools.ModManager.Wizard
                             }
                         });
 
-                        PathCollectionFirst.Text = !String.IsNullOrEmpty(_fetchPath1525) ? _fetchPath1525 : PathCollectionFirst.Text;
-                        PathCollectionFirst.BorderBrush = !String.IsNullOrEmpty(_fetchPath1525) ? _successBrush : _failBrush;
 
-                        PathCollectionSecond.Text = !String.IsNullOrEmpty(_fetchPath28) ? _fetchPath28 : PathCollectionSecond.Text;
+                        _fetchConfig.Frontend.GamePath[0] = !String.IsNullOrEmpty(_fetchPath1525) ? _fetchPath1525 : "";
+                        _fetchConfig.Frontend.GamePath[1] = !String.IsNullOrEmpty(_fetchPath28) ? _fetchPath28 : "";
+
+                        PathCollectionFirst.Text = _fetchConfig.Frontend.GamePath[0];
+                        PathCollectionSecond.Text = _fetchConfig.Frontend.GamePath[1];
+
+                        PathCollectionFirst.BorderBrush = !String.IsNullOrEmpty(_fetchPath1525) ? _successBrush : _failBrush;
                         PathCollectionSecond.BorderBrush = !String.IsNullOrEmpty(_fetchPath28) ? _successBrush : _failBrush;
                     }
 
@@ -366,6 +370,35 @@ namespace OpenKh.Tools.ModManager.Wizard
 
                     else
                         WeakReferenceMessenger.Default.Send(new UnblockNextRequest());
+                }
+            }
+        }
+
+        private void OnGameSelectChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            var _fetchContext = DataContext as MainViewModel;
+            var _fetchConfig = _fetchContext != null ? _fetchContext.CurrentConfig : null;
+
+            if (PlatformBox.SelectedItem != null && _fetchConfig != null)
+            {
+                if (PlatformBox.SelectedIndex == 0x03)
+                {
+                    var _fetchSysDrive = Path.GetPathRoot(Environment.SystemDirectory);
+
+                    var _fetchPath1525 = Path.Combine(_fetchSysDrive, "XboxGames", "KINGDOM HEARTS -HD 1.5+2.5 ReMIX");
+                    var _fetchPath28 = Path.Combine(_fetchSysDrive, "XboxGames", "KINGDOM HEARTS 2.8 FINAL CHAPTER PROLOGUE");
+
+                    var _isValid1525 = !String.IsNullOrEmpty(_fetchPath1525) && File.Exists(Path.Combine(_fetchPath1525, "KINGDOM HEARTS HD 1.5+2.5 ReMIX.exe"));
+                    var _isValid28 = !String.IsNullOrEmpty(_fetchPath28) && File.Exists(Path.Combine(_fetchPath28, "KINGDOM HEARTS HD 2.8 Final Chapter Prologue.exe"));
+
+                    _fetchConfig.Frontend.GamePath[0] = _fetchPath1525;
+                    _fetchConfig.Frontend.GamePath[1] = _fetchPath28;
+
+                    PathCollectionFirst.Text = _fetchConfig.Frontend.GamePath[0];
+                    PathCollectionSecond.Text = _fetchConfig.Frontend.GamePath[1];
+
+                    PathCollectionFirst.BorderBrush = _isValid1525 ? _successBrush : _failBrush;
+                    PathCollectionSecond.BorderBrush = _isValid28 ? _successBrush : _failBrush;
                 }
             }
         }
