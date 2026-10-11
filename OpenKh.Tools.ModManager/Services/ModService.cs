@@ -275,7 +275,49 @@ namespace OpenKh.Tools.ModManager.Services
                             switch (i)
                             {
                                 case 0x00:
-                                    break;
+                                {
+                                    var _fetchOffsetIDX = IsoUtility.GetFileOffset(_fetchStreamISO, "KINGDOM.IDX;1");
+                                    var _fetchOffsetIMG = IsoUtility.GetFileOffset(_fetchStreamISO, "SYSTEM.CNF;1");
+
+                                    var _fetchSubStrIDX = new SubStream(_fetchStreamISO, _fetchOffsetIDX * 0x800, _fetchStreamISO.Length - (_fetchOffsetIDX * 0x800));
+                                    var _fetchSubStrIMG = new SubStream(_fetchStreamISO, _fetchOffsetIMG * 0x800, _fetchStreamISO.Length - (_fetchOffsetIMG * 0x800));
+
+                                    var _fetchIDX = Idx1.Read(_fetchSubStrIDX);
+                                    var _fetchIMG = new Img1(_fetchSubStrIMG, _fetchIDX, 0x00);
+
+                                    var _fetchCount = _fetchIMG.Entries.Count;
+                                    var _fetchProcessed = 0x00;
+
+                                    Parallel.ForEach(_fetchIMG.Entries.AsParallel(), (_fetchEntry, _fetchToken) =>
+                                    {
+                                        var _fetchTargetName = Idx1Name.Lookup(_fetchEntry.Value) ?? $"@noname/{_fetchEntry.Value.Hash:X08}";
+
+                                        using (var _fetchStreamFILE = _fetchIMG.FileOpen(_fetchEntry.Value))
+                                        {
+                                            if (_fetchStreamFILE != null)
+                                            {
+                                                var _targetFilePath = Path.Combine(_fetchDataPath, "kh1", _fetchTargetName);
+                                                var _targetFileDirectory = Path.GetDirectoryName(_targetFilePath);
+
+                                                if (!Directory.Exists(_targetFileDirectory))
+                                                    Directory.CreateDirectory(_targetFileDirectory);
+
+                                                var _fetchData = _fetchStreamFILE.ReadAllBytes();
+                                                File.WriteAllBytes(_targetFilePath, _fetchData);
+                                            }
+                                        }
+
+                                        _fetchProcessed++;
+
+                                        if (reportProgress != null)
+                                        {
+                                            var _fetchProgress = reportProgress(_fetchProcessed, _fetchCount);
+
+                                            if (!_fetchProgress || CancelToken.IsCancellationRequested)
+                                                _fetchToken.Stop();
+                                        }
+                                    });
+                                } break;
                                 case 0x01:
                                 {
                                     var _fetchOffsetIDX = IsoUtility.GetFileOffset(_fetchStreamISO, "KH2.IDX;1");

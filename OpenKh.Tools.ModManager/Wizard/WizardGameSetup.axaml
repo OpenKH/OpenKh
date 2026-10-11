@@ -141,7 +141,7 @@
 
                 <StackPanel Spacing="10" HorizontalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                        <Button  Width="175" Click="OnFileClickKH1" IsEnabled="False">
+                        <Button  Width="175" Click="OnFileClickKH1">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <Label Content="Kingdom Hearts"/>
                                 <PathIcon Name="IconMissingKH1" Data="{StaticResource icon_file_missing}" Height="16" Width="24" IsVisible="{ReflectionBinding CurrentConfig.Emulator.RomPath[0], Converter={x:Static StringConverters.IsNullOrEmpty}}"/>

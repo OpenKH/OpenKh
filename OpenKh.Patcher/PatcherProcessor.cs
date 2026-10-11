@@ -3,6 +3,7 @@ using OpenKh.Bbs;
 using OpenKh.Common;
 using OpenKh.Egs;
 using OpenKh.Imaging;
+using OpenKh.Kh1;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Bdx.Models;
 using OpenKh.Kh2.Bdx.Utils;
@@ -411,7 +412,30 @@ namespace OpenKh.Patcher
                                         switch (targetGame)
                                         {
                                             case 0x00:
-                                                break;
+                                            {
+                                                var _fetchOffsetIDX = IsoUtility.GetFileOffset(_fetchStreamISO, "KINGDOM.IDX;1");
+                                                var _fetchOffsetIMG = IsoUtility.GetFileOffset(_fetchStreamISO, "SYSTEM.CNF;1");
+
+                                                var _fetchSubStrIDX = new SubStream(_fetchStreamISO, _fetchOffsetIDX * 0x800, _fetchStreamISO.Length - (_fetchOffsetIDX * 0x800));
+                                                var _fetchSubStrIMG = new SubStream(_fetchStreamISO, _fetchOffsetIMG * 0x800, _fetchStreamISO.Length - (_fetchOffsetIMG * 0x800));
+
+                                                var _fetchIDX = Idx1.Read(_fetchSubStrIDX);
+                                                var _fetchIMG = new Img1(_fetchSubStrIMG, _fetchIDX, 0x00);
+
+                                                var _fetchEntry = _fetchIMG.Entries.FirstOrDefault(x => Idx1Name.Lookup(x.Value) == _fetchTarget).Value;
+
+                                                if (_fetchEntry != null)
+                                                {
+                                                    using (var _fetchStreamTarget = _fetchIMG.FileOpen(_fetchEntry))
+                                                        File.Create(_fetchTargetPath).Using(_tempStr => _fetchStreamTarget.CopyTo(_tempStr));
+
+                                                    Loggers.ForContext<PatcherProcessor>().Verbose($"[{modMetadata.Title}] - Processed file \"{_fetchAsset.Name}\" successfully from KINGDOM.IDX!");
+                                                }
+
+                                                else
+                                                    Loggers.ForContext<PatcherProcessor>().Verbose($"[{modMetadata.Title}] - The file \"{_fetchAsset.Name}\" does not exist in the ISO! Was this file meant to be COPY? Skipping...");
+                                            }
+                                            break;
                                             case 0x01:
                                             {
                                                 var _fetchOffsetIDX = IsoUtility.GetFileOffset(_fetchStreamISO, "KH2.IDX;1");

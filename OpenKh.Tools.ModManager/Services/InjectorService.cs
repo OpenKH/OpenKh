@@ -23,7 +23,7 @@ namespace OpenKh.Tools.ModManager.Services
         // Y'all need to deal with THIS one until I can switch over to DiscUtil.
         private static readonly string[][] GAME_EXECUTABLES =
         [
-            [],
+            ["SLPS_251.98;1", "SLPS_251.97;1", "SLPM_661.23;1", "SCAJ_250.04;1", "SLAJ_250.04;1", "SCAJ_201.49;1", "SLUS_203.70;1", "SCES_509.70;1", "SCES_509.67;1", "SCES_509.68;1", "SCES_509.69;1", "SCES_509.71;1", "SLPS_251.05;1", "SLPM_661.22;1"],
             ["SLPM_666.75;1", "SLES_541.14;1", "SLES_542.32;1", "SLES_542.33;1", "SLES_542.34;1", "SLES_542.35;1", "SLPM_662.33;1", "SLUS_210.05;1", "SLPM_550.19;1", "SCAJ_201.64;1"]
         ];
 
@@ -55,9 +55,14 @@ namespace OpenKh.Tools.ModManager.Services
         CancellationTokenSource _cancelSource;
         CancellationToken _cancelToken;
 
-        uint _loadFileFunc;   
+        uint _loadFileFunc;
         uint _getFileSizeFunc;
         uint _subFileSizeFunc;
+
+        uint[] _fetchHookLoad;
+        uint[] _fetchHookSize;
+
+        bool _isLoadAdjust;
 
         // Hard-Coded for KH2 rn.
         uint _bufferPtr = 0x350E88;
@@ -153,6 +158,47 @@ namespace OpenKh.Tools.ModManager.Services
             {
                 switch (_targetConfig.Frontend.TargetGame)
                 {
+                    case Game.KINGDOM_HEARTS:
+                    {
+                        foreach (var _gameExec in GAME_EXECUTABLES[0x00])
+                        {
+                            var _fetchExecOffset = IsoUtility.GetFileOffset(_fetchStreamISO, _gameExec);
+
+                            if (_fetchExecOffset == -1)
+                                continue;
+
+                            var _fetchSubStrExec = new SubStream(_fetchStreamISO, _fetchExecOffset * 0x800, _fetchStreamISO.Length - (_fetchExecOffset * 0x800));
+
+                            _loadFileFunc = FetchPattern(_fetchSubStrExec, [0x2D, 0x90, 0x40, 0x00, 0xFF, 0xFF, 0x02, 0x24, 0x2C, 0x00, 0x50, 0xAE], "xxxxxxxxxxxx") + 0xFFF80;
+
+                            _fetchSubStrExec.Position = _loadFileFunc + 0x2C - 0xFFF80;
+
+                            if (_fetchSubStrExec.ReadUInt32() != 0x00)
+                                _isLoadAdjust = true;
+
+                            _fetchHookLoad = 
+                            [
+                                MIPS.LUI(MIPS.T6, 0x0F),
+                                MIPS.SW(MIPS.S1, MIPS.T6, -0x08),
+                                MIPS.SW(MIPS.S0, MIPS.T6, -0x0C),
+                                MIPS.SW(MIPS.V0, MIPS.T6, -0x10),
+                                MIPS.SW(MIPS.T5, MIPS.T6, -0x04),
+                                MIPS.LW(MIPS.T5, MIPS.T6, -0x04),
+                                MIPS.BNE(MIPS.T5, 0x00, -2),
+                                MIPS.LW(MIPS.V1, MIPS.T6, -0x08),
+                                MIPS.BEQ(MIPS.V1, MIPS.Zero, 3),
+                                MIPS.MOVE(MIPS.S2, MIPS.V0),
+                                MIPS.BEQ(MIPS.Zero, MIPS.Zero, 2),
+                                MIPS.ADDIU(MIPS.RA, MIPS.RA, (short)(_isLoadAdjust ? 0x64 : 0x98)),
+                                MIPS.LI(MIPS.V0, -1),
+                                MIPS.JR(MIPS.RA),
+                                MIPS.NOP(),
+                            ];
+
+                            break;
+                        }
+                    } break;
+
                     case Game.KINGDOM_HEARTS_II:
                     {
                         foreach (var _gameExec in GAME_EXECUTABLES[0x01])
@@ -167,6 +213,47 @@ namespace OpenKh.Tools.ModManager.Services
                             _loadFileFunc = FetchPattern(_fetchSubStrExec, [0xF0, 0xFF, 0xBD, 0x27, 0x08, 0x00, 0xBF, 0xFF, 0x00, 0x00, 0xB0, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2D, 0x80, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2D, 0x20, 0x00, 0x00, 0x2D, 0x10, 0x00, 0x02], "xxxxxxxxxxxx????xxxxxxxx????xxxxxxxx") + 0xFF000;
                             _getFileSizeFunc = FetchPattern(_fetchSubStrExec, [0xF0, 0xFF, 0xBD, 0x27, 0x00, 0x00, 0xBF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x40, 0x10, 0x2D, 0x78, 0x00, 0x00, 0x0C, 0x00, 0x4F, 0x8C], "xxxxxxxx????xxxxxxxxxxxxxxxx") + 0xFF000;
                             _subFileSizeFunc = FetchPattern(_fetchSubStrExec, [0xF0, 0xFF, 0xBD, 0x27, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xB0, 0xFF, 0x08, 0x00, 0xBF, 0xFF, 0x2D, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2D, 0x28, 0x00, 0x02, 0x09, 0x00, 0x40, 0x14], "xxxx????xxxxxxxxxxxx????????xxxxxxxx") + 0xFF000;
+
+                            _fetchHookLoad = 
+                            [
+                                MIPS.LUI(MIPS.T6, 0x0F),
+                                MIPS.SW(MIPS.A0, MIPS.T6, -0x08),
+                                MIPS.SW(MIPS.A1, MIPS.T6, -0x0C),
+                                MIPS.SW(MIPS.T5, MIPS.T6, -0x04),
+                                MIPS.LW(MIPS.T5, MIPS.T6, -0x04),
+                                MIPS.BNE(MIPS.T5, 0x00, -2),
+                                MIPS.LW(MIPS.V0, MIPS.T6, -0x08),
+                                MIPS.BEQ(MIPS.V0, MIPS.Zero, 0x02),
+                                MIPS.NOP(),
+                                MIPS.ADDIU(MIPS.RA, MIPS.RA, 4),
+                                MIPS.ADDIU(MIPS.SP, MIPS.SP, -0x10),
+                                MIPS.SD(MIPS.T4, MIPS.SP, 0x08),
+                                MIPS.SD(MIPS.S0, MIPS.SP, 0x00),
+                                MIPS.JR(MIPS.RA),
+                                MIPS.NOP()
+                            ];
+
+                            _fetchHookSize =
+                            [
+                                MIPS.LUI(MIPS.T6, 0x0F),
+                                MIPS.SW(MIPS.A0, MIPS.T6, -0x08),
+                                MIPS.SW(MIPS.A1, MIPS.T6, -0x0C),
+                                MIPS.SW(MIPS.A2, MIPS.T6, -0x10),
+                                MIPS.SW(MIPS.A3, MIPS.T6, -0x14),
+                                MIPS.SW(MIPS.T5, MIPS.T6, -0x04),
+                                MIPS.LW(MIPS.T5, MIPS.T6, -0x04),
+                                MIPS.BNE(MIPS.T5, 0x00, -2),
+                                MIPS.LW(MIPS.V0, MIPS.T6, -0x08),
+                                MIPS.BEQ(MIPS.V0, MIPS.Zero, 0x03),
+                                MIPS.NOP(),
+                                MIPS.JR(MIPS.T4),
+                                MIPS.NOP(),
+                                MIPS.ADDIU(MIPS.SP, MIPS.SP, -0x10),
+                                MIPS.SD(MIPS.T4, MIPS.SP, 0x08),
+                                MIPS.SD(MIPS.S0, MIPS.SP, 0x00),
+                                MIPS.JR(MIPS.RA),
+                                MIPS.NOP()
+                            ];
 
                             break;
                         }
@@ -239,47 +326,6 @@ namespace OpenKh.Tools.ModManager.Services
 
                     _fetchStream.SetPosition(_hookPtrLoad);
 
-                    uint[] _fetchHookLoad =
-                    [
-                        MIPS.LUI(MIPS.T6, 0x0F),
-                        MIPS.SW(MIPS.A0, MIPS.T6, -0x08),
-                        MIPS.SW(MIPS.A1, MIPS.T6, -0x0C),
-                        MIPS.SW(MIPS.T5, MIPS.T6, -0x04),
-                        MIPS.LW(MIPS.T5, MIPS.T6, -0x04),
-                        MIPS.BNE(MIPS.T5, 0x00, -2),
-                        MIPS.LW(MIPS.V0, MIPS.T6, -0x08),
-                        MIPS.BEQ(MIPS.V0, MIPS.Zero, 0x02),
-                        MIPS.NOP(),
-                        MIPS.ADDIU(MIPS.RA, MIPS.RA, 4),
-                        MIPS.ADDIU(MIPS.SP, MIPS.SP, -0x10),
-                        MIPS.SD(MIPS.T4, MIPS.SP, 0x08),
-                        MIPS.SD(MIPS.S0, MIPS.SP, 0x00),
-                        MIPS.JR(MIPS.RA),
-                        MIPS.NOP()
-                    ];
-
-                    uint[] _fetchHookSize =
-                    [
-                        MIPS.LUI(MIPS.T6, 0x0F),
-                        MIPS.SW(MIPS.A0, MIPS.T6, -0x08),
-                        MIPS.SW(MIPS.A1, MIPS.T6, -0x0C),
-                        MIPS.SW(MIPS.A2, MIPS.T6, -0x10),
-                        MIPS.SW(MIPS.A3, MIPS.T6, -0x14),
-                        MIPS.SW(MIPS.T5, MIPS.T6, -0x04),
-                        MIPS.LW(MIPS.T5, MIPS.T6, -0x04),
-                        MIPS.BNE(MIPS.T5, 0x00, -2),
-                        MIPS.LW(MIPS.V0, MIPS.T6, -0x08),
-                        MIPS.BEQ(MIPS.V0, MIPS.Zero, 0x03),
-                        MIPS.NOP(),
-                        MIPS.JR(MIPS.T4),
-                        MIPS.NOP(),
-                        MIPS.ADDIU(MIPS.SP, MIPS.SP, -0x10),
-                        MIPS.SD(MIPS.T4, MIPS.SP, 0x08),
-                        MIPS.SD(MIPS.S0, MIPS.SP, 0x00),
-                        MIPS.JR(MIPS.RA),
-                        MIPS.NOP()
-                    ];
-
                     if (_fetchStream.ReadUInt32() == 0x00)
                     {
                         Loggers.ForContext<InjectorService>().Verbose("Injecting hooks for LoadFile and GetFileSize...");
@@ -307,7 +353,7 @@ namespace OpenKh.Tools.ModManager.Services
                             [
                                 MIPS.ADDIU(MIPS.T4, MIPS.RA, 0),
                                 MIPS.JAL(_hookPtrLoad),
-                                MIPS.ADDIU(MIPS.T5, MIPS.Zero, 0x01)
+                                MIPS.ADDIU(MIPS.T5, MIPS.Zero, (ushort)(_targetConfig.Frontend.TargetGame == Game.KINGDOM_HEARTS ? 0x02 : 0x01))
                             ];
 
                             byte[] _fetchFunctionArray = new byte[_fetchFunction.Length * sizeof(uint)];
@@ -328,7 +374,7 @@ namespace OpenKh.Tools.ModManager.Services
                             [
                                 MIPS.ADDIU(MIPS.T4, MIPS.RA, 0),
                                 MIPS.JAL(_hookPtrSize),
-                                MIPS.ADDIU(MIPS.T5, MIPS.Zero, 0x02),
+                                MIPS.ADDIU(MIPS.T5, MIPS.Zero, 0x03),
                                 MIPS.JAL(_subFileSizeFunc),
                                 MIPS.NOP(),
                                 MIPS.BEQ(MIPS.V0, MIPS.Zero, 2),
@@ -403,6 +449,53 @@ namespace OpenKh.Tools.ModManager.Services
                         break;
 
                         case 0x02:
+                        {
+                            _fetchStream.SetPosition(_fetchOpcodeAddr - 0x0C);
+
+                            var _taskPtr = _fetchStream.ReadInt32();
+                            var _destinationPtr = _fetchStream.ReadInt32();
+                            var _fileNamePtr = _fetchStream.ReadInt32();
+
+                            _fetchStream.SetPosition(_fileNamePtr);
+
+                            var _fetchSize = 0x00;
+                            var _fetchName = _fetchStream.ReadString(0x30, Encoding.ASCII);
+
+                            if (!String.IsNullOrEmpty(_fetchName))
+                            {
+                                var _couldResolve = ResolvePath(_fetchName, out var _filePath);
+
+                                if (_couldResolve == 0x01)
+                                {
+                                    Loggers.ForContext<InjectorService>().Verbose($"Redirecting file \"{_fetchName}\" to the build path...");
+
+                                    var _fetchData = File.ReadAllBytes(_filePath);
+                                    _fetchSize = _fetchData.Length;
+
+                                    _fetchStream.SetPosition(_destinationPtr);
+                                    _fetchStream.Write(_fetchData);
+                                }
+
+                                else
+                                    Loggers.ForContext<InjectorService>().Verbose($"Loading file \"{_fetchName}\" from the ISO...");
+                            }
+
+                            _fetchStream.SetPosition(_taskPtr + 44);
+                            _fetchStream.Write(_destinationPtr);
+
+                            _fetchStream.SetPosition(_fetchOpcodeAddr - 0x04);
+                            _fetchStream.Write(_fetchSize);
+
+                            Thread.Sleep(4);
+
+                            _fetchStream.SetPosition(_taskPtr + 48);
+                            _fetchStream.Write(_fetchSize);
+
+                            _fetchStream.Flush();
+                        }
+                        break;
+
+                        case 0x03:
                         {
                             _fetchStream.SetPosition(_fetchOpcodeAddr - 0x04);
 
