@@ -186,7 +186,31 @@ namespace OpenKh.Tools.ModManager.Wizard
 
         private async void OnFileClickCOM(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
+            var _fetchContext = DataContext as MainViewModel;
+            var _fetchConfig = _fetchContext.CurrentConfig;
 
+            var _fetchTopLevel = TopLevel.GetTopLevel(this);
+            var _storageProvider = _fetchTopLevel != null ? _fetchTopLevel.StorageProvider : null;
+
+            if (_storageProvider != null)
+            {
+                var _fetchFile = await _storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+                {
+                    Title = "Select ISO File for Kingdom Hearts Re:Chain of Memories...",
+                    AllowMultiple = false,
+                    FileTypeFilter = [new FilePickerFileType("ISO Image") { Patterns = ["*.iso"] }]
+                });
+
+                if (_fetchFile.Count >= 1)
+                {
+                    _fetchConfig.Emulator.RomPath[0x02] = _fetchFile[0x00].Path.LocalPath;
+
+                    IconMissingCOM.IsVisible = false;
+                    IconFoundCOM.IsVisible = true;
+
+                    OnPathChanged(null, null);
+                }
+            }
         }
 
         private async void OnDetectClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

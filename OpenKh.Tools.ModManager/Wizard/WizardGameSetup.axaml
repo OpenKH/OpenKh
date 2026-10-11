@@ -176,7 +176,7 @@
                             </StackPanel>
                         </Button>
                     </StackPanel>
-                    <Button  Width="200" Click="OnFileClickCOM" HorizontalAlignment="Center" IsEnabled="False">
+                    <Button  Width="200" Click="OnFileClickCOM" HorizontalAlignment="Center">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Label Content="Re:Chain of Memories"/>
                             <PathIcon Name="IconMissingCOM" Data="{StaticResource icon_file_missing}" Height="16" Width="24" IsVisible="{ReflectionBinding CurrentConfig.Emulator.RomPath[2], Converter={x:Static StringConverters.IsNullOrEmpty}}"/>

@@ -14,6 +14,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xe.IO;
+using static Antlr4.Runtime.Atn.SemanticContext;
+using static Octokit.Caching.CachedResponse;
 using Loggers = Serilog.Log;
 
 namespace OpenKh.Tools.ModManager.Services
@@ -24,7 +26,8 @@ namespace OpenKh.Tools.ModManager.Services
         private static readonly string[][] GAME_EXECUTABLES =
         [
             ["SLPS_251.98;1", "SLPS_251.97;1", "SLPM_661.23;1", "SCAJ_250.04;1", "SLAJ_250.04;1", "SCAJ_201.49;1", "SLUS_203.70;1", "SCES_509.70;1", "SCES_509.67;1", "SCES_509.68;1", "SCES_509.69;1", "SCES_509.71;1", "SLPS_251.05;1", "SLPM_661.22;1"],
-            ["SLPM_666.75;1", "SLES_541.14;1", "SLES_542.32;1", "SLES_542.33;1", "SLES_542.34;1", "SLES_542.35;1", "SLPM_662.33;1", "SLUS_210.05;1", "SLPM_550.19;1", "SCAJ_201.64;1"]
+            ["SLPM_666.75;1", "SLES_541.14;1", "SLES_542.32;1", "SLES_542.33;1", "SLES_542.34;1", "SLES_542.35;1", "SLPM_662.33;1", "SLUS_210.05;1", "SLPM_550.19;1", "SCAJ_201.64;1"],
+            ["SLPM_666.76;1", "SLUS_217.99;1"]
         ];
 
         private static readonly HashSet<string> DENY_FILES = new HashSet<string>
@@ -152,7 +155,7 @@ namespace OpenKh.Tools.ModManager.Services
             Stream? _fetchStream = null;
             var _fetchPathEmu = PathService.ResolveEmulator(TargetConfig);
 
-            var _fetchPathGame = _targetConfig.Frontend.TargetGame == Game.KINGDOM_HEARTS ? TargetConfig.Emulator.RomPath[0] : TargetConfig.Emulator.RomPath[1];
+            var _fetchPathGame = TargetConfig.Emulator.RomPath[(int)_targetConfig.Frontend.TargetGame];
 
             using (var _fetchStreamISO = new FileStream(_fetchPathGame, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
@@ -194,6 +197,8 @@ namespace OpenKh.Tools.ModManager.Services
                                 MIPS.JR(MIPS.RA),
                                 MIPS.NOP(),
                             ];
+
+                            _fetchHookSize = new uint[0x00];
 
                             break;
                         }
@@ -258,6 +263,84 @@ namespace OpenKh.Tools.ModManager.Services
                             break;
                         }
                     } break;
+
+                    case Game.CHAIN_OF_MEMORIES:
+                    {
+                        foreach (var _gameExec in GAME_EXECUTABLES[0x02])
+                        {
+                            var _fetchExecOffset = IsoUtility.GetFileOffset(_fetchStreamISO, _gameExec);
+
+                            if (_fetchExecOffset == -1)
+                                continue;
+
+                            var _fetchSubStrExec = new SubStream(_fetchStreamISO, _fetchExecOffset * 0x800, _fetchStreamISO.Length - (_fetchExecOffset * 0x800));
+
+                            if (_gameExec.Contains("SLUS"))
+                                _isLoadAdjust = true;
+
+                            _loadFileFunc = FetchPattern(_fetchSubStrExec, [0x5B, 0x00, 0x03, 0x3C, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0xC0, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2D, 0x28, 0x40, 0x02], "xxxx????xxxx????????xxxx") + 0xFF000;
+                            _getFileSizeFunc = FetchPattern(_fetchSubStrExec, [0x18, 0x00, 0x43, 0x8E, 0x28, 0x00, 0x23, 0xAE, 0x20, 0x00, 0x42, 0x8E], "xxxxxxxxxxxx") + 0xFF000;
+
+                            _fetchHookLoad =
+                            [
+                                MIPS.LUI(MIPS.T6, 0x0F),
+                                MIPS.LW(MIPS.T2, MIPS.V0, (short)(_isLoadAdjust ? -0x2A10 : 0x18B0)),
+                                MIPS.LW(MIPS.T3, MIPS.V0, (short)(_isLoadAdjust ? -0x2A24 : 0x189C)),
+                                MIPS.ADDI(MIPS.T4, MIPS.V0, (short)(_isLoadAdjust ? -0x29F8 : 0x18C8)),
+                                MIPS.LW(MIPS.T0, MIPS.T4, 0),
+                                MIPS.ADDIU(MIPS.T1, MIPS.T3, 8),
+                                MIPS.LW(MIPS.T4, MIPS.T3, 0x38),
+                                MIPS.LW(MIPS.T4, MIPS.T4, 0),
+                                MIPS.SW(MIPS.T0, MIPS.T6, -0x08),
+                                MIPS.BEQ(MIPS.T2, MIPS.T4, 9),
+                                MIPS.SW(MIPS.T1, MIPS.T6, -0x0C),
+                                MIPS.ADDIU(MIPS.T4, MIPS.Zero, 0x05),
+                                MIPS.SW(MIPS.T4, MIPS.T6, -0x04),
+                                MIPS.LW(MIPS.T4, MIPS.T6, -0x04),
+                                MIPS.BNE(MIPS.T4, 0x00, -2),
+                                MIPS.LW(MIPS.T4, MIPS.T6, -0x08),
+                                MIPS.BEQ(MIPS.T4, MIPS.Zero, 7),
+                                MIPS.NOP(),
+                                MIPS.BEQ(MIPS.Zero, MIPS.Zero, 8),
+                                MIPS.SW(MIPS.T2, MIPS.T6, -0x10), 
+                                MIPS.SW(MIPS.T5, MIPS.T6, -0x04), 
+                                MIPS.LW(MIPS.T5, MIPS.T6, -0x04),
+                                MIPS.BNE(MIPS.T5, 0x00, -2),
+                                MIPS.LW(MIPS.T4, MIPS.T6, -0x08),
+                                MIPS.LUI(MIPS.V1, 0x5B),
+                                MIPS.BEQ(MIPS.T4, MIPS.Zero, 5),
+                                MIPS.LW(MIPS.A2, MIPS.V0, (short)(_isLoadAdjust ? -0x29F4 : 0x18CC)),
+                                MIPS.ADD(MIPS.T2, MIPS.T2, MIPS.T4),
+                                MIPS.SW(MIPS.T2, MIPS.V0, (short)(_isLoadAdjust ? -0x2A10 : 0x18B0)),
+                                MIPS.ADDIU(MIPS.V0, MIPS.Zero, 1),
+                                MIPS.ADDIU(MIPS.RA, MIPS.RA, 0x64),
+                                MIPS.JR(MIPS.RA),
+                                MIPS.NOP(),
+                            ];
+
+                            _fetchHookSize =
+                            [
+                                MIPS.LUI(MIPS.T6, 0x0F),
+                                MIPS.LUI(MIPS.V1, 0x5C),
+                                MIPS.ADDI(MIPS.T4, MIPS.V1, (short)(_isLoadAdjust ? -0x29F8 : 0x18C8)),
+                                MIPS.LW(MIPS.T4, MIPS.T4, 0),
+                                MIPS.SW(MIPS.T4, MIPS.T6, -0x08),
+                                MIPS.SW(MIPS.S2, MIPS.T6, -0x0C),
+                                MIPS.SW(MIPS.T5, MIPS.T6, -0x04),
+                                MIPS.LW(MIPS.T5, MIPS.T6, -0x04),
+                                MIPS.BNE(MIPS.T5, 0x00, -2),
+                                MIPS.LW(MIPS.V1, MIPS.T6, -0x04),
+                                MIPS.BNE(MIPS.V1, MIPS.Zero, 2),
+                                MIPS.NOP(),
+                                MIPS.LW(MIPS.V1, MIPS.S2, 0x18),
+                                MIPS.JR(MIPS.RA),
+                                MIPS.SW(MIPS.V1, MIPS.S1, 0x28),
+                            ];
+
+                            break;
+                        }
+                    }
+                    break;
                 }
             }
           
@@ -353,8 +436,10 @@ namespace OpenKh.Tools.ModManager.Services
                             [
                                 MIPS.ADDIU(MIPS.T4, MIPS.RA, 0),
                                 MIPS.JAL(_hookPtrLoad),
-                                MIPS.ADDIU(MIPS.T5, MIPS.Zero, (ushort)(_targetConfig.Frontend.TargetGame == Game.KINGDOM_HEARTS ? 0x02 : 0x01))
+                                MIPS.ADDIU(MIPS.T5, MIPS.Zero, (ushort)(_targetConfig.Frontend.TargetGame + 0x01))
                             ];
+
+                            _fetchFunction = _targetConfig.Frontend.TargetGame != Game.CHAIN_OF_MEMORIES ? _fetchFunction : _fetchFunction.Skip(0x01).ToArray();
 
                             byte[] _fetchFunctionArray = new byte[_fetchFunction.Length * sizeof(uint)];
                             Buffer.BlockCopy(_fetchFunction, 0, _fetchFunctionArray, 0, _fetchFunctionArray.Length);
@@ -374,7 +459,7 @@ namespace OpenKh.Tools.ModManager.Services
                             [
                                 MIPS.ADDIU(MIPS.T4, MIPS.RA, 0),
                                 MIPS.JAL(_hookPtrSize),
-                                MIPS.ADDIU(MIPS.T5, MIPS.Zero, 0x03),
+                                MIPS.ADDIU(MIPS.T5, MIPS.Zero, 0x04),
                                 MIPS.JAL(_subFileSizeFunc),
                                 MIPS.NOP(),
                                 MIPS.BEQ(MIPS.V0, MIPS.Zero, 2),
@@ -384,6 +469,15 @@ namespace OpenKh.Tools.ModManager.Services
                                 MIPS.JR(MIPS.RA),
                                 MIPS.ADDIU(MIPS.SP, MIPS.SP, 0x10),
                             ];
+
+                            if (_targetConfig.Frontend.TargetGame == Game.CHAIN_OF_MEMORIES)
+                            {
+                                _fetchFunction =
+                                [
+                                    MIPS.JAL(_hookPtrSize),
+                                    MIPS.ADDIU(MIPS.T5, MIPS.Zero, 0x05),
+                                ];
+                            }
 
                             byte[] _fetchFunctionArray = new byte[_fetchFunction.Length * sizeof(uint)];
                             Buffer.BlockCopy(_fetchFunction, 0, _fetchFunctionArray, 0, _fetchFunctionArray.Length);
@@ -497,6 +591,46 @@ namespace OpenKh.Tools.ModManager.Services
 
                         case 0x03:
                         {
+                            _fetchStream.SetPosition(_fetchOpcodeAddr - 0x0C);
+
+                            var _destinationPtr = _fetchStream.ReadInt32();
+                            var _fileNamePtr = _fetchStream.ReadInt32();
+                            var _fileDirID = _fetchStream.ReadInt32();
+
+                            _fetchStream.SetPosition(_fileNamePtr);
+
+                            var _fetchSize = 0x00;
+                            var _fetchName = _fetchStream.ReadString(0x30, Encoding.ASCII);
+
+                            if (!String.IsNullOrEmpty(_fetchName))
+                            {
+                                var _fullDir = Path.Combine(_fileDirID.ToString(), _fetchName);
+                                var _couldResolve = ResolvePath(_fullDir, out var _filePath);
+
+                                if (_couldResolve == 0x01)
+                                {
+                                    Loggers.ForContext<InjectorService>().Verbose($"Redirecting file \"{_fullDir}\" to the build path...");
+
+                                    var _fetchData = File.ReadAllBytes(_filePath);
+                                    _fetchSize = _fetchData.Length;
+
+                                    _fetchStream.SetPosition(_destinationPtr);
+                                    _fetchStream.Write(_fetchData);
+                                }
+
+                                else
+                                    Loggers.ForContext<InjectorService>().Verbose($"Loading file \"{_fullDir}\" from the ISO...");
+                            }
+
+                            _fetchStream.SetPosition(_fetchOpcodeAddr - 0x04);
+                            _fetchStream.Write(_fetchSize);
+
+                            _fetchStream.Flush();
+                        }
+                        break;
+
+                        case 0x04:
+                        {
                             _fetchStream.SetPosition(_fetchOpcodeAddr - 0x04);
 
                             var _fileNamePtr = _fetchStream.ReadInt32();
@@ -522,6 +656,36 @@ namespace OpenKh.Tools.ModManager.Services
                             _fetchStream.Flush();
                         }
                         break;
+
+                        case 0x05:
+                        {
+                            _fetchStream.SetPosition(_fetchOpcodeAddr - 0x08);
+
+                            var _fileNamePtr = _fetchStream.ReadInt32();
+                            var _fileDirID = _fetchStream.ReadInt32();
+
+                            _fetchStream.SetPosition(_fileNamePtr);
+                            var _fetchName = _fetchStream.ReadString(0x30, Encoding.ASCII);
+
+                            if (String.IsNullOrEmpty(_fetchName))
+                                goto LOOP_START;
+
+                            var _fetchSize = 0x00;
+
+                            var _fullDir = Path.Combine(_fileDirID.ToString(), _fetchName);
+                            var _couldResolve = ResolvePath(_fullDir, out var _filePath);
+
+                            if (_couldResolve == 0x01)
+                            {
+                                var _fetchInfo = new FileInfo(_filePath);
+                                _fetchSize = (int)_fetchInfo.Length;
+                            }
+
+                            _fetchStream.SetPosition(_fetchOpcodeAddr - 0x04);
+                            _fetchStream.Write(_fetchSize);
+
+                            _fetchStream.Flush();
+                        } break;
 
                         case 0x00:
                             Thread.Sleep(5);
