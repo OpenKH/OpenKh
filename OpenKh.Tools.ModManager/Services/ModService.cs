@@ -9,6 +9,7 @@ using OpenKh.Egs;
 using OpenKh.Kh1;
 using OpenKh.Kh2;
 using OpenKh.Patcher;
+using OpenKh.Recom;
 using OpenKh.Tools.ModManager.Classes;
 using OpenKh.Tools.ModManager.Models;
 using SharpYaml;
@@ -360,6 +361,16 @@ namespace OpenKh.Tools.ModManager.Services
                                     });
                                 }
                                 break;
+
+                                case 0x02:
+                                {
+                                    _fetchStreamISO.SetPosition(0x244 * 0x800 + 0x08);
+
+                                    var _fetchRDISize = _fetchStreamISO.ReadInt16() + 0x01;
+                                    var _fetchRDIStream = IsoUtility.GetSectors(_fetchStreamISO, 0x244, _fetchRDISize);
+
+                                    var _fetchRDI = RootDirInfo.Read(_fetchRDIStream);
+                                } break;
                             }
                         }
                     }, CancelToken);

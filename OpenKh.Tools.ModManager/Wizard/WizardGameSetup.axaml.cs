@@ -203,6 +203,8 @@ namespace OpenKh.Tools.ModManager.Wizard
 
                 if (_fetchFile.Count >= 1)
                 {
+                    // Can't make sense of this ISO at this moment. Will add verification in a bit.
+
                     _fetchConfig.Emulator.RomPath[0x02] = _fetchFile[0x00].Path.LocalPath;
 
                     IconMissingCOM.IsVisible = false;
