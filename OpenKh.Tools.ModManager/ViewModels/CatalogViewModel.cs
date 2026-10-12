@@ -20,6 +20,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,13 +35,39 @@ namespace OpenKh.Tools.ModManager.ViewModels
         private ModModel? _currentMod = null;
 
         [ObservableProperty]
-        private ObservableCollection<ModModel>? _installedMods = null;
+        private ObservableCollection<ModModel>? _allFetchedMods = null;
+
+        [ObservableProperty]
+        private ObservableCollection<ModModel>? _filterFetchedMods = null;
 
         [ObservableProperty]
         private ObservableCollection<string>? _selectedMods = null;
 
         [ObservableProperty]
         private Config? _currentConfig = null;
+
+        [ObservableProperty]
+        private string _searchQuery = string.Empty;
+
+        partial void OnSearchQueryChanged(string value)
+        {
+            var _fetchValueRegex = new Regex("^(?:(?=(?:.*?\\s)?author:(?<author>\\S+)))?(?:author:\\S+\\s*)?(?<title>.*?)(?:\\s*author:\\S+)?$");
+            var _fetchSearchMatch = _fetchValueRegex.Match(value.ToLower());
+
+            if (_fetchSearchMatch.Success)
+            {
+                var _fetchGroupTitle = _fetchSearchMatch.Groups["title"].Value;
+                var _fetchGroupAuthor = _fetchSearchMatch.Groups["author"].Value;
+
+                var _fetchFilter = AllFetchedMods.Where(x => x.ModTitle.ToLower().Contains(_fetchGroupTitle) && x.ModAuthor.ToLower().Contains(_fetchGroupAuthor));
+
+                var _lockObject = new object();
+                FilterFetchedMods.Clear();
+
+                foreach (var _fetchMod in _fetchFilter)
+                    FilterFetchedMods.Add(_fetchMod);
+            }
+        }
 
         public TopLevel? FetchTopLevel()
         {
@@ -61,13 +88,16 @@ namespace OpenKh.Tools.ModManager.ViewModels
 
             CurrentMod = null;
             SelectedMods = null;
-            InstalledMods = null;
+            AllFetchedMods = null;
+            FilterFetchedMods = null;
 
             if (CurrentConfig != null)
             {
                 var _lockObject = new object();
 
-                InstalledMods = new ObservableCollection<ModModel>();
+                AllFetchedMods = new ObservableCollection<ModModel>();
+                FilterFetchedMods = new ObservableCollection<ModModel>();
+
                 SelectedMods = new ObservableCollection<string>();
 
                 var _fetchHeader = new ProductHeaderValue("OpenKH-ModSearcher");
@@ -96,11 +126,10 @@ namespace OpenKh.Tools.ModManager.ViewModels
                             // If the file doesn't exist, abort.
                             if (_fetchMetadataOK.StatusCode == HttpStatusCode.OK)
                             {
-                                
-                                    var _fetchContent = await _makeClient.GetStringAsync(_fetchMetadataURL, CancellationToken.None);
-                                    var _fetchImageRAW = _fetchImageOK.StatusCode == HttpStatusCode.OK ? await _makeClient.GetByteArrayAsync(_fetchIconURL, CancellationToken.None) : null;
+                                var _fetchContent = await _makeClient.GetStringAsync(_fetchMetadataURL, CancellationToken.None);
+                                var _fetchImageRAW = _fetchImageOK.StatusCode == HttpStatusCode.OK ? await _makeClient.GetByteArrayAsync(_fetchIconURL, CancellationToken.None) : null;
 
-                                    var _fetchMetadata = Metadata.Read(new StringReader(_fetchContent));
+                                var _fetchMetadata = Metadata.Read(new StringReader(_fetchContent));
 
                                 Dispatcher.UIThread.Post(async () =>
                                 {
@@ -119,7 +148,10 @@ namespace OpenKh.Tools.ModManager.ViewModels
                                         };
 
                                         lock (_lockObject)
-                                            InstalledMods.Add(_modModel);
+                                        {
+                                            FilterFetchedMods.Add(_modModel);
+                                            AllFetchedMods.Add(_modModel);
+                                        }
                                     }
                                 });
                             }

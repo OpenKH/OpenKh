@@ -24,7 +24,7 @@
         <convert:SubtractPropertyCalculator x:Key="SubtractConverter"/>
     </ContentPage.Resources>
 
-        <ListBox  Background="Transparent" ItemsSource="{ReflectionBinding InstalledMods}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListBox  Background="Transparent" ItemsSource="{ReflectionBinding FilterFetchedMods}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Columns="3" RowSpacing="5" ColumnSpacing="5"/>

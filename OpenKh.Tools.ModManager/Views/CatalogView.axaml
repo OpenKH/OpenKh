@@ -13,7 +13,7 @@
     <DockPanel>
         <Grid DockPanel.Dock="Top" Margin="10, 10, 10, 0">
             <StackPanel Spacing="5">
-                <TextBox Margin="5" PlaceholderText="[Will be functional soon!]" Name="MainSearch" IsEnabled="false"/>
+                <TextBox Margin="5" Text="{Binding SearchQuery}" PlaceholderText="Search Mods..." Name="MainSearch" IsEnabled="false"/>
                 <TextBlock Margin="5, 5, 5, -10" HorizontalAlignment="Center"  FontSize="16" TextWrapping="Wrap">
                     Here are the mods that are available on GitHub for the currently selected game.<LineBreak/>
                 </TextBlock>

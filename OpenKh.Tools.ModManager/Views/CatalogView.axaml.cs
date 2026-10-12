@@ -30,9 +30,9 @@ namespace OpenKh.Tools.ModManager.Views
             if (!Design.IsDesignMode)
             {
                 var _fetchContext = DataContext as CatalogViewModel;
-                
+
                 if (_fetchContext == null)
-                    return; 
+                    return;
 
                 var _fetchApplication = Application.Current;
 
@@ -60,6 +60,10 @@ namespace OpenKh.Tools.ModManager.Views
                     }
                 }
             }
+        }
+
+        private void SearchTextChanged(object? sender, TextChangedEventArgs e)
+        {
         }
     }
 }
