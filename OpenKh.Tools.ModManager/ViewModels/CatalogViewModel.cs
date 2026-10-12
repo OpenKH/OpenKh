@@ -51,7 +51,7 @@ namespace OpenKh.Tools.ModManager.ViewModels
 
         partial void OnSearchQueryChanged(string value)
         {
-            var _fetchValueRegex = new Regex("^(?:(?=(?:.*?\\s)?author:(?<author>\\S+)))?(?:author:\\S+\\s*)?(?<title>.*?)(?:\\s*author:\\S+)?$");
+            var _fetchValueRegex = new Regex("^(?:(?=(?:.*?\\s)?author:(?<author>\\S+)))?(?:author:\\S+\\s*)?(?<title>.*?)(?:\\s*author:\\S+)?$", RegexOptions.None, TimeSpan.FromMilliseconds(100));
             var _fetchSearchMatch = _fetchValueRegex.Match(value.ToLower());
 
             if (_fetchSearchMatch.Success)
