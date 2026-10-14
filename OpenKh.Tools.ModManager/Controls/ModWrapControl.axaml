@@ -22,9 +22,22 @@
 
     <ContentPage.Resources>
         <convert:SubtractPropertyCalculator x:Key="SubtractConverter"/>
+        <convert:NonNullPropertyConverter x:Key="ModExistsAndValid"/>
     </ContentPage.Resources>
 
-        <ListBox  Background="Transparent" ItemsSource="{ReflectionBinding FilterFetchedMods}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListBox  Background="Transparent" SelectedItem="{ReflectionBinding CurrentMod}" ItemsSource="{ReflectionBinding FilterFetchedMods}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <ContextMenu.IsVisible>
+                        <MultiBinding Converter="{StaticResource ModExistsAndValid}">
+                                <ReflectionBinding Path="CurrentMod"/>
+                                <ReflectionBinding Path="CurrentMod.ModValid"/>
+                        </MultiBinding>
+                    </ContextMenu.IsVisible>
+                    <MenuItem Header="Browse Mod Repository..." Command="{ReflectionBinding OpenGitCommand}"/>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+            
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Columns="3" RowSpacing="5" ColumnSpacing="5"/>

@@ -16,6 +16,16 @@
         </ContentPage.Resources>
 
         <ListBox Name="MainList"  Background="Transparent" ItemsSource="{ReflectionBinding InstalledMods}" SelectedItem="{ReflectionBinding CurrentMod, Mode=TwoWay}">    
+            <ListBox.ContextMenu>
+            <ContextMenu Name="ModContext">
+                <MenuItem Header="Open Mod Folder..." Command="{ReflectionBinding OpenFolderCommand}"/>
+                <MenuItem Header="Remove Mod..." Command="{ReflectionBinding RemoveCommand}"/>
+                <Separator/>
+                <MenuItem Header="Move Up" Command="{ReflectionBinding MoveUpCommand}"/>
+                <MenuItem Header="Move Down" Command="{ReflectionBinding MoveDownCommand}"/>                
+                <MenuItem Header="Move Highest" Command="{ReflectionBinding MoveUtmostCommand}"/>
+            </ContextMenu>
+            </ListBox.ContextMenu>
             <ListBox.ItemTemplate >
             <DataTemplate DataType="{x:Type model:ModModel}">
                 <Grid>

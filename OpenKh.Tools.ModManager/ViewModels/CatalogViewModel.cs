@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -197,5 +198,26 @@ namespace OpenKh.Tools.ModManager.ViewModels
                 _fetchTopLevel.Close(_fetchReturn);
             }
         }
+
+        [RelayCommand]
+        private async Task<bool> OpenGit()
+        {
+            if (CurrentMod != null)
+            {
+                var _fetchTopLevel = FetchTopLevel() as Window;
+
+                if (_fetchTopLevel == null)
+                    return false;
+
+                if (_fetchTopLevel?.Launcher != null)
+                    await _fetchTopLevel.Launcher.LaunchUriAsync(new Uri($"https://github.com/{CurrentMod.ModPath}"));
+
+                return true;
+            }
+
+            else
+                return false;
+        }
+
     }
 }

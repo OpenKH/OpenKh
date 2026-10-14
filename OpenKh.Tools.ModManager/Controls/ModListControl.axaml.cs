@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using CommunityToolkit.Mvvm.ComponentModel;
 using OpenKh.Tools.ModManager.Models;
 using OpenKh.Tools.ModManager.ViewModels;
 using System;
