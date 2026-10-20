@@ -1,6 +1,7 @@
 using OpenKh.Bbs;
 
 using OpenKh.Common;
+using OpenKh.Common.Archives;
 using OpenKh.Egs;
 using OpenKh.Imaging;
 using OpenKh.Kh1;
@@ -13,10 +14,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Xe.BinaryMapper;
 using Xe.IO;
 using YamlDotNet.Serialization;
 
@@ -103,6 +106,7 @@ namespace OpenKh.Patcher
             IDictionary<string, string> packageMap = null,
             Dictionary<string, bool> collectionOptionalEnabledMods = null,
             Func<int, int, bool> reportProgress = null,
+            bool isHardPatch = false,
             bool Tests = false)
         {
             var _isExtraction = extractDataPath != null;
@@ -112,6 +116,8 @@ namespace OpenKh.Patcher
 
             var _fetchCollectionMods = new Dictionary<string, bool> { };
             var _fetchFileDictionary = new ConcurrentDictionary<string, string>();
+
+            var _fetchHardPatchDictionary = new ConcurrentDictionary<string, string>();
 
             if (collectionOptionalEnabledMods != null)
                 _fetchCollectionMods = collectionOptionalEnabledMods;
@@ -142,7 +148,7 @@ namespace OpenKh.Patcher
                 var _assetTotalCount = modMetadata.Assets.Count;
 
                 // If the build is not extraction-based:
-                if (!_isExtraction && targetPlatform != 0x00)
+                if (targetPlatform != 0x00)
                 {
                     // Fetch a list of all header files for the targeted game.
                     var _fetchDataPath = Path.Combine(gameFilesPath, "Image", targetPlatform == 0x01 ? "dt" : (isJapanese ? "jp" : "en"));
@@ -205,7 +211,6 @@ namespace OpenKh.Patcher
                     var _fetchFileNames = new List<string>();
                     var _fetchMultiNames = _fetchAsset.Multi != null ? _fetchAsset.Multi.Select(x => x.Name)
                                                                                         .Where(x => !string.IsNullOrEmpty(x)) : null;
-
                     _fetchFileNames.Add(_fetchAsset.Name);
 
                     if (_fetchMultiNames != null)
@@ -305,6 +310,57 @@ namespace OpenKh.Patcher
                         if (!Directory.Exists(_fetchTargetDir))
                             Directory.CreateDirectory(_fetchTargetDir);
 
+                        var _fetchTarget = _isAssetPatchable ? _fetchName : _fetchAsset.Source[0].Name;
+
+                        var _fetchParent = "";
+                        var _fetchChild = "";
+
+                        var _fetchHeaderName = "";
+                        var _fetchPackageName = "";
+
+                        var _fetchFilePack = "";
+
+                        if (_isFileRAW)
+                            _fetchTarget = _fetchTarget.Replace("raw/", "");
+
+                        if (_isFileRemastered)
+                        {
+                            var _fetchMatch = Regex.Match(_fetchTarget, "[\\w,-]+\\.[a-zA-Z0-9]{2,4}", RegexOptions.None, TimeSpan.FromMilliseconds(500));
+
+                            var _fetchIndex = _fetchTarget.IndexOf(_fetchMatch.Value);
+                            var _fetchEndPoint = _fetchIndex + _fetchMatch.Value.Length;
+
+                            var _fetchSubFirst = _fetchTarget.Substring(0, _fetchEndPoint);
+                            var _fetchSubSecond = _fetchTarget.Substring(_fetchEndPoint, _fetchTarget.Length - _fetchEndPoint);
+
+                            _fetchParent = _fetchSubFirst.Replace("remastered/", "");
+                            _fetchChild = _fetchSubSecond.Trim('/');
+                        }
+
+                        var _fetchNameHash = Egs.Helpers.CreateMD5(_isFileRemastered ? _fetchParent : _fetchName);
+                        var _fetchKeyExists = _fetchFileDictionary.ContainsKey(_fetchNameHash);
+
+                        if (_fetchKeyExists)
+                        {
+                            _fetchFilePack = _fetchFileDictionary[_fetchNameHash];
+
+                            if (!String.IsNullOrEmpty(_fetchFilePack))
+                            {
+                                var _fetchDataPath = Path.Combine(gameFilesPath, "Image", targetPlatform == 0x01 ? "dt" : (isJapanese ? "jp" : "en"));
+
+                                _fetchHeaderName = Path.Combine(_fetchDataPath, _fetchFilePack + ".hed");
+                                _fetchPackageName = Path.Combine(_fetchDataPath, _fetchFilePack + ".pkg");
+
+                                var _fetchAssetPackage = _fetchAsset.Package;
+
+                                if (_fetchAsset.Package == null)
+                                    _fetchHardPatchDictionary.TryAdd(_fetchName, _fetchFilePack);
+
+                                else
+                                    _fetchHardPatchDictionary.TryAdd(_fetchName, _fetchAsset.Package);
+                            }
+                        }
+
                         // If a built version of the file already exists, patch that one.
                         if (_fetchVariablePath != null && File.Exists(_fetchVariablePath))
                         {
@@ -340,64 +396,29 @@ namespace OpenKh.Patcher
 
                                 if (targetPlatform != 0x00)
                                 {
-                                    var _fetchTarget = _isAssetPatchable ? _fetchName : _fetchAsset.Source[0].Name;
-
-                                    var _fetchParent = "";
-                                    var _fetchChild = "";
-
-                                    if (_isFileRAW)
-                                        _fetchTarget = _fetchTarget.Replace("raw/", "");
-
-                                    if (_isFileRemastered)
+                                    if (!String.IsNullOrEmpty(_fetchHeaderName) && !String.IsNullOrEmpty(_fetchPackageName))
                                     {
-                                        var _fetchMatch = Regex.Match(_fetchTarget, "[\\w,-]+\\.[a-zA-Z0-9]{2,4}", RegexOptions.None, TimeSpan.FromMilliseconds(500));
-
-                                        var _fetchIndex = _fetchTarget.IndexOf(_fetchMatch.Value);
-                                        var _fetchEndPoint = _fetchIndex + _fetchMatch.Value.Length;
-
-                                        var _fetchSubFirst = _fetchTarget.Substring(0, _fetchEndPoint);
-                                        var _fetchSubSecond = _fetchTarget.Substring(_fetchEndPoint, _fetchTarget.Length - _fetchEndPoint);
-
-                                        _fetchParent = _fetchSubFirst.Replace("remastered/", "");
-                                        _fetchChild = _fetchSubSecond.Trim('/');
-                                    }
-
-                                    var _fetchNameHash = Egs.Helpers.CreateMD5(_isFileRemastered ? _fetchParent : _fetchTarget);
-                                    var _fetchKeyExists = _fetchFileDictionary.ContainsKey(_fetchNameHash);
-
-                                    if (_fetchKeyExists)
-                                    {
-                                        var _fetchFilePack = _fetchFileDictionary[_fetchNameHash];
-
-                                        if (!String.IsNullOrEmpty(_fetchFilePack))
+                                        using (var _fetchHeaderStream = File.OpenRead(_fetchHeaderName))
                                         {
-                                            var _fetchDataPath = Path.Combine(gameFilesPath, "Image", targetPlatform == 0x01 ? "dt" : (isJapanese ? "jp" : "en"));
+                                            var _fetchEntries = Hed.Read(_fetchHeaderStream);
+                                            var _fetchTargetEntry = _fetchEntries.FirstOrDefault(x => Convert.ToHexString(x.MD5) == _fetchNameHash);
 
-                                            var _fetchHeaderName = Path.Combine(_fetchDataPath, _fetchFilePack + ".hed");
-                                            var _fetchPackageName = Path.Combine(_fetchDataPath, _fetchFilePack + ".pkg");
+                                            Loggers.ForContext<PatcherProcessor>().Verbose($"[{modMetadata.Title}] - Found the file \"{_fetchAsset.Name}\" at \"{_fetchFilePack}.pkg\"! Processing...");
 
-                                            using (var _fetchHeaderStream = File.OpenRead(_fetchHeaderName))
+                                            using (var _fetchPackageStream = File.OpenRead(_fetchPackageName))
                                             {
-                                                var _fetchEntries = Hed.Read(_fetchHeaderStream);
-                                                var _fetchTargetEntry = _fetchEntries.FirstOrDefault(x => Convert.ToHexString(x.MD5) == _fetchNameHash);
+                                                var _fetchTargetAsset = new EgsHdAsset(_fetchPackageStream.SetPosition(_fetchTargetEntry.Offset));
 
-                                                Loggers.ForContext<PatcherProcessor>().Verbose($"[{modMetadata.Title}] - Found the file \"{_fetchAsset.Name}\" at \"{_fetchFilePack}.pkg\"! Processing...");
+                                                if (_isFileRemastered)
+                                                    _fetchTargetAsset.RemasteredAssetsDecompressedData.TryGetValue(_fetchChild, out _fetchAssetData);
 
-                                                using (var _fetchPackageStream = File.OpenRead(_fetchPackageName))
-                                                {
-                                                    var _fetchTargetAsset = new EgsHdAsset(_fetchPackageStream.SetPosition(_fetchTargetEntry.Offset));
+                                                else
+                                                    _fetchAssetData = _isFileRAW ? _fetchTargetAsset.OriginalRawData : _fetchTargetAsset.OriginalData;
 
-                                                    if (_isFileRemastered)
-                                                        _fetchTargetAsset.RemasteredAssetsDecompressedData.TryGetValue(_fetchChild, out _fetchAssetData);
+                                                if (_fetchAssetData != null)
+                                                    await File.WriteAllBytesAsync(_fetchTargetPath, _fetchAssetData, CancellationToken.None);
 
-                                                    else
-                                                        _fetchAssetData = _isFileRAW ? _fetchTargetAsset.OriginalRawData : _fetchTargetAsset.OriginalData;
-
-                                                    if (_fetchAssetData != null)
-                                                        await File.WriteAllBytesAsync(_fetchTargetPath, _fetchAssetData, CancellationToken.None);
-
-                                                    Loggers.ForContext<PatcherProcessor>().Verbose($"[{modMetadata.Title}] - Processed file \"{_fetchAsset.Name}\" successfully!");
-                                                }
+                                                Loggers.ForContext<PatcherProcessor>().Verbose($"[{modMetadata.Title}] - Processed file \"{_fetchAsset.Name}\" successfully!");
                                             }
                                         }
                                     }
@@ -405,8 +426,6 @@ namespace OpenKh.Patcher
 
                                 else
                                 {
-                                    var _fetchTarget = _isAssetPatchable ? _fetchName : _fetchAsset.Source[0].Name;
-
                                     using (var _fetchStreamISO = new FileStream(gameFilesPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                                     {
                                         switch (targetGame)
@@ -482,14 +501,13 @@ namespace OpenKh.Patcher
                     if (reportProgress != null)
                         reportProgress(_assetProcessCount, _assetTotalCount);
                 });
+
+                if (isHardPatch)
+                {
+                }
             }
 
             catch (TaskCanceledException) { }
-
-            catch (Exception ex)
-            {
-                throw new PatcherException(modMetadata, ex);
-            }
         }
 
         private static void PatchFile(Context context, AssetFile assetFile, Stream stream, byte[] originalData = null)

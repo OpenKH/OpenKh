@@ -38,6 +38,8 @@ namespace OpenKh.Tools.ModManager.Classes
     // Frontend Configuration
     public class Frontend
     {
+        public bool IsLog { get; set; }
+
         public Platform TargetPlatform { get; set; }
 
         public Game TargetGame { get; set; }

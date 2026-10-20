@@ -865,7 +865,8 @@ namespace OpenKh.Tools.ModManager.Services
             // Reset the cancel token if it was called prior.
             RenewCancelToken();
 
-            LogService.Show();
+            if (currentConfig.Frontend.IsLog)
+                LogService.Show();
 
             // Create the patcher processor and the package map dictionary.
             var _fetchPatcher = new PatcherProcessor();
@@ -999,6 +1000,7 @@ namespace OpenKh.Tools.ModManager.Services
                             _fetchJapanese,
                             CancelToken,
                             _fetchPackageMap,
+                            isHardPatch: currentConfig.Frontend.ModBuildType == BuildType.PATCH,
                             reportProgress: reportAssetProgress
                         );
 
@@ -1011,7 +1013,8 @@ namespace OpenKh.Tools.ModManager.Services
 
             }, CancelToken);
 
-            LogService.Dismiss();
+            if (currentConfig.Frontend.IsLog)
+                LogService.Dismiss();
 
             // If cancellation is requested, cancel the process, but clean the build folder beforehand.
             if (CancelToken.IsCancellationRequested)
