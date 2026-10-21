@@ -393,7 +393,7 @@ namespace OpenKh.Tools.ModManager.Services
         /// <param name="currentConfig">The current active configuration.</param>
         /// <param name="reportProgress">[Optional] Callback function for this function.</param>
         /// <returns> 0x00 if it succeeds, 0x01 if it fails, 0x03 if it is cancelled.</returns>
-        public static async Task<byte> InstallGit(string repoName, Config currentConfig, Func<long, long, bool, bool>? reportProgress = null)
+        public static async Task<byte> InstallGit(string repoName, Config currentConfig, Func<long, long, bool, bool>? reportProgress = null, bool skipQuestion = false)
         {
             // Reset the cancel token if it was called prior.
             RenewCancelToken();
@@ -422,12 +422,15 @@ namespace OpenKh.Tools.ModManager.Services
             // If it does:
             else
             {
-                // Ask the user if they want to overwrite the mod.
-                var _fetchResult = await DialogService.ShowQuestion(null, "Overwrite Existing Mod?", "The mod you are trying to install already exists. Do you wish to overwrite it?");
+                if (!skipQuestion)
+                {
+                    // Ask the user if they want to overwrite the mod.
+                    var _fetchResult = await DialogService.ShowQuestion(null, "Overwrite Existing Mod?", "The mod you are trying to install already exists. Do you wish to overwrite it?");
 
-                // If they don't, cancel.
-                if (_fetchResult == false)
-                    return 0x03;
+                    // If they don't, cancel.
+                    if (_fetchResult == false)
+                        return 0x03;
+                }
 
                 // If they do, delete the old mod.
                 await Task.Run(() =>

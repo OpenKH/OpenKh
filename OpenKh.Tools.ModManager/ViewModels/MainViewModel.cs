@@ -490,20 +490,6 @@ public partial class MainViewModel : ViewModelBase
                         }
 
                         _fetchMods.Add(_modModel);
-
-                        if (_fetchGitModel != null)
-                        {
-                            Task.Run(async () =>
-                            {
-                                var _fetchModIndex = _fetchMods.IndexOf(_modModel);
-
-                                var _fetchLatest = await GitService.FetchLatestCommit(_fetchGitModel.Platform, _fetchGitModel.Author, _fetchGitModel.Repository, _fetchGitModel.Branch);
-                                var _fetchCompare = DateTime.Compare(_modModel.ModLatestCommit, _fetchLatest ?? _modModel.ModLatestCommit);
-
-                                if (_fetchCompare > 0x00)
-                                    _fetchMods[_fetchModIndex].ModUpdate = true;
-                            });
-                        }
                     }
 
                     // Otherwise, make it known that the mod sucks ASS and is no good for us, but still push it to the ViewModel so we know about it :D
@@ -583,6 +569,26 @@ public partial class MainViewModel : ViewModelBase
                 HasModsInstalled = true;
                 CurrentMod = InstalledMods.First();
             }
+
+            Task.Run(async () =>
+            {
+                foreach (var _fetchMod in InstalledMods)
+                {
+                    var _fetchGitPath = Path.Combine(_fetchMod.ModPath, "git_info.yml");
+
+                    if (File.Exists(_fetchGitPath))
+                    {
+                        var _fetchGitRAW = File.ReadAllText(_fetchGitPath);
+                        var _fetchGitSerial = YamlSerializer.Deserialize<GitModel>(_fetchGitRAW);
+
+                        var _fetchLatest = await GitService.FetchLatestCommit(_fetchGitSerial.Platform, _fetchGitSerial.Author, _fetchGitSerial.Repository, _fetchGitSerial.Branch);
+                        var _fetchCompare = DateTime.Compare(_fetchMod.ModLatestCommit, _fetchLatest ?? _fetchMod.ModLatestCommit);
+
+                        if (_fetchCompare < 0x00)
+                            _fetchMod.ModUpdate = true;
+                    }
+                }
+            });
 
             return true;
         }
@@ -796,7 +802,8 @@ public partial class MainViewModel : ViewModelBase
                                     return false;
 
                                 return true;
-                            }
+                            },
+                            inputParameter != null
                         );
 
                         // Free all the pointers allocated.
@@ -1512,6 +1519,46 @@ public partial class MainViewModel : ViewModelBase
                     }
                 });
 
+                return true;
+            }
+
+            else
+                return false;
+        }
+
+        else
+            return false;
+    }
+
+    [RelayCommand]
+    private async Task<bool> Update()
+    {
+        if (CurrentMod != null && InstalledMods != null)
+        {
+            var _fetchMainView = FetchMainWindow() as Window;
+
+            if (_fetchMainView == null)
+                return false;
+
+            bool? _fetchResult = await DialogService.ShowQuestion(_fetchMainView, "Update Mod?", "Are you sure you want to update the selected mod?");
+
+            // If they indeed do:
+
+            if (_fetchResult == true)
+            {
+                var _fetchGitPath = Path.Combine(CurrentMod.ModPath, "git_info.yml");
+
+                var _fetchGitRAW = File.ReadAllText(_fetchGitPath);
+                var _fetchGitSerial = YamlSerializer.Deserialize<GitModel>(_fetchGitRAW);
+
+                var _fetchAddress = $"{_fetchGitSerial.Author}/{_fetchGitSerial.Repository}";
+
+                if (_fetchGitSerial.Branch != null)
+                    _fetchAddress += $":{_fetchGitSerial.Branch}";
+
+                _fetchAddress += $"@{_fetchGitSerial.Platform}";
+
+                await Install(_fetchAddress);
                 return true;
             }
 

@@ -59,8 +59,7 @@ namespace OpenKh.Tools.ModManager.Services
                 var _fetchBaseUri = new Uri($"https://{host}");
                 var _fetchRelativeUri = new Uri(_fetchBaseUri, $"{author}/{repository}");
 
-                var _fetchRemotes = LibGit2Sharp.Repository.ListRemoteReferences(_fetchRelativeUri.ToString());
-                var _fetchBranch = branch != null ? branch : _fetchRemotes.First().TargetIdentifier.Replace("refs/heads/", "");
+                var _fetchBranch = branch != null ? branch : LibGit2Sharp.Repository.ListRemoteReferences(_fetchRelativeUri.ToString()).First().TargetIdentifier.Replace("refs/heads/", "");
 
                 var _fetchGitHubAPI = $"https://api.github.com/repos/{author}/{repository}/commits?sha={_fetchBranch}";
                 var _fetchForgejoAPI = $"https://{host}/api/v1/repos/{author}/{repository}/commits?sha={_fetchBranch}";
