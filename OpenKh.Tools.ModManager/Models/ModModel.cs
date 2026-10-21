@@ -1,4 +1,5 @@
 using Avalonia.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,24 +11,57 @@ using static OpenKh.Patcher.Metadata;
 
 namespace OpenKh.Tools.ModManager.Models
 {
-    public class ModModel
+    public partial class ModModel : ObservableObject
     {
-        public string? ModTitle { get; set; }
-        public string? ModAuthor { get; set; }
-        public string? ModGitAddress { get; set; }
-        public string? ModPlatform { get; set; }
-        public List<PreferenceModel>? ModPreferences { get; set; }
-        public string? ModDescription { get; set; }
-        public string[]? ModDependencies { get; set; }
-        public string[]? ModFilesList { get; set; }
-        public Bitmap? ModIcon { get; set; }
-        public string? ModPath { get; set; }
-        public bool ModActive { get; set; }
-        public bool ModValid { get; set; }
-        public Uri? ModSource { get; set; }
-        public Uri? ModIssues { get; set; }
-        public PresetModel? ModLinkPreset { get; set; }
-        public DateTime ModLatestCommit { get; set; }
-        public bool ModUpdate { get; set; }
+        [ObservableProperty]
+        private string? _modTitle;
+
+        [ObservableProperty]
+        private string? _modAuthor;
+
+        [ObservableProperty]
+        private string? _modGitAddress;
+
+        [ObservableProperty]
+        private string? _modPlatform;
+
+        [ObservableProperty]
+        private List<PreferenceModel>? _modPreferences;
+
+        [ObservableProperty]
+        private string? _modDescription;
+
+        [ObservableProperty]
+        private string[]? _modDependencies;
+
+        [ObservableProperty]
+        private string[]? _modFilesList;
+
+        [ObservableProperty]
+        private Bitmap? _modIcon;
+
+        [ObservableProperty]
+        private string? _modPath;
+
+        [ObservableProperty]
+        private bool _modActive;
+
+        [ObservableProperty]
+        private bool _modValid;
+
+        [ObservableProperty]
+        private Uri? _modSource;
+
+        [ObservableProperty]
+        private Uri? _modIssues;
+
+        [ObservableProperty]
+        private PresetModel? _modLinkPreset;
+
+        [ObservableProperty]
+        private DateTime _modLatestCommit;
+
+        [ObservableProperty]
+        private bool _modUpdate;
     }
 }

@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using OpenKh.Tools.ModManager.Services;
 using SharpYaml;
 using SharpYaml.Model;
@@ -36,54 +37,72 @@ namespace OpenKh.Tools.ModManager.Classes
     };
 
     // Frontend Configuration
-    public class Frontend
+    public partial class Frontend : ObservableObject
     {
-        public bool IsLog { get; set; }
+        [ObservableProperty]
+        private bool _isLog;
 
-        public Platform TargetPlatform { get; set; }
+        [ObservableProperty]
+        private Platform _targetPlatform;
 
-        public Game TargetGame { get; set; }
+        [ObservableProperty]
+        private Game _targetGame;
 
-        public BuildType ModBuildType { get; set; }
+        [ObservableProperty]
+        private BuildType _modBuildType;
 
-        public string? LaunchArguments { get; set; }
+        [ObservableProperty]
+        private string? _launchArguments;
 
-        public string? ModPath { get; set; }
+        [ObservableProperty]
+        private string? _modPath;
 
-        public string? BuildPath { get; set; }
+        [ObservableProperty]
+        private string? _buildPath;
 
-        public string[]? TargetPreset { get; set; }
+        [ObservableProperty]
+        private string[]? _targetPreset;
 
-        public string? PresetPath { get; set; }
+        [ObservableProperty]
+        private string? _presetPath;
 
-        public bool UpdateMods { get; set; }
+        [ObservableProperty]
+        private bool _updateMods;
 
-        public string? DataPath { get; set; }
+        [ObservableProperty]
+        private string? _dataPath;
 
-        public string[]? GamePath { get; set; }
+        [ObservableProperty]
+        private string[]? _gamePath;
     }
 
     // Panacea Configuration
-    public class Panacea
+    public partial class Panacea : ObservableObject
     {
-        public bool IsConsole { get; set; }
+        [ObservableProperty]
+        public bool _isConsole;
 
-        public bool IsDebug { get; set; }
+        [ObservableProperty]
+        public bool _isDebug;
 
-        public bool IsSoundDebug { get; set; }
+        [ObservableProperty]
+        public bool _isSoundDebug;
 
-        public bool IsCacheActive { get; set; }
+        [ObservableProperty]
+        public bool _isCacheActive;
     }
 
     // PCSX2 Configuration
-    public class Emulator
+    public partial class Emulator : ObservableObject
     {
-        public string[]? EmuPath { get; set; }
+        [ObservableProperty]
+        public string[]? _emuPath;
 
-        public string[]? RomPath { get; set; }
+        [ObservableProperty]
+        public string[]? _romPath;
     }
 
-    public class Config
+    public partial class Config : ObservableObject
     {
         public static Dictionary<Game, string> GameExecutable = new Dictionary<Game, string>()
         {
@@ -103,9 +122,14 @@ namespace OpenKh.Tools.ModManager.Classes
             { Game.DREAM_DROP_DISTANCE, "kh3d" },
         };
 
-        public Frontend Frontend { get; set; }
-        public Panacea Panacea { get; set; }
-        public Emulator Emulator { get; set; }
+        [ObservableProperty]
+        private Frontend _frontend;
+
+        [ObservableProperty]
+        private Panacea _panacea;
+
+        [ObservableProperty]
+        private Emulator _emulator;
 
         public static Config Load()
         {
