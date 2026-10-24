@@ -337,7 +337,7 @@ namespace OpenKh.Patcher
                             _fetchChild = _fetchSubSecond.Trim('/');
                         }
 
-                        var _fetchNameHash = Egs.Helpers.CreateMD5(_isFileRemastered ? _fetchParent : _fetchName);
+                        var _fetchNameHash = Egs.Helpers.CreateMD5(_isFileRemastered ? _fetchParent : _fetchTarget);
                         var _fetchKeyExists = _fetchFileDictionary.ContainsKey(_fetchNameHash);
 
                         if (_fetchKeyExists)
@@ -487,7 +487,7 @@ namespace OpenKh.Patcher
                             }
 
                             // After all that, if the target file actually exists now: Patch it.
-                            if (File.Exists(_fetchTargetPath))
+                            if (File.Exists(_fetchTargetPath) || _isFileRemastered)
                             {
                                 using (var _fileStream = File.Open(_fetchTargetPath, FileMode.OpenOrCreate))
                                 {
