@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>OpenKh.Tools.ModManager</RootNamespace>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <LangVersion>14.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Classes\Config.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.1" />
+    <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="12.0.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.1" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.1" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.1" />
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="DiscUtils.Iso9660" Version="0.16.13" />
+    <PackageReference Include="LibGit2Sharp" Version="0.32.0" />
+    <PackageReference Include="Octokit" Version="14.0.0" />
+    <PackageReference Include="Serilog" Version="4.4.0" />
+    <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
+    <PackageReference Include="SharpYaml" Version="3.14.0" />
+    <PackageReference Include="System.Windows.Extensions" Version="10.0.12" />
+    <PackageReference Include="Tomlyn.Signed" Version="2.10.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Patcher\OpenKh.Patcher.csproj" />
+    <ProjectReference Include="..\OpenKh.Recom\OpenKh.Recom.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\MainView.axaml.cs">
+      <DependentUpon>MainView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\ModDetailsControl.axaml.cs">
+      <DependentUpon>ModDetailsControl.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\ModListControl.axaml.cs">
+      <DependentUpon>ModListControl.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\ModStatusControl.axaml.cs">
+      <DependentUpon>ModStatusControl.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\ModWrapControl.axaml.cs">
+      <DependentUpon>ModWrapControl.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+</Project>

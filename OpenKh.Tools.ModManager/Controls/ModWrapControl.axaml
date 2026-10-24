@@ -1,0 +1,79 @@
+<ContentPage xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:model="using:OpenKh.Tools.ModManager.Models"
+             xmlns:vm="using:OpenKh.Tools.ModManager.ViewModels"
+             xmlns:view="clr-namespace:OpenKh.Tools.ModManager.Views"
+             xmlns:convert="using:OpenKh.Tools.ModManager.Converters"
+             xmlns:service="using:OpenKh.Tools.ModManager.Services"
+             x:Class="OpenKh.Tools.ModManager.Views.ModWrapView">
+
+    <ContentPage.Styles>
+        <Style Selector="ListBoxItem">
+            <Setter Property="MaxHeight" Value="128"/>
+            <Setter Property="MinWidth" Value="256"/>
+            <Setter Property="ClipToBounds" Value="True"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
+    </ContentPage.Styles>
+
+    <ContentPage.Resources>
+        <convert:SubtractPropertyCalculator x:Key="SubtractConverter"/>
+        <convert:NonNullPropertyConverter x:Key="ModExistsAndValid"/>
+    </ContentPage.Resources>
+
+        <ListBox  Background="Transparent" SelectedItem="{ReflectionBinding CurrentMod}" ItemsSource="{ReflectionBinding FilterFetchedMods}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <ContextMenu.IsVisible>
+                        <MultiBinding Converter="{StaticResource ModExistsAndValid}">
+                                <ReflectionBinding Path="CurrentMod"/>
+                                <ReflectionBinding Path="CurrentMod.ModValid"/>
+                        </MultiBinding>
+                    </ContextMenu.IsVisible>
+                    <MenuItem Header="Browse Mod Repository..." Command="{ReflectionBinding OpenGitCommand}"/>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+            
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="3" RowSpacing="5" ColumnSpacing="5"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+
+            <ListBox.ItemTemplate >
+            <DataTemplate DataType="{x:Type model:ModModel}">
+                <StackPanel Orientation="Horizontal">
+                    <ToolTip.Tip>
+                        <StackPanel MaxWidth="350">
+                            <StackPanel Orientation="Horizontal" >
+                                <TextBlock FontWeight="Bold" Text="Title: " />
+                                <TextBlock Text="{ReflectionBinding ModTitle}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontWeight="Bold" Text="Author: " />
+                                <TextBlock Text="{ReflectionBinding ModAuthor}" />
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock FontWeight="Bold" Text="Description: " />
+                                <TextBlock MaxWidth="350" TextWrapping="Wrap" FontStyle="Italic" Text="{ReflectionBinding ModDescription}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ToolTip.Tip>
+                    <CheckBox IsChecked="{ReflectionBinding ModActive}" IsEnabled="{ReflectionBinding ModValid}" IsCheckedChanged="OnModSelectedChanged"/>
+                    <Border Margin="5" VerticalAlignment="Center" CornerRadius="5" ClipToBounds="true">
+                        <Image Width="48" Height="48" Source="{ReflectionBinding ModIcon}"/>
+                    </Border>
+                    <StackPanel Margin="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="{Binding $parent[ListBoxItem].Bounds.Width, Converter={StaticResource SubtractConverter}, ConverterParameter='128'}">
+                        <TextBlock Text="{ReflectionBinding ModTitle}" FontSize="12" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{ReflectionBinding ModAuthor}" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{ReflectionBinding ModDescription}" FontSize="10" FontStyle="Italic" MaxLines="3" TextWrapping="Wrap" TextTrimming="WordEllipsis"/>
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</ContentPage>

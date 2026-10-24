@@ -1,0 +1,193 @@
+<ContentPage xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:convert="using:OpenKh.Tools.ModManager.Converters"
+    xmlns:model="using:OpenKh.Tools.ModManager.Models"
+    xmlns:class="using:OpenKh.Tools.ModManager.Classes"
+    xmlns:vm="using:OpenKh.Tools.ModManager.ViewModels"
+    xmlns:view="clr-namespace:OpenKh.Tools.ModManager.Views"
+    mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+    Width="500" Height="500"
+    x:Class="OpenKh.Tools.ModManager.Wizard.WizardGameSetup">
+
+    <ContentPage.Resources>
+        <StreamGeometry x:Key="icon_open_folder">M2 8V6.25C2 4.45507 3.45507 3 5.25
+            3H8.12868C8.72542 3 9.29771 3.23705 9.71967 3.65901L11.25 5.18934L8.65901
+            7.78033C8.51836 7.92098 8.32759 8 8.12868 8H2ZM2 9.5V17.75C2 19.5449 3.45507 21 5.25
+            21H18.75C20.5449 21 22 19.5449 22 17.75V8.75C22 6.95507 20.5449 5.5 18.75
+            5.5H13.0607L9.71967 8.84099C9.29771 9.26295 8.72542 9.5 8.12868 9.5H2Z</StreamGeometry>
+        <StreamGeometry x:Key="icon_file_missing">M3 6.25C3 4.45507 4.45507 3 6.25 3H17.75C19.5449 3 21 4.45507 21 6.25V17.75C21 19.5449 19.5449 21 17.75 21H6.25C4.45507 21 3 19.5449 3 17.75V6.25ZM6.25 4.5C5.2835 4.5 4.5 5.2835 4.5 6.25V17.75C4.5 18.7165 5.2835 19.5 6.25 19.5H17.75C18.7165 19.5 19.5 18.7165 19.5 17.75V6.25C19.5 5.2835 18.7165 4.5 17.75 4.5H6.25Z</StreamGeometry>
+        <StreamGeometry x:Key="icon_file_good">M6.25 3C4.45507 3 3 4.45507 3 6.25V17.75C3 19.5449 4.45507 21 6.25 21H17.75C19.5449 21 21 19.5449 21 17.75V6.25C21 4.45507 19.5449 3 17.75 3H6.25ZM4.5 6.25C4.5 5.2835 5.2835 4.5 6.25 4.5H17.75C18.7165 4.5 19.5 5.2835 19.5 6.25V17.75C19.5 18.7165 18.7165 19.5 17.75 19.5H6.25C5.2835 19.5 4.5 18.7165 4.5 17.75V6.25ZM17.28 9.28064C17.5731 8.98791 17.5734 8.51304 17.2806 8.21998C16.9879 7.92691 16.513 7.92664 16.22 8.21936L9.99658 14.4356L7.78084 12.2197C7.48795 11.9268 7.01308 11.9268 6.72018 12.2196C6.42727 12.5125 6.42726 12.9874 6.72014 13.2803L9.46591 16.0262C9.75868 16.319 10.2333 16.3192 10.5263 16.0266L17.28 9.28064Z</StreamGeometry>
+        <convert:PropertyNotEqualConverter x:Key="CheckIfNotEqual" />
+        <convert:PropertyIsEqualConverter x:Key="CheckIfEqual" />
+    </ContentPage.Resources>
+
+
+    <StackPanel Margin="10">
+        <TextBlock FontWeight="Bold" Text="Game Setup" Grid.Row="0" />
+        <TextBlock TextWrapping="Wrap"
+            Text="Please select the version of the game you want to mod, as well as its location."
+            Grid.Row="1" />
+        <Separator Margin="-10, 10, -10, 10" Grid.Row="2" />
+        <Label Content="Game Platform:" />
+        <ComboBox Name="PlatformBox"
+            SelectedIndex="{ReflectionBinding CurrentConfig.Frontend.TargetPlatform}"
+            HorizontalAlignment="Stretch" PlaceholderText="Select a Platform..." Margin="0, 5, 0, 5" SelectionChanged="OnGameSelectChanged">
+            <ComboBoxItem Content="Emulator" />
+            <ComboBoxItem Content="Steam" />
+            <ComboBoxItem Content="Epic Games Store" />
+            <ComboBoxItem Content="Microsoft Store / XBOX" />
+        </ComboBox>
+
+        <!-- StackPanel for PC Platforms -->
+        <StackPanel>
+            <StackPanel.IsVisible>
+                <MultiBinding Converter="{StaticResource CheckIfNotEqual}">
+                    <Binding Path="#PlatformBox.SelectedIndex" />
+                    <ReflectionBinding Source="{x:Static class:Platform.PCSX2}" />
+                </MultiBinding>
+            </StackPanel.IsVisible>
+            <TextBlock TextWrapping="Wrap" Margin="0, 10, 0, 10">
+                <Bold>NOTE:</Bold> The Mod Manager supports working with all the legacy games within
+                the 1.5+2.5 as well as the 2.8 collections. As such, please input the paths for the
+                collections you want to mod. <Bold>At least one of these paths must be given!</Bold>
+            </TextBlock>
+            <TextBlock TextTrimming="CharacterEllipsis"> Enter path for <Bold>KINGDOM HEARTS 1.5+2.5
+                ReMIX</Bold>: </TextBlock>
+            <Grid Margin="0, 10, 0, 10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="0.05*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0" Name="PathCollectionFirst"
+                    Text="{ReflectionBinding CurrentConfig.Frontend.GamePath[0]}"
+                    HorizontalAlignment="Stretch" PlaceholderText="Path goes here..."
+                    Margin="0, 0, 10, 0" TextChanged="OnPathChanged" />
+                <Button Grid.Column="1" HorizontalAlignment="Stretch" Width="32" Height="32"
+                    Background="Transparent" VerticalAlignment="Stretch"  Click="OnFolderClickFirst">
+                    <PathIcon Data="{StaticResource icon_open_folder}" Height="24" Width="24" />
+                </Button>
+            </Grid>
+            <TextBlock TextTrimming="CharacterEllipsis"> Enter path for <Bold>KINGDOM HEARTS 2.8
+                Final Chapter Prologue</Bold>: </TextBlock>
+            <Grid Margin="0, 10, 0, 10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="0.05*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0" Name="PathCollectionSecond"
+                    Text="{ReflectionBinding CurrentConfig.Frontend.GamePath[1]}"
+                    HorizontalAlignment="Stretch" PlaceholderText="Path goes here..."
+                    Margin="0, 0, 10, 0" TextChanged="OnPathChanged"/>
+                <Button Grid.Column="1" HorizontalAlignment="Stretch" Width="32" Height="32"
+                    Background="Transparent" VerticalAlignment="Stretch" Click="OnFolderClickSecond">
+                    <PathIcon Data="{StaticResource icon_open_folder}" Height="24" Width="24" />
+                </Button>
+            </Grid>
+                <StackPanel>
+                    <StackPanel.IsVisible>
+                        <MultiBinding Converter="{StaticResource CheckIfNotEqual}">
+                            <Binding Path="#PlatformBox.SelectedIndex"/>
+                            <ReflectionBinding Source="{x:Static class:Platform.MICROSOFT_STORE}" />
+                        </MultiBinding>
+                    </StackPanel.IsVisible>
+                    <TextBlock TextWrapping="Wrap"> 
+                        You can also choose to <Bold>detect your installations</Bold>
+                        instead. Note that this will try to fetch your platform-specific library locations
+                        and may not always be successful. 
+                    </TextBlock>
+
+                    <TextBlock TextWrapping="Wrap" Margin="0, 10, 0, 5"> 
+                        <Bold>NOTE:</Bold> Detecting installations on Linux works for Steam only.
+                    </TextBlock>
+
+                    <Button Margin="0, 5, 0, 10" Height="30" HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center" Content="Detect Installations..." Click="OnDetectClick"/>
+                </StackPanel>
+
+                <StackPanel>
+                    <StackPanel.IsVisible>
+                        <MultiBinding Converter="{StaticResource CheckIfEqual}">
+                            <Binding Path="#PlatformBox.SelectedIndex"/>
+                            <ReflectionBinding Source="{x:Static class:Platform.MICROSOFT_STORE}" />
+                        </MultiBinding>
+                    </StackPanel.IsVisible>
+                    <TextBlock TextWrapping="Wrap"> 
+                        <Bold>NOTE:</Bold> Microsoft Store games are always installed to "C:/XboxGames" unless changed with developer tools. <Bold>Change the file paths at your own risk!</Bold> 
+                    </TextBlock>
+                </StackPanel>
+        </StackPanel>
+
+        <!-- Stack Panel for Emulator -->
+        <StackPanel>
+            <StackPanel.IsVisible>
+                <MultiBinding Converter="{StaticResource CheckIfEqual}">
+                    <Binding Path="#PlatformBox.SelectedIndex"/>
+                    <ReflectionBinding Source="{x:Static class:Platform.PCSX2}" />
+                </MultiBinding>
+            </StackPanel.IsVisible>
+
+            <TextBlock TextWrapping="Wrap" Margin="0, 10, 0, 5">
+                <Bold>NOTE:</Bold> Please be advised that all Lua related features will only work with <Bold>PCSX2-EX</Bold>. On Linux, only the AppImage release is supported.
+            </TextBlock>
+
+            <TextBlock TextTrimming="CharacterEllipsis" Margin="0, 5, 0, 0"> Enter path for the <Bold>
+                PCSX2</Bold> Emulator: </TextBlock>
+            <Grid Margin="0, 10, 0, 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="0.05*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0" Name="PathEmulator"
+                    Text="{ReflectionBinding CurrentConfig.Emulator.EmuPath[0]}"
+                    HorizontalAlignment="Stretch" PlaceholderText="Path goes here..."
+                    Margin="0, 0, 10, 0" />
+                <Button Grid.Column="1" HorizontalAlignment="Stretch" Width="32" Height="32" Background="Transparent" VerticalAlignment="Stretch" Click="OnFolderClickEmuFirst">
+                    <PathIcon Data="{StaticResource icon_open_folder}" Height="24" Width="24"/>
+                </Button>
+            </Grid>
+
+            <TextBlock TextTrimming="CharacterEllipsis" Margin="0, 5, 0, 0"> Click the appropriate buttons to choose your <Bold>
+                ISO</Bold> Files: </TextBlock>
+            <Grid Margin="20, 10, 0, 10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="0.05*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Spacing="10" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                        <Button  Width="175" Click="OnFileClickKH1">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Label Content="Kingdom Hearts"/>
+                                <PathIcon Name="IconMissingKH1" Data="{StaticResource icon_file_missing}" Height="16" Width="24" IsVisible="{ReflectionBinding CurrentConfig.Emulator.RomPath[0], Converter={x:Static StringConverters.IsNullOrEmpty}}"/>
+                                <PathIcon Name="IconFoundKH1" Data="{StaticResource icon_file_good}" Height="16" Width="24" IsVisible="{ReflectionBinding CurrentConfig.Emulator.RomPath[0], Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                            </StackPanel>
+                        </Button>
+                        <Button  Width="175" Click="OnFileClickKH2">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Label Content="Kingdom Hearts II"/>
+                                <PathIcon Name="IconMissingKH2" Data="{StaticResource icon_file_missing}" Height="16" Width="24" IsVisible="{ReflectionBinding CurrentConfig.Emulator.RomPath[1], Converter={x:Static StringConverters.IsNullOrEmpty}}"/>
+                                <PathIcon Name="IconFoundKH2"  Data="{StaticResource icon_file_good}" Height="16" Width="24" IsVisible="{ReflectionBinding CurrentConfig.Emulator.RomPath[1], Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                    <Button  Width="200" Click="OnFileClickCOM" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Label Content="Re:Chain of Memories"/>
+                            <PathIcon Name="IconMissingCOM" Data="{StaticResource icon_file_missing}" Height="16" Width="24" IsVisible="{ReflectionBinding CurrentConfig.Emulator.RomPath[2], Converter={x:Static StringConverters.IsNullOrEmpty}}"/>
+                            <PathIcon Name="IconFoundCOM"  Data="{StaticResource icon_file_good}" Height="16" Width="24" IsVisible="{ReflectionBinding CurrentConfig.Emulator.RomPath[2], Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+            <TextBlock TextWrapping="Wrap">
+            You should always use legally acquired ROMs. Using pirated copies will make you ineligible for support.
+            </TextBlock>
+        </StackPanel>
+    </StackPanel>
+</ContentPage>

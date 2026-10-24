@@ -1,0 +1,15 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="OpenKh.Tools.ModManager.App"
+             xmlns:local="using:OpenKh.Tools.ModManager"
+             xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Avalonia.Svg"
+             RequestedThemeVariant="Default">
+
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+</Application>

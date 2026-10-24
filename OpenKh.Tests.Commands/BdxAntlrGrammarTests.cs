@@ -1,5 +1,5 @@
 using Antlr4.Runtime;
-using OpenKh.Command.Bdxio.Models;
+using OpenKh.Kh2.Bdx.Models;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;

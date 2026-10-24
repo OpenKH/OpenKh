@@ -1,5 +1,6 @@
-using OpenKh.Command.Bdxio.Models;
-using OpenKh.Command.Bdxio.Utils;
+
+using OpenKh.Kh2.Bdx.Utils;
+using OpenKh.Kh2.Bdx.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

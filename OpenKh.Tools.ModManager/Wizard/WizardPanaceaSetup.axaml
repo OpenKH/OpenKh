@@ -1,0 +1,51 @@
+<ContentPage xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:convert="using:OpenKh.Tools.ModManager.Converters"
+    xmlns:model="using:OpenKh.Tools.ModManager.Models"
+    xmlns:class="using:OpenKh.Tools.ModManager.Classes"
+    xmlns:vm="using:OpenKh.Tools.ModManager.ViewModels"
+    xmlns:view="clr-namespace:OpenKh.Tools.ModManager.Views"
+    mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="490"
+    Width="500" Height="490"
+    x:Class="OpenKh.Tools.ModManager.Wizard.WizardPanaceaSetup">
+
+    <ContentPage.Resources>
+    </ContentPage.Resources>
+
+    <StackPanel Margin="10">
+        <TextBlock FontWeight="Bold" Text="Install Panacea [Optional, Highly Recommended]"/>
+        <TextBlock Text="Install the mod loader, eliminating the need to hard-patch game files." />
+
+        <Separator Margin="-10, 10, -10, 10" Grid.Row="2" />
+
+        <TextBlock TextWrapping="Wrap" Margin="0, 0, 0, 5">
+            Panacea allows the PC version of KINGDOM HEARTS titles to load the mods you have installed
+            without any modification done to the game files. This saves time and space whenever you want to disable mods,
+            since you will not need to have backups of the original files and restore them beforehand.
+        </TextBlock>
+
+        <StackPanel Name="NotInstallPanel">
+        <TextBlock TextWrapping="Wrap" Margin="0, 5, 0, 5">
+            It seems that Panacea is <Bold>not currently installed</Bold>. You can skip Panacea
+            installation, but you will be required to hard-patch the game files should
+            you wish to use mods. In addition: Mods that use DLL files to add extra
+            functionality, such as Kingdom Hearts - Re:Fined, <Bold>will NOT work without Panacea!</Bold>
+        </TextBlock>
+            <Button Margin="0, 5, 0, 5" Height="30" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Content="Install Panacea" Click="OnInstallClick"/>
+        </StackPanel>
+
+        <StackPanel Name="InstallPanel" IsVisible="False">
+        <TextBlock TextWrapping="Wrap" Margin="0, 5, 0, 5">
+            It seems that Panacea is <Bold>currently installed</Bold>. The mod loader should
+            work without any need to patch the games beforehand. Should you wish to <Bold>uninstall</Bold> Panacea, you can click the button below.
+        </TextBlock>
+            <Button Margin="0, 5, 0, 5" Height="30" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Content="Uninstall Panacea" Click="OnUninstallClick"/>
+        </StackPanel>
+
+        <TextBlock TextWrapping="Wrap" Margin="0, 5, 0, 5">
+            Installation will be done for all games within detected collections.
+        </TextBlock>
+    </StackPanel>
+</ContentPage>

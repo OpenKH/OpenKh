@@ -20,7 +20,6 @@
     <ProjectReference Include="..\OpenKh.Command.KHAnimationConverter\OpenKh.Command.KHAnimationConverter.csproj" />
     <ProjectReference Include="..\OpenKh.Command.MapGen\OpenKh.Command.MapGen.csproj" />
     <ProjectReference Include="..\OpenKh.Command.TexFooter\OpenKh.Command.TexFooter.csproj" />
-    <ProjectReference Include="..\OpenKh.Command.Bdxio\OpenKh.Command.Bdxio.csproj" />
   </ItemGroup>
 
   <ItemGroup>

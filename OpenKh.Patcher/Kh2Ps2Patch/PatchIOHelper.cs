@@ -16,7 +16,7 @@ namespace OpenKh.Patcher.Kh2Ps2Patch
             }
 
             {
-                var decoded = _patchCodec.ApplyXeeynamosMethod(memory.Span);
+                var decoded = _patchCodec.ApplyLegacyFormatMethod(memory.Span);
                 if (_patchIo.VerifySignature(decoded))
                 {
                     return _patchIo.Read(decoded);
@@ -24,7 +24,7 @@ namespace OpenKh.Patcher.Kh2Ps2Patch
             }
 
             {
-                var decoded = _patchCodec.ApplyGovanifYsMethod(memory.Span);
+                var decoded = _patchCodec.ApplyNewFormatMethod(memory.Span);
                 if (_patchIo.VerifySignature(decoded))
                 {
                     return _patchIo.Read(decoded);

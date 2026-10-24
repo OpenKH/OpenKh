@@ -5,12 +5,13 @@
   <AssemblyVersion>25.02.10.0</AssemblyVersion><FileVersion>25.02.10.0</FileVersion><Version>25.02.10.0-local</Version><InformationalVersion>25.02.10.0-local</InformationalVersion><Authors>OpenKH contributors</Authors><Company>OpenKH</Company><Copyright>Copyright (C) OpenKH </Copyright><Description>https://github.com/OpenKH/OpenKh</Description></PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Serilog" Version="4.4.0" />
+    <PackageReference Include="SharpYaml" Version="3.13.0" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
-    <ProjectReference Include="..\OpenKh.Command.Bdxio\OpenKh.Command.Bdxio.csproj" />
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
     <ProjectReference Include="..\OpenKh.Egs\OpenKh.Egs.csproj" />
     <ProjectReference Include="..\OpenKh.Imaging\OpenKh.Imaging.csproj" />

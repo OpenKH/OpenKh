@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" x:Class="OpenKh.Tools.ModManager.Dialogs.MessageDialog"
+        Title="Some Message Title" SizeToContent="WidthAndHeight" CanResize="False" WindowStartupLocation="CenterOwner">
+
+    <Window.Resources>
+        <StreamGeometry x:Key="icon_type_info">M12.0016 1.99902C17.5253 1.99902 22.0031 6.47687 22.0031 12.0006C22.0031 17.5243 17.5253 22.0021 12.0016 22.0021C6.47785 22.0021 2 17.5243 2 12.0006C2 6.47687 6.47785 1.99902 12.0016 1.99902ZM12 10.5C11.5858 10.5 11.25 10.8358 11.25 11.25V16.25C11.25 16.6642 11.5858 17 12 17C12.4142 17 12.75 16.6642 12.75 16.25V11.25C12.75 10.8358 12.4142 10.5 12 10.5ZM12 9C12.5523 9 13 8.55228 13 8C13 7.44772 12.5523 7 12 7C11.4477 7 11 7.44772 11 8C11 8.55228 11.4477 9 12 9Z</StreamGeometry>
+        <StreamGeometry x:Key="icon_type_warning">M9.13841 3.70704C10.3662 1.43109 13.6314 1.43093 14.8591 3.70704L21.6023 16.209C22.7698 18.3741 21.2018 21.0016 18.7419 21.002H5.25462C2.79479 21.0016 1.22676 18.3741 2.39426 16.209L9.13841 3.70704ZM12.0007 15C11.4486 15.0002 11.0008 15.4479 11.0007 16C11.0007 16.5522 11.4486 16.9998 12.0007 17C12.5528 16.9998 13.0007 16.5522 13.0007 16C13.0006 15.4479 12.5528 15.0002 12.0007 15ZM12.0007 7.50001C11.5867 7.50019 11.2508 7.83598 11.2507 8.25001V12.75C11.2507 13.1641 11.5867 13.4998 12.0007 13.5C12.4148 13.4998 12.7507 13.1641 12.7507 12.75V8.25001C12.7506 7.83599 12.4147 7.50021 12.0007 7.50001Z</StreamGeometry>
+        <StreamGeometry x:Key="icon_type_error">M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM11.999 14.502C11.4475 14.502 11 14.9494 11 15.501C11 16.0525 11.4475 16.5 11.999 16.5C12.5504 16.4998 12.997 16.0524 12.9971 15.501C12.9971 14.9496 12.5504 14.5021 11.999 14.502ZM11.9941 7C11.5801 7.00051 11.2448 7.33687 11.2451 7.75098L11.249 12.252L11.2559 12.3535C11.3058 12.7195 11.6194 13.0021 11.999 13.002C12.4132 13.0016 12.7494 12.6652 12.749 12.251L12.7451 7.74902L12.7383 7.64746C12.6883 7.2815 12.3738 6.9997 11.9941 7Z</StreamGeometry>
+    </Window.Resources>
+
+    <StackPanel Margin="15" Spacing="10">
+        <StackPanel Orientation="Horizontal" Spacing="5">
+            <PathIcon  Name="MainIcon" Data="{StaticResource icon_type_info}" VerticalAlignment="Top"/>
+            <TextBlock Name="MainText" TextWrapping="Wrap" VerticalAlignment="Center" Text="Ayy man this shit be spewin' sum' BULLSHIT!"/>
+        </StackPanel>
+        <Button Name="AcceptButton" HorizontalAlignment="Right" HorizontalContentAlignment="Center" Content="OK" Click="OnAcceptClicked" Width="50" HotKey="Enter"/>
+    </StackPanel>
+</Window>
