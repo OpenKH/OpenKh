@@ -15,7 +15,7 @@ Each rbin holds the files for a given folder in the games file system, refered t
 | 0x0C | uint32   | Reserved |
 | 0x10 | char[16] | Mount point |
 
-The header is immediatly followed by the list of File Entries.
+The header is immediately followed by the list of File Entries.
 
 ## File Entry
 
