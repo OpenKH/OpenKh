@@ -8,18 +8,18 @@ Extensions marked with an asterisk (*) link to _Birth By Sleep_'s documentation.
 |----------------------------------|----------------------------------|-------|
 | [rbin](file/type/rbin.md)        | File container for 3DS           |       |
 | [abc*](../bbs/file/type/abc.md)  | Entity collision controller      |       |
-| bin                              | ?????                            |       |
+| bin                              | Container file                   |       |
 | ccd                              | Entity hitbox controller         |       |
 | cct                              | Common texture file              |       |
 | [ead*](../bbs/file/type/ead.md)  | Weapon effect controller         |       |
-| ese                              | ?????                            |       |
-| exa                              | ?????                            |       |
+| [ese*](../bbs/file/type/ese.md)  | Effect sound effect file         |       |
+| [ese*](../bbs/file/type/ese.md)  | Cutscene camera definition file  |       |
 | [fep*](../bbs/file/type/fep.md)  | Particle effect controller       |       |
 | [l2d*](../bbs/file/type/l2d.md)  | 2D graphic file                  |       |
 | lub                              | Compiled LUA script for enemy AI |       |
 | [pam*](../bbs/file/type/pam.md)  | Animations container             |       |
 | [pmo*](../bbs/file/type/pmo.md)  | 3D model file                    |       |
-| rgr                              | ?????                            |       |
+| rgr                              | Registry file                    |       |
 | [scd*](../bbs/file/type/scd.md)  | Sound container                  |       |
 | [seb*](../bbs/file/type/seb.md)  | Sound effect controller          |       |
 | tcd                              | Technique collision controller   |       |
