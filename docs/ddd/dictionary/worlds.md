@@ -3,20 +3,20 @@
 | Id  | Short | World                                                   |
 | --- | ----- | ------------------------------------------------------- |
 | 0   | ex    | ex                                                      |
-| 1   | di    | [Destiny Islands](#Destiny-Islands)                     |
-| 2   | yt    | [Mysterious Tower](#Mysterious-Tower)                   |
-| 3   | tw    | [Traverse Town](#Traverse-Town)                         |
-| 4   | tm    | [Country of the Musketeers](#Country-of-the-Musketeers) |
-| 5   | fa    | [Symphony of Sorcery](#Symphony-of-Sorcery)             |
-| 6   | pi    | [Pranksters Paradise](#Pranksters-Paradise)             |
-| 7   | rg    | [Radiant Garden](#Radiant-Garden)                       |
-| 8   | nd    | [La Cité des Cloches](#La-Cité-des-Cloches)             |
-| 9   | tl    | [The Grid](#The-Grid)                                   |
-| 10  | eh    | [The World That Never Was](#The-World-That-Never-Was)   |
-| 11  | wm    | [World Map](#World-Map)                                 |
-| 12  | de    | [Spirit Space](#Spirit-Space)                           |
-| 13  | zz    | [For Testing Purposes](#For-Testing-Purposes)           |
-| 14  | unk1  | Traverse Town (Revisited)                               |
+| 1   | di    | [Destiny Islands](#destiny-islands)                     |
+| 2   | yt    | [Mysterious Tower](#mysterious-tower)                   |
+| 3   | tw    | [Traverse Town](#traverse-town)                         |
+| 4   | tm    | [Country of the Musketeers](#country-of-the-musketeers) |
+| 5   | fa    | [Symphony of Sorcery](#symphony-of-sorcery)             |
+| 6   | pi    | [Pranksters Paradise](#pranksters-paradise)             |
+| 7   | rg    | [Radiant Garden](#radiant-garden)                       |
+| 8   | nd    | [La Cité des Cloches](#la-cité-des-cloches)             |
+| 9   | tl    | [The Grid](#the-grid)                                   |
+| 10  | eh    | [The World That Never Was](#the-world-that-never-was)   |
+| 11  | wm    | [World Map](#world-map)                                 |
+| 12  | de    | [Spirit Space](#spirit-space)                           |
+| 13  | zz    | [For Testing Purposes](#for-testing-purposes)           |
+| 14  | unk1  | Traverse Town (revisited)                               |
 | 15  | unk2  | Ending                                                  |
 
 
