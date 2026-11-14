@@ -852,6 +852,82 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
     }
     std::vector<Axa::RemasteredEntry> modfiles;
     ScanFolder(remasteredFolder, modfiles);
+    const bool byName = OpenKH::m_GameID == OpenKH::GameId::KingdomHeartsReCom
+                     || OpenKH::m_GameID == OpenKH::GameId::KingdomHeartsDdd;
+    if (byName && !modfiles.empty())
+    {
+        const int constOff = assetoffs.empty() ? -1 : assetoffs.back();
+        std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
+        std::vector<Axa::RemasteredEntry> merged = modfiles;
+        for (auto& m : merged)
+            m.origOffset = constOff;
+        for (const auto& e : entries)
+        {
+            bool replaced = false;
+            for (const auto& m : modfiles)
+                if (!_stricmp(e.name, m.name)) { replaced = true; break; }
+            if (!replaced)
+                merged.push_back(e);
+        }
+        entries = merged;
+        return;
+    }
+    
+    if (OpenKH::m_GameID == OpenKH::GameId::KingdomHearts1 && !modfiles.empty())
+    {
+        auto offsetOfName = [](const char* name, int& value) -> bool
+        {
+            const char* p = strrchr(name, '/');
+            p = p ? p + 1 : name;
+            if (*p != '-')
+                return false;
+            char* end = nullptr;
+            const long v = strtol(p + 1, &end, 16);
+            if (end == p + 1 || *end != '.')
+                return false;
+            value = (int)v;
+            return true;
+        };
+        std::vector<Axa::RemasteredEntry> merged = entries;
+        std::vector<Axa::RemasteredEntry> added;
+        for (auto m : modfiles)
+        {
+            bool replaced = false;
+            for (auto& e : merged)
+                if (!_stricmp(e.name, m.name))
+                {
+                    e.decompressedSize = m.decompressedSize;
+                    e.compressedSize = -2;
+                    replaced = true;
+                    break;
+                }
+            if (replaced)
+                continue;
+            int h;
+            if (!offsetOfName(m.name, h))
+                continue;
+            const char* ext = strrchr(m.name, '.');
+            m.origOffset = (ext && !_stricmp(ext, ".cvbl")) ? -1 : h;
+            added.push_back(m);
+        }
+
+        merged.erase(std::remove_if(merged.begin(), merged.end(), [&](const Axa::RemasteredEntry& e)
+            {
+                for (const auto& a : added)
+                    if (a.origOffset != -1 && a.origOffset == e.origOffset)
+                        return true;
+                return false;
+            }), merged.end());
+        merged.insert(merged.end(), added.begin(), added.end());
+        entries = merged;
+        if (OpenKH::m_DebugLog)
+        {
+            fwprintf(stdout, L"KH1 remastered assets for \"%ls\":\n", path);
+            for (const auto& e : entries)
+                fprintf(stdout, "  \"%s\" orig 0x%X size 0x%X\n", e.name, e.origOffset, e.decompressedSize);
+        }
+        return;
+    }
     if (modfiles.size() >= assetoffs.size())
     {
         std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
