@@ -1,0 +1,55 @@
+<ContentPage xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="490"
+             Width="500" Height="490"
+             x:Class="OpenKh.Tools.ModManager.Wizard.WizardDirectLaunch">
+    <StackPanel Margin="10">
+        <TextBlock FontWeight="Bold" Text="Allow Direct Launch [Optional, Steam Only]"/>
+        <TextBlock Text="Allow the Mod Manager to launch the games without the launcher." />
+
+        <Separator Margin="-10, 10, -10, 10" Grid.Row="2" />
+
+        <TextBlock TextWrapping="Wrap" Margin="0, 0, 0, 5">
+            This option allows you to launch the games directly when using Mod
+            Manager's running functionality instead of having to go through the
+            launcher first. This utilizes the Steam API on Windows, and a custom
+            intercepter application on Linux. In case of Linux users, the existence of
+            this application is unnoticable.
+        </TextBlock>
+
+        <TextBlock TextWrapping="Wrap" Margin="0, 5, 0, 5">
+            <Bold>NOTE:</Bold> In both operating systems, Steam must be running in any way 
+            possible for this functionality to work. Otherwise, the game will either
+            not launch, or will appear to crash after launching.
+        </TextBlock>
+
+        <StackPanel Name="NotInstallPanel">
+        <TextBlock TextWrapping="Wrap" Margin="0, 5, 0, 5">
+            It seems that direct launching is <Bold>currently not allowed</Bold>.
+        </TextBlock>
+            <Button Margin="0, 5, 0, 5" Height="30" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnInstallClick" Content="Allow Direct Launching" />
+        </StackPanel>
+
+        <StackPanel Name="InstallPanel" IsVisible="False">
+        <TextBlock TextWrapping="Wrap" Margin="0, 5, 0, 5">
+            It seems that direct launching is <Bold>currently allowed</Bold>.
+        </TextBlock>
+            <Button Margin="0, 5, 0, 5" Height="30" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnUninstallClick" Content="Disallow Direct Launching" />
+        </StackPanel>
+
+        <TextBlock TextWrapping="Wrap" Margin="0, 5, 0, 5">
+            You can also declare the Launch Arguments the game should use when
+            launching through the Mod Manager, as launching this way does <Bold>NOT</Bold>
+            carry over the arguments set on Steam.
+        </TextBlock>
+
+        <TextBlock TextWrapping="Wrap" Margin="0, 5, 0, 5">
+            Do note that if you are on Linux, depending on how your DLL Overrides
+            are set, <Bold>declaring them here may be required.</Bold>
+        </TextBlock>
+
+        <TextBox Margin="0, 5, 0, 5" PlaceholderText="Ex. -fastboot -noaspect" Text="{ReflectionBinding CurrentConfig.Frontend.LaunchArguments}"></TextBox>
+    </StackPanel>
+</ContentPage>

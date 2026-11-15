@@ -1,0 +1,179 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:OpenKh.Tools.ModManager.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:model="using:OpenKh.Tools.ModManager.Models"
+        xmlns:view="clr-namespace:OpenKh.Tools.ModManager.Views"
+        xmlns:convert="using:OpenKh.Tools.ModManager.Converters"
+        xmlns:class="using:OpenKh.Tools.ModManager.Classes"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="850"
+        Width="800" Height="850"
+        x:Class="OpenKh.Tools.ModManager.Views.MainView"
+        x:DataType="vm:MainViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="OpenKH - Mod Manager">
+
+    <Window.Resources>
+        <StreamGeometry x:Key="icon_add_mod">M12 2V8C12 9.10457 12.8954 10 14 10H20V20C20 21.1046 19.1046 22 18 22H11.1904C12.3112 20.8321 13 19.2465 13 17.5C13 13.9101 10.0899 11 6.5 11C5.6141 11 4.76959 11.1772 4 11.4982V4C4 2.89543 4.89543 2 6 2H12ZM13.5 2.5V8C13.5 8.27614 13.7239 8.5 14 8.5H19.5L13.5 2.5ZM12 17.5C12 14.4624 9.53757 12 6.5 12C3.46243 12 1 14.4624 1 17.5C1 20.5376 3.46243 23 6.5 23C9.53757 23 12 20.5376 12 17.5ZM7.00065 18L7.00111 20.5035C7.00111 20.7797 6.77725 21.0035 6.50111 21.0035C6.22497 21.0035 6.00111 20.7797 6.00111 20.5035L6.00065 18H3.4956C3.21973 18 2.99609 17.7762 2.99609 17.5C2.99609 17.2239 3.21973 17 3.4956 17H6.00046L6 14.4993C6 14.2231 6.22386 13.9993 6.5 13.9993C6.77614 13.9993 7 14.2231 7 14.4993L7.00046 17H9.49659C9.77246 17 9.99609 17.2239 9.99609 17.5C9.99609 17.7762 9.77246 18 9.49659 18H7.00065Z</StreamGeometry>
+        <StreamGeometry x:Key="icon_remove_mod">M12 2V8C12 9.10457 12.8954 10 14 10H20V20C20 21.1046 19.1046 22 18 22H11.1904C12.3112 20.8321 13 19.2465 13 17.5C13 13.9101 10.0899 11 6.5 11C5.6141 11 4.76959 11.1772 4 11.4982V4C4 2.89543 4.89543 2 6 2H12ZM13.5 2.5V8C13.5 8.27614 13.7239 8.5 14 8.5H19.5L13.5 2.5ZM6.5 12C3.46243 12 1 14.4624 1 17.5C1 20.5376 3.46243 23 6.5 23C9.53757 23 12 20.5376 12 17.5C12 14.4624 9.53757 12 6.5 12ZM8.97823 15.7313L7.20843 17.5001L8.97806 19.2697C9.17332 19.465 9.17332 19.7816 8.97806 19.9768C8.78279 20.1721 8.46621 20.1721 8.27095 19.9768L6.50112 18.207L4.73246 19.9746C4.5372 20.1699 4.22061 20.1699 4.02535 19.9746C3.83009 19.7794 3.83009 19.4628 4.02535 19.2675L5.79401 17.4999L4.02535 15.7312C3.83009 15.536 3.83009 15.2194 4.02535 15.0241C4.22061 14.8289 4.5372 14.8289 4.73246 15.0241L6.50133 16.793L8.27113 15.0242C8.46639 14.829 8.78297 14.829 8.97823 15.0242C9.1735 15.2195 9.1735 15.5361 8.97823 15.7313Z</StreamGeometry>
+        <StreamGeometry x:Key="icon_pri_down">M1.99902 12C1.99902 17.5228 6.47617 22 11.999 22C17.5219 22 21.999 17.5228 21.999 12C21.999 6.47715 17.5219 2 11.999 2C6.47618 2 1.99902 6.47715 1.99902 12ZM16.5297 11.7199C16.796 11.9862 16.8202 12.4028 16.6023 12.6964L16.5297 12.7805L12.5289 16.7814C12.2626 17.0477 11.8459 17.0718 11.5523 16.8539L11.4681 16.7813L7.46814 12.7797C7.1753 12.4868 7.17539 12.0119 7.46834 11.7191C7.73466 11.4529 8.15132 11.4287 8.44489 11.6466L8.529 11.7193L11.2497 14.4412L11.2494 7.74951C11.2494 7.36982 11.5315 7.05602 11.8976 7.00636L11.9994 6.99951C12.3791 6.99951 12.6929 7.28167 12.7425 7.64774L12.7494 7.74951L12.7497 14.4392L15.4691 11.7199C15.7353 11.4536 16.152 11.4294 16.4456 11.6473L16.5297 11.7199Z</StreamGeometry>
+        <StreamGeometry x:Key="icon_pri_up">M22.001 12C22.001 6.47715 17.5238 2 12.001 2C6.47813 2 2.00098 6.47715 2.00098 12C2.00098 17.5228 6.47813 22 12.001 22C17.5238 22 22.001 17.5228 22.001 12ZM7.47028 12.2801C7.20401 12.0138 7.17981 11.5972 7.39766 11.3036L7.47028 11.2195L11.4711 7.21863C11.7374 6.95233 12.1541 6.92816 12.4477 7.14609L12.5319 7.21873L16.5319 11.2203C16.8247 11.5132 16.8246 11.9881 16.5317 12.2809C16.2653 12.5471 15.8487 12.5713 15.5551 12.3534L15.471 12.2807L12.7503 9.55878L12.7506 16.2505C12.7506 16.6302 12.4685 16.944 12.1024 16.9936L12.0006 17.0005C11.6209 17.0005 11.3071 16.7183 11.2575 16.3523L11.2506 16.2505L11.2503 9.56078L8.53094 12.2801C8.26467 12.5464 7.84801 12.5706 7.5544 12.3527L7.47028 12.2801Z</StreamGeometry>
+        <StreamGeometry x:Key="icon_pri_utmost">M16.0883 6.41228C16.016 6.31886 15.9377 6.2298 15.8539 6.14569C15.5417 5.83255 15.1606 5.59666 14.741 5.45683L13.3632 5.00939C13.257 4.97196 13.165 4.90253 13.1 4.81068C13.0349 4.71883 13 4.60908 13 4.49656C13 4.38404 13.0349 4.27429 13.1 4.18244C13.165 4.09058 13.257 4.02116 13.3632 3.98372L14.741 3.53628C15.1547 3.39352 15.5299 3.15705 15.837 2.84537C16.1357 2.54224 16.3623 2.17595 16.5 1.77372L16.5114 1.73963L16.9592 0.362894C16.9967 0.256782 17.0662 0.164895 17.1581 0.0998993C17.25 0.0349035 17.3598 0 17.4724 0C17.5851 0 17.6949 0.0349035 17.7868 0.0998993C17.8787 0.164895 17.9482 0.256782 17.9857 0.362894L18.4335 1.73963C18.5727 2.15819 18.8077 2.53853 19.1198 2.85041C19.432 3.1623 19.8126 3.39715 20.2315 3.53628L21.6093 3.98372L21.6368 3.99061C21.743 4.02804 21.835 4.09747 21.9 4.18932C21.9651 4.28117 22 4.39092 22 4.50344C22 4.61596 21.9651 4.72571 21.9 4.81756C21.835 4.90942 21.743 4.97884 21.6368 5.01628L20.259 5.46372C19.8402 5.60285 19.4595 5.8377 19.1474 6.14959C18.8353 6.46147 18.6003 6.84181 18.461 7.26037L18.0132 8.63711C18.0092 8.64855 18.0048 8.65983 18 8.67093C17.9605 8.76273 17.8964 8.84212 17.8144 8.9001C17.7224 8.9651 17.6126 9 17.5 9C17.3874 9 17.2776 8.9651 17.1856 8.9001C17.0937 8.8351 17.0242 8.74322 16.9868 8.63711L16.539 7.26037C16.4378 6.95331 16.2851 6.66664 16.0883 6.41228ZM23.7829 10.2132L23.0175 9.9646C22.7848 9.8873 22.5733 9.75683 22.3999 9.58356C22.2265 9.41029 22.0959 9.199 22.0186 8.96646L21.7698 8.20161C21.749 8.14266 21.7104 8.09161 21.6593 8.0555C21.6083 8.01939 21.5473 8 21.4847 8C21.4221 8 21.3611 8.01939 21.31 8.0555C21.259 8.09161 21.2204 8.14266 21.1996 8.20161L20.9508 8.96646C20.875 9.19736 20.7467 9.40761 20.5761 9.58076C20.4055 9.75392 20.1971 9.88529 19.9672 9.9646L19.2018 10.2132C19.1428 10.234 19.0917 10.2725 19.0555 10.3236C19.0194 10.3746 19 10.4356 19 10.4981C19 10.5606 19.0194 10.6216 19.0555 10.6726C19.0917 10.7236 19.1428 10.7622 19.2018 10.783L19.9672 11.0316C20.2003 11.1093 20.412 11.2403 20.5855 11.4143C20.7589 11.5882 20.8893 11.8003 20.9661 12.0335L21.2149 12.7984C21.2357 12.8573 21.2743 12.9084 21.3254 12.9445C21.3764 12.9806 21.4374 13 21.5 13C21.5626 13 21.6236 12.9806 21.6746 12.9445C21.7257 12.9084 21.7643 12.8573 21.7851 12.7984L22.0339 12.0335C22.1113 11.801 22.2418 11.5897 22.4152 11.4164C22.5886 11.2432 22.8001 11.1127 23.0328 11.0354L23.7982 10.7868C23.8572 10.766 23.9083 10.7275 23.9445 10.6764C23.9806 10.6254 24 10.5644 24 10.5019C24 10.4394 23.9806 10.3784 23.9445 10.3274C23.9083 10.2764 23.8572 10.2378 23.7982 10.217L23.7829 10.2132ZM12 2.00073C12.957 2.00073 13.8827 2.13518 14.7591 2.38621C14.6432 2.4573 14.5193 2.51563 14.39 2.55903L13.05 2.99903C12.4247 3.22211 12.0018 3.80273 12 4.46903C12.002 5.10403 12.4159 5.74618 13 5.99903L14.4 6.45903C14.9164 6.63419 15.4143 7.02503 15.59 7.54903L16 8.99903C16.2128 9.62184 16.8014 10.047 17.46 10.049C17.6963 10.0519 17.9298 9.99699 18.14 9.88903C18.0212 10.0886 17.959 10.3168 17.96 10.549C17.9556 11.0886 18.322 11.5971 18.83 11.779C18.9034 11.8023 18.9865 11.8233 19.0738 11.8454C19.4335 11.9365 19.8642 12.0456 19.98 12.399L19.9943 12.4444C20.2303 13.1929 20.5003 14.0495 21.46 14.0495C21.5839 14.0495 21.6961 14.0353 21.7983 14.009C20.8685 18.5694 16.835 22.0007 12 22.0007C6.47715 22.0007 2 17.5236 2 12.0007C2 6.47788 6.47715 2.00073 12 2.00073ZM7.4693 12.2808L7.55342 12.3535C7.84703 12.5713 8.2637 12.5471 8.52996 12.2808L11.2493 9.56152L11.2496 16.2512L11.2565 16.353C11.3061 16.7191 11.6199 17.0012 11.9996 17.0012L12.1014 16.9944C12.4675 16.9447 12.7496 16.6309 12.7496 16.2512L12.7493 9.55952L15.47 12.2814L15.5541 12.3541C15.8477 12.572 16.2644 12.5479 16.5307 12.2817C16.8236 11.9888 16.8237 11.5139 16.5309 11.221L12.5309 7.21947L12.4468 7.14682C12.1532 6.92889 11.7364 6.95306 11.4701 7.21936L7.4693 11.2202L7.39669 11.3043C7.17883 11.5979 7.20304 12.0146 7.4693 12.2808Z</StreamGeometry>
+    
+        <convert:NonNullPropertyConverter x:Key="ModExistsAndValid"/>
+        <convert:PropertyIsEqualConverter x:Key="CheckIfEqual"/>
+        <convert:PropertyNotEqualConverter x:Key="CheckIfNotEqual"/>
+    </Window.Resources>
+
+    <Window.KeyBindings>
+        <KeyBinding Command="{Binding InstallCommand}" Gesture="Ctrl+N"/>
+        <KeyBinding Command="{Binding LaunchCatalogCommand}" Gesture="Ctrl+M"/>
+        <KeyBinding Command="{Binding OpenFolderCommand}" Gesture="Ctrl+O"/>
+        <KeyBinding Command="{Binding RemoveCommand}" Gesture="Delete"/>
+        <KeyBinding Command="{Binding MoveUpCommand}" Gesture="PageUp"/>
+        <KeyBinding Command="{Binding MoveDownCommand}" Gesture="PageDown"/>
+        <KeyBinding Command="{Binding MoveUtmostCommand}" Gesture="Home"/>
+        <KeyBinding Command="{Binding RunCommand}" Gesture="F5"/>
+        <KeyBinding Command="{Binding BuildCommand}" Gesture="Ctrl+B"/>
+        <KeyBinding Command="{Binding BuildRunCommand}" Gesture="Ctrl+F5"/>
+        <KeyBinding Command="{Binding LaunchSetupCommand}" Gesture="Alt+S"/>
+        <KeyBinding Command="{Binding PromptArgumentsCommand}" Gesture="Alt+A"/>
+        <KeyBinding Command="{Binding InstallPanaceaCommand}" Gesture="Alt+P"/>
+        <KeyBinding Command="{Binding InstallBackendCommand}" Gesture="Alt+L"/>
+    </Window.KeyBindings>
+
+    <DockPanel>
+        <Grid DockPanel.Dock="Top" Margin="5">
+            <Menu>
+                <MenuItem Header="Mods">
+                    <MenuItem Header="Install a New Mod..." Command="{Binding InstallCommand}" InputGesture="Ctrl+N"/>
+                    <MenuItem Header="Open Online Catalog..." Command="{Binding LaunchCatalogCommand}" InputGesture="Ctrl+M"/>
+                    <Separator/>
+                    <MenuItem Header="Open Folder..." Command="{Binding OpenFolderCommand}" InputGesture="Ctrl+O" IsEnabled="{Binding CurrentMod, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    <MenuItem Header="Remove..." Command="{Binding RemoveCommand}" InputGesture="Delete" IsEnabled="{Binding CurrentMod, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    <MenuItem Header="Move Up" Command="{Binding MoveUpCommand}" InputGesture="PageUp" IsEnabled="{Binding CurrentMod, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    <MenuItem Header="Move Down" Command="{Binding MoveDownCommand}"  InputGesture="PageDown" IsEnabled="{Binding CurrentMod, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    <MenuItem Header="Move Highest" Command="{Binding MoveUtmostCommand}"  InputGesture="Home" IsEnabled="{Binding CurrentMod, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    <Separator/>
+                    <MenuItem Header="Exit" InputGesture="F4"/>
+                </MenuItem>
+                <MenuItem Header="Build">
+                    <MenuItem Header="Run..." Command="{Binding RunCommand}" InputGesture="F5"/>
+                    <MenuItem Header="Build..." Command="{Binding BuildCommand}" InputGesture="Ctrl+B" IsEnabled="{ReflectionBinding HasModsInstalled}"/>
+                    <MenuItem Header="Build and Run..." Command="{Binding BuildRunCommand}" InputGesture="Ctrl+F5" IsEnabled="{ReflectionBinding HasModsInstalled}"/>
+                    <Separator/>
+                    <MenuItem Header="Restore..." Command="{Binding RestoreCommand}" InputGesture="Ctrl+R"/>
+                </MenuItem>
+                <MenuItem Header="Settings"> 
+                    <MenuItem Header="Run the Setup Wizard..." Command="{Binding LaunchSetupCommand}" InputGesture="Alt+S"/>
+                    <MenuItem Header="Setup Launch Arguments..." Command="{Binding PromptArgumentsCommand}" InputGesture="Alt+A">
+                        <MenuItem.IsEnabled>
+                            <MultiBinding Converter="{StaticResource CheckIfEqual}">
+                                <Binding Path="CurrentConfig.Frontend.TargetPlatform" FallbackValue=""/>
+                                <Binding Source="{x:Static class:Platform.STEAM}" FallbackValue="" />
+                            </MultiBinding>
+                        </MenuItem.IsEnabled>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="Re/Install Panacea" InputGesture="Alt+P" Command="{Binding InstallPanaceaCommand}"> 
+                        <MenuItem.IsEnabled>
+                            <MultiBinding Converter="{StaticResource CheckIfNotEqual}">
+                                <Binding Path="CurrentConfig.Frontend.TargetPlatform" />
+                                <Binding Source="{x:Static class:Platform.PCSX2}" />
+                            </MultiBinding>
+                        </MenuItem.IsEnabled>
+                    </MenuItem>
+                    <MenuItem Header="Re/Install LuaBackend" InputGesture="Alt+L" Command="{Binding InstallBackendCommand}">
+                        <MenuItem.IsEnabled>
+                            <MultiBinding Converter="{StaticResource CheckIfNotEqual}">
+                                <Binding Path="CurrentConfig.Frontend.TargetPlatform" />
+                                <Binding Source="{x:Static class:Platform.PCSX2}" />
+                            </MultiBinding>
+                        </MenuItem.IsEnabled>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Profiles" ItemsSource="{Binding PresetMenu}">
+                </MenuItem>
+                <MenuItem Header="Info"/>
+            </Menu>
+            
+            <ComboBox Name="GameBox" Margin="0,0,10,0" Width="200" HorizontalAlignment="Right" SelectedIndex="{ReflectionBinding CurrentConfig.Frontend.TargetGame}" SelectionChanged="OnTargetGameChanged">
+                <ComboBoxItem Content="Kingdom Hearts"/>
+                <ComboBoxItem Content="Kingdom Hearts II"/>
+                <ComboBoxItem Content="Re:Chain of Memories"/>
+                <ComboBoxItem Content="Birth by Sleep"/>
+                <ComboBoxItem Content="Dream Drop Distance"/>
+            </ComboBox>
+        </Grid>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="0.07*"/>
+            </Grid.RowDefinitions>
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.25*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="0.07*"/>
+                    </Grid.RowDefinitions>
+
+                    <GroupBox Margin="5" Grid.Row="0" Header="Installed Mods">
+                        <view:ModListView Name="ModList" ModToggled="{Binding ToggleCommand}"/>
+                    </GroupBox>
+
+                    <StackPanel Grid.Row="1" Spacing="5" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
+                        <Button Background="Transparent" Command="{Binding InstallCommand}" ToolTip.Tip="Install Mod...">
+                            <PathIcon Data="{StaticResource icon_add_mod}" Height="24" Width="24"/>
+                        </Button>
+                        <Button Background="Transparent" Command="{Binding RemoveCommand}" ToolTip.Tip="Remove Mod..." IsEnabled="{Binding CurrentMod, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <PathIcon Data="{StaticResource icon_remove_mod}" Height="24" Width="24"/>
+                        </Button>
+                        <Separator Margin="5" Width="1" Height="NaN" VerticalAlignment="Stretch" IsEnabled="{Binding CurrentMod, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                        <Button Background="Transparent" ToolTip.Tip="Move Highest" Command="{Binding MoveUtmostCommand}" >
+                            <Button.IsEnabled>
+                                <MultiBinding Converter="{StaticResource ModExistsAndValid}">
+                                    <Binding Path="CurrentMod"/>
+                                    <Binding Path="CurrentMod.ModValid"/>
+                                </MultiBinding>
+                            </Button.IsEnabled>
+                            <PathIcon Data="{StaticResource icon_pri_utmost}" Height="24" Width="24"/>
+                        </Button>
+                        <Button Background="Transparent" ToolTip.Tip="Move Up" Command="{Binding MoveUpCommand}" >
+                            <Button.IsEnabled>
+                                <MultiBinding Converter="{StaticResource ModExistsAndValid}">
+                                    <Binding Path="CurrentMod"/>
+                                    <Binding Path="CurrentMod.ModValid"/>
+                                </MultiBinding>
+                            </Button.IsEnabled>
+                            <PathIcon Data="{StaticResource icon_pri_up}" Height="24" Width="24"/>
+                        </Button>
+                        <Button Background="Transparent" ToolTip.Tip="Move Down" Command="{Binding MoveDownCommand}" >
+                            <Button.IsEnabled>
+                                <MultiBinding Converter="{StaticResource ModExistsAndValid}">
+                                    <Binding Path="CurrentMod"/>
+                                    <Binding Path="CurrentMod.ModValid"/>
+                                </MultiBinding>
+                            </Button.IsEnabled>
+                            <PathIcon Data="{StaticResource icon_pri_down}" Height="24" Width="24"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <GroupBox Margin="5" Grid.Column="1" Header="Mod Properties">
+                    <view:ModDetailsView Name="ModDetails" DataContext="{ReflectionBinding CurrentMod}" IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                </GroupBox>
+            </Grid>
+
+            <view:ModStatusView Name="ModStatus" RunRequested="{Binding RunCommand}" BuildRunRequested="{Binding BuildRunCommand}" SetupRequested="{Binding LaunchSetupCommand}" Grid.Row="1"/>
+
+        </Grid>
+    </DockPanel>
+
+</Window>

@@ -1,0 +1,38 @@
+<ContentPage xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="490"
+             Width="500" Height="490"
+             x:Class="OpenKh.Tools.ModManager.Wizard.WizardScriptSetup">
+
+    <StackPanel Margin="10">
+        <TextBlock FontWeight="Bold" Text="Install LuaBackend [Optional]"/>
+        <TextBlock Text="Install the backend to allow Lua scripts to work." />
+
+        <Separator Margin="-10, 10, -10, 10" Grid.Row="2" />
+
+        <TextBlock TextWrapping="Wrap" Margin="0, 0, 0, 5">
+            LuaBackend allows Lua scripts written for the games to run. While its
+            installation is completely optional, it should be noted that any mod that 
+            requires Lua scripts to work, such as the Garden of Assemblage Randomizer, <Bold>will NOT work without it!</Bold>
+        </TextBlock>
+
+        <StackPanel Name="NotInstallPanel">
+        <TextBlock TextWrapping="Wrap" Margin="0, 5, 0, 5">
+            It seems that LuaBackend is <Bold>not currently installed</Bold>.
+        </TextBlock>
+            <Button Margin="0, 5, 0, 5" Height="30" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnInstallClick" Content="Install LuaBackend" />
+        </StackPanel>
+
+        <StackPanel Name="InstallPanel" IsVisible="False">
+        <TextBlock TextWrapping="Wrap" Margin="0, 5, 0, 5">
+            It seems that LuaBackend is <Bold>currently installed</Bold>.
+        </TextBlock>
+            <Button Margin="0, 5, 0, 5" Height="30" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnUninstallClick" Content="Uninstall LuaBackend" />
+        </StackPanel>
+        <TextBlock TextWrapping="Wrap" Margin="0, 5, 0, 5">
+            Installation will be done for all games within detected collections.
+        </TextBlock>
+    </StackPanel>
+</ContentPage>

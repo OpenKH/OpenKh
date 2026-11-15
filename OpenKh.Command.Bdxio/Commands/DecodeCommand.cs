@@ -1,6 +1,6 @@
 using McMaster.Extensions.CommandLineUtils;
 using NLog;
-using OpenKh.Command.Bdxio.Utils;
+using OpenKh.Kh2.Bdx.Utils;
 using System.ComponentModel.DataAnnotations;
 
 namespace OpenKh.Command.Bdxio.Commands
