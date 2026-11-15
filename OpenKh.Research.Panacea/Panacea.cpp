@@ -806,6 +806,89 @@ bool sortRemasteredFiles(const Axa::RemasteredEntry& a, const Axa::RemasteredEnt
     return false;
 }
 
+struct Kh1PsTables
+{
+    const unsigned short (*western)[2] = nullptr;
+    const unsigned short (*other)[2] = nullptr;
+    const unsigned short (*const* active)[2] = nullptr;
+};
+static const Kh1PsTables& Kh1FindPsTables()
+{
+    static Kh1PsTables t;
+    static bool searched = false;
+    if (searched)
+        return t;
+    searched = true;
+    const auto* base = (const unsigned char*)GetModuleHandleW(nullptr);
+    const auto* nt = (const IMAGE_NT_HEADERS*)(base + ((const IMAGE_DOS_HEADER*)base)->e_lfanew);
+    const unsigned char* end = base + nt->OptionalHeader.SizeOfImage;
+    auto inImage = [&](const void* p, size_t n) { return (const unsigned char*)p >= base && (const unsigned char*)p + n <= end; };
+    auto rel = [](const unsigned char* at, int next) { return at + next + *(const int*)(at + next - 4); };
+    static const unsigned char pat[] = { 0x8B, 0x88, 0x74, 0x02, 0x00, 0x00, 0x85, 0xC9, 0x74, 0x00, 0x83, 0xF9, 0x07,
+        0x48, 0x8D, 0x05, 0, 0, 0, 0, 0x75, 0x00, 0x48, 0x8D, 0x05, 0, 0, 0, 0, 0x48, 0x89, 0x05 };
+    static const char mask[] = "xxxxxxxxx?xxxxxx????x?xxx????xxx";
+    static const unsigned short westernStart[] = { 128, 128, 128, 256, 64, 128, 64, 256 };
+    static const unsigned short otherStart[] = { 56, 104, 128, 256, 128, 128, 64, 128 };
+    const auto* sec = IMAGE_FIRST_SECTION(nt);
+    for (int s = 0; s < nt->FileHeader.NumberOfSections; s++, sec++)
+    {
+        if (!(sec->Characteristics & IMAGE_SCN_CNT_CODE))
+            continue;
+        const unsigned char* p = base + sec->VirtualAddress;
+        const unsigned char* last = p + sec->Misc.VirtualSize - (sizeof(pat) + 4);
+        for (; p < last; p++)
+        {
+            size_t i = 0;
+            while (i < sizeof(pat) && (mask[i] == '?' || p[i] == pat[i]))
+                i++;
+            if (i != sizeof(pat))
+                continue;
+            const auto* western = (const unsigned short (*)[2])rel(p, 20);
+            const auto* other = (const unsigned short (*)[2])rel(p, 29);
+            const auto* active = (const unsigned short (*const*)[2])rel(p, 36);
+            if (!inImage(western, 240 * 4) || !inImage(other, 240 * 4) || !inImage(active, 8)
+                || memcmp(western, westernStart, sizeof(westernStart)) || memcmp(other, otherStart, sizeof(otherStart)))
+                continue;
+            t.western = western;
+            t.other = other;
+            t.active = active;
+            return t;
+        }
+    }
+    return t;
+}
+static const unsigned short (*Kh1PsSizes())[2]
+{
+    const Kh1PsTables& t = Kh1FindPsTables();
+    if (!t.western)
+        return nullptr;
+    const auto* active = *t.active;
+    if (active == t.western || active == t.other)
+        return active;
+    return t.western;
+}
+
+static int Kh1PsSizeIndex(const wchar_t* ddsPath)
+{
+    const unsigned short (*tab)[2] = Kh1PsSizes();
+    if (!tab)
+        return -1;
+    FILE* f = nullptr;
+    if (_wfopen_s(&f, ddsPath, L"rb") || !f)
+        return -1;
+    unsigned int hdr[5]{};
+    const size_t n = fread(hdr, 4, 5, f);
+    fclose(f);
+    if (n != 5 || hdr[0] != 0x20534444u)
+        return -1;
+    const unsigned int h = hdr[3], w = hdr[4];
+    for (unsigned int scale : { 4u, 2u, 8u, 1u })
+        for (int i = 0; i < 240; i++)
+            if (tab[i][0] && tab[i][1] && tab[i][0] * scale == h && tab[i][1] * scale == w)
+                return i;
+    return -1;
+}
+
 void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remasteredFolder, std::vector<Axa::RemasteredEntry>& entries)
 {
     std::vector<int> assetoffs{};
@@ -893,11 +976,23 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
         for (auto m : modfiles)
         {
             bool replaced = false;
+            int sizeIndex = -1;
+            {
+                const char* ext = strrchr(m.name, '.');
+                if (ext && !_stricmp(ext, ".dds"))
+                {
+                    wchar_t ddsPath[MAX_PATH];
+                    swprintf_s(ddsPath, L"%ls\\%hs", remasteredFolder, m.name);
+                    sizeIndex = Kh1PsSizeIndex(ddsPath);
+                }
+            }
             for (auto& e : merged)
                 if (!_stricmp(e.name, m.name))
                 {
                     e.decompressedSize = m.decompressedSize;
                     e.compressedSize = -2;
+                    if (sizeIndex >= 0 && e.origOffset != -1)
+                        e.origOffset = (e.origOffset & 0x00FFFFFF) | (sizeIndex << 24);
                     replaced = true;
                     break;
                 }
@@ -907,14 +1002,14 @@ void ScanRemasteredFolder(const wchar_t* path, void* addr, const wchar_t*  remas
             if (!offsetOfName(m.name, h))
                 continue;
             const char* ext = strrchr(m.name, '.');
-            m.origOffset = (ext && !_stricmp(ext, ".cvbl")) ? -1 : h;
+            m.origOffset = (ext && !_stricmp(ext, ".cvbl")) ? -1 : h | (sizeIndex >= 0 ? sizeIndex << 24 : 0);
             added.push_back(m);
         }
 
         merged.erase(std::remove_if(merged.begin(), merged.end(), [&](const Axa::RemasteredEntry& e)
             {
                 for (const auto& a : added)
-                    if (a.origOffset != -1 && a.origOffset == e.origOffset)
+                    if (a.origOffset != -1 && e.origOffset != -1 && (a.origOffset & 0x00FFFFFF) == (e.origOffset & 0x00FFFFFF))
                         return true;
                 return false;
             }), merged.end());
