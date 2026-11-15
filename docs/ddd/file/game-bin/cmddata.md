@@ -1,18 +1,24 @@
 # [Kingdom Hearts Dream Drop Distance](../index.md) - cmddata
 
-Location: /game/bin/
+Location: `/game/bin/`
 
 Contains data pertaining to command details, including slot cost and reload time. 3DS and PC files are agnostic. The PC version includes an EOF line. 
 
-Click a link below to jump to a specific section.
-- [File Structure](#File-Structure)
-- [Entry Structure](#Entry-Structure)
-- [Glossary](#Glossary)
-- [Entries](#Entries)
-	- [Action](#Action)
-	- [Flowmotion](#Flowmotion)
-	- [Battle](#Battle)
-	- [Support](#Support)
+Click a link below to jump to a specific section. Please note not all sections have been fully identified.
+- [File Structure](#file-structure)
+- [Entry Structure](#entry-structure)
+- [Glossary](#glossary)
+- [Entries](#entries)
+	- [Action](#action)
+	- [Flowmotion](#flowmotion)
+	- [Battle](#battle)
+	- [Support](#support)
+	- [Spirit Links](#spirit-links)
+	- [Reality Shift](#reality-shift)
+	- [Unknown 1](#placeholder1)
+	- [Unknown 2](#placeholder2)
+	- [Unknown 3](#placeholder3)
+	- [Unknown 4](#placeholder4)
 
 ## File Structure
 
@@ -48,7 +54,7 @@ Effects are not entirely known, and its value may be used contextually in-game. 
 
 ## Glossary
 
-This section breaks down what each value means for categories, types, and elements. 
+This section breaks down what each value means for categories, types, and elements. Further research is required.
 
 ### Categories
 
@@ -277,7 +283,7 @@ Below have not yet been fully identified. It is possible these are correlated wi
 | 00                 | 00             | 0              | 00                | FF           |               |                    |                     | 00                    |                 |                    |                    |                    |                    |
 | 04                 | 0D             | 0              | 00                | FF           |               |                    |                     | 00                    |                 |                    |                    |                    |                    |
 
-### Spirit Links/Styles
+### Spirit Links
 
 Below have not yet been fully identified. It is possible these are correlated with Spirit Links & Styles (including duplicates).
 
@@ -367,7 +373,7 @@ Below have not yet been fully identified. These may be correlated with Reality S
 | 06                 | 19             | 0              | 06                | 08           | 008           |                    |                     | 05                    | 0D              | 05                 | 14                 | 64                 |                    |
 | 06                 | 19             | 0              | 08                | 09           | 009           |                    |                     | 0D                    | 0D              | 08                 |                    |                    |                    |
 
-### Placeholder
+### Placeholder1
 
 Below are not yet identified.
 
@@ -384,7 +390,7 @@ Below are not yet identified.
 | 07                 | 0A             | 0              | 08                | 0B           | 011           |                    |                     |                       | 0E              |                    |                    |                    |                    |
 | 07                 | 0A             | 0              | 08                | FF           |               |                    |                     |                       | 0E              |                    |                    |                    |                    |
 
-### Placeholder
+### Placeholder2
 
 Below are not yet identified.
 
@@ -436,7 +442,7 @@ Below are not yet identified.
 | 09                 | 15             | 0              | 00                | 2B           | 043           |                    | 0                   |                       | 0F              | 01                 |                    |                    |                    |
 | 09                 | 0B             | 0              | 00                | FF           | 255           |                    | 0                   |                       | 0F              |                    |                    |                    |                    |
 
-### Placeholder
+### Placeholder3
 
 Below are not yet identified.
 
@@ -460,7 +466,7 @@ Below are not yet identified.
 | 08                 | 18             | 0              | 00                | 0F           | 015           |                    |                     |                       | 0F              | 4B                 |                    | 64                 | 78                 |
 | 08                 | 0B             | 0              | 00                | FF           |               |                    |                     |                       | 0F              |                    |                    |                    |                    |
 
-### Placeholder
+### Placeholder4
 
 Below are not yet identified.
 
