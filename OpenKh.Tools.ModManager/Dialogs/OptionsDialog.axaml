@@ -1,0 +1,15 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" x:Class="OpenKh.Tools.ModManager.Dialogs.OptionsDialog"
+        Title="Some Input Title" SizeToContent="WidthAndHeight" CanResize="False" Name="Root" WindowStartupLocation="CenterOwner">
+    <StackPanel Margin="15" Spacing="10">
+        <TextBlock Name="MainText" TextWrapping="Wrap" Text="This gonn' be the message that the input asks people."/>
+        <ComboBox Name="MainOption" HorizontalAlignment="Stretch"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+            <Button Name="MiscButton" HorizontalContentAlignment="Center" Content="This is an extra button." Click="OnMiscClicked" IsVisible="False"/>
+            <Button Name="AcceptButton" HorizontalContentAlignment="Center" Content="This is the actual button." Click="OnAcceptClicked" HotKey="Enter"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

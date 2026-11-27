@@ -64,10 +64,6 @@ Get-CSProjects "OpenKh.Tools.*" | ForEach-Object {
     dotnet sln $solution add $_
     Test-Success $LASTEXITCODE
 }
-Get-CSProjects "OpenKh.WinShell.*" | ForEach-Object {
-    dotnet sln $solution add $_
-    Test-Success $LASTEXITCODE
-}
 Get-CSProjects "OpenKh.Game*" | ForEach-Object {
     dotnet sln $solution add $_
     Test-Success $LASTEXITCODE

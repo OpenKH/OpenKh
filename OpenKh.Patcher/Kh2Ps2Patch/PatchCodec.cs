@@ -3,21 +3,31 @@ using System;
 namespace OpenKh.Patcher.Kh2Ps2Patch
 {
     /// <summary>
-    /// Encryptor and decryptor codes are taken from https://github.com/GovanifY/KH2FM_Toolkit
     /// 
-    /// KH2FM_Toolkit is programmed by GovanifY https://www.govanify.com https://www.twitter.com/GovanifY
-    /// KH2FM_Toolkit Copyright (c) 2015 Gauvain "GovanifY" Roussel-Tarbouriech
     /// </summary>
     public class PatchCodec
     {
+        /// Attributions:
+        /// 
+        /// The original KH2PATCH format (Noted here as "Legacy") has been devised by Xeeynamo.
+        /// The new KH2PATCH format (Noted here as "New") is the original format, improved upon by CrazyCatz00.
+        /// 
+        /// Signature for the legacy format is 0x5032484B, for the new format is 0x5132484B.
+        /// 
+        /// The new format can be compatible with the legacy format as long as it adheres to these differences:
+        /// 
+        /// - Legacy format cannot edit OVL.IDX, it also can't edit the ISO direct.
+        /// - Legacy format is unable to add non-existing files.
+        /// - Legacy format patches cannot be decrypted.
+        
         private static readonly byte[] _xTab = Convert.FromBase64String(
             "WAzdWfckf08="
         );
-        private static readonly byte[] _gTab = Convert.FromBase64String(
+        private static readonly byte[] _cTab = Convert.FromBase64String(
             "pBxrgTANI1tcOqfe2/RzWqDCcNEoSKpyYrWafHwg4MciIHLMJsa8gC14tZXbNyF0BhG1fe+JSNcBp27Qbu58zA=="
         );
 
-        public byte[] ApplyXeeynamosMethod(ReadOnlySpan<byte> input)
+        public byte[] ApplyLegacyFormatMethod(ReadOnlySpan<byte> input)
         {
             var tab = _xTab;
             var length = input.Length;
@@ -29,9 +39,9 @@ namespace OpenKh.Patcher.Kh2Ps2Patch
             return output;
         }
 
-        public byte[] ApplyGovanifYsMethod(ReadOnlySpan<byte> input)
+        public byte[] ApplyNewFormatMethod(ReadOnlySpan<byte> input)
         {
-            var tab = _gTab;
+            var tab = _cTab;
             var length = input.Length;
             var output = new byte[length];
             for (int index = 0; 0 < length; index++)

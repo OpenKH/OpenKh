@@ -1,0 +1,12 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="650" Height="350"
+        x:Class="OpenKh.Tools.ModManager.Views.LogView"
+        Title="Mod Manager - Debug Log" Background="#404040">
+        <ScrollViewer Name="Scroller">
+            <TextBlock Name="Loggers" Background="#404040" FontSize="12" Margin="10" FontFamily="Consolas" Inlines="" ScrollViewer.VerticalScrollBarVisibility="Visible" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            </TextBlock>
+        </ScrollViewer>
+</Window>

@@ -8,12 +8,6 @@ using System.Text;
 
 namespace OpenKh.Patcher.Kh2Ps2Patch
 {
-    /// <summary>
-    /// The patch formats are taken from https://github.com/GovanifY/KH2FM_Toolkit
-    /// 
-    /// KH2FM_Toolkit is programmed by GovanifY https://www.govanify.com https://www.twitter.com/GovanifY
-    /// KH2FM_Toolkit Copyright (c) 2015 Gauvain "GovanifY" Roussel-Tarbouriech
-    /// </summary>
     public class PatchIO
     {
         public bool VerifySignature(Memory<byte> memory)

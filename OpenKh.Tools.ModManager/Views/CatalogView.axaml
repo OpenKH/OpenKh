@@ -1,0 +1,46 @@
+<Window xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:OpenKh.Tools.ModManager.ViewModels"
+             mc:Ignorable="d" Width="850" Height="650"
+             MinWidth="850" MinHeight="650"
+             xmlns:view="clr-namespace:OpenKh.Tools.ModManager.Views"
+             xmlns:convert="using:OpenKh.Tools.ModManager.Converters"
+             x:Class="OpenKh.Tools.ModManager.Views.CatalogView" x:Name="Root" x:DataType="vm:CatalogViewModel"
+             Title="Mod Manager - Online Catalog" WindowStartupLocation="CenterOwner">
+
+    <DockPanel>
+        <Grid DockPanel.Dock="Top" Margin="10, 10, 10, 0">
+            <StackPanel Spacing="5">
+                <TextBox Margin="5" Text="{Binding SearchQuery}" PlaceholderText="Search Mods..." Name="MainSearch" IsEnabled="false"/>
+                <TextBlock Margin="5, 5, 5, -10" HorizontalAlignment="Center"  FontSize="16" TextWrapping="Wrap">
+                    Here are the mods that are available on GitHub for the currently selected game.<LineBreak/>
+                </TextBlock>
+                <Border ClipToBounds="True" Margin="5, -10, 5, 5" Height="30"  CornerRadius="5" Background="#E0900C">
+                    <TextBlock Margin="5" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center"  FontSize="16" TextWrapping="Wrap">
+                        This list is <Bold>not curated</Bold> and as such OpenKH is <Bold>not responsible</Bold> for the mods present here.
+                    </TextBlock>
+                </Border>
+            </StackPanel>
+        </Grid>
+        <Grid Margin="10, 5, 10, 10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.75*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="0.10*"/>
+            </Grid.RowDefinitions>
+
+            <GroupBox Margin="5" Grid.ColumnSpan="2" Header="Mod Catalog">
+                <view:ModWrapView Name="ModList" ModSelectedRequested="{Binding ToggleCommand}"/>
+            </GroupBox>
+
+            <ProgressBar Grid.Row="1" Margin="5" Name="MainProgress" ProgressTextFormat="Fetching Mods from GitHub... Please be patient..." ShowProgressText="True" IsIndeterminate="true" Height="30"/>
+            <Button Name="InstallButton" Command="{Binding InstallCommand}" Grid.Row="1" Margin="25" HorizontalAlignment="Stretch" Grid.Column="1" Height="30" HorizontalContentAlignment="Center" Content="{ReflectionBinding SelectedMods.Count, StringFormat='Install {0} Mods...'}" IsEnabled="{ReflectionBinding SelectedMods.Count}"/>
+        </Grid>
+    </DockPanel>
+</Window>

@@ -1,0 +1,26 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wizard="clr-namespace:OpenKh.Tools.ModManager.Wizard"
+        xmlns:convert="using:OpenKh.Tools.ModManager.Converters"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="575"
+        Width="500" Height="575"
+        x:Class="OpenKh.Tools.ModManager.Views.SetupWizardView"
+        x:Name="Root"
+        Title="OpenKH - Mod Manager | Setup Wizard">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.1*"/>
+        </Grid.RowDefinitions>
+        <ContentControl Grid.Row="0" VerticalAlignment="Top" Content="{ReflectionBinding _rootModel.CurrentWizardPage, ElementName=Root}" />
+        <StackPanel Grid.Row="1" Spacing="5" Margin="10" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Content="Back" Name="BackButton" Click="OnBackPage" HorizontalContentAlignment="Center" Width="80" IsEnabled="false"/>
+            <Button Content="Next" Name="NextButton" Click="OnNextPage" HorizontalContentAlignment="Center" Width="80" IsVisible="{ReflectionBinding !#FinishButton.IsVisible}"/>
+            <Button Content="Cancel" Name="CancelButton" Click="OnSubmitClick" HorizontalContentAlignment="Center" Width="80" Margin="5, 0, 0, 0"/>
+            <Button Content="Finish" Name="FinishButton" Click="OnSubmitClick" HorizontalContentAlignment="Center" IsVisible="False" Width="80" Margin="5, 0, 0, 0"/>
+        </StackPanel>
+    </Grid>
+</Window>
